@@ -54,8 +54,21 @@ for (const route of routes) {
     missing.push(`${route}: esperado exatamente 1 h1, encontrado ${h1Count}`);
   }
 
-  if (/<video[\s>]/i.test(html)) {
-    missing.push(`${route}: vídeo não deve ser usado nesta rodada`);
+  const videoTags = html.match(/<video\b[^>]*>/gi) || [];
+  for (const tag of videoTags) {
+    for (const attr of ["muted", "loop", "playsinline"]) {
+      if (!new RegExp(`\\b${attr}\\b`, "i").test(tag)) {
+        missing.push(`${route}: video sem atributo obrigatorio: ${attr}`);
+      }
+    }
+
+    if (!/\bpreload=["']metadata["']/i.test(tag)) {
+      missing.push(`${route}: video deve usar preload="metadata"`);
+    }
+
+    if (!/\bposter=["'][^"']+["']/i.test(tag)) {
+      missing.push(`${route}: video deve ter poster`);
+    }
   }
 
   for (const href of [
