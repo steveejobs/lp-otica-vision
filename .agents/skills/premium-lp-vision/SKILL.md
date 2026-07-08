@@ -1,5 +1,6 @@
 ---
 name: premium-lp-vision
+description: Use for any planning, copywriting, design, asset selection, implementation, review, or QA work on the Otica Vision Araguaina landing page. Enforce the local project docs as the definition of premium, prevent invented business data, require one section per implementation round, and preserve the beige, polished steel, editorial, clean brand direction.
 ---
 
 # Premium LP Vision
