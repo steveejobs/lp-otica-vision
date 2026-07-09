@@ -69,7 +69,22 @@ Marcas confirmadas pelo material do projeto:
 - Versace
 - Emilio Pucci
 
-Nao foram localizados arquivos individuais de logo dessas marcas na pasta do projeto. Usar chips tipograficos elegantes. Nao buscar logos na internet e nao afirmar autorizacao, estoque, colecao completa, exclusividade ou disponibilidade de todos os modelos.
+### Logos De Marcas Localizados
+
+| Marca | Arquivo | Dimensoes | Uso recomendado |
+| --- | --- | ---: | --- |
+| Ray-Ban | `galeria/marcas/logo-rayban.png` | 1280x1280 | Logo real na secao de marcas. |
+| Carrera | `galeria/marcas/carrera (1).png` | 800x157 | Logo real na secao de marcas. |
+| Persol | `galeria/marcas/persol-logo-png-transparent.png` | 2400x2400 | Logo real na secao de marcas. |
+| Tom Ford | `galeria/marcas/Tom-Ford-logo.png` | 3840x2160 | Logo real na secao de marcas. |
+| Swarovski | `galeria/marcas/Swarovski-Logo-2016.png` | 3840x2160 | Logo real na secao de marcas. |
+| Dolce & Gabbana | `galeria/marcas/images__2_-removebg-preview.png` | 447x447 | Logo real na secao de marcas; arquivo sem nome descritivo, validado visualmente antes do uso. |
+| Jimmy Choo | `galeria/marcas/Jimmy_Choo_Ltd-Logo.wine.png` | 3000x2000 | Logo real na secao de marcas. |
+| Max Mara | `galeria/marcas/Max-Mara-logo.png` | 1280x720 | Logo real na secao de marcas. |
+| Versace | `galeria/marcas/versace-logo.png` | 1280x659 | Logo real na secao de marcas. |
+| Emilio Pucci | `galeria/marcas/Emilio-Pucci-Logo.png` | 1280x720 | Logo real na secao de marcas. |
+
+Todos os logos das marcas confirmadas foram localizados localmente em `galeria/marcas/`. Nao buscar logos na internet e nao afirmar autorizacao, estoque, colecao completa, exclusividade ou disponibilidade de todos os modelos.
 
 ## Descartar Ou Evitar Nesta Fase
 
