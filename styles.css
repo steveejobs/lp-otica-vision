@@ -2429,3 +2429,434 @@ h2 {
     flex-basis: auto;
   }
 }
+
+
+/* Polish profundo da home */
+.intent-strip {
+  width: min(100%, var(--max-page));
+  margin: 0 auto;
+  padding: 0 var(--space-page) clamp(1rem, 2.5vw, 1.6rem);
+}
+
+.intent-strip p {
+  margin: 0;
+  border-block: 1px solid rgba(21, 19, 18, 0.11);
+  padding: 0.78rem 0;
+  color: rgba(21, 19, 18, 0.76);
+  font-size: clamp(0.82rem, 1.8vw, 0.95rem);
+  font-weight: 820;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.editorial-sequence {
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+}
+
+.editorial-sequence-heading {
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+  align-items: end;
+  max-width: none;
+  gap: clamp(1rem, 4vw, 3rem);
+}
+
+.editorial-sequence-heading h2 {
+  max-width: 14ch;
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+}
+
+.editorial-sequence-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, 0.72fr));
+  grid-template-rows: repeat(2, minmax(210px, 1fr));
+  gap: 0.85rem;
+}
+
+.editorial-sequence-grid figure {
+  position: relative;
+  min-height: 260px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: var(--vision-radius);
+  background: rgba(217, 221, 225, 0.34);
+  box-shadow: 0 18px 42px rgba(21, 19, 18, 0.08);
+}
+
+.editorial-sequence-main {
+  grid-row: 1 / -1;
+}
+
+.editorial-sequence-grid figure:nth-child(4) {
+  grid-column: 2 / -1;
+}
+
+.editorial-sequence-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 34%;
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.editorial-sequence-grid figure:hover img {
+  transform: scale(1.035);
+}
+
+.news-section {
+  width: 100%;
+  max-width: none;
+  border-block: 1px solid rgba(21, 19, 18, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0)),
+    rgba(235, 224, 209, 0.72);
+}
+
+.news-shell {
+  display: grid;
+  width: min(100%, var(--max-page));
+  margin: 0 auto;
+  grid-template-columns: minmax(260px, 0.62fr) minmax(0, 1.38fr);
+  gap: clamp(1.2rem, 4vw, 3rem);
+  padding-inline: var(--space-page);
+}
+
+.news-copy {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.news-copy h2 {
+  max-width: 12ch;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.news-copy p:not(.eyebrow) {
+  max-width: 28ch;
+  margin: 0;
+  color: var(--vision-muted);
+  font-size: clamp(1rem, 1.8vw, 1.1rem);
+  font-weight: 560;
+  line-height: 1.5;
+}
+
+.news-copy .button {
+  margin-top: auto;
+}
+
+.news-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: 0.8rem;
+}
+
+.news-card {
+  min-height: 138px;
+  border: 1px solid rgba(174, 182, 189, 0.52);
+  border-radius: var(--vision-radius);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(239, 229, 216, 0.46)),
+    rgba(244, 238, 230, 0.68);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62), 0 14px 34px rgba(21, 19, 18, 0.06);
+}
+
+.news-card-feature {
+  grid-row: span 3;
+  min-height: 100%;
+}
+
+.news-card a {
+  display: flex;
+  min-height: inherit;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.news-card span {
+  color: rgba(21, 19, 18, 0.64);
+  font-size: 0.78rem;
+  font-weight: 860;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.news-card h3 {
+  margin: 0;
+  color: var(--vision-ink);
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  font-weight: 820;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.news-card-feature h3 {
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.05;
+}
+
+.news-card p {
+  margin: 0;
+  color: var(--vision-muted);
+  font-size: 0.86rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+@media (min-width: 900px) {
+  .site-header {
+    padding-top: 0.5rem;
+  }
+
+  .header-shell {
+    min-height: 54px;
+    padding-block: 0.34rem;
+  }
+
+  .brand-link {
+    width: clamp(96px, 10vw, 128px);
+  }
+
+  .hero {
+    min-height: calc(100vh - 62px);
+    grid-template-columns: minmax(0, 0.92fr) minmax(390px, 0.76fr);
+    gap: clamp(2rem, 6vw, 4.5rem);
+    padding-top: clamp(1.2rem, 3vw, 2.6rem);
+    padding-bottom: clamp(1.2rem, 3vw, 2.2rem);
+  }
+
+  .hero-copy {
+    min-height: 0;
+  }
+
+  .hero-media img {
+    max-height: min(72vh, 650px);
+  }
+
+  .guided-compact {
+    padding-top: clamp(1.35rem, 2.5vw, 2.1rem);
+    padding-bottom: clamp(1.35rem, 2.5vw, 2.1rem);
+  }
+
+  .section {
+    padding-top: clamp(3.4rem, 6vw, 5rem);
+    padding-bottom: clamp(3.4rem, 6vw, 5rem);
+  }
+
+  .close-look-section {
+    min-height: 138vh;
+    padding-top: clamp(2rem, 4vw, 3rem);
+    padding-bottom: clamp(2rem, 4vw, 3rem);
+  }
+
+  .close-look-stage {
+    top: 104px;
+    height: min(66vh, 620px);
+  }
+
+  .close-look-section h2 {
+    top: 70px;
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+  }
+
+  .close-look-main {
+    width: min(36vw, 500px);
+    height: min(56vh, 560px);
+  }
+
+  .video-section {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.46fr) minmax(0, 1fr);
+    align-items: end;
+    gap: clamp(1.2rem, 4vw, 3rem);
+  }
+
+  .video-section .section-heading {
+    margin-bottom: 0;
+  }
+
+  .video-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.82fr);
+    align-items: stretch;
+  }
+
+  .video-feature video {
+    aspect-ratio: 16 / 10.2;
+  }
+
+  .video-card:not(.video-feature) video {
+    aspect-ratio: 16 / 10;
+  }
+
+  .brands-section {
+    width: min(100%, var(--max-page));
+    max-width: var(--max-page);
+    display: grid;
+    grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
+    align-items: center;
+    gap: clamp(1.2rem, 4vw, 3rem);
+    padding-top: clamp(3.2rem, 5vw, 4.5rem);
+    padding-bottom: clamp(3.2rem, 5vw, 4.5rem);
+  }
+
+  .brands-section .section-heading {
+    display: block;
+    margin-bottom: 0.9rem;
+  }
+
+  .brands-section .section-heading h2 {
+    max-width: 14ch;
+    font-size: clamp(1.85rem, 3.2vw, 3rem);
+    line-height: 1.04;
+  }
+
+  .brands-section .section-heading p:not(.eyebrow),
+  .brands-support {
+    max-width: 34ch;
+  }
+
+  .brand-marquee {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    align-self: center;
+  }
+
+  .brands-note {
+    margin-top: 1.1rem;
+  }
+
+  .lab-section {
+    padding-block: clamp(3.4rem, 6vw, 4.8rem);
+  }
+
+  .location-section {
+    padding-block: clamp(3rem, 5vw, 4.2rem);
+  }
+}
+
+@media (max-width: 899px) {
+  .news-shell,
+  .video-section,
+  .editorial-sequence-heading {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .news-layout,
+  .editorial-sequence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .news-card-feature,
+  .editorial-sequence-main,
+  .editorial-sequence-grid figure:nth-child(4) {
+    grid-row: auto;
+    grid-column: auto;
+  }
+
+  .editorial-sequence-grid figure {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 700px) {
+  .intent-strip {
+    padding-bottom: 0.8rem;
+  }
+
+  .intent-strip p {
+    text-align: left;
+  }
+
+  .news-section {
+    padding-inline: 0;
+  }
+
+  .news-shell {
+    padding-inline: var(--space-page);
+  }
+
+  .news-copy .button {
+    width: 100%;
+  }
+
+  .news-layout {
+    gap: 0.65rem;
+  }
+
+  .news-card,
+  .news-card-feature {
+    min-height: 148px;
+  }
+
+  .editorial-sequence-grid figure {
+    min-height: 280px;
+  }
+
+  .editorial-sequence-grid figure:not(.editorial-sequence-main) {
+    min-height: 210px;
+  }
+}
+
+/* Ajuste de proporcao da sequencia editorial */
+.editorial-sequence-grid {
+  grid-template-rows: repeat(2, clamp(220px, 21vw, 300px));
+}
+
+.editorial-sequence-grid figure {
+  min-height: 0;
+  height: 100%;
+}
+
+.editorial-sequence-grid img {
+  position: absolute;
+  inset: 0;
+}
+
+@media (max-width: 899px) {
+  .editorial-sequence-grid {
+    grid-template-rows: none;
+  }
+
+  .editorial-sequence-grid figure {
+    height: clamp(210px, 62vw, 280px);
+    min-height: 0;
+  }
+
+  .editorial-sequence-main {
+    height: clamp(330px, 108vw, 430px);
+  }
+}
+
+/* Compactacao da dobra inicial em desktop */
+@media (min-width: 900px) {
+  .site-header {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .header-shell {
+    min-height: 48px;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-top: clamp(1.8rem, 3.2vw, 3rem);
+    padding-bottom: clamp(2rem, 4vw, 3.8rem);
+  }
+
+  .hero-media img {
+    max-height: min(64vh, 580px);
+  }
+
+  .guided-compact {
+    padding-top: clamp(1.15rem, 2vw, 1.55rem);
+    padding-bottom: clamp(1.15rem, 2vw, 1.55rem);
+  }
+}
