@@ -1,0 +1,15 @@
+# Originals and project documentation are not runtime inputs.
+galeria/
+docs/
+.agents/
+.codex/
+AGENTS.md
+
+# Local build and QA output.
+.tmp/
+.next/
+out/
+dist/
+playwright-report/
+test-results/
+*.log
