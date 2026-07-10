@@ -6705,3 +6705,115 @@ h2,
   position: relative;
   z-index: 1;
 }
+/* Fallback real e troca estavel das cenas editoriais */
+.model-story.vision .story-media { --scene-fallback-image: url("galeria/6%20(1).jpg"); }
+.model-story.presence .story-media { --scene-fallback-image: url("galeria/1%20(1).jpg"); }
+.model-story.impact .story-media { --scene-fallback-image: url("galeria/2%20(1).jpg"); }
+.model-story.neutral .story-media { --scene-fallback-image: url("galeria/3%20(1).jpg"); }
+.model-story.proportion .story-media { --scene-fallback-image: url("galeria/7%20(1).jpg"); }
+.model-story.details .story-media { --scene-fallback-image: url("galeria/8%20(1).jpg"); }
+.model-story.real .story-media { --scene-fallback-image: url("galeria/5%20(1).jpg"); }
+.model-story.attitude .story-media { --scene-fallback-image: url("galeria/4%20(1).jpg"); }
+
+.model-story .story-media {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--vision-bg-soft, #f4eee6) !important;
+}
+
+.model-story .story-media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--scene-fallback-image);
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px);
+  opacity: 0.2;
+  transform: scale(1.08);
+  pointer-events: none;
+}
+
+.model-story .story-media figure {
+  position: relative;
+  z-index: 1;
+  background-color: transparent !important;
+}
+
+.story-fade .story-media figure,
+.story-feature .story-media figure,
+.story-side .story-media figure {
+  animation-duration: 0s;
+}
+
+.story-fade .story-media figure {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: none !important;
+}
+
+.story-fade .story-media figure:first-child {
+  z-index: 1;
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+.story-fade .story-media figure:nth-child(n + 2) {
+  z-index: 2;
+  opacity: 0;
+  animation: visionSceneOverlayFade 7.6s ease-in-out infinite !important;
+}
+
+.story-fade .story-media figure:nth-child(2) {
+  animation-delay: 0s !important;
+}
+
+.story-fade .story-media figure:nth-child(3) {
+  animation-delay: 3.8s !important;
+}
+
+.story-fade .story-media img,
+.story-feature .story-media img,
+.story-side .story-media img {
+  animation: visionSceneScaleSafe 4s ease-in-out infinite alternate !important;
+}
+
+.story-split .story-media figure,
+.story-cards .story-media figure,
+.story-side .story-media figure,
+.story-feature .story-media figure,
+.story-rail .story-media figure {
+  opacity: 1 !important;
+}
+
+@keyframes visionSceneOverlayFade {
+  0%, 18% { opacity: 0; transform: scale(1); }
+  26%, 58% { opacity: 1; transform: scale(1.018); }
+  66%, 100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes visionSceneScaleSafe {
+  from { transform: scale(1); }
+  to { transform: scale(1.025); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-fade .story-media figure {
+    animation: none !important;
+    opacity: 0 !important;
+    transform: none !important;
+  }
+
+  .story-fade .story-media figure:first-child {
+    opacity: 1 !important;
+  }
+
+  .story-fade .story-media img,
+  .story-feature .story-media img,
+  .story-side .story-media img {
+    animation: none !important;
+    transform: none !important;
+  }
+}
