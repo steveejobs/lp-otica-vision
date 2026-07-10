@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --vision-bg: #b19475;
   --vision-bg-soft: #f4eee6;
   --vision-ink: #151312;
@@ -6261,3 +6261,111 @@ h2,
   min-height: 0 !important;
   aspect-ratio: 16 / 10 !important;
 }
+
+
+/* Ajuste focado do /instagram: video principal e rail de videos */
+.bio-page .bio-shell-dynamic {
+  width: min(100%, 520px);
+}
+
+.bio-page .bio-hero-media {
+  width: 100%;
+  margin: 0.85rem auto 0.78rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.46);
+  box-shadow: 0 18px 42px rgba(25, 22, 20, 0.1);
+}
+
+.bio-page .bio-hero-media video.bio-video-lowered {
+  display: block;
+  width: 100%;
+  height: clamp(390px, 56vh, 520px);
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: center 76%;
+  transform: translateY(12%) scale(1.04);
+  transform-origin: center center;
+}
+
+.bio-video-rail {
+  display: flex;
+  gap: 0.62rem;
+  margin: 0.78rem calc(var(--space-page) * -0.55) 0.9rem;
+  padding: 0 calc(var(--space-page) * 0.55) 0.18rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bio-video-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.bio-mini-video {
+  display: block;
+  flex: 0 0 clamp(132px, 42vw, 180px);
+  width: clamp(132px, 42vw, 180px);
+  height: clamp(202px, 58vw, 258px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 10px;
+  background: rgba(255, 252, 247, 0.5);
+  box-shadow: 0 12px 26px rgba(25, 22, 20, 0.07);
+  object-fit: cover;
+  object-position: center 74%;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 760px) {
+  .bio-video-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  .bio-mini-video {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+@media (max-width: 430px) {
+  .bio-page .bio-shell-dynamic {
+    padding-inline: 0.68rem;
+  }
+
+  .bio-page .bio-hero-media video.bio-video-lowered {
+    height: clamp(360px, 55vh, 460px);
+    object-position: center 76%;
+    transform: translateY(12%) scale(1.045);
+  }
+}
+
+@media (max-width: 370px) {
+  .bio-page .bio-hero-media video.bio-video-lowered {
+    height: 382px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bio-page .bio-hero-media video.bio-video-lowered,
+  .bio-mini-video {
+    transform: none !important;
+  }
+}
+
+/* Ajuste final do teto mobile do video principal do /instagram */
+@media (max-width: 430px) {
+  .bio-page .bio-hero-media video.bio-video-lowered {
+    height: clamp(360px, 52vh, 440px);
+    object-position: center 76%;
+    transform: translateY(12%) scale(1.045);
+  }
+}
+
