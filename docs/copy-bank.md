@@ -1,86 +1,41 @@
-# Copy Bank
+# Copy Bank V2
 
-Use este arquivo como banco de frases permitidas e como limite para o que nao pode ser escrito.
+## Home
 
-## Dados Confirmados
+- Linha do hero: `Otica Vision · Araguaina - TO`
+- H1: `Armacoes que fazem sentido no rosto — e na rotina.`
+- Apoio: `Modelos nacionais e importados, com lentes feitas pela Vision em Araguaina.`
+- Videos: `No rosto, na luz, no detalhe.`
+- Videos apoio: `Veja como as armacoes se comportam em uso real.`
+- Galeria: `Escolhas que mudam o olhar.`
+- Galeria apoio: `Presenca, formato e acabamento em uma selecao real da Vision.`
+- Marcas: `Marcas que passam pela Vision`
+- Marcas apoio: `Consulte a disponibilidade dos modelos pelo WhatsApp.`
+- LAB selo: `LAB. DIGITAL`
+- LAB headline: `Lentes feitas pela propria Vision.`
+- LAB apoio: `Confeccao propria de lentes em Araguaina - TO, com cuidado no acabamento.`
+- Noticias selo: `Exame`
+- Noticias: `Tendencias em oculos`
+- Noticias apoio: `Materias sobre moda, consumo e mercado optico.`
+- Localizacao: `Escolha seus proximos oculos em Araguaina.`
+- Localizacao apoio: `Fale com a Otica Vision ou veja a rota ate a loja.`
 
-- Otica Vision.
-- Araguaina - TO.
-- Armacoes nacionais e importadas.
-- LAB. DIGITAL para confeccao propria de lentes.
-- Atendimento local em Araguaina - TO.
-- WhatsApp oficial.
-- Instagram oficial.
-- Google Maps oficial.
+## Instagram
 
-## Headlines Permitidas
+- Handle: `@oticavisionaraguaina`
+- Bio: `Armacoes nacionais e importadas, LAB. DIGITAL e atendimento em Araguaina - TO.`
 
-- Otica Vision
-- Armacoes nacionais e importadas em Araguaina
-- Seu novo olhar com acabamento Vision
-- Curadoria de armacoes para diferentes estilos
-- LAB. DIGITAL para lentes feitas pela propria otica
-- Elegancia, precisao e atendimento local
+## CTAs
 
-## Apoios Permitidos
+- WhatsApp
+- Instagram
+- Falar sobre lentes
+- Ver mais na Exame
+- Ver rota
+- Rota
+- Site completo
+- Ler na Exame
 
-- Escolha sua armacao com atendimento em Araguaina - TO.
-- A Otica Vision trabalha com armacoes nacionais e importadas.
-- O LAB. DIGITAL permite a confeccao propria de lentes pela otica.
-- Encontre a Otica Vision no Instagram, WhatsApp ou Google Maps.
-- Uma experiencia visual limpa, elegante e focada no produto real.
+## Proibido
 
-## CTAs Permitidos
-
-- Chamar no WhatsApp
-- Ver Instagram
-- Abrir no Maps
-- Falar com a Otica Vision
-- Conhecer armacoes
-
-## Microcopy Permitida
-
-- Atendimento em Araguaina - TO.
-- Armacoes nacionais e importadas.
-- LAB. DIGITAL.
-- Confeccao propria de lentes.
-- Canais oficiais.
-- Fotos reais da marca.
-
-## Copy Proibida
-
-Nao usar frases que afirmem dados ausentes:
-
-- "Estamos na [endereco completo]".
-- "Aberto hoje ate..."
-- "Mais de X avaliacoes".
-- "Nota 5 estrelas".
-- "Clientes aprovam".
-- "Depoimentos reais".
-- "Vendemos Ray-Ban, Prada, Gucci..." ou qualquer marca nao confirmada.
-- "Lentes prontas em X horas".
-- "Garantia de X meses".
-- "Exame de vista no local".
-- "Ajuste gratuito".
-- "Manutencao inclusa".
-- "Parcelamos em X vezes".
-
-## Claims Proibidos
-
-- "A melhor otica de Araguaina".
-- "A maior variedade da regiao".
-- "Menor preco garantido".
-- "Entrega mais rapida".
-- "Tecnologia exclusiva".
-- "Qualidade incomparavel".
-- "100% garantido".
-
-## Regra Para Novas Frases
-
-Uma frase nova so pode entrar na landing se cumprir todos os criterios:
-
-- Usa apenas dados confirmados.
-- Nao implica servico, prazo, marca, garantia, avaliacao ou condicao comercial ausente.
-- Parece escrita para otica, nao para SaaS.
-- Funciona em mobile sem quebrar a hierarquia.
-- Tem funcao clara: informar, orientar ou acionar.
+Nao criar copy sobre dados ausentes listados em `docs/content-rules.md`. Nao usar superlativos, urgencia, disponibilidade permanente ou promessas de prazo.

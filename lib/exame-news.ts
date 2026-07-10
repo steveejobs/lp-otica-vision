@@ -1,278 +1,222 @@
-const EXAME_URL = "https://exame.com/noticias-sobre/oculos/";
-const MAX_ITEMS = 8;
-const COLLECT_LIMIT = 16;
-const CACHE_SECONDS = 21600;
+import { load, type Cheerio, type CheerioAPI } from "cheerio";
+import type { AnyNode } from "domhandler";
 
-type ExameNewsItem = {
+import { LINKS } from "@/lib/links";
+
+export const EXAME_REVALIDATE_SECONDS = 28_800;
+
+export type ExameArticle = {
   title: string;
   url: string;
-  category?: string;
-  time?: string;
-  imageUrl?: string;
-  imageAlt?: string;
+  image: string | null;
+  category: string;
+  meta: string;
+  source: "Exame";
 };
 
-type FetchLike = typeof fetch;
+const REQUEST_HEADERS = {
+  accept: "text/html,application/xhtml+xml",
+  "accept-language": "pt-BR,pt;q=0.9",
+  "user-agent":
+    "Mozilla/5.0 (compatible; OticaVision/2.0; +https://www.instagram.com/oticavisionaraguaina/)",
+};
 
-function decodeEntities(value = "") {
-  return value
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/&#x([\da-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-}
+const cleanText = (value: string | undefined) =>
+  (value ?? "")
+    .replace(/Â·/g, "·")
+    .replace(/Â/g, "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-function clean(value = "") {
-  return decodeEntities(String(value).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim());
-}
+const normalizeArticleUrl = (value: string | undefined) => {
+  if (!value) return null;
 
-function absoluteUrl(url = "") {
-  if (!url) return "";
-  if (/^data:/i.test(url)) return "";
-  if (/^https?:\/\//i.test(url)) return url;
   try {
-    return new URL(url, EXAME_URL).toString();
+    const url = new URL(value, LINKS.exame);
+    if (url.protocol !== "https:") return null;
+    if (url.hostname !== "exame.com" && url.hostname !== "www.exame.com") return null;
+    return url.href;
   } catch {
-    return "";
+    return null;
   }
-}
+};
 
-function attr(tag = "", name = "") {
-  const pattern = new RegExp(`${name}=["']([^"']+)["']`, "i");
-  return decodeEntities(tag.match(pattern)?.[1] || "");
-}
+const normalizeImageUrl = (value: string | undefined, baseUrl: string) => {
+  const candidate = cleanText(value);
+  if (!candidate || candidate.startsWith("data:") || candidate.startsWith("blob:")) return null;
 
-function isRemoteImage(url = "") {
-  return /^https?:\/\//i.test(url) && !/^data:/i.test(url) && !/\.svg(?:\?|$)/i.test(url);
-}
+  try {
+    const url = new URL(candidate, baseUrl);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    if (url.protocol === "http:") url.protocol = "https:";
+    return url.href;
+  } catch {
+    return null;
+  }
+};
 
-function chooseSrcset(srcset = "") {
-  const candidates = srcset
+const imageFromSrcset = (value: string | undefined, baseUrl: string) => {
+  if (!value) return null;
+
+  const candidates = value
     .split(",")
-    .map((part) => {
-      const [url, descriptor = ""] = part.trim().split(/\s+/);
-      const width = Number(descriptor.replace(/[^\d]/g, "")) || 0;
-      return { url: absoluteUrl(url), width };
+    .map((entry) => {
+      const [url, descriptor = "0"] = entry.trim().split(/\s+/);
+      const score = Number.parseFloat(descriptor) || 0;
+      return { url: normalizeImageUrl(url, baseUrl), score };
     })
-    .filter((candidate) => isRemoteImage(candidate.url));
+    .filter((entry): entry is { url: string; score: number } => Boolean(entry.url))
+    .sort((a, b) => b.score - a.score);
 
-  if (candidates.length === 0) return "";
-  const ordered = candidates.sort((a, b) => a.width - b.width);
-  const middle = ordered.find((candidate) => candidate.width >= 480 && candidate.width <= 900);
-  return (middle || ordered[Math.min(1, ordered.length - 1)]).url;
-}
+  return candidates[0]?.url ?? null;
+};
 
-function imageValueToUrl(value: unknown): string {
-  if (!value) return "";
-  if (typeof value === "string") return absoluteUrl(value);
-  if (Array.isArray(value)) return imageValueToUrl(value[0]);
-  if (typeof value === "object") {
-    const entry = value as { url?: string; contentUrl?: string };
-    return absoluteUrl(entry.url || entry.contentUrl || "");
-  }
-  return "";
-}
+const nestedNoscriptImages = ($: CheerioAPI, scope: Cheerio<AnyNode>) => {
+  const images: Cheerio<AnyNode>[] = [];
 
-function imageUrlFromValue(value: unknown) {
-  const imageUrl = imageValueToUrl(value);
-  return isRemoteImage(imageUrl) ? imageUrl : "";
-}
+  scope.find("noscript").each((_, element) => {
+    const markup = $(element).text() || $(element).html() || "";
+    if (!markup) return;
+    const nested = load(markup);
+    nested("img").each((__, image) => {
+      images.push(nested(image));
+    });
+  });
 
-function metaContent(html = "", names: string[] = []) {
-  const wanted = names.map((name) => name.toLowerCase());
-  const metas = [...html.matchAll(/<meta\b[^>]*>/gi)].map((match) => match[0]);
+  return images;
+};
 
-  for (const tag of metas) {
-    const key = (attr(tag, "property") || attr(tag, "name")).toLowerCase();
-    if (!wanted.includes(key)) continue;
+const extractImage = ($: CheerioAPI, scope: Cheerio<AnyNode>, baseUrl: string) => {
+  const images = [
+    ...scope.find("img").toArray().map((element) => $(element)),
+    ...nestedNoscriptImages($, scope),
+  ];
 
-    const content = absoluteUrl(attr(tag, "content"));
-    if (isRemoteImage(content)) return content;
+  for (const image of images) {
+    const src = normalizeImageUrl(image.attr("src"), baseUrl);
+    if (src) return src;
   }
 
-  return "";
-}
-
-function imageFromBlock(block = "") {
-  const noscriptImg = block.match(/<noscript>[\s\S]*?(<img\b[^>]*>)[\s\S]*?<\/noscript>/i)?.[1];
-  const imgTags = [...block.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
-  const sourceTags = [...block.matchAll(/<source\b[^>]*>/gi)].map((match) => match[0]);
-  const ordered = noscriptImg ? [noscriptImg, ...imgTags, ...sourceTags] : [...imgTags, ...sourceTags];
-
-  for (const tag of ordered) {
-    const chosen =
-      absoluteUrl(attr(tag, "src")) ||
-      chooseSrcset(attr(tag, "srcset")) ||
-      chooseSrcset(attr(tag, "data-srcset")) ||
-      absoluteUrl(attr(tag, "data-src") || attr(tag, "data-lazy-src") || attr(tag, "data-original"));
-
-    if (isRemoteImage(chosen)) {
-      return {
-        imageUrl: chosen,
-        imageAlt: clean(attr(tag, "alt"))
-      };
-    }
+  for (const image of images) {
+    const srcset = imageFromSrcset(image.attr("srcset"), baseUrl);
+    if (srcset) return srcset;
   }
 
-  const nearby = block.match(/https?:\/\/[^"'\s<>]+?\.(?:jpe?g|png|webp)(?:\?[^"'\s<>]*)?/gi) || [];
-  const imageUrl = nearby.map((url) => absoluteUrl(decodeEntities(url))).find((url) => isRemoteImage(url));
-  if (imageUrl) return { imageUrl, imageAlt: "" };
+  for (const source of scope.find("source").toArray()) {
+    const srcset = imageFromSrcset($(source).attr("srcset"), baseUrl);
+    if (srcset) return srcset;
+  }
+
+  for (const image of images) {
+    const dataSrc = normalizeImageUrl(image.attr("data-src"), baseUrl);
+    if (dataSrc) return dataSrc;
+  }
+
+  for (const image of images) {
+    const lazySrc = normalizeImageUrl(image.attr("data-lazy-src"), baseUrl);
+    if (lazySrc) return lazySrc;
+  }
 
   return null;
-}
+};
 
-function collectJsonLdNodes(node: unknown, bucket: Record<string, unknown>[] = []) {
-  if (!node || typeof node !== "object") return bucket;
-  if (Array.isArray(node)) {
-    node.forEach((entry) => collectJsonLdNodes(entry, bucket));
-    return bucket;
-  }
+const findCard = ($: CheerioAPI, heading: Cheerio<AnyNode>) => {
+  let candidate = heading.parent();
 
-  const entry = node as Record<string, unknown>;
-  bucket.push(entry);
-  collectJsonLdNodes(entry["@graph"], bucket);
-  collectJsonLdNodes(entry.itemListElement, bucket);
-  collectJsonLdNodes(entry.item, bucket);
-  return bucket;
-}
-
-function itemFromJsonLd(node: Record<string, unknown>): ExameNewsItem | null {
-  const title = clean(String(node.headline || node.name || ""));
-  const url = absoluteUrl(String(node.url || node["@id"] || ""));
-  const imageUrl = imageUrlFromValue(node.image || node.thumbnailUrl || node.primaryImageOfPage);
-  if (!title || !url) return null;
-
-  return {
-    title,
-    url,
-    imageUrl,
-    imageAlt: title,
-    category: clean(String(node.articleSection || node.genre || "Exame")),
-    time: clean(String(node.datePublished || node.dateModified || ""))
-  };
-}
-
-function isAllowedTitle(title = "") {
-  const normalized = title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  return !["galeria", "colecao"].some((term) => normalized.includes(term));
-}
-
-function dedupe(items: ExameNewsItem[]) {
-  const seen = new Set<string>();
-  return items.filter((item) => {
-    const key = item.url || item.title;
-    if (!key || seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function finalize(items: ExameNewsItem[]) {
-  return dedupe(items).filter((item) => isAllowedTitle(item.title)).slice(0, MAX_ITEMS);
-}
-
-function parseJsonLd(html = "") {
-  const scripts = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
-  const items: ExameNewsItem[] = [];
-
-  for (const [, raw] of scripts) {
-    try {
-      const parsed = JSON.parse(decodeEntities(raw.trim()));
-      for (const node of collectJsonLdNodes(parsed)) {
-        const item = itemFromJsonLd(node);
-        if (item) items.push(item);
-      }
-    } catch {
-      continue;
+  for (let depth = 0; depth < 5 && candidate.length; depth += 1) {
+    if (candidate.find("img, noscript").length && candidate.find("p").length) {
+      return candidate;
     }
+    candidate = candidate.parent();
   }
 
-  return finalize(items);
-}
+  return heading.parent().parent();
+};
 
-function parseCardBlocks(html = "") {
-  const parts = html.split(/<div class=["']pb-4["']>/i).slice(1);
-  const items: ExameNewsItem[] = [];
+export function parseExameTopic(html: string, limit = 3): ExameArticle[] {
+  const $ = load(html);
+  const articles: ExameArticle[] = [];
+  const seen = new Set<string>();
 
-  for (const part of parts) {
-    const block = part.split(/<div class=["']pb-4["']>|<nav|<footer|<aside/i)[0];
-    const anchor = block.match(/<h3[^>]*>[\s\S]*?<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>[\s\S]*?<\/h3>/i);
-    if (!anchor) continue;
+  $("h3 a[href], h2 a[href]").each((_, anchor) => {
+    if (articles.length >= limit) return false;
 
-    const title = clean(anchor[2]);
-    const url = absoluteUrl(anchor[1]);
-    if (!title || !url) continue;
+    const link = $(anchor);
+    const title = cleanText(link.text());
+    const url = normalizeArticleUrl(link.attr("href"));
+    if (!url || title.length < 20 || seen.has(url)) return;
 
-    const imageData = imageFromBlock(block);
+    const heading = link.closest("h2, h3");
+    const card = findCard($, heading);
+    const category =
+      card
+        .find("span")
+        .toArray()
+        .map((element) => cleanText($(element).text()))
+        .find((text) => text.length >= 2 && text.length <= 40 && !/salvar/i.test(text)) ?? "Óculos";
+    const meta =
+      card
+        .find("time, p")
+        .toArray()
+        .map((element) => cleanText($(element).text()))
+        .find((text) => /leitura|há\s|publicado|atualizado/i.test(text)) ?? "";
 
-    items.push({
+    seen.add(url);
+    articles.push({
       title,
       url,
-      imageUrl: imageData?.imageUrl || "",
-      imageAlt: imageData?.imageAlt || title,
-      category: clean(block.match(/<span[^>]*label-small[^>]*>([\s\S]*?)<\/span>/i)?.[1] || "Exame"),
-      time: clean(block.match(/<p[^>]*title-small[^>]*>([\s\S]*?)<\/p>/i)?.[1] || "")
+      image: extractImage($, card, url),
+      category,
+      meta,
+      source: "Exame",
     });
+  });
 
-    if (dedupe(items).length >= COLLECT_LIMIT) break;
+  return articles;
+}
+
+async function fetchHtml(url: string) {
+  const response = await fetch(url, {
+    headers: REQUEST_HEADERS,
+    next: { revalidate: EXAME_REVALIDATE_SECONDS },
+    signal: AbortSignal.timeout(10_000),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Exame respondeu com status ${response.status}.`);
   }
 
-  return finalize(items);
+  return response.text();
 }
 
-function parseItems(html = "") {
-  const listed = parseCardBlocks(html);
-  if (listed.length >= 4) return listed;
-  return parseJsonLd(html);
-}
-
-async function imageFromArticle(url: string, fetchImpl: FetchLike) {
+async function fetchArticleMetaImage(url: string) {
   try {
-    const upstream = await fetchImpl(url, {
-      headers: {
-        "user-agent": "Mozilla/5.0 OticaVision/1.0"
-      }
-    });
-
-    if (!upstream.ok) return "";
-    const html = await upstream.text();
-    return metaContent(html, ["og:image", "og:image:secure_url", "twitter:image"]);
+    const html = await fetchHtml(url);
+    const $ = load(html);
+    return (
+      normalizeImageUrl($("meta[property='og:image']").attr("content"), url) ??
+      normalizeImageUrl($("meta[name='twitter:image']").attr("content"), url) ??
+      normalizeImageUrl($("meta[property='twitter:image']").attr("content"), url)
+    );
   } catch {
-    return "";
+    return null;
   }
 }
 
-async function enrichMissingImages(items: ExameNewsItem[], fetchImpl: FetchLike) {
-  let fallbackCount = 0;
-  return Promise.all(
-    items.map(async (item) => {
-      if (item.imageUrl || fallbackCount >= 6) return item;
-      fallbackCount += 1;
-      const imageUrl = await imageFromArticle(item.url, fetchImpl);
-      if (!imageUrl) return item;
-      return { ...item, imageUrl, imageAlt: item.imageAlt || item.title };
-    })
-  );
-}
-
-async function fetchExameNews(fetchImpl: FetchLike = fetch) {
+export async function getExameNews(limit = 3): Promise<ExameArticle[]> {
   try {
-    const upstream = await fetchImpl(EXAME_URL, {
-      headers: {
-        "user-agent": "Mozilla/5.0 OticaVision/1.0"
-      }
-    });
+    const html = await fetchHtml(LINKS.exame);
+    const articles = parseExameTopic(html, limit);
 
-    if (!upstream.ok) return [];
-    const items = parseItems(await upstream.text());
-    return enrichMissingImages(items, fetchImpl);
+    return Promise.all(
+      articles.map(async (article) =>
+        article.image
+          ? article
+          : { ...article, image: await fetchArticleMetaImage(article.url) },
+      ),
+    );
   } catch {
     return [];
   }
 }
-
-export { CACHE_SECONDS, EXAME_URL, MAX_ITEMS, fetchExameNews, parseItems };
-export type { ExameNewsItem };

@@ -1,4 +1,25 @@
-.vercel
+# Dependencies and Next.js output
+node_modules/
+.next/
+out/
+dist/
+.vercel/
 
-# Local browser/temp files
+# Local environment files
+.env*
+!.env.example
+
+# QA and temporary output
 .tmp/
+playwright-report/
+test-results/
+*.log
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+*.swp
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

@@ -1,47 +1,32 @@
-# Anti-Erros
-
-Este arquivo registra falhas cronicas que devem ser bloqueadas antes de qualquer implementacao.
+# Anti-Erros V2
 
 ## Conteudo
 
-- Nao inventar endereco, horario, avaliacoes, depoimentos, marcas, prazos, garantia ou servicos.
-- Nao transformar "LAB. DIGITAL" em promessa de entrega rapida.
-- Nao chamar servicos nao confirmados como exame, ajuste, manutencao ou parcelamento.
-- Nao usar "premium" como justificativa vaga; apontar qual regra local esta sendo seguida.
-- Nao criar FAQ com dados ausentes.
+- Nao inventar endereco, horario, avaliacao, depoimento, prazo, garantia, servico, condicao comercial ou marca.
+- Nao transformar LAB. DIGITAL em promessa de rapidez.
+- Nao criar noticia falsa quando a Exame falhar.
+- Nao afirmar autorizacao, estoque ou disponibilidade de marca.
 
 ## Visual
 
-- Nao usar visual SaaS generico.
-- Nao usar gradiente artificial como base da identidade.
-- Nao criar hero com card de texto de um lado e imagem decorativa do outro.
-- Nao cobrir rosto, oculos ou logo com texto.
-- Nao usar icone generico quando ha foto real que comunica melhor.
-- Nao encher a pagina de cards.
-- Nao usar sombras pesadas para simular luxo.
-- Nao usar roxo/azul escuro generico como tema principal.
+- Nao reutilizar codigo visual ou layout da versao anterior.
+- Nao usar hero com slideshow, secao preta, gradiente artificial ou botao preto.
+- Nao repetir midia na home.
+- Nao criar excesso de cards, chips ou galerias concorrentes.
+- Nao cobrir rosto, olhos, oculos ou logo com texto ou controles.
+- Nao remover a imagem anterior durante a transicao da galeria.
 
-## Layout
+## Tecnico
 
-- Nao deixar texto estourar no mobile.
-- Nao criar secoes altas demais sem conteudo real.
-- Nao desalinha logo, CTA e grid.
-- Nao usar tamanhos fluidos sem limite.
-- Nao permitir que hover, labels ou estados mudem dimensoes fixas.
-- Nao esconder informacao essencial apenas atras de hover.
-
-## Performance
-
-- Nao colocar video pesado no primeiro carregamento sem poster e decisao explicita.
-- Nao carregar todas as imagens em tamanho original quando houver galeria.
-- Nao usar animacoes longas no carregamento.
-- Nao ignorar `prefers-reduced-motion`.
+- Um unico deploy Next.js; sem `index.html` paralelo ou `dist` manual.
+- Videos sempre com poster, `muted`, `loop`, `playsInline` e observador de viewport.
+- Nenhum video 0x0 ou invisivel carregando.
+- Nenhum overflow horizontal, request 404 ou erro de console.
+- Imagens com dimensoes/aspect ratio e alt util.
+- Respeitar `prefers-reduced-motion`.
 
 ## Processo
 
-- Nao implementar mais de uma secao por rodada.
-- Nao alterar `package.json` sem pedido explicito.
-- Nao apagar assets.
-- Nao fazer redesign completo se o pedido for ajuste pontual.
-- Nao encerrar rodada sem checklist mobile.
-- Nao encerrar implementacao sem build/lint quando existirem.
+- Trabalhar uma secao por rodada sequencial.
+- Validar mobile durante cada rodada.
+- Rodar lint, typecheck e build ao final de cada fase.
