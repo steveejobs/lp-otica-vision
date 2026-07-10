@@ -1,1 +1,4 @@
 .vercel
+
+# Local browser/temp files
+.tmp/
