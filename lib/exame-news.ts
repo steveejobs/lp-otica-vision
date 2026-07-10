@@ -1,4 +1,4 @@
-﻿const EXAME_URL = "https://exame.com/noticias-sobre/oculos/";
+const EXAME_URL = "https://exame.com/noticias-sobre/oculos/";
 const MAX_ITEMS = 8;
 const COLLECT_LIMIT = 16;
 const CACHE_SECONDS = 21600;
@@ -71,6 +71,21 @@ function imageValueToUrl(value: unknown): string {
   return "";
 }
 
+function metaContent(html = "", names: string[] = []) {
+  const wanted = names.map((name) => name.toLowerCase());
+  const metas = [...html.matchAll(/<meta\b[^>]*>/gi)].map((match) => match[0]);
+
+  for (const tag of metas) {
+    const key = (attr(tag, "property") || attr(tag, "name")).toLowerCase();
+    if (!wanted.includes(key)) continue;
+
+    const content = absoluteUrl(attr(tag, "content"));
+    if (isRemoteImage(content)) return content;
+  }
+
+  return "";
+}
+
 function imageFromBlock(block = "") {
   const noscriptImg = block.match(/<noscript>[\s\S]*?(<img\b[^>]*>)[\s\S]*?<\/noscript>/i)?.[1];
   const imgTags = [...block.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
@@ -112,12 +127,12 @@ function itemFromJsonLd(node: Record<string, unknown>): ExameNewsItem | null {
   const title = clean(String(node.headline || node.name || ""));
   const url = absoluteUrl(String(node.url || node["@id"] || ""));
   const image = imageValueToUrl(node.image || node.thumbnailUrl || node.primaryImageOfPage);
-  if (!title || !url || !isRemoteImage(image)) return null;
+  if (!title || !url) return null;
 
   return {
     title,
     url,
-    image,
+    image: isRemoteImage(image) ? image : "",
     imageAlt: title,
     category: clean(String(node.articleSection || node.genre || "Exame")),
     date: clean(String(node.datePublished || node.dateModified || ""))
@@ -171,18 +186,17 @@ function parseCardBlocks(html = "") {
     const anchor = block.match(/<h3[^>]*>[\s\S]*?<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>[\s\S]*?<\/h3>/i);
     if (!anchor) continue;
 
-    const imageData = imageFromBlock(block);
-    if (!imageData) continue;
-
     const title = clean(anchor[2]);
     const url = absoluteUrl(anchor[1]);
     if (!title || !url) continue;
 
+    const imageData = imageFromBlock(block);
+
     items.push({
       title,
       url,
-      image: imageData.image,
-      imageAlt: imageData.imageAlt || title,
+      image: imageData?.image || "",
+      imageAlt: imageData?.imageAlt || title,
       category: clean(block.match(/<span[^>]*label-small[^>]*>([\s\S]*?)<\/span>/i)?.[1] || "Exame"),
       date: clean(block.match(/<p[^>]*title-small[^>]*>([\s\S]*?)<\/p>/i)?.[1] || "")
     });
@@ -199,6 +213,33 @@ function parseItems(html = "") {
   return parseCardBlocks(html);
 }
 
+async function imageFromArticle(url: string, fetchImpl: FetchLike) {
+  try {
+    const upstream = await fetchImpl(url, {
+      headers: {
+        "user-agent": "Mozilla/5.0 OticaVision/1.0"
+      }
+    });
+
+    if (!upstream.ok) return "";
+    const html = await upstream.text();
+    return metaContent(html, ["og:image", "og:image:secure_url", "twitter:image"]);
+  } catch {
+    return "";
+  }
+}
+
+async function enrichMissingImages(items: ExameNewsItem[], fetchImpl: FetchLike) {
+  return Promise.all(
+    items.map(async (item) => {
+      if (item.image) return item;
+      const image = await imageFromArticle(item.url, fetchImpl);
+      if (!image) return item;
+      return { ...item, image, imageAlt: item.imageAlt || item.title };
+    })
+  );
+}
+
 async function fetchExameNews(fetchImpl: FetchLike = fetch) {
   try {
     const upstream = await fetchImpl(EXAME_URL, {
@@ -208,7 +249,8 @@ async function fetchExameNews(fetchImpl: FetchLike = fetch) {
     });
 
     if (!upstream.ok) return [];
-    return parseItems(await upstream.text());
+    const items = parseItems(await upstream.text());
+    return enrichMissingImages(items, fetchImpl);
   } catch {
     return [];
   }

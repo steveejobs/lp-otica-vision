@@ -289,7 +289,7 @@
         const render = (items) => {
           if (!Array.isArray(items) || items.length === 0) return;
           const limited = items
-            .filter((item) => item?.title && item?.url && /^https?:\/\//i.test(item.url) && /^https?:\/\//i.test(item.image || ""))
+            .filter((item) => item?.title && item?.url && /^https?:\/\//i.test(item.url))
             .slice(0, 8);
           if (limited.length === 0) return;
           const card = (item, index, hidden = false) => {
@@ -297,11 +297,13 @@
             const category = escapeHtml(item.category || "Exame");
             const date = escapeHtml(item.date || "");
             const url = escapeHtml(item.url);
-            const image = escapeHtml(item.image);
+            const image = /^https?:\/\//i.test(item.image || "") ? escapeHtml(item.image) : "";
             const imageAlt = hidden ? "" : escapeHtml(item.imageAlt || item.title || "Imagem da materia na Exame");
             const meta = ["Exame", category, date].filter(Boolean).join(" · ");
             const hiddenAttrs = hidden ? ' tabindex="-1" aria-hidden="true"' : '';
-            return '<article class="news-card"><a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Ler na Exame: ' + title + '"' + hiddenAttrs + '><span class="news-thumb"><img src="' + image + '" alt="' + imageAlt + '" width="800" height="500" decoding="async" referrerpolicy="no-referrer" /></span><span class="news-meta">' + meta + '</span><h3>' + title + '</h3><strong>Ler na Exame</strong></a></article>';
+            const media = image ? '<span class="news-thumb"><img src="' + image + '" alt="' + imageAlt + '" width="800" height="500" decoding="async" referrerpolicy="no-referrer" /></span>' : '';
+            const className = image ? 'news-card' : 'news-card news-card-text';
+            return '<article class="' + className + '"><a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Ler na Exame: ' + title + '"' + hiddenAttrs + '>' + media + '<span class="news-meta">' + meta + '</span><h3>' + title + '</h3><strong>Ler na Exame</strong></a></article>';
           };
           const cards = limited.map((item, index) => card(item, index)).join("");
           const duplicateCards = limited.map((item, index) => card(item, index, true)).join("");
@@ -315,6 +317,7 @@
     </script>
   </body>
 </html>
+
 
 
 
