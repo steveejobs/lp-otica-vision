@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -207,7 +207,7 @@
         <div class="lab-panel lab-panel-visual">
           <div class="lab-copy">
             <p class="lab-kicker">LAB. DIGITAL</p>
-            <h2 id="lab-title">Lentes feitas com mais controle, dentro da pr&oacute;pria &oacute;tica.</h2>
+            <h2 id="lab-title">Lentes feitas com mais controle.</h2>
             <p>Mais cuidado no acabamento e mais fluidez no atendimento.</p>
             <div class="lab-points" aria-label="Destaques do LAB. DIGITAL">
               <span>Controle</span>
@@ -216,8 +216,10 @@
             </div>
             <a class="button button-secondary" href="https://api.whatsapp.com/send/?phone=5563992231522&amp;text=Ol%C3%A1%21%20Vim%20pelo%20site%20da%20%C3%93tica%20Vision%20e%20quero%20saber%20mais%20sobre%20lentes.&amp;type=phone_number&amp;app_absent=0"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12.04 2.5a9.43 9.43 0 0 0-8.02 14.4l-1.1 4.05 4.16-1.09a9.42 9.42 0 1 0 4.96-17.36Zm0 1.82a7.6 7.6 0 0 1 6.43 11.66 7.6 7.6 0 0 1-10.9 2.14l-.3-.18-2.48.65.66-2.4-.2-.32a7.6 7.6 0 0 1 6.79-11.55Zm-3.12 3.8c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.23.9 2.42 1.02 2.59.13.17 1.76 2.68 4.27 3.76.6.26 1.06.41 1.42.53.6.19 1.14.16 1.57.1.48-.07 1.48-.6 1.69-1.19.21-.58.21-1.08.15-1.19-.06-.1-.23-.17-.48-.3-.25-.13-1.48-.73-1.71-.81-.23-.09-.4-.13-.57.12-.17.26-.66.82-.81.99-.15.17-.3.19-.55.06-.25-.12-1.06-.39-2.02-1.25-.75-.67-1.25-1.49-1.4-1.74-.15-.26-.02-.4.11-.52.12-.12.26-.3.38-.45.13-.15.17-.26.26-.43.08-.17.04-.32-.02-.45-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.42-.57-.43h-.48Z" fill="currentColor" /></svg><span>Falar sobre lentes</span></a>
           </div>
-          <figure class="lab-media" aria-label="Detalhe visual de arma&ccedil;&atilde;o da &Oacute;tica Vision">
-            <img src="galeria/8%20(1).jpg" alt="Close de arma&ccedil;&atilde;o com acabamento em destaque" width="1440" height="1762" loading="lazy" />
+          <figure class="lab-media" aria-label="Detalhe visual da &Oacute;tica Vision">
+            <video muted loop playsinline preload="metadata" poster="galeria/logo%20com%20fundo.png" aria-label="Detalhe em v&iacute;deo da &Oacute;tica Vision">
+              <source src="galeria/video%20(3).mp4" type="video/mp4" />
+            </video>
           </figure>
         </div>
       </section>
@@ -286,16 +288,20 @@
         const escapeHtml = (value) => String(value || "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
         const render = (items) => {
           if (!Array.isArray(items) || items.length === 0) return;
-          const limited = items.slice(0, 10);
+          const limited = items
+            .filter((item) => item?.title && item?.url && /^https?:\/\//i.test(item.url) && /^https?:\/\//i.test(item.image || ""))
+            .slice(0, 8);
+          if (limited.length === 0) return;
           const card = (item, index, hidden = false) => {
             const title = escapeHtml(item.title);
             const category = escapeHtml(item.category || "Exame");
-            const date = escapeHtml(item.date || "Exame");
-            const url = escapeHtml(item.url || "https://exame.com/noticias-sobre/oculos/");
-            const image = escapeHtml(item.image || "galeria/8%20(3).jpg");
-            const imageAlt = hidden ? "" : escapeHtml(item.imageAlt || item.title || "Imagem da matéria na Exame");
+            const date = escapeHtml(item.date || "");
+            const url = escapeHtml(item.url);
+            const image = escapeHtml(item.image);
+            const imageAlt = hidden ? "" : escapeHtml(item.imageAlt || item.title || "Imagem da materia na Exame");
+            const meta = ["Exame", category, date].filter(Boolean).join(" · ");
             const hiddenAttrs = hidden ? ' tabindex="-1" aria-hidden="true"' : '';
-            return '<article class="news-card"><a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Ler na Exame: ' + title + '"' + hiddenAttrs + '><span class="news-thumb"><img src="' + image + '" alt="' + imageAlt + '" loading="lazy" referrerpolicy="no-referrer" /></span><span class="news-meta">Exame · ' + category + ' · ' + date + '</span><h3>' + title + '</h3><strong>Ler na Exame</strong></a></article>';
+            return '<article class="news-card"><a href="' + url + '" target="_blank" rel="noopener noreferrer" aria-label="Ler na Exame: ' + title + '"' + hiddenAttrs + '><span class="news-thumb"><img src="' + image + '" alt="' + imageAlt + '" width="800" height="500" decoding="async" referrerpolicy="no-referrer" /></span><span class="news-meta">' + meta + '</span><h3>' + title + '</h3><strong>Ler na Exame</strong></a></article>';
           };
           const cards = limited.map((item, index) => card(item, index)).join("");
           const duplicateCards = limited.map((item, index) => card(item, index, true)).join("");
@@ -309,3 +315,6 @@
     </script>
   </body>
 </html>
+
+
+
