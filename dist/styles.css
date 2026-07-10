@@ -8082,20 +8082,20 @@ h2,
   object-fit: contain !important;
   object-position: center !important;
   filter: grayscale(1) contrast(1.02) brightness(0.66) !important;
-  opacity: 0.88;
+  opacity: 0.88 !important;
   transform-origin: center;
 }
 
-.brand-list > .brand-logo-card:nth-child(1) img { max-width: 64% !important; max-height: 34px !important; transform: scale(0.96); }
-.brand-list > .brand-logo-card:nth-child(2) img { max-width: 84% !important; max-height: 23px !important; transform: scale(1.04); opacity: 0.92; }
-.brand-list > .brand-logo-card:nth-child(3) img { max-width: 62% !important; max-height: 33px !important; transform: scale(0.98); }
-.brand-list > .brand-logo-card:nth-child(4) img { max-width: 82% !important; max-height: 25px !important; transform: scale(1.02); }
-.brand-list > .brand-logo-card:nth-child(5) img { max-width: 80% !important; max-height: 28px !important; transform: scale(1.02); }
-.brand-list > .brand-logo-card:nth-child(6) img { max-width: 64% !important; max-height: 32px !important; transform: scale(0.98); }
-.brand-list > .brand-logo-card:nth-child(7) img { max-width: 82% !important; max-height: 27px !important; transform: scale(1.02); }
-.brand-list > .brand-logo-card:nth-child(8) img { max-width: 78% !important; max-height: 25px !important; transform: scale(1.02); }
-.brand-list > .brand-logo-card:nth-child(9) img { max-width: 72% !important; max-height: 30px !important; transform: scale(0.96); }
-.brand-list > .brand-logo-card:nth-child(10) img { max-width: 84% !important; max-height: 26px !important; transform: scale(1.02); }
+.brand-rayban img { max-width: 76% !important; max-height: 34px !important; transform: scale(2.06); }
+.brand-carrera img { max-width: 80% !important; max-height: 22px !important; transform: scale(1.02); opacity: 0.9 !important; }
+.brand-persol img { max-width: 72% !important; max-height: 33px !important; transform: scale(1.96); }
+.brand-tom-ford img { max-width: 82% !important; max-height: 24px !important; transform: scale(1.02); }
+.brand-swarovski img { max-width: 78% !important; max-height: 30px !important; transform: scale(1); }
+.brand-dolce-gabbana img { max-width: 80% !important; max-height: 30px !important; transform: scale(3.84); opacity: 0.9 !important; }
+.brand-jimmy-choo img { max-width: 82% !important; max-height: 30px !important; transform: scale(1.28); }
+.brand-max-mara img { max-width: 78% !important; max-height: 24px !important; transform: scale(1.02); }
+.brand-versace img { max-width: 74% !important; max-height: 31px !important; transform: scale(0.98); }
+.brand-emilio-pucci img { max-width: 70% !important; max-height: 29px !important; transform: scale(0.98); }
 
 @media (max-width: 767px) {
   .brand-marquee {
@@ -8119,36 +8119,21 @@ h2,
     max-height: 28px !important;
   }
 
-  .brand-list > .brand-logo-card:nth-child(1) img { max-width: 62% !important; max-height: 28px !important; }
-  .brand-list > .brand-logo-card:nth-child(2) img { max-width: 82% !important; max-height: 20px !important; }
-  .brand-list > .brand-logo-card:nth-child(3) img { max-width: 60% !important; max-height: 27px !important; }
-  .brand-list > .brand-logo-card:nth-child(4) img { max-width: 82% !important; max-height: 22px !important; }
-  .brand-list > .brand-logo-card:nth-child(5) img { max-width: 78% !important; max-height: 23px !important; }
-  .brand-list > .brand-logo-card:nth-child(6) img { max-width: 62% !important; max-height: 27px !important; }
-  .brand-list > .brand-logo-card:nth-child(7) img { max-width: 82% !important; max-height: 23px !important; }
-  .brand-list > .brand-logo-card:nth-child(8) img { max-width: 78% !important; max-height: 22px !important; }
-  .brand-list > .brand-logo-card:nth-child(9) img { max-width: 70% !important; max-height: 25px !important; }
-  .brand-list > .brand-logo-card:nth-child(10) img { max-width: 82% !important; max-height: 22px !important; }
+  .brand-rayban img { max-width: 74% !important; max-height: 28px !important; transform: scale(2); }
+  .brand-carrera img { max-width: 80% !important; max-height: 20px !important; }
+  .brand-persol img { max-width: 70% !important; max-height: 27px !important; transform: scale(1.9); }
+  .brand-tom-ford img { max-width: 82% !important; max-height: 22px !important; }
+  .brand-swarovski img { max-width: 78% !important; max-height: 24px !important; }
+  .brand-dolce-gabbana img { max-width: 80% !important; max-height: 26px !important; transform: scale(3.72); }
+  .brand-jimmy-choo img { max-width: 82% !important; max-height: 25px !important; transform: scale(1.24); }
+  .brand-max-mara img { max-width: 78% !important; max-height: 21px !important; }
+  .brand-versace img { max-width: 72% !important; max-height: 26px !important; }
+  .brand-emilio-pucci img { max-width: 68% !important; max-height: 25px !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .brand-track {
     animation: none !important;
-  }
-}
-
-/* Etapa marcas: correcao optica para logos com canvas quadrado */
-.brand-list > .brand-logo-card:nth-child(1) img,
-.brand-list > .brand-logo-card:nth-child(3) img,
-.brand-list > .brand-logo-card:nth-child(6) img {
-  transform: scale(1.48) !important;
-}
-
-@media (max-width: 767px) {
-  .brand-list > .brand-logo-card:nth-child(1) img,
-  .brand-list > .brand-logo-card:nth-child(3) img,
-  .brand-list > .brand-logo-card:nth-child(6) img {
-    transform: scale(1.42) !important;
   }
 }
 
