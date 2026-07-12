@@ -16,30 +16,8 @@
   margin-inline: auto;
 }
 
-.reveal {
-  animation: section-enter 620ms var(--ease-vision) both;
-}
-
-@keyframes section-enter {
-  from {
-    opacity: 0.9;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (min-width: 721px) {
   .container {
     width: min(88vw, 1320px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal {
-    animation: none;
   }
 }

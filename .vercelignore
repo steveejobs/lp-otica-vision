@@ -4,6 +4,7 @@ docs/
 .agents/
 .codex/
 AGENTS.md
+.env*
 
 # Local build and QA output.
 .tmp/

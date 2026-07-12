@@ -1,0 +1,89 @@
+.section {
+  width: min(100%, 940px);
+  margin: 3rem auto 0;
+}
+
+.headingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+  color: var(--vision-bronze);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.headingRow span {
+  color: var(--vision-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rail {
+  position: relative;
+  display: grid;
+  grid-auto-columns: clamp(142px, 40vw, 164px);
+  grid-auto-flow: column;
+  gap: 0.7rem;
+  overflow-x: auto;
+  padding: 0 0 0.8rem;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 0;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(122, 96, 73, 0.38) transparent;
+  scrollbar-width: thin;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x;
+}
+
+.card {
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgba(143, 150, 157, 0.48);
+  border-radius: var(--radius-sm);
+  background: var(--placeholder-color, var(--vision-steel));
+  scroll-snap-align: start;
+}
+
+.card:nth-child(even) {
+  transform: translateY(0.5rem);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 721px) {
+  .section {
+    margin-top: 4rem;
+  }
+
+  .rail {
+    grid-auto-columns: 185px;
+    gap: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    scroll-behavior: auto;
+  }
+
+  .card:nth-child(even) {
+    transform: none;
+  }
+}

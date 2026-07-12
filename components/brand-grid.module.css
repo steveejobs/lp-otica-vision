@@ -3,7 +3,7 @@
 }
 
 .inner {
-  padding-block: 2rem;
+  padding-block: 3.35rem 3.6rem;
 }
 
 .intro {
@@ -12,39 +12,51 @@
 
 .intro h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.35rem, 10vw, 3.2rem);
+  font-size: clamp(2.25rem, 9.4vw, 3rem);
   font-weight: 500;
-  line-height: 1.04;
+  line-height: 1.03;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
 .intro p {
-  margin-top: 0.8rem;
+  max-width: 350px;
+  margin-top: 0.75rem;
   color: var(--vision-muted);
-  font-size: 0.96rem;
-  line-height: 1.5;
+  font-size: 0.92rem;
+  line-height: 1.48;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 132px);
+  grid-template-columns: repeat(2, minmax(0, 132px));
   justify-content: center;
-  gap: 0.5rem 0.75rem;
-  margin: 1.25rem 0 0;
-  padding: 0;
+  gap: 0;
+  margin: 1.5rem 0 0;
+  padding: 0.45rem 0;
+  border-top: 1px solid rgba(143, 150, 157, 0.34);
+  border-bottom: 1px solid rgba(251, 248, 243, 0.86);
   list-style: none;
 }
 
 .slot {
+  position: relative;
   display: flex;
   width: 132px;
-  height: 62px;
+  height: 58px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-top: 1px solid rgba(143, 150, 157, 0.32);
-  border-bottom: 1px solid rgba(251, 248, 243, 0.72);
+}
+
+.slot:nth-child(odd)::after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  right: 0;
+  bottom: 18%;
+  width: 1px;
+  background: rgba(143, 150, 157, 0.22);
 }
 
 .logo {
@@ -53,31 +65,58 @@
   max-width: var(--brand-max-width);
   max-height: var(--brand-max-height);
   object-fit: contain;
+  filter: grayscale(1) contrast(0.92);
+  opacity: 0.82;
   transform: scale(var(--brand-scale));
   transform-origin: center;
 }
 
 @media (min-width: 721px) {
   .inner {
-    padding-block: 2rem;
-  }
-
-  .intro {
-    max-width: 840px;
+    padding-block: 3.25rem;
   }
 
   .intro h2 {
-    font-size: clamp(2.8rem, 3.6vw, 3.2rem);
+    font-size: clamp(2.75rem, 3.5vw, 3.35rem);
   }
 
   .grid {
-    grid-template-columns: repeat(5, 150px);
-    gap: 1.25rem;
-    margin-top: 1.25rem;
+    grid-template-columns: repeat(5, minmax(0, 150px));
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-block: 0.6rem;
   }
 
   .slot {
     width: 150px;
-    height: 72px;
+    height: 66px;
+  }
+
+  .slot:nth-child(odd)::after {
+    display: none;
+  }
+
+  .slot:not(:nth-child(5n))::after {
+    content: "";
+    position: absolute;
+    top: 18%;
+    right: 0;
+    bottom: 18%;
+    width: 1px;
+    background: rgba(143, 150, 157, 0.2);
+  }
+}
+
+@media (min-width: 1200px) {
+  .inner {
+    display: grid;
+    grid-template-columns: minmax(350px, 0.72fr) minmax(0, 1.28fr);
+    align-items: center;
+    gap: clamp(3rem, 5vw, 5rem);
+  }
+
+  .grid {
+    justify-content: end;
+    margin-top: 0;
   }
 }

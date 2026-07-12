@@ -21,7 +21,7 @@ export function VideoStory({ videos }: VideoStoryProps) {
         <p>Veja como as armações se comportam em uso real.</p>
       </header>
 
-      <div className={styles.stage}>
+      <div className={styles.stage} data-focus-reveal>
         <ObservedVideo asset={videos[0]} className={styles.main} />
         <div className={styles.supportRow}>
           <ObservedVideo asset={videos[1]} className={styles.support} />

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { MessageCircle } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import type { ImageAsset } from "@/lib/assets";
 import { LINKS } from "@/lib/links";
@@ -13,6 +14,10 @@ type LabSectionProps = {
 };
 
 export function LabSection({ media }: LabSectionProps) {
+  const mediaStyle = {
+    "--placeholder-color": media.placeholderColor,
+  } as CSSProperties;
+
   return (
     <SectionShell
       className={styles.section}
@@ -35,13 +40,16 @@ export function LabSection({ media }: LabSectionProps) {
         </VisionButton>
       </div>
 
-      <figure className={styles.media}>
+      <figure className={styles.media} data-focus-reveal style={mediaStyle}>
         <Image
           src={media.src}
           width={media.width}
           height={media.height}
           sizes="(max-width: 720px) 78vw, 380px"
           alt={media.alt}
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL={media.blurDataURL}
           style={{ objectPosition: media.objectPosition }}
         />
       </figure>

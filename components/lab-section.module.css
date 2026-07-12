@@ -2,14 +2,39 @@
   border-bottom: 1px solid var(--vision-line);
 }
 
+.section::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 12%;
+  right: 0;
+  bottom: 12%;
+  width: clamp(150px, 25vw, 380px);
+  background: rgba(199, 173, 142, 0.18);
+  pointer-events: none;
+}
+
 .inner {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 1rem;
-  padding-block: 2rem;
+  gap: 1.75rem;
+  padding-block: 3.75rem 4rem;
 }
 
 .copy {
-  max-width: 520px;
+  position: relative;
+  max-width: 560px;
+}
+
+.copy::after {
+  content: "";
+  position: absolute;
+  top: 1.25rem;
+  left: 8.2rem;
+  width: min(28vw, 190px);
+  height: 1px;
+  background: rgba(143, 150, 157, 0.48);
 }
 
 .eyebrow {
@@ -18,31 +43,31 @@
 
 .copy h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.55rem, 10.5vw, 3.3rem);
+  font-size: clamp(2.6rem, 10.6vw, 3.3rem);
   font-weight: 500;
-  line-height: 1.02;
+  line-height: 1;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
 .description {
   max-width: 460px;
-  margin: 1rem 0 1.25rem;
+  margin: 1rem 0 1.35rem;
   color: var(--vision-muted);
-  font-size: 0.98rem;
-  line-height: 1.55;
+  font-size: 0.96rem;
+  line-height: 1.52;
 }
 
 .media {
   position: relative;
-  width: min(78vw, 335px);
-  aspect-ratio: 1;
+  width: min(78vw, 325px);
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   margin: 0 0 0 auto;
-  border: 1px solid rgba(143, 150, 157, 0.46);
+  border: 1px solid rgba(143, 150, 157, 0.5);
   border-radius: var(--radius-md);
-  background: var(--vision-steel);
-  box-shadow: 0 18px 36px rgba(25, 22, 20, 0.11);
+  background: var(--placeholder-color, var(--vision-steel));
+  box-shadow: 0 18px 36px rgba(25, 22, 20, 0.1);
 }
 
 .media::after {
@@ -62,19 +87,32 @@
 
 @media (min-width: 721px) {
   .inner {
-    grid-template-columns: minmax(0, 6fr) minmax(320px, 5fr);
+    min-height: 540px;
+    grid-template-columns: minmax(0, 7fr) minmax(320px, 5fr);
     align-items: center;
-    gap: clamp(4.5rem, 7vw, 6rem);
-    padding-block: 2.5rem;
+    gap: clamp(4.5rem, 8vw, 7.5rem);
+    padding-block: 3.5rem;
   }
 
   .copy h2 {
-    font-size: clamp(3.25rem, 4.3vw, 4.2rem);
+    font-size: clamp(3.5rem, 4.7vw, 4.65rem);
+  }
+
+  .copy::after {
+    top: 1.35rem;
+    left: 8.6rem;
+    width: clamp(120px, 15vw, 220px);
   }
 
   .media {
-    width: min(100%, 380px);
-    aspect-ratio: 4 / 5;
+    width: min(100%, 360px);
     margin-inline: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .section::before {
+    top: auto;
+    height: 47%;
   }
 }

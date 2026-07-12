@@ -5,7 +5,6 @@ import styles from "./section-shell.module.css";
 type SectionShellProps = ComponentPropsWithoutRef<"section"> & {
   innerClassName?: string;
   tone?: "paper" | "soft";
-  reveal?: boolean;
 };
 
 export function SectionShell({
@@ -13,12 +12,11 @@ export function SectionShell({
   className = "",
   innerClassName = "",
   tone = "paper",
-  reveal = true,
   ...props
 }: SectionShellProps) {
   return (
     <section
-      className={`${styles.shell} ${styles[tone]} ${reveal ? styles.reveal : ""} ${className}`}
+      className={`${styles.shell} ${styles[tone]} ${className}`}
       {...props}
     >
       <div className={`${styles.container} ${innerClassName}`}>{children}</div>

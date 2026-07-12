@@ -12,19 +12,23 @@ import styles from "./news-section.module.css";
 
 type NewsSectionProps = {
   items: readonly ExameNewsItem[];
+  loading?: boolean;
 };
 
-export function NewsSection({ items }: NewsSectionProps) {
+export function NewsSection({ items, loading = false }: NewsSectionProps) {
+  const titleId = loading ? "news-section-loading-title" : "news-section-title";
+
   return (
     <SectionShell
       className={styles.section}
       innerClassName={styles.inner}
       tone="soft"
-      aria-labelledby="news-section-title"
+      aria-labelledby={titleId}
+      aria-busy={loading || undefined}
     >
       <div className={styles.intro}>
         <p className="eyebrow">Exame</p>
-        <h2 id="news-section-title">Tendências em óculos</h2>
+        <h2 id={titleId}>Tendências em óculos</h2>
         <p className={styles.description}>
           Matérias sobre moda, consumo e mercado óptico.
         </p>
@@ -77,6 +81,16 @@ export function NewsSection({ items }: NewsSectionProps) {
                 </div>
               </a>
             </article>
+          ))}
+        </div>
+      ) : loading ? (
+        <div className={styles.loadingCards} aria-hidden="true" data-news-loading>
+          {Array.from({ length: 3 }, (_, index) => (
+            <div className={styles.loadingCard} key={index}>
+              <span className={styles.loadingMedia} />
+              <span className={styles.loadingLine} />
+              <span className={styles.loadingLineShort} />
+            </div>
           ))}
         </div>
       ) : null}

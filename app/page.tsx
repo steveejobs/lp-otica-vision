@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { BrandGrid } from "@/components/brand-grid";
 import { EditorialGallery } from "@/components/editorial-gallery";
 import { HomeHero } from "@/components/home-hero";
@@ -17,9 +19,13 @@ import { getExameNews } from "@/lib/exame-news";
 
 export const revalidate = 28_800;
 
-export default async function HomePage() {
+async function ExameNewsSection() {
   const newsItems = await getExameNews();
 
+  return <NewsSection items={newsItems} />;
+}
+
+export default function HomePage() {
   return (
     <>
       <SiteHeader />
@@ -29,7 +35,9 @@ export default async function HomePage() {
         <EditorialGallery images={editorialGalleryImages} />
         <BrandGrid brands={brandLogos} />
         <LabSection media={labMedia} />
-        <NewsSection items={newsItems} />
+        <Suspense fallback={<NewsSection items={[]} loading />}>
+          <ExameNewsSection />
+        </Suspense>
         <LocationSection />
       </main>
       <SiteFooter />

@@ -1,9 +1,25 @@
 const visibleVideos = new Map<HTMLVideoElement, number>();
 
+const currentVisibilityRatio = (video: HTMLVideoElement) => {
+  const rect = video.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return 0;
+
+  const intersectionWidth = Math.max(
+    0,
+    Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0),
+  );
+  const intersectionHeight = Math.max(
+    0,
+    Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0),
+  );
+  return (intersectionWidth * intersectionHeight) / (rect.width * rect.height);
+};
+
 const updatePlayback = () => {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const canPlay = !reduceMotion && document.visibilityState === "visible";
-  const candidates = [...visibleVideos.entries()]
+  const candidates = [...visibleVideos.keys()]
+    .map((video) => [video, currentVisibilityRatio(video)] as const)
     .filter(([, ratio]) => ratio >= 0.45)
     .sort(([videoA, ratioA], [videoB, ratioB]) => {
       if (ratioA !== ratioB) return ratioB - ratioA;
@@ -41,6 +57,9 @@ export function observeAutoplayVideo(video: HTMLVideoElement) {
   );
 
   observer.observe(video);
+  const handleScroll = () => updatePlayback();
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  video.addEventListener("timeupdate", updatePlayback);
   motionPreference.addEventListener("change", updatePlayback);
   document.addEventListener("visibilitychange", updatePlayback);
 
@@ -49,6 +68,8 @@ export function observeAutoplayVideo(video: HTMLVideoElement) {
     visibleVideos.delete(video);
     updatePlayback();
     observer.disconnect();
+    window.removeEventListener("scroll", handleScroll);
+    video.removeEventListener("timeupdate", updatePlayback);
     motionPreference.removeEventListener("change", updatePlayback);
     document.removeEventListener("visibilitychange", updatePlayback);
   };

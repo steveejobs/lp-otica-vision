@@ -1,9 +1,13 @@
+import { IMAGE_PLACEHOLDERS } from "./image-placeholders";
+
 export type ImageAsset = {
   src: string;
   width: number;
   height: number;
   alt: string;
   objectPosition: string;
+  blurDataURL: string;
+  placeholderColor: string;
 };
 
 export type VideoAsset = {
@@ -33,13 +37,19 @@ const image = (
   height: number,
   alt: string,
   objectPosition = "50% 50%",
-): ImageAsset => ({
-  src: pathFor("photos", filename),
-  width,
-  height,
-  alt,
-  objectPosition,
-});
+): ImageAsset => {
+  const placeholder = IMAGE_PLACEHOLDERS[filename];
+
+  return {
+    src: pathFor("photos", filename),
+    width,
+    height,
+    alt,
+    objectPosition,
+    blurDataURL: placeholder?.blurDataURL ?? "",
+    placeholderColor: placeholder?.color ?? "#d9dde1",
+  };
+};
 
 const video = (
   filename: string,

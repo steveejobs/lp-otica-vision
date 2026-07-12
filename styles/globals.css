@@ -10,6 +10,7 @@
   --vision-bronze: #7a6049;
   --vision-line: rgba(25, 22, 20, 0.12);
   --vision-shadow: rgba(25, 22, 20, 0.14);
+  --vision-red: #8e1f28;
   --font-display: "Iowan Old Style", Baskerville, Georgia, "Times New Roman", serif;
   --font-body: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
   --ease-vision: cubic-bezier(0.22, 0.8, 0.24, 1);
@@ -60,6 +61,23 @@ button {
   color: inherit;
 }
 
+[data-focus-reveal] {
+  clip-path: inset(0 0 0 0);
+  filter: blur(0) saturate(1);
+  transform: scale(1);
+  transition:
+    clip-path 900ms var(--ease-vision),
+    filter 900ms var(--ease-vision),
+    transform 900ms var(--ease-vision);
+  will-change: clip-path, filter, transform;
+}
+
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-focus-visible) {
+  clip-path: inset(0 6% 0 0);
+  filter: blur(2px) saturate(0.82);
+  transform: scale(1.018);
+}
+
 h1,
 h2,
 p,
@@ -93,8 +111,10 @@ figure {
   transition: transform 180ms var(--ease-vision);
 }
 
-.skip-link:focus {
-  transform: translateY(0);
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0) !important;
+  transition: none !important;
 }
 
 .eyebrow {
@@ -108,5 +128,12 @@ figure {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  [data-focus-reveal] {
+    clip-path: none;
+    filter: none;
+    transform: none;
+    transition: none;
   }
 }

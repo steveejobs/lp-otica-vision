@@ -4,7 +4,7 @@
   border: 1px solid rgba(143, 150, 157, 0.52);
   border-radius: var(--radius-md);
   background: var(--vision-steel);
-  box-shadow: 0 18px 38px rgba(25, 22, 20, 0.12);
+  box-shadow: 0 16px 34px rgba(25, 22, 20, 0.1);
 }
 
 .frame::after {

@@ -10,9 +10,14 @@ import styles from "./observed-video.module.css";
 type ObservedVideoProps = {
   asset: VideoAsset;
   className?: string;
+  focusReveal?: boolean;
 };
 
-export function ObservedVideo({ asset, className = "" }: ObservedVideoProps) {
+export function ObservedVideo({
+  asset,
+  className = "",
+  focusReveal = false,
+}: ObservedVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -23,7 +28,11 @@ export function ObservedVideo({ asset, className = "" }: ObservedVideoProps) {
   }, []);
 
   return (
-    <div className={`${styles.frame} ${className}`} data-video-card>
+    <div
+      className={`${styles.frame} ${className}`}
+      data-video-card
+      data-focus-reveal={focusReveal || undefined}
+    >
       <video
         ref={videoRef}
         muted

@@ -1,8 +1,8 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import { Camera, Home, MapPin, MessageCircle } from "lucide-react";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { InstagramImageRail } from "@/components/instagram-image-rail";
 import { ObservedVideo } from "@/components/observed-video";
 import { VisionButton } from "@/components/vision-button";
 import { instagramImages, instagramVideos } from "@/lib/assets";
@@ -55,7 +55,11 @@ export default function InstagramPage() {
       </header>
 
       <section className={styles.primary} aria-label="Conteúdo principal da Ótica Vision">
-        <ObservedVideo asset={instagramVideos[0]} className={styles.mainVideo} />
+        <ObservedVideo
+          asset={instagramVideos[0]}
+          className={styles.mainVideo}
+          focusReveal
+        />
 
         <div className={styles.details}>
           <p className={styles.bio}>
@@ -82,42 +86,19 @@ export default function InstagramPage() {
             </VisionButton>
           </nav>
 
-          <div
-            className={styles.supportVideos}
-            role="group"
-            aria-label="Mais vídeos da Ótica Vision"
-          >
-            <ObservedVideo asset={instagramVideos[1]} className={styles.supportVideo} />
-            <ObservedVideo asset={instagramVideos[2]} className={styles.supportVideo} />
-          </div>
+        </div>
+
+        <div
+          className={styles.supportVideos}
+          role="group"
+          aria-label="Mais vídeos da Ótica Vision"
+        >
+          <ObservedVideo asset={instagramVideos[1]} className={styles.supportVideo} />
+          <ObservedVideo asset={instagramVideos[2]} className={styles.supportVideo} />
         </div>
       </section>
 
-      <section className={styles.imageSection} aria-labelledby="instagram-images-title">
-        <h2 className={styles.srOnly} id="instagram-images-title">
-          Seleção editorial da Ótica Vision
-        </h2>
-        <div
-          className={styles.imageStrip}
-          role="region"
-          aria-label="Seis imagens da Ótica Vision"
-          tabIndex={0}
-        >
-          {instagramImages.map((asset) => (
-            <figure className={styles.imageCard} key={asset.src}>
-              <Image
-                src={asset.src}
-                width={asset.width}
-                height={asset.height}
-                sizes="(max-width: 720px) 145px, 170px"
-                alt={asset.alt}
-                loading="lazy"
-                style={{ objectPosition: asset.objectPosition }}
-              />
-            </figure>
-          ))}
-        </div>
-      </section>
+      <InstagramImageRail images={instagramImages} />
 
       <section className={styles.location} aria-labelledby="instagram-location-title">
         <div>

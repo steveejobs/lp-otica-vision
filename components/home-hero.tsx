@@ -17,7 +17,9 @@ export function HomeHero() {
     >
       <div className={styles.copy}>
         <p className={`eyebrow ${styles.eyebrow}`}>Ótica Vision · Araguaína - TO</p>
-        <h1 id="hero-title">Armações que fazem sentido no rosto — e na rotina.</h1>
+        <h1 id="hero-title">
+          Armações que fazem sentido <span>no rosto — e na rotina.</span>
+        </h1>
         <p className={styles.support}>
           Modelos nacionais e importados, com lentes feitas pela Vision em Araguaína.
         </p>
@@ -43,15 +45,21 @@ export function HomeHero() {
       </div>
 
       <figure className={styles.media}>
-        <div className={styles.mediaFrame}>
+        <div className={styles.mediaFrame} data-focus-reveal>
           <Image
             src={heroMedia.src}
             alt={heroMedia.alt}
             fill
             priority
-            sizes="(max-width: 720px) 76vw, 450px"
+            placeholder="blur"
+            blurDataURL={heroMedia.blurDataURL}
+            sizes="(max-width: 720px) 70vw, (max-width: 1100px) 39vw, 470px"
           />
         </div>
+        <figcaption className={styles.mediaNote} aria-hidden="true">
+          <span>Vision</span>
+          <span>01</span>
+        </figcaption>
       </figure>
     </SectionShell>
   );

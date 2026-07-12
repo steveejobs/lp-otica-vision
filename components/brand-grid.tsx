@@ -29,7 +29,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
         <p>Consulte a disponibilidade dos modelos pelo WhatsApp.</p>
       </header>
 
-      <ul className={styles.grid} aria-label="Marcas disponíveis para consulta">
+      <ul className={styles.grid} aria-label="Logos de marcas para consulta na Ótica Vision">
         {brands.map((brandItem) => {
           const logoStyle: BrandLogoStyle = {
             "--brand-scale": brandItem.scale,
@@ -46,6 +46,7 @@ export function BrandGrid({ brands }: BrandGridProps) {
                 height={brandItem.height}
                 sizes="(max-width: 720px) 132px, 150px"
                 alt={brandItem.alt}
+                loading="lazy"
                 style={logoStyle}
               />
             </li>

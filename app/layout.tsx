@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
+import { VisionMotion } from "@/components/vision-motion";
 import { heroMedia, identityAssets } from "@/lib/assets";
 import { getMetadataBase } from "@/lib/metadata";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main-content">
           Pular para o conteúdo
         </a>
+        <VisionMotion />
         {children}
       </body>
     </html>
