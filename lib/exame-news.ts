@@ -44,6 +44,18 @@ const normalizeUrl = (value: string | undefined, baseUrl: string) => {
   }
 };
 
+const isExameUrl = (value: string) => {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "exame.com" || url.hostname.endsWith(".exame.com"))
+    );
+  } catch {
+    return false;
+  }
+};
+
 const imageLooksUsable = (value: string | undefined, baseUrl: string) => {
   const normalized = normalizeUrl(value, baseUrl);
   if (!normalized) return undefined;
@@ -192,7 +204,7 @@ export function extractExameNews(
       : headingNode.closest("a[href]");
     const url = normalizeUrl(anchor.attr("href"), baseUrl);
 
-    if (!title || !url || seenUrls.has(url) || !url.includes("exame.com/")) return;
+    if (!title || !url || seenUrls.has(url) || !isExameUrl(url)) return;
 
     const container = findCardContainer($, heading);
     const metadata = readCardMetadata(container);

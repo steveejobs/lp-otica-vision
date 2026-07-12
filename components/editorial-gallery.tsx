@@ -107,16 +107,18 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
               aria-hidden={position !== "active"}
               key={asset.src}
             >
-              <Image
-                src={asset.src}
-                width={asset.width}
-                height={asset.height}
-                sizes="(max-width: 720px) 80vw, 430px"
-                alt={asset.alt}
-                draggable={false}
-                loading="lazy"
-                style={{ objectPosition: asset.objectPosition }}
-              />
+              {position !== "resting" ? (
+                <Image
+                  src={asset.src}
+                  width={asset.width}
+                  height={asset.height}
+                  sizes="(max-width: 720px) 80vw, 430px"
+                  alt={asset.alt}
+                  draggable={false}
+                  loading="lazy"
+                  style={{ objectPosition: asset.objectPosition }}
+                />
+              ) : null}
             </figure>
           );
         })}
