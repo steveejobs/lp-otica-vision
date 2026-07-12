@@ -107,6 +107,20 @@
   }
 }
 
+@media (max-width: 720px) {
+  .inner {
+    padding-block: 2.85rem 3rem;
+  }
+
+  .grid {
+    margin-top: 1.2rem;
+  }
+
+  .slot {
+    height: 53px;
+  }
+}
+
 @media (min-width: 1200px) {
   .inner {
     display: grid;

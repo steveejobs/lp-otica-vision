@@ -21,12 +21,17 @@ export function VideoStory({ videos }: VideoStoryProps) {
         <p>Veja como as armações se comportam em uso real.</p>
       </header>
 
-      <div className={styles.stage} data-focus-reveal>
+      <div className={styles.stage}>
+        <span className={styles.aperture} aria-hidden="true" />
         <ObservedVideo asset={videos[0]} className={styles.main} />
-        <div className={styles.supportRow}>
-          <ObservedVideo asset={videos[1]} className={styles.support} />
-          <ObservedVideo asset={videos[2]} className={styles.support} />
-        </div>
+        <ObservedVideo
+          asset={videos[1]}
+          className={`${styles.support} ${styles.supportOne}`}
+        />
+        <ObservedVideo
+          asset={videos[2]}
+          className={`${styles.support} ${styles.supportTwo}`}
+        />
       </div>
     </SectionShell>
   );

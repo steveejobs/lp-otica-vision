@@ -113,6 +113,20 @@
 @media (max-width: 720px) {
   .section::before {
     top: auto;
-    height: 47%;
+    height: 43%;
+  }
+
+  .inner {
+    gap: 1.35rem;
+    padding-block: 3.1rem 3.3rem;
+  }
+
+  .description {
+    margin-block: 0.85rem 1.15rem;
+  }
+
+  .media {
+    width: min(64vw, 250px);
+    border-radius: 2px;
   }
 }

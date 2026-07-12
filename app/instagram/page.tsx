@@ -4,7 +4,6 @@ import { Camera, Home, MapPin, MessageCircle } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { InstagramImageRail } from "@/components/instagram-image-rail";
 import { ObservedVideo } from "@/components/observed-video";
-import { VisionButton } from "@/components/vision-button";
 import { instagramImages, instagramVideos } from "@/lib/assets";
 import { LINKS } from "@/lib/links";
 import { getMetadataBase } from "@/lib/metadata";
@@ -54,47 +53,57 @@ export default function InstagramPage() {
         <h1>@oticavisionaraguaina</h1>
       </header>
 
-      <section className={styles.primary} aria-label="Conteúdo principal da Ótica Vision">
-        <ObservedVideo
-          asset={instagramVideos[0]}
-          className={styles.mainVideo}
-          focusReveal
-        />
+      <section className={styles.poster} aria-label="Ótica Vision em movimento">
+        <div className={styles.mediaStage}>
+          <span className={styles.aperture} aria-hidden="true" />
+          <ObservedVideo asset={instagramVideos[0]} className={styles.mainVideo} />
+          <ObservedVideo
+            asset={instagramVideos[1]}
+            className={`${styles.supportVideo} ${styles.supportOne}`}
+          />
+          <ObservedVideo
+            asset={instagramVideos[2]}
+            className={`${styles.supportVideo} ${styles.supportTwo}`}
+          />
+        </div>
 
-        <div className={styles.details}>
+        <div className={styles.narrative}>
           <p className={styles.bio}>
-            Armações nacionais e importadas, LAB. DIGITAL e atendimento em Araguaína - TO.
+            Armações nacionais e importadas, <strong>LAB. DIGITAL</strong> e atendimento
+            em Araguaína - TO.
           </p>
 
           <nav className={styles.actions} aria-label="Links da Ótica Vision">
-            <VisionButton href={LINKS.whatsapp} icon={MessageCircle} external>
-              WhatsApp
-            </VisionButton>
-            <VisionButton
-              href={LINKS.instagram}
-              icon={Camera}
-              variant="secondary"
-              external
+            <a
+              className={styles.primaryLink}
+              href={LINKS.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              Instagram
-            </VisionButton>
-            <VisionButton href={LINKS.maps} icon={MapPin} variant="secondary" external>
-              Rota
-            </VisionButton>
-            <VisionButton href={LINKS.home} icon={Home} variant="secondary">
-              Site completo
-            </VisionButton>
+              <MessageCircle aria-hidden="true" size={21} strokeWidth={1.55} />
+              <span>WhatsApp</span>
+              <small aria-hidden="true">01</small>
+            </a>
+            <a
+              href={LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Camera aria-hidden="true" size={21} strokeWidth={1.55} />
+              <span>Instagram</span>
+              <small aria-hidden="true">02</small>
+            </a>
+            <a href={LINKS.maps} target="_blank" rel="noopener noreferrer">
+              <MapPin aria-hidden="true" size={21} strokeWidth={1.55} />
+              <span>Rota</span>
+              <small aria-hidden="true">03</small>
+            </a>
+            <a href={LINKS.home}>
+              <Home aria-hidden="true" size={21} strokeWidth={1.55} />
+              <span>Site completo</span>
+              <small aria-hidden="true">04</small>
+            </a>
           </nav>
-
-        </div>
-
-        <div
-          className={styles.supportVideos}
-          role="group"
-          aria-label="Mais vídeos da Ótica Vision"
-        >
-          <ObservedVideo asset={instagramVideos[1]} className={styles.supportVideo} />
-          <ObservedVideo asset={instagramVideos[2]} className={styles.supportVideo} />
         </div>
       </section>
 
@@ -105,9 +114,10 @@ export default function InstagramPage() {
           <p className="eyebrow">Ótica Vision</p>
           <h2 id="instagram-location-title">Araguaína - TO</h2>
         </div>
-        <VisionButton href={LINKS.maps} icon={MapPin} variant="secondary" external>
-          Rota
-        </VisionButton>
+        <a href={LINKS.maps} target="_blank" rel="noopener noreferrer">
+          <MapPin aria-hidden="true" size={20} strokeWidth={1.55} />
+          <span>Rota</span>
+        </a>
       </section>
     </main>
   );

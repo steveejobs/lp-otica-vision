@@ -8,6 +8,7 @@ import {
   useState,
   type CSSProperties,
   type KeyboardEvent,
+  type PointerEvent,
 } from "react";
 
 import type { ImageAsset } from "@/lib/assets";
@@ -22,6 +23,14 @@ type CardStyle = CSSProperties & {
   "--placeholder-color": string;
 };
 
+type DragState = {
+  pointerId: number;
+  pointerType: string;
+  startX: number;
+  startScrollLeft: number;
+  moved: boolean;
+};
+
 const AUTOPLAY_DELAY = 3_200;
 const INTERACTION_PAUSE = 5_500;
 
@@ -30,6 +39,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
   const directionRef = useRef<1 | -1>(1);
   const pauseUntil = useRef(0);
   const interactingRef = useRef(false);
+  const dragStateRef = useRef<DragState | null>(null);
   const scrollFrame = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(() => new Set());
@@ -59,8 +69,9 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
       if (!rail || !card || (!manual && !loadedIndexes.has(index))) return false;
       if (manual) pauseAfterInteraction();
       setActiveIndex(index);
+      const targetLeft = card.offsetLeft - (rail.clientWidth - card.offsetWidth) / 2;
       rail.scrollTo({
-        left: card.offsetLeft,
+        left: targetLeft,
         behavior: reducedMotion ? "auto" : "smooth",
       });
       return true;
@@ -132,7 +143,9 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
       const cards = Array.from(rail.querySelectorAll<HTMLElement>("[data-rail-index]"));
       const nearest = cards.reduce(
         (best, card, index) => {
-          const distance = Math.abs(card.offsetLeft - rail.scrollLeft);
+          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          const railCenter = rail.scrollLeft + rail.clientWidth / 2;
+          const distance = Math.abs(cardCenter - railCenter);
           return distance < best.distance ? { index, distance } : best;
         },
         { index: activeIndex, distance: Number.POSITIVE_INFINITY },
@@ -150,12 +163,39 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
     scrollToIndex(target, true);
   };
 
-  const beginInteraction = () => {
+  const beginInteraction = (event: PointerEvent<HTMLDivElement>) => {
     interactingRef.current = true;
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      pointerType: event.pointerType,
+      startX: event.clientX,
+      startScrollLeft: event.currentTarget.scrollLeft,
+      moved: false,
+    };
+    if (event.pointerType === "mouse") {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
     pauseAfterInteraction();
   };
 
-  const endInteraction = () => {
+  const moveInteraction = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const distance = event.clientX - drag.startX;
+    if (Math.abs(distance) > 6) drag.moved = true;
+    if (drag.pointerType === "mouse") {
+      event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
+    }
+  };
+
+  const endInteraction = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = dragStateRef.current;
+    if (drag && drag.pointerId === event.pointerId && !drag.moved) {
+      const target = (event.target as Element).closest<HTMLElement>("[data-rail-index]");
+      const index = Number(target?.dataset.railIndex);
+      if (Number.isInteger(index)) scrollToIndex(index, true);
+    }
+    dragStateRef.current = null;
     interactingRef.current = false;
     pauseAfterInteraction();
   };
@@ -182,6 +222,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
         onBlur={pauseAfterInteraction}
         onKeyDown={handleKeyDown}
         onPointerDown={beginInteraction}
+        onPointerMove={moveInteraction}
         onPointerUp={endInteraction}
         onPointerCancel={endInteraction}
         onWheel={pauseAfterInteraction}
@@ -189,12 +230,14 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
       >
         {images.map((asset, index) => {
           const cardStyle: CardStyle = { "--placeholder-color": asset.placeholderColor };
-          const eager = index <= Math.min(images.length - 1, activeIndex + 2);
+          const eager =
+            index === activeIndex || index === Math.min(images.length - 1, activeIndex + 1);
 
           return (
             <figure
-              className={styles.card}
+              className={`${styles.card} ${index === activeIndex ? styles.active : ""}`}
               data-rail-index={index}
+              data-active={index === activeIndex || undefined}
               style={cardStyle}
               key={asset.src}
             >

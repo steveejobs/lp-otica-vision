@@ -1,9 +1,9 @@
-import Image from "next/image";
 import { Camera, MessageCircle } from "lucide-react";
 
 import { heroMedia } from "@/lib/assets";
 import { LINKS } from "@/lib/links";
 
+import { FocusPortrait } from "./focus-portrait";
 import { SectionShell } from "./section-shell";
 import { VisionButton } from "./vision-button";
 import styles from "./home-hero.module.css";
@@ -15,11 +15,24 @@ export function HomeHero() {
       innerClassName={styles.inner}
       aria-labelledby="hero-title"
     >
+      <div className={styles.eyebrowRail}>
+        <p className="eyebrow">Ótica Vision · Araguaína - TO</p>
+      </div>
+
+      <h1
+        className={styles.title}
+        id="hero-title"
+        aria-label="Armações que fazem sentido no rosto — e na rotina."
+      >
+        <span className={styles.titleLead}>Armações que </span>
+        <span className={styles.titleSecond}>fazem sentido </span>
+        <span className={styles.titleThird}>no rosto — </span>
+        <span className={styles.titleEnd}>e na rotina.</span>
+      </h1>
+
+      <FocusPortrait asset={heroMedia} className={styles.media} priority />
+
       <div className={styles.copy}>
-        <p className={`eyebrow ${styles.eyebrow}`}>Ótica Vision · Araguaína - TO</p>
-        <h1 id="hero-title">
-          Armações que fazem sentido <span>no rosto — e na rotina.</span>
-        </h1>
         <p className={styles.support}>
           Modelos nacionais e importados, com lentes feitas pela Vision em Araguaína.
         </p>
@@ -43,24 +56,6 @@ export function HomeHero() {
           </VisionButton>
         </div>
       </div>
-
-      <figure className={styles.media}>
-        <div className={styles.mediaFrame} data-focus-reveal>
-          <Image
-            src={heroMedia.src}
-            alt={heroMedia.alt}
-            fill
-            priority
-            placeholder="blur"
-            blurDataURL={heroMedia.blurDataURL}
-            sizes="(max-width: 720px) 70vw, (max-width: 1100px) 39vw, 470px"
-          />
-        </div>
-        <figcaption className={styles.mediaNote} aria-hidden="true">
-          <span>Vision</span>
-          <span>01</span>
-        </figcaption>
-      </figure>
     </SectionShell>
   );
 }

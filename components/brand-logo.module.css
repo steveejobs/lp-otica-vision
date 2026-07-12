@@ -10,26 +10,26 @@
   content: "";
   position: absolute;
   z-index: -1;
-  top: 61%;
+  top: 60%;
   left: 50%;
-  width: 108%;
-  height: 28%;
+  width: 104%;
+  height: 23%;
   border-radius: 999px;
   background: radial-gradient(
     ellipse at center,
-    rgba(25, 22, 20, 0.24),
-    rgba(25, 22, 20, 0.1) 46%,
-    transparent 78%
+    rgba(25, 22, 20, 0.17),
+    rgba(25, 22, 20, 0.055) 48%,
+    transparent 80%
   );
-  filter: blur(12px);
-  opacity: 0.62;
+  filter: blur(14px);
+  opacity: 0.48;
   transform: translate(-50%, -50%);
 }
 
 .image {
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 1px 2px rgba(25, 22, 20, 0.14));
+  filter: drop-shadow(0 1px 1.5px rgba(25, 22, 20, 0.09));
   object-fit: contain;
 }
 
@@ -60,7 +60,7 @@
   }
 
   .wrap::before {
-    filter: blur(12px);
-    opacity: 0.56;
+    filter: blur(13px);
+    opacity: 0.44;
   }
 }

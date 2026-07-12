@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -36,13 +35,14 @@ type CardStyle = CSSProperties & {
   "--placeholder-color": string;
 };
 
-const AUTOPLAY_DELAY = 4_600;
-const INTERACTION_PAUSE = 6_000;
+const AUTOPLAY_DELAY = 5_100;
+const INTERACTION_PAUSE = 6_500;
 
-function LensFocusGallery({ images }: EditorialGalleryProps) {
+function FocusSequence({ images }: EditorialGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(() => new Set());
   const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -53,7 +53,6 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
 
   const previousIndex = (activeIndex - 1 + images.length) % images.length;
   const nextIndex = (activeIndex + 1) % images.length;
-  const previousReady = loadedIndexes.has(previousIndex);
   const nextReady = loadedIndexes.has(nextIndex);
 
   const markLoaded = useCallback((index: number) => {
@@ -70,22 +69,25 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
     setResumeVersion((current) => current + 1);
   }, []);
 
-  const showPrevious = useCallback(
-    (manual = true) => {
-      if (!loadedIndexes.has(previousIndex)) return;
+  const showIndex = useCallback(
+    (index: number, manual = true) => {
       if (manual) pauseAfterInteraction();
-      setActiveIndex(previousIndex);
+      setActiveIndex(index);
     },
-    [loadedIndexes, pauseAfterInteraction, previousIndex],
+    [pauseAfterInteraction],
   );
+
+  const showPrevious = useCallback(() => {
+    if (!loadedIndexes.has(previousIndex)) return;
+    showIndex(previousIndex);
+  }, [loadedIndexes, previousIndex, showIndex]);
 
   const showNext = useCallback(
     (manual = true) => {
       if (!loadedIndexes.has(nextIndex)) return;
-      if (manual) pauseAfterInteraction();
-      setActiveIndex(nextIndex);
+      showIndex(nextIndex, manual);
     },
-    [loadedIndexes, nextIndex, pauseAfterInteraction],
+    [loadedIndexes, nextIndex, showIndex],
   );
 
   useEffect(() => {
@@ -96,8 +98,8 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.28),
-      { threshold: [0, 0.28, 0.6], rootMargin: "0px 0px -5%" },
+      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.24),
+      { threshold: [0, 0.24, 0.56], rootMargin: "0px 0px -5%" },
     );
     observer.observe(viewport);
     return () => observer.disconnect();
@@ -124,7 +126,7 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
       reducedMotion ||
       !isInView ||
       !isPageVisible ||
-      dragStart.current ||
+      isDragging ||
       !nextReady
     ) {
       return;
@@ -138,6 +140,7 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
     return () => window.clearTimeout(timer);
   }, [
     activeIndex,
+    isDragging,
     isInView,
     isPageVisible,
     nextReady,
@@ -159,9 +162,10 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
   const getPosition = useCallback(
     (index: number) => {
       const distance = getDistance(index);
-      if (distance === -1) return "previous";
+      if (distance === -1) return "past";
       if (distance === 0) return "active";
-      if (distance === 1) return "next";
+      if (distance === 1) return "near";
+      if (distance === 2) return "far";
       return "resting";
     },
     [getDistance],
@@ -172,7 +176,10 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
       new Set(
         images
           .map((_, index) => index)
-          .filter((index) => Math.abs(getDistance(index)) <= 1),
+          .filter((index) => {
+            const distance = getDistance(index);
+            return distance >= -1 && distance <= 2;
+          }),
       ),
     [getDistance, images],
   );
@@ -191,6 +198,7 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary) return;
     pauseAfterInteraction();
+    setIsDragging(true);
     dragStart.current = {
       pointerId: event.pointerId,
       x: event.clientX,
@@ -205,19 +213,20 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
     const distanceX = event.clientX - start.x;
     const distanceY = event.clientY - start.y;
     if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 12) return;
-    setDragOffset(Math.max(-64, Math.min(64, distanceX * 0.42)));
+    setDragOffset(Math.max(-82, Math.min(82, distanceX * 0.48)));
   };
 
   const finishPointer = (event: PointerEvent<HTMLDivElement>, cancelled = false) => {
     const start = dragStart.current;
     dragStart.current = null;
+    setIsDragging(false);
     setDragOffset(0);
     pauseAfterInteraction();
     if (cancelled || !start || start.pointerId !== event.pointerId) return;
 
     const distanceX = event.clientX - start.x;
     const distanceY = event.clientY - start.y;
-    if (Math.abs(distanceX) < 38 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
+    if (Math.abs(distanceX) < 42 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
     if (distanceX > 0) showPrevious();
     else showNext();
   };
@@ -225,13 +234,13 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
   const viewportStyle: GalleryStyle = { "--drag-offset": `${dragOffset}px` };
 
   return (
-    <div className={styles.gallery}>
+    <div className={styles.sequence}>
       <div
         ref={viewportRef}
-        className={styles.viewport}
+        className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
         role="region"
         aria-roledescription="carrossel"
-        aria-label="Galeria editorial de óculos com reprodução automática"
+        aria-label="Sequência editorial de óculos com avanço automático"
         tabIndex={0}
         style={viewportStyle}
         onBlur={pauseAfterInteraction}
@@ -257,10 +266,10 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
                   src={asset.src}
                   width={asset.width}
                   height={asset.height}
-                  sizes="(max-width: 720px) 74vw, 410px"
+                  sizes="(max-width: 720px) 72vw, (max-width: 1100px) 38vw, 410px"
                   alt={asset.alt}
                   draggable={false}
-                  loading="lazy"
+                  loading={index === 0 ? "eager" : "lazy"}
                   placeholder="blur"
                   blurDataURL={asset.blurDataURL}
                   onLoad={() => markLoaded(index)}
@@ -270,30 +279,30 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
             </figure>
           );
         })}
+        <span className={styles.orbit} aria-hidden="true" />
       </div>
 
-      <div className={styles.controls} aria-label="Controles da galeria">
-        <button
-          type="button"
-          onClick={() => showPrevious()}
-          aria-label="Imagem anterior"
-          disabled={!previousReady}
-        >
-          <ArrowLeft aria-hidden="true" size={17} strokeWidth={1.6} />
-        </button>
+      <div className={styles.navigation}>
         <p className={styles.counter} aria-live="polite" aria-atomic="true">
           <span>{String(activeIndex + 1).padStart(2, "0")}</span>
-          <span aria-hidden="true">—</span>
+          <span aria-hidden="true">/</span>
           <span>{String(images.length).padStart(2, "0")}</span>
         </p>
-        <button
-          type="button"
-          onClick={() => showNext()}
-          aria-label="Próxima imagem"
-          disabled={!nextReady}
-        >
-          <ArrowRight aria-hidden="true" size={17} strokeWidth={1.6} />
-        </button>
+        <div className={styles.progress} aria-label="Navegar pela seleção">
+          {images.map((asset, index) => (
+            <button
+              type="button"
+              className={index === activeIndex ? styles.current : ""}
+              onClick={() => showIndex(index)}
+              aria-label={`Mostrar imagem ${index + 1}: ${asset.alt}`}
+              aria-current={index === activeIndex ? "true" : undefined}
+              key={asset.src}
+            />
+          ))}
+        </div>
+        <p className={styles.hint} aria-hidden="true">
+          arraste para mudar o foco
+        </p>
       </div>
     </div>
   );
@@ -309,9 +318,10 @@ export function EditorialGallery({ images }: EditorialGalleryProps) {
       <header className={styles.intro}>
         <h2 id="editorial-gallery-title">Escolhas que mudam o olhar.</h2>
         <p>Presença, formato e acabamento em uma seleção real da Vision.</p>
+        <span aria-hidden="true">seleção 01 — 08</span>
       </header>
 
-      <LensFocusGallery images={images} />
+      <FocusSequence images={images} />
     </SectionShell>
   );
 }
