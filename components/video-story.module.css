@@ -34,7 +34,7 @@
 }
 
 .main {
-  width: min(100%, 390px);
+  width: min(100%, 370px);
   aspect-ratio: 9 / 16;
   margin-inline: auto;
 }
@@ -67,7 +67,7 @@
   }
 
   .main {
-    max-width: 310px;
+    max-width: 300px;
   }
 
   .supportRow {

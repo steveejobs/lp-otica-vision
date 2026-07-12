@@ -3,6 +3,7 @@ export type ImageAsset = {
   width: number;
   height: number;
   alt: string;
+  objectPosition: string;
 };
 
 export type VideoAsset = {
@@ -10,6 +11,17 @@ export type VideoAsset = {
   poster: string;
   label: string;
   objectPosition: string;
+};
+
+export type BrandAsset = {
+  name: string;
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  scale: number;
+  maxWidth: number;
+  maxHeight: number;
 };
 
 const pathFor = (folder: string, filename: string) =>
@@ -20,11 +32,13 @@ const image = (
   width: number,
   height: number,
   alt: string,
+  objectPosition = "50% 50%",
 ): ImageAsset => ({
   src: pathFor("photos", filename),
   width,
   height,
   alt,
+  objectPosition,
 });
 
 const video = (
@@ -37,6 +51,25 @@ const video = (
   poster: pathFor("posters", poster),
   label,
   objectPosition,
+});
+
+const brand = (
+  name: string,
+  filename: string,
+  width: number,
+  height: number,
+  scale: number,
+  maxWidth: number,
+  maxHeight: number,
+): BrandAsset => ({
+  name,
+  src: pathFor("brands", filename),
+  alt: `Logo ${name}`,
+  width,
+  height,
+  scale,
+  maxWidth,
+  maxHeight,
 });
 
 export const identityAssets = {
@@ -73,6 +106,126 @@ export const homeVideos = [
   ),
 ] as const;
 
+export const editorialGalleryImages = [
+  image(
+    "1 (1).jpg",
+    1358,
+    1810,
+    "Retrato editorial com óculos escuros pretos e textura felpuda",
+    "50% 46%",
+  ),
+  image(
+    "8 (2).jpg",
+    1440,
+    1762,
+    "Mulher experimentando óculos escuros no interior da Ótica Vision",
+    "50% 42%",
+  ),
+  image(
+    "6 (1).jpg",
+    1440,
+    1919,
+    "Retrato com armação tartaruga e acabamento em tom quente",
+    "50% 43%",
+  ),
+  image(
+    "5 (2).jpg",
+    1440,
+    1919,
+    "Perfil com armação de grau tartaruga e lente clara",
+    "48% 42%",
+  ),
+  image(
+    "4 (2).jpg",
+    1440,
+    1911,
+    "Retrato com óculos de lente espelhada e jaqueta vermelha",
+    "50% 40%",
+  ),
+  image(
+    "8 (3).jpg",
+    1320,
+    1615,
+    "Seleção de óculos organizada em bandeja na loja",
+    "50% 49%",
+  ),
+  image(
+    "3 (1).jpg",
+    1440,
+    1919,
+    "Retrato em tons neutros com óculos escuros e braço elevado",
+    "50% 42%",
+  ),
+  image(
+    "7 (3).jpg",
+    1440,
+    1919,
+    "Close com óculos de lente marrom e acabamento translúcido",
+    "50% 43%",
+  ),
+] as const;
+
+export const brandLogos = [
+  brand("Ray-Ban", "logo-rayban.png", 1280, 1280, 1.34, 104, 42),
+  brand("Carrera", "carrera (1).png", 800, 157, 0.9, 112, 30),
+  brand(
+    "Persol",
+    "persol-logo-png-transparent.png",
+    2400,
+    2400,
+    1.42,
+    104,
+    40,
+  ),
+  brand("Tom Ford", "Tom-Ford-logo.png", 3840, 2160, 1.12, 108, 30),
+  brand(
+    "Swarovski",
+    "Swarovski-Logo-2016.png",
+    3840,
+    2160,
+    1.1,
+    108,
+    34,
+  ),
+  brand(
+    "Dolce & Gabbana",
+    "images__2_-removebg-preview.png",
+    447,
+    447,
+    2.2,
+    86,
+    38,
+  ),
+  brand(
+    "Jimmy Choo",
+    "Jimmy_Choo_Ltd-Logo.wine.png",
+    3000,
+    2000,
+    1.6,
+    104,
+    36,
+  ),
+  brand("Max Mara", "Max-Mara-logo.png", 1280, 720, 1.1, 104, 30),
+  brand("Versace", "versace-logo.png", 1280, 659, 0.88, 94, 42),
+  brand(
+    "Emilio Pucci",
+    "Emilio-Pucci-Logo.png",
+    1280,
+    720,
+    1.28,
+    106,
+    34,
+  ),
+] as const;
+
+export const labMedia = image(
+  "5 (1).jpg",
+  1440,
+  1919,
+  "Detalhe editorial de armação de grau e reflexo na lente",
+  "50% 42%",
+);
+
 const assertUnique = (paths: readonly string[], route: string) => {
   if (new Set(paths).size !== paths.length) {
     throw new Error(`Asset repetido na rota ${route}.`);
@@ -80,6 +233,12 @@ const assertUnique = (paths: readonly string[], route: string) => {
 };
 
 assertUnique(
-  [heroMedia.src, ...homeVideos.map((item) => item.src)],
+  [
+    heroMedia.src,
+    ...homeVideos.map((item) => item.src),
+    ...editorialGalleryImages.map((item) => item.src),
+    ...brandLogos.map((item) => item.src),
+    labMedia.src,
+  ],
   "home",
 );
