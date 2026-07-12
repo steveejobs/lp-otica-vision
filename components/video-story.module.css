@@ -1,41 +1,41 @@
 .section {
-  position: relative;
-  padding-block: clamp(4rem, 5.5vw, 5.5rem);
-  background: var(--vision-paper);
-  overflow: clip;
+  border-bottom: 1px solid var(--vision-line);
+}
+
+.inner {
+  padding-block: clamp(4.5rem, 6vw, 5.5rem) clamp(5rem, 7vw, 6.25rem);
 }
 
 .intro {
-  max-width: 620px;
-  margin: 0 auto 2.4rem;
+  max-width: 600px;
+  margin: 0 auto 2rem;
   text-align: center;
 }
 
 .intro h2 {
-  margin: 0.65rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(2.45rem, 4.4vw, 4rem);
+  font-size: clamp(2.8rem, 4.2vw, 3.8rem);
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.02;
   letter-spacing: 0;
   text-wrap: balance;
 }
 
-.intro > p:last-child {
-  margin: 0.9rem 0 0;
+.intro p {
+  margin-top: 0.85rem;
   color: var(--vision-muted);
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .stage {
-  width: min(100%, 800px);
+  width: min(100%, 780px);
   margin-inline: auto;
 }
 
 .main {
-  width: min(100%, 380px);
-  aspect-ratio: 3 / 4;
+  width: min(100%, 390px);
+  aspect-ratio: 9 / 16;
   margin-inline: auto;
 }
 
@@ -43,35 +43,36 @@
   display: grid;
   width: min(100%, 400px);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin: 1rem auto 0;
+  gap: 0.85rem;
+  margin: 0.85rem auto 0;
 }
 
 .support {
-  aspect-ratio: 4 / 5;
-  box-shadow: 0 14px 34px rgba(25, 22, 20, 0.1);
+  aspect-ratio: 9 / 16;
+  box-shadow: 0 14px 30px rgba(25, 22, 20, 0.1);
 }
 
 @media (max-width: 720px) {
-  .section {
-    padding-block: 3.8rem 4.4rem;
+  .inner {
+    padding-block: 3.75rem 4.5rem;
   }
 
   .intro {
-    margin-bottom: 1.8rem;
+    max-width: 350px;
+    margin-bottom: 1.65rem;
   }
 
   .intro h2 {
-    font-size: clamp(2.35rem, 10vw, 3.3rem);
+    font-size: clamp(2.45rem, 10.5vw, 2.9rem);
   }
 
   .main {
-    max-width: 380px;
+    max-width: 310px;
   }
 
   .supportRow {
-    gap: 0.7rem;
-    margin-top: 0.7rem;
+    max-width: 356px;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
   }
-
 }

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Pause, Play } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import type { VideoAsset } from "@/lib/assets";
 import { observeAutoplayVideo } from "@/lib/video-observer";
@@ -15,31 +14,16 @@ type ObservedVideoProps = {
 
 export function ObservedVideo({ asset, className = "" }: ObservedVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const userPausedRef = useRef(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    return observeAutoplayVideo(video, () => !userPausedRef.current);
+    return observeAutoplayVideo(video);
   }, []);
 
-  const togglePlayback = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      userPausedRef.current = false;
-      void video.play().catch(() => setIsPlaying(false));
-    } else {
-      userPausedRef.current = true;
-      video.pause();
-    }
-  };
-
   return (
-    <div className={`${styles.tile} ${className}`}>
+    <div className={`${styles.frame} ${className}`} data-video-card>
       <video
         ref={videoRef}
         muted
@@ -47,26 +31,13 @@ export function ObservedVideo({ asset, className = "" }: ObservedVideoProps) {
         playsInline
         preload="metadata"
         poster={asset.poster}
-        aria-label={asset.title}
+        aria-label={asset.label}
+        data-video-asset={asset.src}
         style={{ objectPosition: asset.objectPosition }}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
       >
         <source src={asset.src} type="video/mp4" />
+        Seu navegador não oferece suporte a vídeo HTML5.
       </video>
-      <button
-        className={styles.control}
-        type="button"
-        onClick={togglePlayback}
-        aria-label={isPlaying ? `Pausar: ${asset.title}` : `Reproduzir: ${asset.title}`}
-        title={isPlaying ? "Pausar vídeo" : "Reproduzir vídeo"}
-      >
-        {isPlaying ? (
-          <Pause aria-hidden="true" size={16} fill="currentColor" />
-        ) : (
-          <Play aria-hidden="true" size={16} fill="currentColor" />
-        )}
-      </button>
     </div>
   );
 }

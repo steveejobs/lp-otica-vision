@@ -1,12 +1,13 @@
+import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
 import styles from "./vision-button.module.css";
 
 type VisionButtonProps = {
   href?: string;
-  children?: React.ReactNode;
+  children: ReactNode;
   icon: LucideIcon;
-  variant?: "primary" | "secondary" | "icon";
+  variant?: "primary" | "secondary" | "compact";
   ariaLabel?: string;
   external?: boolean;
   className?: string;
@@ -26,22 +27,22 @@ export function VisionButton({
   const content = (
     <>
       <Icon aria-hidden="true" size={18} strokeWidth={1.8} />
-      {children ? <span>{children}</span> : null}
+      <span>{children}</span>
     </>
   );
 
   if (href) {
     return (
-    <a
-      className={`${styles.button} ${styles[variant]} ${className}`}
-      href={href}
-      aria-label={ariaLabel}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
-    >
-      {content}
-    </a>
-  );
+      <a
+        className={`${styles.button} ${styles[variant]} ${className}`}
+        href={href}
+        aria-label={ariaLabel}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+      >
+        {content}
+      </a>
+    );
   }
 
   return (

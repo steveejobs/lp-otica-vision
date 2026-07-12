@@ -1,40 +1,43 @@
 export function observeAutoplayVideo(
   video: HTMLVideoElement,
-  shouldPlay: () => boolean = () => true,
 ) {
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let isVisible = false;
 
-  const pause = () => video.pause();
+  const updatePlayback = () => {
+    const canPlay =
+      isVisible &&
+      !motionPreference.matches &&
+      document.visibilityState === "visible";
 
-  if (reducedMotion.matches || !("IntersectionObserver" in window)) {
-    pause();
-    return pause;
-  }
+    if (!canPlay) {
+      video.pause();
+      return;
+    }
+
+    void video.play().catch(() => video.pause());
+  };
+
+  video.pause();
+
+  if (!("IntersectionObserver" in window)) return () => video.pause();
 
   const observer = new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.55 && shouldPlay()) {
-        void video.play().catch(pause);
-      } else {
-        pause();
-      }
+      isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.45;
+      updatePlayback();
     },
-    { threshold: [0, 0.55, 1] },
+    { threshold: [0, 0.45, 0.8], rootMargin: "0px 0px -6%" },
   );
 
   observer.observe(video);
-
-  const handleMotionChange = () => {
-    if (reducedMotion.matches) {
-      pause();
-    }
-  };
-
-  reducedMotion.addEventListener("change", handleMotionChange);
+  motionPreference.addEventListener("change", updatePlayback);
+  document.addEventListener("visibilitychange", updatePlayback);
 
   return () => {
-    pause();
+    video.pause();
     observer.disconnect();
-    reducedMotion.removeEventListener("change", handleMotionChange);
+    motionPreference.removeEventListener("change", updatePlayback);
+    document.removeEventListener("visibilitychange", updatePlayback);
   };
 }

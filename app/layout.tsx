@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 
-import { MotionController } from "@/components/motion-controller";
-
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -24,7 +22,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#b19475",
+  themeColor: "#fbf8f3",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -34,7 +32,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main-content">
           Pular para o conteúdo
         </a>
-        <MotionController />
         {children}
       </body>
     </html>
