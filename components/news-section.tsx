@@ -1,0 +1,85 @@
+import { ArrowUpRight, ExternalLink } from "lucide-react";
+
+import {
+  EXAME_TOPIC_URL,
+  type ExameNewsItem,
+} from "@/lib/exame-news";
+
+import { NewsImage } from "./news-image";
+import { SectionShell } from "./section-shell";
+import { VisionButton } from "./vision-button";
+import styles from "./news-section.module.css";
+
+type NewsSectionProps = {
+  items: readonly ExameNewsItem[];
+};
+
+export function NewsSection({ items }: NewsSectionProps) {
+  return (
+    <SectionShell
+      className={styles.section}
+      innerClassName={styles.inner}
+      tone="soft"
+      aria-labelledby="news-section-title"
+    >
+      <div className={styles.intro}>
+        <p className="eyebrow">Exame</p>
+        <h2 id="news-section-title">Tendências em óculos</h2>
+        <p className={styles.description}>
+          Matérias sobre moda, consumo e mercado óptico.
+        </p>
+        <VisionButton
+          className={styles.button}
+          href={EXAME_TOPIC_URL}
+          icon={ExternalLink}
+          variant="secondary"
+          external
+        >
+          Ver mais na Exame
+        </VisionButton>
+      </div>
+
+      {items.length > 0 ? (
+        <div
+          className={styles.cards}
+          role="region"
+          aria-label="Matérias recentes da Exame"
+          tabIndex={0}
+        >
+          {items.map((item) => (
+            <article className={styles.article} key={item.url}>
+              <a
+                className={styles.card}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${item.title} — ler na Exame`}
+              >
+                {item.imageUrl ? (
+                  <NewsImage
+                    className={styles.media}
+                    src={item.imageUrl}
+                    alt={item.imageAlt ?? item.title}
+                  />
+                ) : null}
+
+                <div className={styles.body}>
+                  <p className={styles.meta}>
+                    <span>{item.category}</span>
+                    {item.timeLabel ? <span>{item.timeLabel}</span> : null}
+                    <span>{item.source}</span>
+                  </p>
+                  <h3>{item.title}</h3>
+                  <span className={styles.readLink}>
+                    Ler na Exame
+                    <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
+                  </span>
+                </div>
+              </a>
+            </article>
+          ))}
+        </div>
+      ) : null}
+    </SectionShell>
+  );
+}

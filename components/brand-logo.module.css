@@ -49,6 +49,10 @@
   width: clamp(164px, 16vw, 214px);
 }
 
+.instagram {
+  width: clamp(132px, 14vw, 160px);
+}
+
 @media (max-width: 720px) {
   .header {
     width: 96px;

@@ -1,21 +1,48 @@
 import type { Metadata, Viewport } from "next";
 
+import { heroMedia, identityAssets } from "@/lib/assets";
+import { getMetadataBase } from "@/lib/metadata";
+
 import "@/styles/globals.css";
 
+const metadataBase = getMetadataBase();
+const title = "Ótica Vision em Araguaína | Armações e LAB. DIGITAL";
+const description =
+  "Armações nacionais e importadas, lentes feitas pela Vision e atendimento em Araguaína - TO.";
+
 export const metadata: Metadata = {
-  title: "Ótica Vision | Araguaína - TO",
-  description:
-    "Armações nacionais e importadas, LAB. DIGITAL e atendimento em Araguaína - TO.",
+  ...(metadataBase ? { metadataBase } : {}),
+  title,
+  description,
   icons: {
-    icon: "/media/identity/favicon.png",
-    apple: "/media/identity/favicon.png",
+    icon: identityAssets.favicon,
+    shortcut: identityAssets.favicon,
+    apple: identityAssets.favicon,
   },
   openGraph: {
-    title: "Ótica Vision | Araguaína - TO",
-    description:
-      "Armações nacionais e importadas, LAB. DIGITAL e atendimento em Araguaína - TO.",
+    title,
+    description,
+    siteName: "Ótica Vision",
     locale: "pt_BR",
     type: "website",
+    ...(metadataBase
+      ? {
+          images: [
+            {
+              url: heroMedia.src,
+              width: 1440,
+              height: 1919,
+              alt: heroMedia.alt,
+            },
+          ],
+        }
+      : {}),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    ...(metadataBase ? { images: [heroMedia.src] } : {}),
   },
 };
 

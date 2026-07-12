@@ -226,6 +226,72 @@ export const labMedia = image(
   "50% 42%",
 );
 
+export const instagramVideos = [
+  video(
+    "video (2).mp4",
+    "video-2.jpg",
+    "Modelos de óculos em uso no interior da Ótica Vision",
+    "50% 26%",
+  ),
+  video(
+    "video (3).mp4",
+    "video-3.jpg",
+    "Óculos claros e escuros apresentados em movimento",
+    "50% 27%",
+  ),
+  video(
+    "video (4).mp4",
+    "video-4.jpg",
+    "Óculos escuros em uso dentro e diante da loja",
+    "50% 28%",
+  ),
+] as const;
+
+export const instagramImages = [
+  image(
+    "1 (2).jpg",
+    1440,
+    1919,
+    "Close lateral com óculos escuros pretos e detalhe metálico na haste",
+    "50% 45%",
+  ),
+  image(
+    "2 (2).jpg",
+    1440,
+    1919,
+    "Retrato com óculos escuros geométricos e jaqueta vermelha",
+    "50% 40%",
+  ),
+  image(
+    "3 (2).jpg",
+    1440,
+    1919,
+    "Retrato em tons neutros com óculos escuros e mão sobre o cabelo",
+    "50% 42%",
+  ),
+  image(
+    "4 (1).jpg",
+    1440,
+    1919,
+    "Retrato com óculos amplos de lente marrom sobre fundo escuro",
+    "50% 44%",
+  ),
+  image(
+    "6 (2).jpg",
+    1440,
+    1919,
+    "Retrato frontal com óculos tartaruga e acabamento quente",
+    "50% 40%",
+  ),
+  image(
+    "8 (4).jpg",
+    1440,
+    1762,
+    "Mulher experimentando óculos diante do espelho na Ótica Vision",
+    "50% 45%",
+  ),
+] as const;
+
 const assertUnique = (paths: readonly string[], route: string) => {
   if (new Set(paths).size !== paths.length) {
     throw new Error(`Asset repetido na rota ${route}.`);
@@ -241,4 +307,12 @@ assertUnique(
     labMedia.src,
   ],
   "home",
+);
+
+assertUnique(
+  [
+    ...instagramVideos.map((item) => item.src),
+    ...instagramImages.map((item) => item.src),
+  ],
+  "/instagram",
 );

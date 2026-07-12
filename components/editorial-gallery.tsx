@@ -114,7 +114,7 @@ function LensFocusGallery({ images }: EditorialGalleryProps) {
                 sizes="(max-width: 720px) 80vw, 430px"
                 alt={asset.alt}
                 draggable={false}
-                loading={index < 3 ? "eager" : "lazy"}
+                loading="lazy"
                 style={{ objectPosition: asset.objectPosition }}
               />
             </figure>
