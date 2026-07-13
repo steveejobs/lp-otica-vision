@@ -37,8 +37,8 @@ type CardStyle = CSSProperties & {
   "--placeholder-color": string;
 };
 
-const AUTOPLAY_DELAY = 5_100;
-const INTERACTION_PAUSE = 6_500;
+const AUTOPLAY_DELAY = 4_800;
+const INTERACTION_PAUSE = 7_200;
 
 function FocusSequence({ images }: EditorialGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -49,6 +49,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [announceChanges, setAnnounceChanges] = useState(false);
   const [resumeVersion, setResumeVersion] = useState(0);
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragStart = useRef<DragStart | null>(null);
@@ -94,6 +95,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   const showIndex = useCallback(
     (index: number, manual = true) => {
       if (manual) pauseAfterInteraction();
+      setAnnounceChanges(manual);
       markChapterTransition(index);
       setActiveIndex(index);
     },
@@ -269,6 +271,8 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   };
 
   const viewportStyle: GalleryStyle = { "--drag-offset": `${dragOffset}px` };
+  const autoplayRunning =
+    !reducedMotion && isInView && isPageVisible && !isDragging && nextReady;
 
   return (
     <div className={styles.sequence}>
@@ -277,9 +281,11 @@ function FocusSequence({ images }: EditorialGalleryProps) {
         className={`${styles.viewport} ${isDragging ? styles.dragging : ""} ${chapterTransition ? styles.chapterTransition : ""}`}
         role="region"
         aria-roledescription="carrossel"
-        aria-label="Sequência editorial de óculos com avanço automático"
+        aria-label="Galeria de armações da Ótica Vision"
         tabIndex={0}
         data-series={images[activeIndex]?.seriesId}
+        data-active-index={activeIndex}
+        data-autoplay-state={autoplayRunning ? "running" : "paused"}
         style={viewportStyle}
         onBlur={pauseAfterInteraction}
         onKeyDown={handleKeyDown}
@@ -323,7 +329,11 @@ function FocusSequence({ images }: EditorialGalleryProps) {
       </div>
 
       <div className={styles.navigation}>
-        <p className={styles.counter} aria-live="polite" aria-atomic="true">
+        <p
+          className={styles.counter}
+          aria-live={announceChanges ? "polite" : "off"}
+          aria-atomic="true"
+        >
           <span>{String(activeIndex + 1).padStart(2, "0")}</span>
           <span aria-hidden="true">/</span>
           <span>{String(images.length).padStart(2, "0")}</span>
@@ -367,11 +377,8 @@ export function EditorialGallery({ images }: EditorialGalleryProps) {
       aria-labelledby="editorial-gallery-title"
     >
       <header className={styles.intro}>
-        <h2 id="editorial-gallery-title">Escolhas que mudam o olhar.</h2>
-        <p>Presença, formato e acabamento em uma seleção real da Vision.</p>
-        <span aria-hidden="true">
-          seleção 01 — {String(images.length).padStart(2, "0")}
-        </span>
+        <h2 id="editorial-gallery-title">A escolha ganha contorno.</h2>
+        <p>Linhas, proporções e acabamentos reunidos pela Vision.</p>
       </header>
 
       <FocusSequence images={images} />

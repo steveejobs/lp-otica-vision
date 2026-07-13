@@ -215,10 +215,6 @@ export function FocusPortrait({
         <span className={styles.lens} aria-hidden="true" />
         <span className={styles.glint} aria-hidden="true" />
       </div>
-      <figcaption className={styles.caption} aria-hidden="true">
-        <span>foco</span>
-        <span>acompanha o gesto</span>
-      </figcaption>
     </figure>
   );
 }

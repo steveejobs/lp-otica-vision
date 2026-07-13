@@ -26,9 +26,9 @@ export function LabSection({ media }: LabSectionProps) {
     >
       <div className={styles.copy}>
         <p className={`eyebrow ${styles.eyebrow}`}>LAB. DIGITAL</p>
-        <h2 id="lab-section-title">Lentes feitas pela própria Vision.</h2>
+        <h2 id="lab-section-title">Lentes que nascem na própria Vision.</h2>
         <p className={styles.description}>
-          Confecção própria de lentes em Araguaína - TO, com cuidado no acabamento.
+          Confecção própria em Araguaína - TO, com cuidado no acabamento.
         </p>
         <VisionButton
           href={LINKS.whatsapp}

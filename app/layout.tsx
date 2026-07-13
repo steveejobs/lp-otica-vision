@@ -7,9 +7,9 @@ import { getMetadataBase } from "@/lib/metadata";
 import "@/styles/globals.css";
 
 const metadataBase = getMetadataBase();
-const title = "Ótica Vision em Araguaína | Armações e LAB. DIGITAL";
+const title = "Ótica Vision | Armações e lentes em Araguaína";
 const description =
-  "Armações nacionais e importadas, lentes feitas pela Vision e atendimento em Araguaína - TO.";
+  "Seleção de armações nacionais e importadas, LAB. DIGITAL e confecção própria de lentes em Araguaína - TO.";
 
 export const metadata: Metadata = {
   ...(metadataBase ? { metadataBase } : {}),

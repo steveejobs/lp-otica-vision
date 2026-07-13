@@ -10,7 +10,7 @@ As alturas são aproximações para orientar ritmo e enquadramento. Elas não s�
 | Hero | 690–740 px | 1 | Linha, H1, texto e CTAs; foto abaixo e levemente deslocada à direita | Foto 4:5, largura 78–84% do container | 20–28 px entre grupos; termina mostrando o início da próxima seção |
 | Vídeos | 880–960 px | 1 + 2 | Título central; principal central; dois apoios abaixo | Principal 9:16 com 286–310 px de largura; apoios 9:16 com 145–158 px | 24 px copy/mídia; 10–12 px entre apoios; nenhum rail se couber em 390 px |
 | Galeria | 580–640 px | 1 foco | Copy acima; imagem central e laterais parciais | Ativa 3:4, largura 76–82vw | 28 px até a mídia; swipe; viewport interna corta laterais sem gerar overflow da página |
-| Marcas | 430–480 px | 2 | Título e texto acima; grid abaixo | Slots 112×56 | 12 px horizontal e 16 px vertical; cinco linhas estáveis |
+| Marcas | 190–240 px | 1 | Título e texto acima; rail contínuo abaixo | Slots 128×56 | Movimento horizontal automático; sem setas, paginação ou cards |
 | LAB | 560–620 px | 1 | Selo, headline, texto e CTA; imagem abaixo | Imagem 4:5, largura 78–86% | 20 px entre copy e CTA; 28 px antes da mídia |
 | Notícias | 560–650 px | 1 + rail | Copy e CTA; cards abaixo | Cards 270×aprox. 360; imagem 16:10 quando existir | Rail manual com gap 14 px e scroll padding; sem translate negativo |
 | Localização | 360–420 px | 1 | Título, texto e dois CTAs empilhados ou 2×1 quando couber | Sem mídia | 16 px entre CTAs; padding vertical 64–72 px |
@@ -21,35 +21,34 @@ As alturas são aproximações para orientar ritmo e enquadramento. Elas não s�
 ```text
 [ logo | Instagram | WhatsApp ]
 
-Ótica Vision · Araguaína - TO
-Armações que fazem sentido
-no rosto — e na rotina.
+Armações e lentes · Araguaína - TO
+Armações que dão forma
+à sua presença.
 Texto
 [ WhatsApp ] [ Instagram ]
                 [ FOTO HERO 4:5 ]
 
-No rosto, na luz, no detalhe.
+A armação entra em cena.
            [ VÍDEO PRINCIPAL 9:16 ]
        [ APOIO 9:16 ] [ APOIO 9:16 ]
 
-Escolhas que mudam o olhar.
+A escolha ganha contorno.
  [ anterior ][ ATIVA 3:4 ][ próxima ]
 
-Marcas que passam pela Vision
-[ logo ][ logo ]
-[ logo ][ logo ] × 5 linhas
+Marcas premium. Seleção Vision.
+[ logo ][ logo ][ logo → ] rail contínuo
 
 LAB. DIGITAL
-Lentes feitas pela própria Vision.
+Lentes que nascem na própria Vision.
 [ Falar sobre lentes ]
              [ FOTO 4:5 ]
 
-Tendências em óculos
-[ Ver mais na Exame ]
+Óculos em pauta.
+[ Ler mais na Exame ]
 [ CARD ][ próximo parcial ]
 
-Escolha seus próximos óculos em Araguaína.
-[ WhatsApp ]
+Vision em Araguaína. Escolha de perto.
+[ Falar no WhatsApp ]
 [ Ver rota ]
 
 [ footer mínimo ]
@@ -63,7 +62,7 @@ Escolha seus próximos óculos em Araguaína.
 | Hero | 620–670 px | 5/7 | Copy na esquerda; foto vertical na direita | Foto entre 420×525 e 450×600 | Gap 64–88 px; base do hero deixa 80–120 px da próxima seção visível na viewport inicial |
 | Vídeos | 720–780 px | Conjunto central | Copy acima; principal; dois apoios abaixo | Principal 360–400×640–711; apoios 170–190×302–338 | Conjunto total 720–820 px; 16 px entre apoios |
 | Galeria | 650–720 px | 3 planos | Copy acima/à esquerda; ativa central, laterais de apoio | Ativa 360–420×480–560 | Gap visual 20–28 px; controles fora da imagem; sem rotação exagerada |
-| Marcas | 320–370 px | 5 | Copy acima; duas linhas de logos | Slots 132×64 | 20–28 px entre slots; alinhamento óptico individual |
+| Marcas | 210–260 px | 2 áreas | Copy à esquerda; rail contínuo à direita | Slots 150×66 | Alinhamento óptico individual e pausa no hover |
 | LAB | 500–560 px | 6/5 | Copy na esquerda; imagem compacta na direita | Imagem 360–400×450–500 | Gap 72–96 px; CTA diretamente após o texto |
 | Notícias | 500–560 px | 3/9 | Copy e CTA em coluna curta; três cards no restante | Cards flexíveis; imagem 16:10 | Gap 24 px; botão nunca ocupa a coluna dos cards |
 | Localização | 340–400 px | 7/5 | Título/texto à esquerda; CTAs à direita ou abaixo | Sem mídia | Alinhamento vertical central; área quente curta |
@@ -118,11 +117,13 @@ Bio
 [ WhatsApp ]
 [ Instagram ]
 [ Rota ]
-[ Site completo ]
+[ Site ]
 
 [ VÍDEO 9:16 ][ VÍDEO 9:16 ]
 
 [ img ][ img ][ img → ]  seis no total
+
+[ marcas → ] rail compacto
 
 Araguaína - TO
 [ Rota ]
@@ -145,10 +146,12 @@ Araguaína - TO
 
           [ VÍDEO       ][ bio                   ]
           [ PRINCIPAL    ][ WhatsApp | Instagram ]
-          [ 9:16         ][ Rota | Site completo ]
+          [ 9:16         ][ Rota | Site          ]
           [              ][ vídeo | vídeo         ]
 
           [ img ][ img ][ img ][ img ][ img ][ img ]
+
+          [ marcas em rail contínuo ]
 
           [ Araguaína - TO                 ][ Rota ]
 ```

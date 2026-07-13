@@ -1,5 +1,7 @@
 # QA Mobile-First — Ótica Vision
 
+> Atualização de 2026-07-13: a seção **Refinamento Final De Movimento E Composição**, ao fim deste documento, substitui as medições anteriores sobre grade de marcas, `preload`, quantidade simultânea de vídeos e tempos de autoplay.
+
 Validação concluída em 2026-07-12 no build otimizado do Next.js, sem promoção para produção.
 
 ## Escopo E Referências
@@ -37,10 +39,10 @@ As referências influenciaram apenas ritmo, densidade de ação e ocupação da 
 
 - Header e hero com safe areas, CTA principal dentro da primeira viewport e composição preservada em 360–430 px.
 - Lente cinética responde ao toque e continua com movimento ocioso; aparelhos modestos usam cadência reduzida em vez de perder o efeito.
-- Trio de vídeos mantido como uma única composição em profundidade, com no máximo um vídeo tocando.
-- Vídeos usam poster e `preload="none"`; no carregamento inicial da home, os três permanecem em `readyState 0`.
+- Trio de vídeos mantido como uma única composição em profundidade, com os três tocando simultaneamente quando o conjunto está visível.
+- Vídeos usam poster e `preload="metadata"`; em rede lenta, os três permanecem em `readyState 0` sem bloquear o conteúdo inicial.
 - Galeria mantém anterior/atual/próxima, autoplay observado, swipe lento/rápido, teclado e botões de 44 px.
-- Marcas, LAB, notícias e localização permanecem compactos; o primeiro card da Exame cabe inteiro no eixo horizontal.
+- Marcas usam rail contínuo compacto; LAB, notícias e localização preservam o ritmo, e o primeiro card da Exame cabe inteiro no eixo horizontal.
 - Falha de imagem da Exame preserva a proporção e o fundo do card, sem salto.
 - Footer recebeu safe area inferior e reflow estável em zoom de texto.
 
@@ -53,7 +55,8 @@ As referências influenciaram apenas ritmo, densidade de ação e ocupação da 
 - Bio e dock horizontal de quatro ações ficam na primeira viewport; a primeira ação termina entre 611 px e 650 px.
 - Números auxiliares foram removidos da leitura visual dos links.
 - Seis imagens viraram um deck finito sem clones e sem esteira longa; apenas três imagens existem como mídia carregável por vez.
-- O deck só inicia autoplay quando ao menos 52% está visível.
+- O deck inicia autoplay quando ao menos 34% está visível.
+- Um rail compacto de marcas usa a mesma normalização óptica da home.
 - Localização encerra a página com 24 px de respiro final, sem espaço morto.
 
 ## Motion E Autoplay
@@ -65,7 +68,7 @@ As referências influenciaram apenas ritmo, densidade de ação e ocupação da 
 - Nenhum frame branco é inserido: a imagem anterior permanece e todos os cards têm placeholder derivado da mídia.
 - Swipes lentos usam distância; swipes rápidos também consideram velocidade.
 - Transições usam transform/opacity/filter e não geram CLS.
-- Vídeos seguem o mesmo observador global, com seleção única por visibilidade.
+- Cada composição tem um observador próprio e reproduz seus três vídeos simultaneamente apenas enquanto está visível.
 
 ## Séries Visuais
 
@@ -80,14 +83,14 @@ As referências influenciaram apenas ritmo, densidade de ação e ocupação da 
 
 | Viewport | CTA home (bottom) | CTA `/instagram` (bottom) | Overflow | CLS | Max. vídeos tocando |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 360×800 | 759 px | 611 px | 0 px | 0 | 1 |
-| 375×812 | 784 px | 617 px | 0 px | 0 | 1 |
-| 390×844 | 803 px | 633 px | 0 px | 0 | 1 |
-| 393×852 | 811 px | 636 px | 0 px | 0 | 1 |
-| 412×915 | 874 px | 646 px | 0 px | 0 | 1 |
-| 430×932 | 891 px | 650 px | 0 px | 0 | 1 |
+| 360×800 | 743 px | 584 px | 0 px | 0 | 3 |
+| 375×812 | 784 px | 589 px | 0 px | 0 | 3 |
+| 390×844 | 803 px | 605 px | 0 px | 0 | 3 |
+| 393×852 | 811 px | 608 px | 0 px | 0 | 3 |
+| 412×915 | 874 px | 646 px | 0 px | 0 | 3 |
+| 430×932 | 891 px | 650 px | 0 px | 0 | 3 |
 
-Resultado comum às 12 combinações de rota e viewport:
+Resultado comum às 16 combinações de rota e viewport:
 
 - zero 404, erro de console, erro de página ou hydration;
 - zero imagem quebrada, imagem 0×0, vídeo 0×0 ou link vazio;
@@ -102,7 +105,7 @@ Resultado comum às 12 combinações de rota e viewport:
 - JavaScript desabilitado: copy, links, posters, três vídeos dimensionados e uma imagem ativa por galeria continuam visíveis.
 - Zoom de texto simulado em 200%: overflow 0 e nenhum heading cortado nas duas rotas.
 - Visibilidade da página: vídeo pausou com delta de 0,002 s; galerias mantiveram o contador em hidden e avançaram após visible.
-- Scroll com autoplay: um vídeo continuou selecionado, sem concorrência de playback.
+- Scroll com autoplay: três vídeos tocaram dentro da composição ativa e todos pausaram fora dela.
 
 ## Rede Móvel Lenta
 
@@ -110,8 +113,8 @@ Simulação Chromium `cellular3g`, 400 ms de latência, 60 KiB/s de download e c
 
 | Rota | DOMContentLoaded | FCP | Container inicial | Imagens carregadas no recorte | Requests de vídeo |
 | --- | ---: | ---: | --- | ---: | ---: |
-| Home | 1728 ms | 1752 ms | 281×351 px | 3 de 21 elementos | 0 |
-| `/instagram` | 1826 ms | 1872 ms | 220×276 px | 1 de 4 elementos | 0 |
+| Home | 2337 ms | 2708 ms | 209×374 px | 3 de 31 elementos | 3 metadados |
+| `/instagram` | 1892 ms | 2060 ms | 218×273 px | 1 de 24 elementos | 3 metadados |
 
 Os containers mantiveram proporção desde o primeiro paint. Mídia abaixo da dobra permaneceu lazy, placeholders não ficaram brancos e nenhum vídeo bloqueou o conteúdo inicial.
 
@@ -156,3 +159,64 @@ Sequências de interação:
 - `npm run typecheck`: passou.
 - `npm run build`: passou localmente e no preview Vercel.
 - `git diff --check`: passou.
+
+## Refinamento Final De Movimento E Composição
+
+Validação concluída em 2026-07-13 no build otimizado do Next.js.
+
+### Movimento Implementado
+
+- Home e `/instagram`: exatamente três vídeos por rota, todos com `preload="metadata"`, poster, muted, loop e playsInline.
+- Os três vídeos da composição visível tocam simultaneamente; todos pausam fora da viewport, em aba oculta, reduced motion ou economia de dados.
+- Galeria da home: autoplay de 4,8 s; pausa de 7,2 s após swipe, drag ou teclado.
+- Galeria do `/instagram`: autoplay de 3,9 s; pausa de 6,5 s após interação.
+- Ambas esperam a próxima imagem carregar, preservam swipe lento/rápido, drag, teclado e retomada automática.
+- Marcas: duas sequências idênticas; a animação percorre exatamente `50% + metade do gap`, equivalente à largura de uma sequência mais a emenda.
+- Emenda medida em 0,04 px; Emilio Pucci encontra Ray-Ban, sem logo igual lado a lado.
+- Home: rail de 34 s no mobile e 38 s no desktop. `/instagram`: variante compacta de 32 s.
+- Hover desktop, saída da viewport e aba oculta pausam o rail; reduced motion e `Save-Data` deixam uma lista horizontal manual.
+- O botão Instagram usa vetor reconhecível com ícone à esquerda, `aria-hidden` e área tocável de 72 px no dock mobile.
+
+### Matriz Final
+
+| Viewport | CTA home | CTA `/instagram` | Overflow | CLS | Vídeos simultâneos |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 360×800 | 743 px | 584 px | 0 px | 0 | 3 |
+| 375×812 | 784 px | 589 px | 0 px | 0 | 3 |
+| 390×844 | 803 px | 605 px | 0 px | 0 | 3 |
+| 393×852 | 811 px | 608 px | 0 px | 0 | 3 |
+| 412×915 | 874 px | 646 px | 0 px | 0 | 3 |
+| 430×932 | 891 px | 650 px | 0 px | 0 | 3 |
+| 1366×768 | 675 px | 625 px | 0 px | 0 | 3 |
+| 1440×900 | 675 px | 659 px | 0 px | 0 | 3 |
+
+Resultado comum: zero 404, erro de console, hydration, mídia quebrada, vídeo 0×0, overflow ou CLS. Cada rota solicitou somente seus três vídeos.
+
+### Interação E Estados Especiais
+
+- Autoplay de 30 s: home avançou seis posições em ordem; `/instagram` completou um loop de seis imagens e reiniciou sem branco.
+- Swipe lento, swipe rápido, drag com mouse e teclado avançaram uma posição; o autoplay retomou após a pausa definida.
+- Page Visibility emulada com eventos reais: vídeos, galerias e rails pausaram em hidden e retomaram em visible.
+- Rotação `390×844 → 844×390 → 390×844`: overflow 0 e todas as mídias mantiveram dimensões positivas.
+- Reduced motion: vídeos parados, galerias manuais e apenas uma sequência estática de marcas.
+- `Save-Data`: vídeos pausados e rail manual.
+- Chrome/Android foi coberto por Chromium com toque e viewport móvel; safe areas de Safari/iOS permanecem tratadas por CSS, sem aparelho físico disponível.
+
+### Rede Móvel Lenta
+
+Simulação `cellular3g`, 400 ms, 60 KiB/s e cache desabilitado:
+
+| Rota | DOMContentLoaded | FCP | CLS | Imagens carregadas no recorte | Requests de vídeo |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Home | 2337 ms | 2708 ms | 0 | 3 de 31 | 3 metadados |
+| `/instagram` | 1892 ms | 2060 ms | 0 | 1 de 24 | 3 metadados |
+
+Os vídeos permaneceram em `readyState 0` e pausados durante o recorte lento, sem bloquear o conteúdo inicial. Imagens abaixo da dobra continuaram lazy e todos os containers permaneceram dimensionados.
+
+### Preview Do Refinamento
+
+- Home: `https://lp-otica-vision-momk2klyl-bandeirargabriel-6963s-projects.vercel.app/`
+- Instagram: `https://lp-otica-vision-momk2klyl-bandeirargabriel-6963s-projects.vercel.app/instagram`
+- O build remoto da Vercel passou e as duas rotas retornaram o HTML correto por `vercel curl` autenticado.
+- O deployment está protegido pelo SSO da equipe para acessos anônimos.
+- Nenhum comando `--prod`, promoção ou alteração de alias foi executado.

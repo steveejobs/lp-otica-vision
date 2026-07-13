@@ -1,40 +1,50 @@
-# Copy Bank V2
+# Copy Bank V3
 
 ## Home
 
-- Linha do hero: `Otica Vision · Araguaina - TO`
-- H1: `Armacoes que fazem sentido no rosto — e na rotina.`
-- Apoio: `Modelos nacionais e importados, com lentes feitas pela Vision em Araguaina.`
-- Videos: `No rosto, na luz, no detalhe.`
-- Videos apoio: `Veja como as armacoes se comportam em uso real.`
-- Galeria: `Escolhas que mudam o olhar.`
-- Galeria apoio: `Presenca, formato e acabamento em uma selecao real da Vision.`
-- Marcas: `Marcas que passam pela Vision`
-- Marcas apoio: `Consulte a disponibilidade dos modelos pelo WhatsApp.`
+- Linha do hero: `Armações e lentes · Araguaína - TO`
+- H1: `Armações que dão forma à sua presença.`
+- Apoio: `Armações nacionais e importadas, com lentes confeccionadas pela Vision em Araguaína.`
+- Vídeos: `A armação entra em cena.`
+- Vídeos apoio: `Forma, proporção e acabamento em movimento.`
+- Galeria: `A escolha ganha contorno.`
+- Galeria apoio: `Linhas, proporções e acabamentos reunidos pela Vision.`
+- Marcas: `Marcas premium. Seleção Vision.`
+- Marcas apoio: `Consulte os modelos pelo WhatsApp.`
 - LAB selo: `LAB. DIGITAL`
-- LAB headline: `Lentes feitas pela propria Vision.`
-- LAB apoio: `Confeccao propria de lentes em Araguaina - TO, com cuidado no acabamento.`
-- Noticias selo: `Exame`
-- Noticias: `Tendencias em oculos`
-- Noticias apoio: `Materias sobre moda, consumo e mercado optico.`
-- Localizacao: `Escolha seus proximos oculos em Araguaina.`
-- Localizacao apoio: `Fale com a Otica Vision ou veja a rota ate a loja.`
+- LAB headline: `Lentes que nascem na própria Vision.`
+- LAB apoio: `Confecção própria em Araguaína - TO, com cuidado no acabamento.`
+- Notícias selo: `Exame`
+- Notícias: `Óculos em pauta.`
+- Notícias apoio: `Moda, consumo e mercado óptico em matérias da Exame.`
+- Localização: `Vision em Araguaína. Escolha de perto.`
+- Localização apoio: `Fale com a Vision pelo WhatsApp ou veja a rota até a loja.`
+- Footer: `Ótica Vision` · `Araguaína - TO`
 
 ## Instagram
 
 - Handle: `@oticavisionaraguaina`
-- Bio: `Armacoes nacionais e importadas, LAB. DIGITAL e atendimento em Araguaina - TO.`
+- Bio: `Armações nacionais e importadas. Lentes feitas pela Vision. Araguaína - TO.`
+- Seleção: `Seleção Vision`
+- Localização: `Ótica Vision` · `Araguaína - TO`
 
 ## CTAs
 
+- Falar no WhatsApp
+- Ver Instagram
 - WhatsApp
 - Instagram
 - Falar sobre lentes
-- Ver mais na Exame
+- Ler mais na Exame
 - Ver rota
 - Rota
-- Site completo
+- Site
 - Ler na Exame
+
+## Indicadores
+
+- Home: manter apenas o contador funcional da galeria; remover `seleção 01 — 07`.
+- Instagram: manter `01 / 06`; remover números decorativos dos links e o número interno do ensaio.
 
 ## Proibido
 

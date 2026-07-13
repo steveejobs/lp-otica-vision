@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Camera, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 import { LINKS } from "@/lib/links";
 
 import { BrandLogo } from "./brand-logo";
+import { InstagramIcon } from "./instagram-icon";
 import { VisionButton } from "./vision-button";
 import styles from "./site-header.module.css";
 
@@ -23,7 +24,7 @@ export function SiteHeader() {
             rel="noopener noreferrer"
             aria-label="Abrir Instagram da Ótica Vision"
           >
-            <Camera aria-hidden="true" size={18} strokeWidth={1.7} />
+            <InstagramIcon aria-hidden="true" size={18} strokeWidth={1.7} />
             <span>Instagram</span>
           </a>
           <VisionButton

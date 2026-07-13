@@ -2,6 +2,7 @@ import type { VideoAsset } from "@/lib/assets";
 
 import { ObservedVideo } from "./observed-video";
 import { SectionShell } from "./section-shell";
+import { VideoComposition } from "./video-composition";
 import styles from "./video-story.module.css";
 
 type VideoStoryProps = {
@@ -17,11 +18,11 @@ export function VideoStory({ videos }: VideoStoryProps) {
       aria-labelledby="video-story-title"
     >
       <header className={styles.intro}>
-        <h2 id="video-story-title">No rosto, na luz, no detalhe.</h2>
-        <p>Veja como as armações se comportam em uso real.</p>
+        <h2 id="video-story-title">A armação entra em cena.</h2>
+        <p>Forma, proporção e acabamento em movimento.</p>
       </header>
 
-      <div className={styles.stage}>
+      <VideoComposition className={styles.stage}>
         <span className={styles.aperture} aria-hidden="true" />
         <ObservedVideo asset={videos[0]} className={styles.main} />
         <ObservedVideo
@@ -32,7 +33,7 @@ export function VideoStory({ videos }: VideoStoryProps) {
           asset={videos[2]}
           className={`${styles.support} ${styles.supportTwo}`}
         />
-      </div>
+      </VideoComposition>
     </SectionShell>
   );
 }

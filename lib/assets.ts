@@ -431,6 +431,7 @@ assertUnique(
   [
     ...instagramVideos.map((item) => item.src),
     ...instagramImages.map((item) => item.src),
+    ...brandLogos.map((item) => item.src),
   ],
   "/instagram",
 );

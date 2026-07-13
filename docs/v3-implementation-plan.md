@@ -69,9 +69,9 @@ Este plano começa somente após aprovação explícita da direção e da curado
 
 ### Rodada 2.2 — Marcas
 
-- Implementar grid estático com dez slots.
+- Implementar rail contínuo com dez slots normalizados e uma cópia visual inacessível para a emenda.
 - Ajustar escala óptica individual por logo.
-- Validar alinhamento em duas colunas no mobile e cinco no desktop.
+- Validar continuidade matemática, pausa por visibilidade/hover e fallback manual em reduced motion.
 
 ### Rodada 2.3 — LAB. DIGITAL
 
@@ -111,6 +111,8 @@ Este plano começa somente após aprovação explícita da direção e da curado
 
 - Implementar a página na ordem aprovada.
 - Usar três vídeos e seis imagens, sem repetição dentro da rota.
+- Reutilizar o rail de marcas em variante compacta.
+- Reproduzir os três vídeos simultaneamente somente enquanto a composição estiver visível.
 - Auditar que nenhum vídeo oculto ou mídia 0×0 é carregado.
 
 ### Rodada 3.4 — Acessibilidade e performance

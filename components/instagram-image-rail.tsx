@@ -36,8 +36,8 @@ type DragState = {
   startedAt: number;
 };
 
-const AUTOPLAY_DELAY = 3_700;
-const INTERACTION_PAUSE = 5_800;
+const AUTOPLAY_DELAY = 3_900;
+const INTERACTION_PAUSE = 6_500;
 
 export function InstagramImageRail({ images }: InstagramImageRailProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -51,6 +51,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [announceChanges, setAnnounceChanges] = useState(false);
   const [chapterTransition, setChapterTransition] = useState(false);
   const [resumeVersion, setResumeVersion] = useState(0);
 
@@ -95,6 +96,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
     (index: number, manual = true) => {
       if (!loadedIndexes.has(index)) return false;
       if (manual) pauseAfterInteraction();
+      setAnnounceChanges(manual);
       markChapterTransition(index);
       setActiveIndex(index);
       return true;
@@ -126,8 +128,8 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.52),
-      { threshold: [0, 0.52, 0.76], rootMargin: "0px 0px -4%" },
+      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.34),
+      { threshold: [0, 0.34, 0.62], rootMargin: "0px 0px -4%" },
     );
     observer.observe(viewport);
     return () => observer.disconnect();
@@ -239,7 +241,12 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
   };
 
   const viewportStyle: ViewportStyle = { "--drag-offset": `${dragOffset}px` };
-  const activeSeries = images[activeIndex]?.seriesId.replace("series", "");
+  const autoplayRunning =
+    !reducedMotion &&
+    isInView &&
+    isPageVisible &&
+    !isDragging &&
+    loadedIndexes.has(nextIndex);
 
   return (
     <section
@@ -248,10 +255,10 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
     >
       <div className={styles.headingRow}>
         <h2 className={styles.srOnly} id="instagram-images-title">
-          Seleção editorial da Ótica Vision
+          Seleção de armações da Ótica Vision
         </h2>
-        <p aria-hidden="true">Ensaio {activeSeries?.padStart(2, "0")}</p>
-        <span aria-live="polite" aria-atomic="true">
+        <p aria-hidden="true">Seleção Vision</p>
+        <span aria-live={announceChanges ? "polite" : "off"} aria-atomic="true">
           {String(activeIndex + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
         </span>
       </div>
@@ -261,9 +268,11 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
         className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
         role="region"
         aria-roledescription="carrossel"
-        aria-label="Seis imagens da Ótica Vision com avanço automático"
+        aria-label="Galeria de seis imagens da Ótica Vision"
         tabIndex={0}
         data-series={images[activeIndex]?.seriesId}
+        data-active-index={activeIndex}
+        data-autoplay-state={autoplayRunning ? "running" : "paused"}
         style={viewportStyle}
         onBlur={pauseAfterInteraction}
         onKeyDown={handleKeyDown}

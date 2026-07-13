@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
-import { Camera, Home, MapPin, MessageCircle } from "lucide-react";
+import {
+  Home,
+  MapPin,
+  MessageCircle,
+} from "lucide-react";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { BrandRail } from "@/components/brand-rail";
+import { InstagramIcon } from "@/components/instagram-icon";
 import { InstagramImageRail } from "@/components/instagram-image-rail";
 import { ObservedVideo } from "@/components/observed-video";
-import { instagramImages, instagramVideos } from "@/lib/assets";
+import { VideoComposition } from "@/components/video-composition";
+import { brandLogos, instagramImages, instagramVideos } from "@/lib/assets";
 import { LINKS } from "@/lib/links";
 import { getMetadataBase } from "@/lib/metadata";
 
 import styles from "./page.module.css";
 
 const metadataBase = getMetadataBase();
-const instagramTitle = "Instagram da Ótica Vision em Araguaína";
+const instagramTitle = "Ótica Vision no Instagram | Araguaína - TO";
 const instagramDescription =
-  "Armações nacionais e importadas, LAB. DIGITAL e atendimento em Araguaína - TO.";
+  "Armações nacionais e importadas, lentes feitas pela Vision e atendimento em Araguaína - TO.";
 
 export const metadata: Metadata = {
   title: instagramTitle,
@@ -54,7 +61,7 @@ export default function InstagramPage() {
       </header>
 
       <section className={styles.poster} aria-label="Ótica Vision em movimento">
-        <div className={styles.mediaStage}>
+        <VideoComposition className={styles.mediaStage}>
           <span className={styles.aperture} aria-hidden="true" />
           <ObservedVideo asset={instagramVideos[0]} className={styles.mainVideo} />
           <ObservedVideo
@@ -65,12 +72,12 @@ export default function InstagramPage() {
             asset={instagramVideos[2]}
             className={`${styles.supportVideo} ${styles.supportTwo}`}
           />
-        </div>
+        </VideoComposition>
 
         <div className={styles.narrative}>
           <p className={styles.bio}>
-            Armações nacionais e importadas, <strong>LAB. DIGITAL</strong> e atendimento
-            em Araguaína - TO.
+            Armações nacionais e importadas. <strong>Lentes feitas pela Vision.</strong>{" "}
+            Araguaína - TO.
           </p>
 
           <nav className={styles.actions} aria-label="Links da Ótica Vision">
@@ -82,32 +89,36 @@ export default function InstagramPage() {
             >
               <MessageCircle aria-hidden="true" size={21} strokeWidth={1.55} />
               <span>WhatsApp</span>
-              <small aria-hidden="true">01</small>
             </a>
             <a
               href={LINKS.instagram}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Camera aria-hidden="true" size={21} strokeWidth={1.55} />
+              <InstagramIcon aria-hidden="true" size={21} strokeWidth={1.55} />
               <span>Instagram</span>
-              <small aria-hidden="true">02</small>
             </a>
             <a href={LINKS.maps} target="_blank" rel="noopener noreferrer">
               <MapPin aria-hidden="true" size={21} strokeWidth={1.55} />
               <span>Rota</span>
-              <small aria-hidden="true">03</small>
             </a>
             <a href={LINKS.home}>
               <Home aria-hidden="true" size={21} strokeWidth={1.55} />
-              <span>Site completo</span>
-              <small aria-hidden="true">04</small>
+              <span>Site</span>
             </a>
           </nav>
         </div>
       </section>
 
       <InstagramImageRail images={instagramImages} />
+
+      <section className={styles.brandSignature} aria-label="Marcas premium na Ótica Vision">
+        <BrandRail
+          brands={brandLogos}
+          variant="compact"
+          ariaLabel="Marcas premium na Ótica Vision"
+        />
+      </section>
 
       <section className={styles.location} aria-labelledby="instagram-location-title">
         <div>
@@ -116,7 +127,7 @@ export default function InstagramPage() {
         </div>
         <a href={LINKS.maps} target="_blank" rel="noopener noreferrer">
           <MapPin aria-hidden="true" size={20} strokeWidth={1.55} />
-          <span>Rota</span>
+          <span>Ver rota</span>
         </a>
       </section>
     </main>

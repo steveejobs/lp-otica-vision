@@ -28,9 +28,9 @@ export function NewsSection({ items, loading = false }: NewsSectionProps) {
     >
       <div className={styles.intro}>
         <p className="eyebrow">Exame</p>
-        <h2 id={titleId}>Tendências em óculos</h2>
+        <h2 id={titleId}>Óculos em pauta.</h2>
         <p className={styles.description}>
-          Matérias sobre moda, consumo e mercado óptico.
+          Moda, consumo e mercado óptico em matérias da Exame.
         </p>
         <VisionButton
           className={styles.button}
@@ -39,7 +39,7 @@ export function NewsSection({ items, loading = false }: NewsSectionProps) {
           variant="secondary"
           external
         >
-          Ver mais na Exame
+          Ler mais na Exame
         </VisionButton>
       </div>
 

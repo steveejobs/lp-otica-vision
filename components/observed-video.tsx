@@ -1,9 +1,4 @@
-"use client";
-
-import { useEffect, useRef } from "react";
-
 import type { VideoAsset } from "@/lib/assets";
-import { observeAutoplayVideo } from "@/lib/video-observer";
 
 import styles from "./observed-video.module.css";
 
@@ -18,15 +13,6 @@ export function ObservedVideo({
   className = "",
   focusReveal = false,
 }: ObservedVideoProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    return observeAutoplayVideo(video);
-  }, []);
-
   return (
     <div
       className={`${styles.frame} ${className}`}
@@ -34,11 +20,10 @@ export function ObservedVideo({
       data-focus-reveal={focusReveal || undefined}
     >
       <video
-        ref={videoRef}
         muted
         loop
         playsInline
-        preload="none"
+        preload="metadata"
         poster={asset.poster}
         aria-label={asset.label}
         data-video-asset={asset.src}

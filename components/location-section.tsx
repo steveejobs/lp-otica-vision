@@ -15,8 +15,8 @@ export function LocationSection() {
       aria-labelledby="location-section-title"
     >
       <div className={styles.copy}>
-        <h2 id="location-section-title">Escolha seus próximos óculos em Araguaína.</h2>
-        <p>Fale com a Ótica Vision ou veja a rota até a loja.</p>
+        <h2 id="location-section-title">Vision em Araguaína. Escolha de perto.</h2>
+        <p>Fale com a Vision pelo WhatsApp ou veja a rota até a loja.</p>
       </div>
 
       <div className={styles.actions}>
@@ -26,7 +26,7 @@ export function LocationSection() {
           external
           ariaLabel="Falar com a Ótica Vision pelo WhatsApp"
         >
-          WhatsApp
+          Falar no WhatsApp
         </VisionButton>
         <VisionButton
           href={LINKS.maps}
