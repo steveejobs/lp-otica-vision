@@ -7,9 +7,19 @@ type NewsImageProps = {
   src: string;
   alt: string;
   className: string;
+  sizes?: string;
+  onLoad?: () => void;
+  onError?: () => void;
 };
 
-export function NewsImage({ src, alt, className }: NewsImageProps) {
+export function NewsImage({
+  src,
+  alt,
+  className,
+  sizes = "(max-width: 720px) 82vw, (max-width: 1100px) 40vw, 360px",
+  onLoad,
+  onError,
+}: NewsImageProps) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
@@ -25,10 +35,16 @@ export function NewsImage({ src, alt, className }: NewsImageProps) {
           src={src}
           alt={alt}
           fill
-          sizes="(max-width: 720px) 82vw, (max-width: 1100px) 40vw, 360px"
+          sizes={sizes}
           loading="lazy"
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
+          onLoad={() => {
+            setLoaded(true);
+            onLoad?.();
+          }}
+          onError={() => {
+            setFailed(true);
+            onError?.();
+          }}
         />
       ) : null}
     </div>

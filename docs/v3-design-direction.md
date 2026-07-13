@@ -9,7 +9,7 @@ A V3 deve parecer uma peça editorial feita para a Ótica Vision: humana no uso 
 ## Princípios
 
 1. **A pessoa vem antes da interface.** Rosto, olhos e armação permanecem legíveis; controles nunca cobrem o produto.
-2. **Uma mídia forte por capítulo.** O hero tem uma foto, a seção de vídeos tem um principal, a galeria tem uma imagem ativa e o LAB tem um detalhe compacto.
+2. **Uma composição forte por capítulo.** O hero tem uma foto, a seção de vídeos tem um principal, a galeria tem uma imagem ativa e o LAB usa um díptico compacto da mesma série.
 3. **Calor na base, precisão no acabamento.** Off-white e champagne formam o ambiente; aço e grafite definem bordas, foco e hierarquia.
 4. **Ritmo curto.** Cada seção tem uma função comercial e termina antes de se tornar cenário vazio.
 5. **Conversão sem ruído.** WhatsApp, Instagram e rota aparecem onde ajudam a decisão, sem chips, barras de prova ou CTAs repetidos em todo bloco.
@@ -64,7 +64,7 @@ O vermelho da foto do hero é um acento editorial da mídia, não uma nova cor d
 - Hero: `2 (1).jpg`, em painel vertical, sem slideshow.
 - Vídeos: proporção nativa 9:16; nenhum vídeo encaixado em palco horizontal.
 - Galeria: todas as imagens permanecem montadas durante a transição; a ativa ganha opacidade e escala, as laterais permanecem parcialmente visíveis.
-- LAB: `5 (1).jpg` em escala compacta. A imagem acompanha o tema de lentes, mas não representa o processo de fabricação.
+- LAB: série 5 completa em escala compacta. As imagens acompanham o tema de lentes, mas não representam o processo de fabricação.
 - Imagens abaixo da dobra usam carregamento tardio; dimensões ou `aspect-ratio` reservam espaço antes do carregamento.
 - Posters são obrigatórios nos vídeos.
 
@@ -111,11 +111,11 @@ Regras:
 | Vídeos | Conjunto centralizado e compacto; principal acima, dois apoios abaixo; fundo neutro sem palco gigante |
 | Galeria | Foco central, laterais parciais, profundidade sutil; sem legenda em cada foto |
 | Marcas | Grid de slots iguais, logos com escala óptica individual; nenhuma afirmação de estoque |
-| LAB | Faixa curta com copy e detalhe de lente; precisão no alinhamento, não em selos técnicos |
+| LAB | Faixa curta com copy e díptico da série 5; precisão no alinhamento, não em selos técnicos |
 | Notícias | Copy curta e três matérias reais; falha da fonte reduz a seção à copy e ao link da Exame |
 | Localização | Encerramento claro, dois CTAs e nenhum mapa pesado |
 | Footer | Logo ou nome, Instagram e direitos essenciais; sem sitemap fictício |
-| `/instagram` | Página concentrada, centrada no conteúdo e nos quatro links oficiais |
+| `/instagram` | Página concentrada, centrada em mídia, quatro links oficiais, marcas e notícias reais da Exame |
 
 ## Anti-template
 
@@ -124,7 +124,7 @@ Regras:
 - Sem faixa de benefícios.
 - Sem gradiente artificial de fundo.
 - Sem alternância mecânica de blocos idênticos.
-- Sem múltiplos carrosséis.
+- Sem carrosséis redundantes ou com a mesma função.
 - Sem texto técnico sobre fabricação que os dados não sustentem.
 - Sem tipografia enorme usada para compensar falta de conteúdo.
 

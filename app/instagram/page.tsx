@@ -9,9 +9,11 @@ import { BrandLogo } from "@/components/brand-logo";
 import { BrandRail } from "@/components/brand-rail";
 import { InstagramIcon } from "@/components/instagram-icon";
 import { InstagramImageRail } from "@/components/instagram-image-rail";
+import { InstagramNewsCarousel } from "@/components/instagram-news-carousel";
 import { ObservedVideo } from "@/components/observed-video";
 import { VideoComposition } from "@/components/video-composition";
 import { brandLogos, instagramImages, instagramVideos } from "@/lib/assets";
+import { getExameNews } from "@/lib/exame-news";
 import { LINKS } from "@/lib/links";
 import { getMetadataBase } from "@/lib/metadata";
 
@@ -52,7 +54,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function InstagramPage() {
+export default async function InstagramPage() {
+  const newsItems = await getExameNews();
+
   return (
     <main className={styles.page} id="main-content">
       <header className={styles.identity}>
@@ -66,11 +70,7 @@ export default function InstagramPage() {
           <ObservedVideo asset={instagramVideos[0]} className={styles.mainVideo} />
           <ObservedVideo
             asset={instagramVideos[1]}
-            className={`${styles.supportVideo} ${styles.supportOne}`}
-          />
-          <ObservedVideo
-            asset={instagramVideos[2]}
-            className={`${styles.supportVideo} ${styles.supportTwo}`}
+            className={styles.supportVideo}
           />
         </VideoComposition>
 
@@ -110,15 +110,26 @@ export default function InstagramPage() {
         </div>
       </section>
 
+      <section className={styles.soloStory} aria-label="Seleção Vision em movimento">
+        <VideoComposition className={styles.soloStage}>
+          <ObservedVideo asset={instagramVideos[2]} className={styles.soloVideo} />
+        </VideoComposition>
+      </section>
+
       <InstagramImageRail images={instagramImages} />
 
-      <section className={styles.brandSignature} aria-label="Marcas premium na Ótica Vision">
+      <section className={styles.brandSignature} aria-labelledby="instagram-brands-title">
+        <header className={styles.brandIntro}>
+          <h2 id="instagram-brands-title">Marcas premium. Seleção Vision.</h2>
+        </header>
         <BrandRail
           brands={brandLogos}
           variant="compact"
           ariaLabel="Marcas premium na Ótica Vision"
         />
       </section>
+
+      <InstagramNewsCarousel items={newsItems} />
 
       <section className={styles.location} aria-labelledby="instagram-location-title">
         <div>

@@ -76,3 +76,48 @@ O contexto Vercel final contém 88 arquivos. Documentação, originais em `galer
 - `git diff --check`: passou.
 
 O preview final é gerado somente depois do commit de limpeza, a partir de uma working tree limpa. A URL é informada na entrega, sem promoção para produção.
+
+## Refinamento focado de LAB e `/instagram` — 2026-07-13
+
+### Alterações validadas
+
+- LAB mobile recomposto com `5 (1).jpg` e `5 (2).jpg`, na ordem da série, sem associar as fotos ao processo de fabricação.
+- `/instagram` com dois vídeos 9:16 na hero e `video (4).mp4` inteiro em uma composição posterior.
+- Rails de marcas ampliados no mobile da home e do `/instagram`, preservando duas sequências, deslocamento contínuo e normalização óptica.
+- Ícone vetorial do Instagram confirmado à esquerda do rótulo, com `21×21 px` e sem raster ou emoji.
+- Três notícias reais da Exame adicionadas ao `/instagram` em carrossel observado, com imagem real, fallback textual, swipe, drag, teclado e controles.
+
+### Matriz final
+
+| Viewport | Home | `/instagram` |
+| --- | --- | --- |
+| `360×800` | passou | passou |
+| `375×812` | passou | passou |
+| `390×844` | passou | passou |
+| `393×852` | passou | passou |
+| `412×915` | passou | passou |
+| `430×932` | passou | passou |
+| `1366×768` | passou | passou |
+| `1440×900` | passou | passou |
+
+Resultado comum às 16 combinações: overflow `0`, zero imagem quebrada, vídeo `0×0`, link vazio, request 404, erro de console, página ou hidratação.
+
+### Motion e interação
+
+- Home: os três vídeos tocaram simultaneamente e avançaram de `0 s` para aproximadamente `1,6 s` no mesmo intervalo.
+- `/instagram`: os dois vídeos da hero avançaram juntos; o vídeo completo também avançou em sua composição própria.
+- Todos os vídeos pausaram em visibilidade de página `hidden` e fora da viewport.
+- Galeria da home: autoplay `0 → 1`; swipe real por toque `0 → 1`.
+- Galeria do `/instagram`: autoplay `0 → 1`; swipe real por toque `0 → 1`.
+- Notícias: autoplay `0 → 1`; ação manual pausou em `1`, retomou em `2`; em aba oculta permaneceu em `2` e retomou em `0` ao voltar.
+- Rails: transform avançou nas duas rotas; grupos duplicados têm larguras idênticas e gaps de `20 px` na home e `18 px` no `/instagram`.
+- Reduced motion: vídeos e carrosséis pausados; rail estático e navegável horizontalmente em todos os breakpoints.
+
+### Rede e build
+
+- Recorte completo em `390×844`: 34 responses na home e 30 no `/instagram`, sem status `4xx/5xx`.
+- Cada rota solicitou somente os três vídeos inventariados.
+- `npm run lint`: passou.
+- `npm run typecheck`: passou.
+- `npm run build`: passou; `/` e `/instagram` estáticas com revalidação de 8 horas.
+- Nenhuma promoção, `--prod` ou alteração de alias foi executada.

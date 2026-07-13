@@ -185,6 +185,14 @@ const visualSeries = {
       "Detalhe editorial de armação de grau e reflexo na lente",
       "50% 42%",
     ),
+    image(
+      "series5",
+      "5 (2).jpg",
+      1440,
+      1919,
+      "Perfil com armação de grau tartaruga e lente clara",
+      "48% 42%",
+    ),
   ],
   series6: [
     image(
@@ -326,7 +334,7 @@ export const brandLogos = [
   ),
 ] as const;
 
-export const labMedia = visualSeries.series5[0];
+export const labMedia = visualSeries.series5;
 
 export const instagramVideos = [
   video(
@@ -370,7 +378,7 @@ assertUnique(
     ...homeVideos.map((item) => item.src),
     ...editorialGalleryImages.map((item) => item.src),
     ...brandLogos.map((item) => item.src),
-    labMedia.src,
+    ...labMedia.map((item) => item.src),
   ],
   "home",
 );
@@ -388,7 +396,7 @@ assertUnique(
   [
     heroMedia.src,
     ...editorialGalleryImages.map((item) => item.src),
-    labMedia.src,
+    ...labMedia.map((item) => item.src),
     ...instagramImages.map((item) => item.src),
   ],
   "curadoria de imagens do site",

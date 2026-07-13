@@ -58,7 +58,11 @@ function BrandSequence({
                 src={brandItem.src}
                 width={brandItem.width}
                 height={brandItem.height}
-                sizes={variant === "compact" ? "116px" : "(max-width: 720px) 128px, 150px"}
+                sizes={
+                  variant === "compact"
+                    ? "(max-width: 720px) 142px, 116px"
+                    : "(max-width: 720px) 144px, 150px"
+                }
                 alt={duplicate ? "" : brandItem.alt}
                 loading="lazy"
                 decoding="async"

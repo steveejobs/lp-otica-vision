@@ -10,12 +10,16 @@ import { VisionButton } from "./vision-button";
 import styles from "./lab-section.module.css";
 
 type LabSectionProps = {
-  media: ImageAsset;
+  media: readonly [ImageAsset, ImageAsset];
 };
 
 export function LabSection({ media }: LabSectionProps) {
-  const mediaStyle = {
-    "--placeholder-color": media.placeholderColor,
+  const [primaryMedia, secondaryMedia] = media;
+  const primaryStyle = {
+    "--placeholder-color": primaryMedia.placeholderColor,
+  } as CSSProperties;
+  const secondaryStyle = {
+    "--placeholder-color": secondaryMedia.placeholderColor,
   } as CSSProperties;
 
   return (
@@ -40,19 +44,34 @@ export function LabSection({ media }: LabSectionProps) {
         </VisionButton>
       </div>
 
-      <figure className={styles.media} data-focus-reveal style={mediaStyle}>
-        <Image
-          src={media.src}
-          width={media.width}
-          height={media.height}
-          sizes="(max-width: 720px) 78vw, 380px"
-          alt={media.alt}
-          loading="lazy"
-          placeholder="blur"
-          blurDataURL={media.blurDataURL}
-          style={{ objectPosition: media.objectPosition }}
-        />
-      </figure>
+      <div className={styles.chapter} data-focus-reveal>
+        <figure className={`${styles.media} ${styles.primaryMedia}`} style={primaryStyle}>
+          <Image
+            src={primaryMedia.src}
+            width={primaryMedia.width}
+            height={primaryMedia.height}
+            sizes="(max-width: 720px) 62vw, 330px"
+            alt={primaryMedia.alt}
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={primaryMedia.blurDataURL}
+            style={{ objectPosition: primaryMedia.objectPosition }}
+          />
+        </figure>
+        <figure className={`${styles.media} ${styles.secondaryMedia}`} style={secondaryStyle}>
+          <Image
+            src={secondaryMedia.src}
+            width={secondaryMedia.width}
+            height={secondaryMedia.height}
+            sizes="(max-width: 720px) 48vw, 230px"
+            alt={secondaryMedia.alt}
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL={secondaryMedia.blurDataURL}
+            style={{ objectPosition: secondaryMedia.objectPosition }}
+          />
+        </figure>
+      </div>
     </SectionShell>
   );
 }

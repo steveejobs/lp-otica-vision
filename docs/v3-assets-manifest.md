@@ -5,7 +5,7 @@ Inventário consolidado em 13 de julho de 2026, depois da aprovação visual e d
 ## Fontes
 
 - `galeria/`: arquivo mestre imutável, com 38 originais.
-- `public/media/`: única fonte publicada, com 33 arquivos usados pelo runtime.
+- `public/media/`: única fonte publicada, com 34 arquivos usados pelo runtime.
 - `lib/assets.ts`: referência tipada de toda mídia local entregue ao site.
 - `.vercelignore`: exclui `galeria/` do contexto de deploy.
 
@@ -22,7 +22,7 @@ As cópias necessárias em `public/media/` são idênticas aos mestres por SHA-2
 
 - Hero: `2 (1).jpg`.
 - Galeria: `1 (1).jpg`, `1 (2).jpg`, `1 (3).jpg`, `3 (1).jpg`, `3 (2).jpg`, `4 (1).jpg`, `4 (2).jpg`.
-- LAB. DIGITAL: `5 (1).jpg`.
+- LAB. DIGITAL: `5 (1).jpg` e `5 (2).jpg`, nesta ordem.
 - Vídeos: `video (4).mp4`, `video (2).mp4`, `video (3).mp4`.
 - Posters: `video-4.jpg`, `video-2.jpg`, `video-3.jpg`.
 - Marcas: os dez arquivos de `public/media/brands/`.
@@ -44,7 +44,6 @@ As cópias necessárias em `public/media/` são idênticas aos mestres por SHA-2
 Permanecem apenas em `galeria/`, como acervo mestre:
 
 - `2 (2).jpg`;
-- `5 (2).jpg`;
 - `8 (1).jpg`, `8 (2).jpg`, `8 (3).jpg`, `8 (4).jpg`;
 - `video.mp4`;
 - `logo com fundo.png`.
@@ -53,7 +52,7 @@ Esses arquivos não entram no deployment e não devem ser apagados, movidos ou r
 
 ## Cópias públicas removidas
 
-- Seis fotos fora da curadoria final: `2 (2)`, `5 (2)` e série 8.
+- Cinco fotos fora da curadoria final: `2 (2)` e série 8.
 - Vídeo reserva `video.mp4` e seu poster `video-1.jpg`.
 - Logo institucional com fundo, sem referência de runtime.
 

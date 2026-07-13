@@ -59,7 +59,7 @@
 .mediaStage {
   position: relative;
   width: 100%;
-  height: clamp(306px, 82vw, 326px);
+  height: clamp(342px, 96vw, 382px);
   margin-top: 0.7rem;
   perspective: 1100px;
   transform-style: preserve-3d;
@@ -111,40 +111,23 @@
 
 .mainVideo {
   z-index: 3;
-  top: 0.7rem;
-  left: 50%;
-  width: min(54vw, 210px);
-  aspect-ratio: 4 / 5;
+  top: 0;
+  left: 2%;
+  width: min(55vw, 212px);
+  aspect-ratio: 9 / 16;
   box-shadow: 0 24px 48px rgba(25, 22, 20, 0.16);
-  transform: translateX(-50%) translateZ(52px);
-}
-
-.mainVideo video {
-  object-position: 50% 34% !important;
+  transform: translateZ(52px);
 }
 
 .supportVideo {
   z-index: 2;
-  width: min(25vw, 96px);
-  aspect-ratio: 3 / 4;
-  filter: saturate(0.78) contrast(0.95);
-  box-shadow: 0 14px 28px rgba(25, 22, 20, 0.1);
-}
-
-.supportVideo video {
-  object-position: 50% 33% !important;
-}
-
-.supportOne {
-  top: 1.2rem;
-  left: 0;
-  transform: rotateY(7deg) translateZ(-48px);
-}
-
-.supportTwo {
-  right: 0;
-  bottom: 0.25rem;
-  transform: rotateY(-7deg) translateZ(-58px);
+  right: 1%;
+  bottom: 0;
+  width: min(40vw, 154px);
+  aspect-ratio: 9 / 16;
+  filter: saturate(0.88) contrast(0.98);
+  box-shadow: 0 18px 34px rgba(25, 22, 20, 0.12);
+  transform: rotateY(-5deg) translateZ(-38px);
 }
 
 .narrative {
@@ -213,8 +196,72 @@
   overflow-wrap: anywhere;
 }
 
+.soloStory {
+  position: relative;
+  width: 100%;
+  margin-top: 2.5rem;
+  padding-block: 1.8rem;
+  border-top: 1px solid rgba(143, 150, 157, 0.36);
+  border-bottom: 1px solid rgba(143, 150, 157, 0.3);
+}
+
+.soloStory::before {
+  content: "";
+  position: absolute;
+  top: 13%;
+  right: 0;
+  bottom: 13%;
+  width: 64%;
+  background: rgba(199, 173, 142, 0.16);
+  pointer-events: none;
+}
+
+.soloStage {
+  position: relative;
+  width: min(78vw, 304px);
+  margin-inline: auto;
+}
+
+.soloStage::before {
+  content: "";
+  position: absolute;
+  top: 12%;
+  right: -12%;
+  width: 108%;
+  height: 62%;
+  border: 1px solid rgba(143, 150, 157, 0.34);
+  border-radius: 50%;
+  transform: rotate(7deg);
+  pointer-events: none;
+}
+
+.soloVideo {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border-radius: 3px;
+  box-shadow: 0 26px 54px rgba(25, 22, 20, 0.16);
+}
+
 .brandSignature {
-  margin-top: 2.15rem;
+  margin-top: 2.35rem;
+  padding-top: 1.8rem;
+  border-top: 1px solid var(--vision-line);
+}
+
+.brandIntro {
+  max-width: 330px;
+}
+
+.brandIntro h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.05rem, 9.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.brandIntro + [data-brand-rail] {
+  margin-top: 1.15rem;
 }
 
 .location {
@@ -291,28 +338,17 @@
   }
 
   .mainVideo {
-    top: 1.7rem;
-    width: 310px;
+    top: 0.7rem;
+    left: 2%;
+    width: 318px;
     aspect-ratio: 9 / 16;
-  }
-
-  .mainVideo video {
-    object-position: 50% 27% !important;
   }
 
   .supportVideo {
-    width: 168px;
+    right: 1%;
+    bottom: 1rem;
+    width: 218px;
     aspect-ratio: 9 / 16;
-  }
-
-  .supportOne {
-    top: 0;
-    left: -1rem;
-  }
-
-  .supportTwo {
-    right: -0.5rem;
-    bottom: 0;
   }
 
   .aperture {
@@ -359,6 +395,20 @@
     border-bottom: 1px solid rgba(143, 150, 157, 0.4);
   }
 
+  .soloStory {
+    margin-top: 3.4rem;
+    padding-block: 2.5rem;
+  }
+
+  .soloStory::before {
+    right: 7%;
+    width: 48%;
+  }
+
+  .soloStage {
+    width: 340px;
+  }
+
   .location {
     grid-template-columns: 1fr 150px;
     align-items: end;
@@ -367,7 +417,16 @@
   }
 
   .brandSignature {
-    margin-top: 3rem;
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+  }
+
+  .brandIntro {
+    max-width: 480px;
+  }
+
+  .brandIntro h2 {
+    font-size: clamp(2.75rem, 3.6vw, 3.45rem);
   }
 
   .location > a {
@@ -388,11 +447,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mainVideo {
-    transform: translateX(-50%);
+    transform: none;
   }
 
-  .supportOne,
-  .supportTwo {
+  .supportVideo {
     transform: none;
   }
 }

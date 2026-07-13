@@ -57,10 +57,10 @@ A home terá exatamente nove blocos. Cada bloco tem uma função distinta e uma 
 - Headline: `Lentes que nascem na própria Vision.`
 - Texto: `Confecção própria em Araguaína - TO, com cuidado no acabamento.`
 - CTA: `Falar sobre lentes`.
-- Mídia: `5 (1).jpg`.
+- Mídia: série 5 completa, `5 (1).jpg` e `5 (2).jpg`, preservando essa ordem.
 - Desktop: copy e mídia compacta em duas colunas.
-- Mobile: copy antes da mídia; CTA permanece junto ao texto.
-- A foto é detalhe editorial de lente em uso e não deve ser tratada como registro do processo fabril.
+- Mobile: copy antes de um mini-capítulo visual sobreposto; CTA permanece junto ao texto e as duas imagens ficam integralmente encaixadas no container.
+- As fotos mostram armações e lentes em uso e não devem ser tratadas como registro do processo fabril.
 
 ### 7. Notícias
 
@@ -94,23 +94,25 @@ A rota funciona como página de links e mídia, não como segunda landing page.
 
 1. Logo transparente com halo discreto.
 2. `@oticavisionaraguaina`.
-3. Vídeo principal `video (2).mp4`.
+3. Hero de vídeo com `video (2).mp4` e `video (3).mp4`.
 4. Bio: `Armações nacionais e importadas. Lentes feitas pela Vision. Araguaína - TO.`
 5. Botões: `WhatsApp`, `Instagram`, `Rota` e `Site`.
-6. Vídeos menores: `video (3).mp4` e `video (4).mp4`.
+6. Vídeo completo `video (4).mp4` em uma composição própria.
 7. Imagens: `6 (1)`, `6 (2)`, `6 (3)`, `7 (1)`, `7 (2)`, `7 (3)`.
-8. Rail compacto com as dez marcas confirmadas.
-9. Localização em Araguaína com link de rota.
+8. Rail com as dez marcas confirmadas e a mesma linguagem da home.
+9. Carrossel de três notícias reais da Exame.
+10. Localização em Araguaína com link de rota.
 
 ### Comportamento
 
-- Mobile: coluna única; principal com largura máxima controlada; vídeos menores lado a lado; imagens em faixa curta com seis itens.
-- Desktop: logo e handle centralizados; bloco principal em duas colunas, com vídeo à esquerda e bio, botões e apoios à direita; imagens em faixa curta abaixo.
-- Nenhum terceiro vídeo oculto, clone visual carregado ou carrossel infinito.
-- Os três vídeos tocam simultaneamente apenas enquanto a composição está visível.
+- Mobile: coluna única; os dois vídeos da hero compõem a primeira dobra e o terceiro aparece inteiro em um bloco vertical posterior.
+- Desktop: logo e handle centralizados; bloco principal em duas colunas, com a hero de vídeos de um lado e bio e botões do outro; o vídeo completo aparece abaixo.
+- Nenhum quarto vídeo oculto ou mídia 0×0.
+- Cada composição toca todos os seus vídeos simultaneamente apenas enquanto está visível; ambas pausam fora da viewport, em aba oculta e reduced motion.
 - A galeria avança a cada 3,9 s, pausa por 6,5 s após gesto e retoma automaticamente.
 - O rail de marcas reutiliza a mesma normalização óptica da home em escala menor.
-- Não incluir notícias, seção LAB separada, lista longa ou mais de seis imagens.
+- O carrossel de notícias avança sozinho, espera a próxima mídia, pausa após interação e respeita visibilidade e reduced motion.
+- Não incluir seção LAB separada, lista longa ou mais de seis imagens na galeria de armações.
 
 ## Links oficiais
 
