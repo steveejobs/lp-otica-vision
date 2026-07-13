@@ -38,10 +38,11 @@ export function ObservedVideo({
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         poster={asset.poster}
         aria-label={asset.label}
         data-video-asset={asset.src}
+        disablePictureInPicture
         style={{ objectPosition: asset.objectPosition }}
       >
         <source src={asset.src} type="video/mp4" />

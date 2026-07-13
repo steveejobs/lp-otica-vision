@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -25,6 +26,7 @@ type DragStart = {
   pointerId: number;
   x: number;
   y: number;
+  time: number;
 };
 
 type GalleryStyle = CSSProperties & {
@@ -43,6 +45,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(() => new Set());
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [chapterTransition, setChapterTransition] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -50,6 +53,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const dragStart = useRef<DragStart | null>(null);
   const pauseUntil = useRef(0);
+  const chapterTimer = useRef<number | null>(null);
 
   const previousIndex = (activeIndex - 1 + images.length) % images.length;
   const nextIndex = (activeIndex + 1) % images.length;
@@ -69,12 +73,37 @@ function FocusSequence({ images }: EditorialGalleryProps) {
     setResumeVersion((current) => current + 1);
   }, []);
 
+  const markChapterTransition = useCallback(
+    (index: number) => {
+      const crossing = images[activeIndex]?.seriesId !== images[index]?.seriesId;
+      if (chapterTimer.current !== null) {
+        window.clearTimeout(chapterTimer.current);
+        chapterTimer.current = null;
+      }
+      setChapterTransition(crossing);
+      if (crossing) {
+        chapterTimer.current = window.setTimeout(() => {
+          setChapterTransition(false);
+          chapterTimer.current = null;
+        }, 1_050);
+      }
+    },
+    [activeIndex, images],
+  );
+
   const showIndex = useCallback(
     (index: number, manual = true) => {
       if (manual) pauseAfterInteraction();
+      markChapterTransition(index);
       setActiveIndex(index);
     },
-    [pauseAfterInteraction],
+    [markChapterTransition, pauseAfterInteraction],
+  );
+
+  useEffect(
+    () => () => {
+      if (chapterTimer.current !== null) window.clearTimeout(chapterTimer.current);
+    },
   );
 
   const showPrevious = useCallback(() => {
@@ -135,7 +164,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
     const remainingPause = Math.max(0, pauseUntil.current - Date.now());
     const timer = window.setTimeout(
       () => showNext(false),
-      remainingPause + AUTOPLAY_DELAY,
+      Math.max(remainingPause, AUTOPLAY_DELAY),
     );
     return () => window.clearTimeout(timer);
   }, [
@@ -203,6 +232,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
       pointerId: event.pointerId,
       x: event.clientX,
       y: event.clientY,
+      time: performance.now(),
     };
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -226,7 +256,14 @@ function FocusSequence({ images }: EditorialGalleryProps) {
 
     const distanceX = event.clientX - start.x;
     const distanceY = event.clientY - start.y;
-    if (Math.abs(distanceX) < 42 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
+    const elapsed = Math.max(1, performance.now() - start.time);
+    const velocity = Math.abs(distanceX) / elapsed;
+    if (
+      (Math.abs(distanceX) < 42 && velocity < 0.42) ||
+      Math.abs(distanceX) <= Math.abs(distanceY)
+    ) {
+      return;
+    }
     if (distanceX > 0) showPrevious();
     else showNext();
   };
@@ -237,11 +274,12 @@ function FocusSequence({ images }: EditorialGalleryProps) {
     <div className={styles.sequence}>
       <div
         ref={viewportRef}
-        className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
+        className={`${styles.viewport} ${isDragging ? styles.dragging : ""} ${chapterTransition ? styles.chapterTransition : ""}`}
         role="region"
         aria-roledescription="carrossel"
         aria-label="Sequência editorial de óculos com avanço automático"
         tabIndex={0}
+        data-series={images[activeIndex]?.seriesId}
         style={viewportStyle}
         onBlur={pauseAfterInteraction}
         onKeyDown={handleKeyDown}
@@ -256,8 +294,10 @@ function FocusSequence({ images }: EditorialGalleryProps) {
 
           return (
             <figure
-              className={`${styles.card} ${styles[position]}`}
+              className={`${styles.card} ${styles[position]} ${asset.seriesId !== images[activeIndex]?.seriesId ? styles.otherChapter : ""}`}
               aria-hidden={position !== "active"}
+              data-asset={asset.src}
+              data-series={asset.seriesId}
               style={cardStyle}
               key={asset.src}
             >
@@ -269,7 +309,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
                   sizes="(max-width: 720px) 72vw, (max-width: 1100px) 38vw, 410px"
                   alt={asset.alt}
                   draggable={false}
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading="lazy"
                   placeholder="blur"
                   blurDataURL={asset.blurDataURL}
                   onLoad={() => markLoaded(index)}
@@ -288,21 +328,32 @@ function FocusSequence({ images }: EditorialGalleryProps) {
           <span aria-hidden="true">/</span>
           <span>{String(images.length).padStart(2, "0")}</span>
         </p>
-        <div className={styles.progress} aria-label="Navegar pela seleção">
+        <div className={styles.progress} aria-hidden="true">
           {images.map((asset, index) => (
-            <button
-              type="button"
+            <span
               className={index === activeIndex ? styles.current : ""}
-              onClick={() => showIndex(index)}
-              aria-label={`Mostrar imagem ${index + 1}: ${asset.alt}`}
-              aria-current={index === activeIndex ? "true" : undefined}
               key={asset.src}
             />
           ))}
         </div>
-        <p className={styles.hint} aria-hidden="true">
-          arraste para mudar o foco
-        </p>
+        <div className={styles.controls} aria-label="Navegar pela seleção">
+          <button
+            type="button"
+            onClick={showPrevious}
+            disabled={!loadedIndexes.has(previousIndex)}
+            aria-label="Mostrar imagem anterior"
+          >
+            <ChevronLeft aria-hidden="true" size={18} strokeWidth={1.6} />
+          </button>
+          <button
+            type="button"
+            onClick={() => showNext()}
+            disabled={!loadedIndexes.has(nextIndex)}
+            aria-label="Mostrar próxima imagem"
+          >
+            <ChevronRight aria-hidden="true" size={18} strokeWidth={1.6} />
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -318,7 +369,9 @@ export function EditorialGallery({ images }: EditorialGalleryProps) {
       <header className={styles.intro}>
         <h2 id="editorial-gallery-title">Escolhas que mudam o olhar.</h2>
         <p>Presença, formato e acabamento em uma seleção real da Vision.</p>
-        <span aria-hidden="true">seleção 01 — 08</span>
+        <span aria-hidden="true">
+          seleção 01 — {String(images.length).padStart(2, "0")}
+        </span>
       </header>
 
       <FocusSequence images={images} />

@@ -32,10 +32,19 @@ const updatePlayback = () => {
   visibleVideos.forEach((_, candidate) => {
     if (candidate !== selected) {
       candidate.pause();
+      candidate.dataset.autoplayActive = "false";
       return;
     }
 
-    void candidate.play().catch(() => candidate.pause());
+    void candidate.play().then(
+      () => {
+        candidate.dataset.autoplayActive = "true";
+      },
+      () => {
+        candidate.dataset.autoplayActive = "false";
+        candidate.pause();
+      },
+    );
   });
 };
 
@@ -59,7 +68,7 @@ export function observeAutoplayVideo(video: HTMLVideoElement) {
   observer.observe(video);
   const handleScroll = () => updatePlayback();
   window.addEventListener("scroll", handleScroll, { passive: true });
-  video.addEventListener("timeupdate", updatePlayback);
+  window.addEventListener("resize", handleScroll, { passive: true });
   motionPreference.addEventListener("change", updatePlayback);
   document.addEventListener("visibilitychange", updatePlayback);
 
@@ -69,7 +78,7 @@ export function observeAutoplayVideo(video: HTMLVideoElement) {
     updatePlayback();
     observer.disconnect();
     window.removeEventListener("scroll", handleScroll);
-    video.removeEventListener("timeupdate", updatePlayback);
+    window.removeEventListener("resize", handleScroll);
     motionPreference.removeEventListener("change", updatePlayback);
     document.removeEventListener("visibilitychange", updatePlayback);
   };

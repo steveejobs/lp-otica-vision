@@ -13,19 +13,24 @@ export function NewsImage({ src, alt, className }: NewsImageProps) {
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  if (failed) return null;
-
   return (
-    <div className={className} data-news-media data-loaded={loaded ? "true" : "false"}>
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="(max-width: 720px) 82vw, (max-width: 1100px) 40vw, 360px"
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
-      />
+    <div
+      className={className}
+      data-news-media
+      data-loaded={loaded ? "true" : "false"}
+      data-failed={failed ? "true" : "false"}
+    >
+      {!failed ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 720px) 82vw, (max-width: 1100px) 40vw, 360px"
+          loading="lazy"
+          onLoad={() => setLoaded(true)}
+          onError={() => setFailed(true)}
+        />
+      ) : null}
     </div>
   );
 }

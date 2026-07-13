@@ -42,6 +42,7 @@ export function FocusPortrait({
   const pointerDownRef = useRef(false);
   const pointerInsideRef = useRef(false);
   const lastInteractionRef = useRef(0);
+  const lastFrameRef = useRef(0);
 
   const setTargetFromPointer = useCallback((event: PointerEvent<HTMLElement>) => {
     if (event.pointerType !== "mouse" && !pointerDownRef.current) return;
@@ -69,11 +70,6 @@ export function FocusPortrait({
     const modestDevice =
       navigator.hardwareConcurrency <= 2 || (typeof memory === "number" && memory <= 2);
 
-    if (modestDevice) {
-      frame.dataset.focusStatic = "true";
-      return;
-    }
-
     let frameId: number | null = null;
     let inView = true;
     let pageVisible = document.visibilityState === "visible";
@@ -82,6 +78,12 @@ export function FocusPortrait({
     const render = (now: number) => {
       frameId = null;
       if (!inView || !pageVisible || reducedMotion) return;
+
+      if (modestDevice && now - lastFrameRef.current < 32) {
+        frameId = window.requestAnimationFrame(render);
+        return;
+      }
+      lastFrameRef.current = now;
 
       const recentlyTouched = now - lastInteractionRef.current < 2_600;
       if (!pointerInsideRef.current && !recentlyTouched) {
@@ -158,8 +160,12 @@ export function FocusPortrait({
       ref={frameRef}
       className={`${styles.portrait} ${className}`}
       style={focusStyle}
+      data-focus-portrait
       onPointerDown={(event) => {
         pointerDownRef.current = true;
+        if (event.pointerType !== "mouse") {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }
         setTargetFromPointer(event);
       }}
       onPointerEnter={() => {

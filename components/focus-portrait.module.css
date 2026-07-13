@@ -3,7 +3,7 @@
   --focus-y: 36%;
   position: relative;
   margin: 0;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
 }
 

@@ -1,5 +1,15 @@
 import { IMAGE_PLACEHOLDERS } from "./image-placeholders";
 
+export type VisualSeriesId =
+  | "series1"
+  | "series2"
+  | "series3"
+  | "series4"
+  | "series5"
+  | "series6"
+  | "series7"
+  | "series8";
+
 export type ImageAsset = {
   src: string;
   width: number;
@@ -8,6 +18,12 @@ export type ImageAsset = {
   objectPosition: string;
   blurDataURL: string;
   placeholderColor: string;
+  seriesId: VisualSeriesId;
+};
+
+export type GalleryChapter = {
+  id: VisualSeriesId;
+  images: readonly ImageAsset[];
 };
 
 export type VideoAsset = {
@@ -32,6 +48,7 @@ const pathFor = (folder: string, filename: string) =>
   `/media/${folder}/${encodeURIComponent(filename)}`;
 
 const image = (
+  seriesId: VisualSeriesId,
   filename: string,
   width: number,
   height: number,
@@ -48,6 +65,7 @@ const image = (
     objectPosition,
     blurDataURL: placeholder?.blurDataURL ?? "",
     placeholderColor: placeholder?.color ?? "#d9dde1",
+    seriesId,
   };
 };
 
@@ -88,12 +106,193 @@ export const identityAssets = {
   favicon: pathFor("identity", "favicon.png"),
 } as const;
 
-export const heroMedia = image(
-  "2 (1).jpg",
-  1440,
-  1919,
-  "Mulher usando óculos escuros e jaqueta vermelha em retrato editorial",
-);
+export const visualSeries = {
+  series1: [
+    image(
+      "series1",
+      "1 (1).jpg",
+      1358,
+      1810,
+      "Retrato editorial com óculos escuros pretos e textura felpuda",
+      "50% 46%",
+    ),
+    image(
+      "series1",
+      "1 (2).jpg",
+      1440,
+      1919,
+      "Close lateral com óculos escuros pretos e detalhe metálico na haste",
+      "50% 45%",
+    ),
+    image(
+      "series1",
+      "1 (3).jpg",
+      1440,
+      1920,
+      "Retrato frontal com óculos escuros pretos e casaco de textura felpuda",
+      "50% 44%",
+    ),
+  ],
+  series2: [
+    image(
+      "series2",
+      "2 (1).jpg",
+      1440,
+      1919,
+      "Mulher usando óculos escuros e jaqueta vermelha em retrato editorial",
+    ),
+    image(
+      "series2",
+      "2 (2).jpg",
+      1440,
+      1919,
+      "Retrato com óculos escuros geométricos e jaqueta vermelha",
+      "50% 40%",
+    ),
+  ],
+  series3: [
+    image(
+      "series3",
+      "3 (1).jpg",
+      1440,
+      1919,
+      "Retrato em tons neutros com óculos escuros e braço elevado",
+      "50% 42%",
+    ),
+    image(
+      "series3",
+      "3 (2).jpg",
+      1440,
+      1919,
+      "Retrato em tons neutros com óculos escuros e mão sobre o cabelo",
+      "50% 42%",
+    ),
+  ],
+  series4: [
+    image(
+      "series4",
+      "4 (1).jpg",
+      1440,
+      1919,
+      "Retrato com óculos amplos de lente marrom sobre fundo escuro",
+      "50% 44%",
+    ),
+    image(
+      "series4",
+      "4 (2).jpg",
+      1440,
+      1911,
+      "Retrato com óculos de lente espelhada e jaqueta vermelha",
+      "50% 40%",
+    ),
+  ],
+  series5: [
+    image(
+      "series5",
+      "5 (1).jpg",
+      1440,
+      1919,
+      "Detalhe editorial de armação de grau e reflexo na lente",
+      "50% 42%",
+    ),
+    image(
+      "series5",
+      "5 (2).jpg",
+      1440,
+      1919,
+      "Perfil com armação de grau tartaruga e lente clara",
+      "48% 42%",
+    ),
+  ],
+  series6: [
+    image(
+      "series6",
+      "6 (1).jpg",
+      1440,
+      1919,
+      "Retrato com armação tartaruga e acabamento em tom quente",
+      "50% 43%",
+    ),
+    image(
+      "series6",
+      "6 (2).jpg",
+      1440,
+      1919,
+      "Retrato frontal com óculos tartaruga e acabamento quente",
+      "50% 40%",
+    ),
+    image(
+      "series6",
+      "6 (3).jpg",
+      1440,
+      1919,
+      "Close frontal com óculos estreitos de lente marrom",
+      "50% 43%",
+    ),
+  ],
+  series7: [
+    image(
+      "series7",
+      "7 (1).jpg",
+      1440,
+      1919,
+      "Perfil com óculos de lente marrom e casaco em tom neutro",
+      "50% 43%",
+    ),
+    image(
+      "series7",
+      "7 (2).jpg",
+      1440,
+      1919,
+      "Retrato frontal com óculos de lente marrom sobre fundo escuro",
+      "50% 42%",
+    ),
+    image(
+      "series7",
+      "7 (3).jpg",
+      1440,
+      1919,
+      "Close com óculos de lente marrom e acabamento translúcido",
+      "50% 43%",
+    ),
+  ],
+  series8: [
+    image(
+      "series8",
+      "8 (1).jpg",
+      1440,
+      1762,
+      "Detalhe de haste e acabamento de óculos sobre superfície clara",
+      "50% 50%",
+    ),
+    image(
+      "series8",
+      "8 (2).jpg",
+      1440,
+      1762,
+      "Mulher experimentando óculos escuros no interior da Ótica Vision",
+      "50% 42%",
+    ),
+    image(
+      "series8",
+      "8 (3).jpg",
+      1320,
+      1615,
+      "Seleção de óculos organizada em bandeja na loja",
+      "50% 49%",
+    ),
+    image(
+      "series8",
+      "8 (4).jpg",
+      1440,
+      1762,
+      "Mulher experimentando óculos diante do espelho na Ótica Vision",
+      "50% 45%",
+    ),
+  ],
+} as const;
+
+export const heroMedia = visualSeries.series2[0];
 
 export const homeVideos = [
   video(
@@ -116,64 +315,15 @@ export const homeVideos = [
   ),
 ] as const;
 
-export const editorialGalleryImages = [
-  image(
-    "1 (1).jpg",
-    1358,
-    1810,
-    "Retrato editorial com óculos escuros pretos e textura felpuda",
-    "50% 46%",
-  ),
-  image(
-    "8 (2).jpg",
-    1440,
-    1762,
-    "Mulher experimentando óculos escuros no interior da Ótica Vision",
-    "50% 42%",
-  ),
-  image(
-    "6 (1).jpg",
-    1440,
-    1919,
-    "Retrato com armação tartaruga e acabamento em tom quente",
-    "50% 43%",
-  ),
-  image(
-    "5 (2).jpg",
-    1440,
-    1919,
-    "Perfil com armação de grau tartaruga e lente clara",
-    "48% 42%",
-  ),
-  image(
-    "4 (2).jpg",
-    1440,
-    1911,
-    "Retrato com óculos de lente espelhada e jaqueta vermelha",
-    "50% 40%",
-  ),
-  image(
-    "8 (3).jpg",
-    1320,
-    1615,
-    "Seleção de óculos organizada em bandeja na loja",
-    "50% 49%",
-  ),
-  image(
-    "3 (1).jpg",
-    1440,
-    1919,
-    "Retrato em tons neutros com óculos escuros e braço elevado",
-    "50% 42%",
-  ),
-  image(
-    "7 (3).jpg",
-    1440,
-    1919,
-    "Close com óculos de lente marrom e acabamento translúcido",
-    "50% 43%",
-  ),
-] as const;
+export const homeGalleryChapters = [
+  { id: "series1", images: visualSeries.series1 },
+  { id: "series3", images: visualSeries.series3 },
+  { id: "series4", images: visualSeries.series4 },
+] as const satisfies readonly GalleryChapter[];
+
+export const editorialGalleryImages = homeGalleryChapters.flatMap(
+  (chapter) => chapter.images,
+);
 
 export const brandLogos = [
   brand("Ray-Ban", "logo-rayban.png", 1280, 1280, 1.34, 104, 42),
@@ -228,13 +378,7 @@ export const brandLogos = [
   ),
 ] as const;
 
-export const labMedia = image(
-  "5 (1).jpg",
-  1440,
-  1919,
-  "Detalhe editorial de armação de grau e reflexo na lente",
-  "50% 42%",
-);
+export const labMedia = visualSeries.series5[0];
 
 export const instagramVideos = [
   video(
@@ -257,50 +401,14 @@ export const instagramVideos = [
   ),
 ] as const;
 
-export const instagramImages = [
-  image(
-    "1 (2).jpg",
-    1440,
-    1919,
-    "Close lateral com óculos escuros pretos e detalhe metálico na haste",
-    "50% 45%",
-  ),
-  image(
-    "2 (2).jpg",
-    1440,
-    1919,
-    "Retrato com óculos escuros geométricos e jaqueta vermelha",
-    "50% 40%",
-  ),
-  image(
-    "3 (2).jpg",
-    1440,
-    1919,
-    "Retrato em tons neutros com óculos escuros e mão sobre o cabelo",
-    "50% 42%",
-  ),
-  image(
-    "4 (1).jpg",
-    1440,
-    1919,
-    "Retrato com óculos amplos de lente marrom sobre fundo escuro",
-    "50% 44%",
-  ),
-  image(
-    "6 (2).jpg",
-    1440,
-    1919,
-    "Retrato frontal com óculos tartaruga e acabamento quente",
-    "50% 40%",
-  ),
-  image(
-    "8 (4).jpg",
-    1440,
-    1762,
-    "Mulher experimentando óculos diante do espelho na Ótica Vision",
-    "50% 45%",
-  ),
-] as const;
+export const instagramGalleryChapters = [
+  { id: "series6", images: visualSeries.series6 },
+  { id: "series7", images: visualSeries.series7 },
+] as const satisfies readonly GalleryChapter[];
+
+export const instagramImages = instagramGalleryChapters.flatMap(
+  (chapter) => chapter.images,
+);
 
 const assertUnique = (paths: readonly string[], route: string) => {
   if (new Set(paths).size !== paths.length) {
@@ -325,4 +433,14 @@ assertUnique(
     ...instagramImages.map((item) => item.src),
   ],
   "/instagram",
+);
+
+assertUnique(
+  [
+    heroMedia.src,
+    ...editorialGalleryImages.map((item) => item.src),
+    labMedia.src,
+    ...instagramImages.map((item) => item.src),
+  ],
+  "curadoria de imagens do site",
 );

@@ -1,8 +1,10 @@
 .header {
   position: relative;
   z-index: 10;
+  padding-top: env(safe-area-inset-top, 0px);
   border-bottom: 1px solid var(--vision-line);
   background: var(--vision-paper);
+  overflow: clip;
 }
 
 .inner {
@@ -17,6 +19,8 @@
 
 .brand {
   display: inline-flex;
+  min-width: 0;
+  max-width: 96px;
   flex: 0 0 auto;
   align-items: center;
 }
@@ -29,6 +33,15 @@
 
 .actions {
   gap: 1rem;
+  min-width: 0;
+}
+
+.actions a {
+  min-width: 0;
+}
+
+.actions a span {
+  overflow-wrap: anywhere;
 }
 
 .instagram {

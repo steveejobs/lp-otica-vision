@@ -1,5 +1,6 @@
 .footer {
   background: var(--vision-paper);
+  overflow: clip;
 }
 
 .inner {
@@ -9,7 +10,8 @@
   align-items: center;
   gap: 0.35rem 1rem;
   margin-inline: auto;
-  padding-block: 1rem;
+  padding-top: 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   color: var(--vision-muted);
   font-size: 0.8rem;
 }
@@ -34,7 +36,8 @@
 }
 
 .copyright {
-  justify-self: end;
+  grid-column: 1 / -1;
+  justify-self: start;
   white-space: nowrap;
 }
 
@@ -60,7 +63,8 @@
     grid-template-columns: 1fr auto auto;
     align-items: center;
     gap: 2.5rem;
-    padding-block: 1.25rem;
+    padding-top: 1.25rem;
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   }
 
   .identity {
@@ -69,5 +73,10 @@
 
   .links {
     gap: 1.5rem;
+  }
+
+  .copyright {
+    grid-column: auto;
+    justify-self: end;
   }
 }

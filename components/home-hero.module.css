@@ -197,6 +197,7 @@
 
   .inner {
     min-height: 0;
+    min-height: calc(100svh - 70px - env(safe-area-inset-top, 0px));
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: auto repeat(6, auto);
     gap: 0;
@@ -216,6 +217,7 @@
   .title > span {
     font-size: clamp(2.6rem, 12vw, 3.1rem);
     line-height: 0.91;
+    white-space: normal;
   }
 
   .titleLead,
@@ -273,6 +275,17 @@
   .actions {
     gap: 0.5rem;
     margin-top: 0.9rem;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) and (max-width: 960px) {
+  .inner {
+    min-height: 470px;
+    padding-block: 1.25rem 1.75rem;
+  }
+
+  .media {
+    max-height: 390px;
   }
 }
 

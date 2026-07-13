@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -23,30 +25,42 @@ type CardStyle = CSSProperties & {
   "--placeholder-color": string;
 };
 
-type DragState = {
-  pointerId: number;
-  pointerType: string;
-  startX: number;
-  startScrollLeft: number;
-  moved: boolean;
+type ViewportStyle = CSSProperties & {
+  "--drag-offset": string;
 };
 
-const AUTOPLAY_DELAY = 3_200;
-const INTERACTION_PAUSE = 5_500;
+type DragState = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  startedAt: number;
+};
+
+const AUTOPLAY_DELAY = 3_700;
+const INTERACTION_PAUSE = 5_800;
 
 export function InstagramImageRail({ images }: InstagramImageRailProps) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const directionRef = useRef<1 | -1>(1);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const pauseUntil = useRef(0);
-  const interactingRef = useRef(false);
-  const dragStateRef = useRef<DragState | null>(null);
-  const scrollFrame = useRef<number | null>(null);
+  const dragState = useRef<DragState | null>(null);
+  const chapterTimer = useRef<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(() => new Set());
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [chapterTransition, setChapterTransition] = useState(false);
   const [resumeVersion, setResumeVersion] = useState(0);
+
+  const previousIndex = (activeIndex - 1 + images.length) % images.length;
+  const nextIndex = (activeIndex + 1) % images.length;
+
+  const renderedIndexes = useMemo(
+    () => new Set([previousIndex, activeIndex, nextIndex]),
+    [activeIndex, nextIndex, previousIndex],
+  );
 
   const markLoaded = useCallback((index: number) => {
     setLoadedIndexes((current) => {
@@ -62,34 +76,60 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
     setResumeVersion((current) => current + 1);
   }, []);
 
-  const scrollToIndex = useCallback(
-    (index: number, manual = false) => {
-      const rail = railRef.current;
-      const card = rail?.querySelector<HTMLElement>(`[data-rail-index="${index}"]`);
-      if (!rail || !card || (!manual && !loadedIndexes.has(index))) return false;
+  const markChapterTransition = useCallback(
+    (index: number) => {
+      const crossing = images[activeIndex]?.seriesId !== images[index]?.seriesId;
+      if (chapterTimer.current !== null) window.clearTimeout(chapterTimer.current);
+      setChapterTransition(crossing);
+      if (crossing) {
+        chapterTimer.current = window.setTimeout(() => {
+          setChapterTransition(false);
+          chapterTimer.current = null;
+        }, 900);
+      }
+    },
+    [activeIndex, images],
+  );
+
+  const showIndex = useCallback(
+    (index: number, manual = true) => {
+      if (!loadedIndexes.has(index)) return false;
       if (manual) pauseAfterInteraction();
+      markChapterTransition(index);
       setActiveIndex(index);
-      const targetLeft = card.offsetLeft - (rail.clientWidth - card.offsetWidth) / 2;
-      rail.scrollTo({
-        left: targetLeft,
-        behavior: reducedMotion ? "auto" : "smooth",
-      });
       return true;
     },
-    [loadedIndexes, pauseAfterInteraction, reducedMotion],
+    [loadedIndexes, markChapterTransition, pauseAfterInteraction],
+  );
+
+  const showPrevious = useCallback(
+    () => showIndex(previousIndex),
+    [previousIndex, showIndex],
+  );
+  const showNext = useCallback(
+    (manual = true) => showIndex(nextIndex, manual),
+    [nextIndex, showIndex],
+  );
+
+  useEffect(
+    () => () => {
+      if (chapterTimer.current !== null) window.clearTimeout(chapterTimer.current);
+    },
+    [],
   );
 
   useEffect(() => {
-    const rail = railRef.current;
-    if (!rail || !("IntersectionObserver" in window)) {
+    const viewport = viewportRef.current;
+    if (!viewport || !("IntersectionObserver" in window)) {
       setIsInView(true);
       return;
     }
+
     const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.22),
-      { threshold: [0, 0.22, 0.55], rootMargin: "0px 0px -4%" },
+      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.52),
+      { threshold: [0, 0.52, 0.76], rootMargin: "0px 0px -4%" },
     );
-    observer.observe(rail);
+    observer.observe(viewport);
     return () => observer.disconnect();
   }, []);
 
@@ -108,155 +148,188 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion || !isInView || !isPageVisible || interactingRef.current) return;
-
-    let direction = directionRef.current;
-    if (activeIndex === images.length - 1) direction = -1;
-    if (activeIndex === 0) direction = 1;
-    directionRef.current = direction;
-    const target = activeIndex + direction;
-    if (!loadedIndexes.has(target)) return;
+    if (
+      reducedMotion ||
+      !isInView ||
+      !isPageVisible ||
+      isDragging ||
+      !loadedIndexes.has(nextIndex)
+    ) {
+      return;
+    }
 
     const remainingPause = Math.max(0, pauseUntil.current - Date.now());
     const timer = window.setTimeout(
-      () => scrollToIndex(target),
-      remainingPause + AUTOPLAY_DELAY,
+      () => showNext(false),
+      Math.max(remainingPause, AUTOPLAY_DELAY),
     );
     return () => window.clearTimeout(timer);
   }, [
     activeIndex,
-    images.length,
+    isDragging,
     isInView,
     isPageVisible,
     loadedIndexes,
+    nextIndex,
     reducedMotion,
     resumeVersion,
-    scrollToIndex,
+    showNext,
   ]);
 
-  const handleScroll = () => {
-    if (scrollFrame.current !== null) return;
-    scrollFrame.current = window.requestAnimationFrame(() => {
-      scrollFrame.current = null;
-      const rail = railRef.current;
-      if (!rail) return;
-      const cards = Array.from(rail.querySelectorAll<HTMLElement>("[data-rail-index]"));
-      const nearest = cards.reduce(
-        (best, card, index) => {
-          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-          const railCenter = rail.scrollLeft + rail.clientWidth / 2;
-          const distance = Math.abs(cardCenter - railCenter);
-          return distance < best.distance ? { index, distance } : best;
-        },
-        { index: activeIndex, distance: Number.POSITIVE_INFINITY },
-      );
-      setActiveIndex(nearest.index);
-    });
+  const getPosition = (index: number) => {
+    if (index === activeIndex) return "active";
+    if (index === previousIndex) return "previous";
+    if (index === nextIndex) return "next";
+    return "resting";
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    const direction = event.key === "ArrowRight" ? 1 : -1;
-    const target = Math.max(0, Math.min(images.length - 1, activeIndex + direction));
-    directionRef.current = direction as 1 | -1;
-    scrollToIndex(target, true);
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      showPrevious();
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      showNext();
+    }
   };
 
-  const beginInteraction = (event: PointerEvent<HTMLDivElement>) => {
-    interactingRef.current = true;
-    dragStateRef.current = {
+  const beginDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary) return;
+    pauseAfterInteraction();
+    setIsDragging(true);
+    dragState.current = {
       pointerId: event.pointerId,
-      pointerType: event.pointerType,
       startX: event.clientX,
-      startScrollLeft: event.currentTarget.scrollLeft,
-      moved: false,
+      startY: event.clientY,
+      startedAt: performance.now(),
     };
-    if (event.pointerType === "mouse") {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    }
-    pauseAfterInteraction();
+    event.currentTarget.setPointerCapture(event.pointerId);
   };
 
-  const moveInteraction = (event: PointerEvent<HTMLDivElement>) => {
-    const drag = dragStateRef.current;
+  const moveDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
     if (!drag || drag.pointerId !== event.pointerId) return;
-    const distance = event.clientX - drag.startX;
-    if (Math.abs(distance) > 6) drag.moved = true;
-    if (drag.pointerType === "mouse") {
-      event.currentTarget.scrollLeft = drag.startScrollLeft - distance;
-    }
+    const distanceX = event.clientX - drag.startX;
+    const distanceY = event.clientY - drag.startY;
+    if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 12) return;
+    setDragOffset(Math.max(-78, Math.min(78, distanceX * 0.5)));
   };
 
-  const endInteraction = (event: PointerEvent<HTMLDivElement>) => {
-    const drag = dragStateRef.current;
-    if (drag && drag.pointerId === event.pointerId && !drag.moved) {
-      const target = (event.target as Element).closest<HTMLElement>("[data-rail-index]");
-      const index = Number(target?.dataset.railIndex);
-      if (Number.isInteger(index)) scrollToIndex(index, true);
-    }
-    dragStateRef.current = null;
-    interactingRef.current = false;
+  const endDrag = (event: PointerEvent<HTMLDivElement>, cancelled = false) => {
+    const drag = dragState.current;
+    dragState.current = null;
+    setIsDragging(false);
+    setDragOffset(0);
     pauseAfterInteraction();
+    if (cancelled || !drag || drag.pointerId !== event.pointerId) return;
+
+    const distanceX = event.clientX - drag.startX;
+    const distanceY = event.clientY - drag.startY;
+    const elapsed = Math.max(1, performance.now() - drag.startedAt);
+    const velocity = Math.abs(distanceX) / elapsed;
+    if (
+      (Math.abs(distanceX) < 38 && velocity < 0.4) ||
+      Math.abs(distanceX) <= Math.abs(distanceY)
+    ) {
+      return;
+    }
+    if (distanceX > 0) showPrevious();
+    else showNext();
   };
+
+  const viewportStyle: ViewportStyle = { "--drag-offset": `${dragOffset}px` };
+  const activeSeries = images[activeIndex]?.seriesId.replace("series", "");
 
   return (
-    <section className={styles.section} aria-labelledby="instagram-images-title">
+    <section
+      className={`${styles.section} ${chapterTransition ? styles.chapterTransition : ""}`}
+      aria-labelledby="instagram-images-title"
+    >
       <div className={styles.headingRow}>
         <h2 className={styles.srOnly} id="instagram-images-title">
           Seleção editorial da Ótica Vision
         </h2>
-        <p aria-hidden="true">Seleção Vision</p>
-        <span aria-hidden="true">
+        <p aria-hidden="true">Ensaio {activeSeries?.padStart(2, "0")}</p>
+        <span aria-live="polite" aria-atomic="true">
           {String(activeIndex + 1).padStart(2, "0")} / {String(images.length).padStart(2, "0")}
         </span>
       </div>
 
       <div
-        ref={railRef}
-        className={styles.rail}
+        ref={viewportRef}
+        className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
         role="region"
         aria-roledescription="carrossel"
-        aria-label="Seis imagens da Ótica Vision com reprodução automática"
+        aria-label="Seis imagens da Ótica Vision com avanço automático"
         tabIndex={0}
+        data-series={images[activeIndex]?.seriesId}
+        style={viewportStyle}
         onBlur={pauseAfterInteraction}
         onKeyDown={handleKeyDown}
-        onPointerDown={beginInteraction}
-        onPointerMove={moveInteraction}
-        onPointerUp={endInteraction}
-        onPointerCancel={endInteraction}
-        onWheel={pauseAfterInteraction}
-        onScroll={handleScroll}
+        onPointerDown={beginDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={(event) => endDrag(event)}
+        onPointerCancel={(event) => endDrag(event, true)}
       >
         {images.map((asset, index) => {
+          const position = getPosition(index);
           const cardStyle: CardStyle = { "--placeholder-color": asset.placeholderColor };
-          const eager =
-            index === activeIndex || index === Math.min(images.length - 1, activeIndex + 1);
-
           return (
             <figure
-              className={`${styles.card} ${index === activeIndex ? styles.active : ""}`}
-              data-rail-index={index}
-              data-active={index === activeIndex || undefined}
+              className={`${styles.card} ${styles[position]} ${asset.seriesId !== images[activeIndex]?.seriesId ? styles.otherChapter : ""}`}
+              aria-hidden={position !== "active"}
+              data-active={position === "active" || undefined}
+              data-asset={asset.src}
+              data-series={asset.seriesId}
               style={cardStyle}
               key={asset.src}
             >
-              <Image
-                src={asset.src}
-                width={asset.width}
-                height={asset.height}
-                sizes="(max-width: 720px) 40vw, 190px"
-                alt={asset.alt}
-                loading={eager ? "eager" : "lazy"}
-                placeholder="blur"
-                blurDataURL={asset.blurDataURL}
-                draggable={false}
-                onLoad={() => markLoaded(index)}
-                style={{ objectPosition: asset.objectPosition }}
-              />
+              {renderedIndexes.has(index) ? (
+                <Image
+                  src={asset.src}
+                  width={asset.width}
+                  height={asset.height}
+                  sizes="(max-width: 720px) 64vw, 290px"
+                  alt={asset.alt}
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL={asset.blurDataURL}
+                  draggable={false}
+                  onLoad={() => markLoaded(index)}
+                  style={{ objectPosition: asset.objectPosition }}
+                />
+              ) : null}
             </figure>
           );
         })}
+        <span className={styles.orbit} aria-hidden="true" />
+      </div>
+
+      <div className={styles.navigation}>
+        <div className={styles.progress} aria-hidden="true">
+          {images.map((asset, index) => (
+            <span className={index === activeIndex ? styles.current : ""} key={asset.src} />
+          ))}
+        </div>
+        <div className={styles.controls} aria-label="Navegar pela seleção">
+          <button
+            type="button"
+            onClick={showPrevious}
+            disabled={!loadedIndexes.has(previousIndex)}
+            aria-label="Mostrar imagem anterior"
+          >
+            <ChevronLeft aria-hidden="true" size={18} strokeWidth={1.6} />
+          </button>
+          <button
+            type="button"
+            onClick={() => showNext()}
+            disabled={!loadedIndexes.has(nextIndex)}
+            aria-label="Mostrar próxima imagem"
+          >
+            <ChevronRight aria-hidden="true" size={18} strokeWidth={1.6} />
+          </button>
+        </div>
       </div>
     </section>
   );
