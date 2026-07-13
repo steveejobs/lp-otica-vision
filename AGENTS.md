@@ -5,10 +5,12 @@ Este projeto e para a landing page da Otica Vision, em Araguaina - TO. Antes de 
 1. `docs/brand.md`
 2. `docs/copy-bank.md`
 3. `docs/design-system.md`
-4. `docs/assets-map.md`
-5. `docs/anti-erros.md`
-6. `docs/implementation-plan.md`
-7. `.agents/skills/premium-lp-vision/SKILL.md`
+4. `docs/v3-design-direction.md`
+5. `docs/v3-architecture.md`
+6. `docs/assets-map.md`
+7. `docs/v3-assets-manifest.md`
+8. `docs/anti-erros.md`
+9. `.agents/skills/premium-lp-vision/SKILL.md`
 
 ## Regra Principal
 

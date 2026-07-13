@@ -1,27 +1,41 @@
-# Dependencies and Next.js output
+# Dependencies and generated output
 node_modules/
 .next/
 out/
 dist/
 .vercel/
+*.tsbuildinfo
+next-env.d.ts
 
-# Local environment files
+# Local environment and credentials
 .env*
 !.env.example
 
 # QA and temporary output
 .tmp/
+coverage/
 playwright-report/
 test-results/
 *.log
+*.dmp
+*.dump
+*.har
+*.heapsnapshot
+
+# Local browser profiles
+.chrome/
+chrome-profile*/
+browser-profile*/
+user-data-dir*/
+/Cookies*
+/Local State
+/Default/
+/Profile */
+
+# Local agent tooling not required by the project
+.codex/
 
 # Editors and operating systems
 .DS_Store
 Thumbs.db
 *.swp
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-.vercel
-.env*.local

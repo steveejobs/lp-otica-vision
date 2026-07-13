@@ -15,9 +15,11 @@ Before making decisions, read:
 2. `docs/brand.md`
 3. `docs/copy-bank.md`
 4. `docs/design-system.md`
-5. `docs/assets-map.md`
-6. `docs/anti-erros.md`
-7. `docs/implementation-plan.md`
+5. `docs/v3-design-direction.md`
+6. `docs/v3-architecture.md`
+7. `docs/assets-map.md`
+8. `docs/v3-assets-manifest.md`
+9. `docs/anti-erros.md`
 
 ## Core Rule
 

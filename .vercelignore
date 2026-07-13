@@ -1,16 +1,34 @@
-# Originals and project documentation are not runtime inputs.
-galeria/
-docs/
+# Repository and local tooling are not runtime inputs.
+.git/
+.github/
+.vscode/
+.idea/
 .agents/
 .codex/
 AGENTS.md
+README.md
+
+# Originals and project documentation stay in Git, not in the deployment.
+galeria/
+docs/
 .env*
 
-# Local build and QA output.
+# Local dependencies, build output and QA artifacts.
+node_modules/
 .tmp/
 .next/
 out/
 dist/
+coverage/
 playwright-report/
 test-results/
+tests/
+test/
+__tests__/
+e2e/
 *.log
+*.dmp
+*.dump
+*.har
+*.heapsnapshot
+*.tsbuildinfo

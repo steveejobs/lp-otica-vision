@@ -7,8 +7,7 @@ export type VisualSeriesId =
   | "series4"
   | "series5"
   | "series6"
-  | "series7"
-  | "series8";
+  | "series7";
 
 export type ImageAsset = {
   src: string;
@@ -21,7 +20,7 @@ export type ImageAsset = {
   seriesId: VisualSeriesId;
 };
 
-export type GalleryChapter = {
+type GalleryChapter = {
   id: VisualSeriesId;
   images: readonly ImageAsset[];
 };
@@ -102,11 +101,10 @@ const brand = (
 
 export const identityAssets = {
   logo: pathFor("identity", "logo sem fundo.png"),
-  logoWithBackground: pathFor("identity", "logo com fundo.png"),
   favicon: pathFor("identity", "favicon.png"),
 } as const;
 
-export const visualSeries = {
+const visualSeries = {
   series1: [
     image(
       "series1",
@@ -140,14 +138,6 @@ export const visualSeries = {
       1440,
       1919,
       "Mulher usando óculos escuros e jaqueta vermelha em retrato editorial",
-    ),
-    image(
-      "series2",
-      "2 (2).jpg",
-      1440,
-      1919,
-      "Retrato com óculos escuros geométricos e jaqueta vermelha",
-      "50% 40%",
     ),
   ],
   series3: [
@@ -194,14 +184,6 @@ export const visualSeries = {
       1919,
       "Detalhe editorial de armação de grau e reflexo na lente",
       "50% 42%",
-    ),
-    image(
-      "series5",
-      "5 (2).jpg",
-      1440,
-      1919,
-      "Perfil com armação de grau tartaruga e lente clara",
-      "48% 42%",
     ),
   ],
   series6: [
@@ -256,40 +238,6 @@ export const visualSeries = {
       "50% 43%",
     ),
   ],
-  series8: [
-    image(
-      "series8",
-      "8 (1).jpg",
-      1440,
-      1762,
-      "Detalhe de haste e acabamento de óculos sobre superfície clara",
-      "50% 50%",
-    ),
-    image(
-      "series8",
-      "8 (2).jpg",
-      1440,
-      1762,
-      "Mulher experimentando óculos escuros no interior da Ótica Vision",
-      "50% 42%",
-    ),
-    image(
-      "series8",
-      "8 (3).jpg",
-      1320,
-      1615,
-      "Seleção de óculos organizada em bandeja na loja",
-      "50% 49%",
-    ),
-    image(
-      "series8",
-      "8 (4).jpg",
-      1440,
-      1762,
-      "Mulher experimentando óculos diante do espelho na Ótica Vision",
-      "50% 45%",
-    ),
-  ],
 } as const;
 
 export const heroMedia = visualSeries.series2[0];
@@ -315,7 +263,7 @@ export const homeVideos = [
   ),
 ] as const;
 
-export const homeGalleryChapters = [
+const homeGalleryChapters = [
   { id: "series1", images: visualSeries.series1 },
   { id: "series3", images: visualSeries.series3 },
   { id: "series4", images: visualSeries.series4 },
@@ -401,7 +349,7 @@ export const instagramVideos = [
   ),
 ] as const;
 
-export const instagramGalleryChapters = [
+const instagramGalleryChapters = [
   { id: "series6", images: visualSeries.series6 },
   { id: "series7", images: visualSeries.series7 },
 ] as const satisfies readonly GalleryChapter[];

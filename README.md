@@ -1,6 +1,6 @@
-# Otica Vision V2
+# Ótica Vision V3
 
-Site oficial da Otica Vision em Araguaina - TO, construido com Next.js App Router e TypeScript.
+Landing page da Ótica Vision em Araguaína - TO, construída com Next.js App Router e TypeScript.
 
 ## Desenvolvimento
 
@@ -12,7 +12,7 @@ Requisitos:
 Comandos:
 
 ```bash
-npm install
+npm ci
 npm run dev
 npm run lint
 npm run typecheck
@@ -21,32 +21,39 @@ npm run build
 
 ## Publicacao Na Vercel
 
-O projeto usa a integracao nativa entre Next.js e Vercel. Nao existe `vercel.json`, export estatico, output customizado ou `dist` manual.
+O projeto usa a integração nativa entre Next.js e Vercel. Não existe `vercel.json`, export estático, output customizado ou `dist` manual.
 
-Ao importar `steveejobs/lp-otica-vision`, use:
+Ao importar o repositório na Vercel, use:
 
 | Configuracao | Valor |
 | --- | --- |
-| Production Branch | `vision-v2-clean` enquanto `main` nao for atualizada |
+| Production Branch | Definida no painel da Vercel |
 | Framework Preset | Next.js, detectado automaticamente |
-| Root Directory | raiz do repositorio |
-| Install Command | padrao detectado pelo lockfile |
-| Build Command | `npm run build`, padrao |
-| Output Directory | padrao do Next.js; nao preencher com `dist` |
+| Root Directory | Raiz do repositório |
+| Install Command | `npm ci`, detectado pelo lockfile |
+| Build Command | `npm run build` |
+| Output Directory | Padrão do Next.js; não preencher com `dist` |
 | Node.js Version | 24.x |
-| Environment Variables | nenhuma obrigatoria |
+| Environment Variables | Nenhuma obrigatória |
 
-O diretorio `public/` e a unica fonte dos assets publicados. `galeria/` preserva os originais e fica fora do upload feito pela Vercel CLI por meio de `.vercelignore`.
+O diretório `public/` é a única fonte de assets publicados. `galeria/` preserva os originais mestres e fica fora do upload por meio de `.vercelignore`. Documentação, QA e ferramentas locais também não entram no contexto do build.
 
-## Verificacao Depois Do Deploy
+Para criar preview sem promover produção:
+
+```bash
+npx vercel --yes
+```
+
+Não use `--prod` sem autorização explícita.
+
+## Verificação Depois Do Deploy
 
 Validar:
 
 - `/`;
 - `/instagram`;
-- `/api/exame-news`;
-- imagens, videos e posters;
-- links de WhatsApp, Instagram, rota e materias da Exame;
-- ausencia de erros de console e respostas 404.
+- imagens, vídeos e posters;
+- links de WhatsApp, Instagram, rota e matérias da Exame;
+- ausência de erros de console e respostas 404.
 
-O relatorio tecnico completo esta em `docs/qa-report.md`.
+O relatório técnico final está em `docs/qa-report.md`.

@@ -208,10 +208,6 @@
   background: rgba(199, 173, 142, 0.18);
 }
 
-.actions small {
-  display: none;
-}
-
 .actions span {
   min-width: 0;
   overflow-wrap: anywhere;

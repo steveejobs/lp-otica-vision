@@ -121,23 +121,6 @@
   pointer-events: none;
 }
 
-.caption {
-  position: absolute;
-  top: calc(100% + 0.72rem);
-  right: 0;
-  display: flex;
-  gap: 0.55rem;
-  color: var(--vision-steel-dark);
-  font-size: 0.61rem;
-  font-weight: 600;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.caption span:first-child {
-  color: var(--vision-bronze);
-}
-
 @supports (clip-path: ellipse(20% 20% at 50% 50%)) {
   .focusImage {
     clip-path: ellipse(28.5% 15.5% at var(--focus-x) var(--focus-y));
@@ -159,11 +142,6 @@
     .focusImage {
       clip-path: ellipse(30% 14.5% at var(--focus-x) var(--focus-y));
     }
-  }
-
-  .caption {
-    gap: 0.4rem;
-    font-size: 0.57rem;
   }
 }
 

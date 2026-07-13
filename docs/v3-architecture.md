@@ -35,7 +35,7 @@ A home terá exatamente nove blocos. Cada bloco tem uma função distinta e uma 
 
 - Título: `A escolha ganha contorno.`
 - Texto: `Linhas, proporções e acabamentos reunidos pela Vision.`
-- Ordem: `1 (1)`, `8 (2)`, `6 (1)`, `5 (2)`, `4 (2)`, `8 (3)`, `3 (1)`, `7 (3)`.
+- Ordem: `1 (1)`, `1 (2)`, `1 (3)`, `3 (1)`, `3 (2)`, `4 (1)`, `4 (2)`.
 - Desktop: imagem ativa central, anterior e próxima parcialmente visíveis; controles pequenos fora da mídia.
 - Mobile: swipe horizontal com laterais visíveis; interação por toque sem botão obrigatório.
 - Todas as imagens permanecem no DOM; troca por opacidade e transformação leve.
@@ -98,7 +98,7 @@ A rota funciona como página de links e mídia, não como segunda landing page.
 4. Bio: `Armações nacionais e importadas. Lentes feitas pela Vision. Araguaína - TO.`
 5. Botões: `WhatsApp`, `Instagram`, `Rota` e `Site`.
 6. Vídeos menores: `video (3).mp4` e `video (4).mp4`.
-7. Imagens: `1 (2)`, `2 (2)`, `3 (2)`, `4 (1)`, `6 (2)`, `8 (4)`.
+7. Imagens: `6 (1)`, `6 (2)`, `6 (3)`, `7 (1)`, `7 (2)`, `7 (3)`.
 8. Rail compacto com as dez marcas confirmadas.
 9. Localização em Araguaína com link de rota.
 
