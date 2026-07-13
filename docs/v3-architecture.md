@@ -68,8 +68,10 @@ A home terá exatamente nove blocos. Cada bloco tem uma função distinta e uma 
 - Título: `Óculos em pauta.`
 - Texto: `Moda, consumo e mercado óptico em matérias da Exame.`
 - CTA: `Ler mais na Exame`.
-- Desktop: copy com CTA e três cards de matérias reais ao lado ou abaixo, conforme largura útil.
-- Mobile: copy e CTA primeiro; cards em rail manual de 260 a 285 px.
+- Conteúdo: até seis matérias reais, únicas e com imagem recuperada pela integração da Exame.
+- Desktop: copy com CTA e três cards em cena, com avanço automático lento e navegação manual.
+- Mobile: copy e CTA primeiro; um card inteiro com parte do próximo visível.
+- Comportamento: sequência cíclica sem clones, swipe e drag; pausa após interação, fora da viewport e em aba oculta; `prefers-reduced-motion` mantém apenas a navegação manual.
 - Falha de fonte: manter apenas copy e CTA. Não criar fallback editorial fictício.
 - Card sem imagem: versão textual compacta, sem reservar mídia vazia.
 
@@ -96,12 +98,11 @@ A rota funciona como página de links e mídia, não como segunda landing page.
 2. `@oticavisionaraguaina`.
 3. Hero de vídeo com `video (2).mp4` e `video (3).mp4`.
 4. Bio: `Armações nacionais e importadas. Lentes feitas pela Vision. Araguaína - TO.`
-5. Botões: `WhatsApp`, `Instagram`, `Rota` e `Site`.
+5. Botões empilhados: `WhatsApp`, `Instagram`, `Rota` e `Site completo`, com WhatsApp em primeiro nível.
 6. Vídeo completo `video (4).mp4` em uma composição própria.
 7. Imagens: `6 (1)`, `6 (2)`, `6 (3)`, `7 (1)`, `7 (2)`, `7 (3)`.
 8. Rail com as dez marcas confirmadas e a mesma linguagem da home.
-9. Carrossel de três notícias reais da Exame.
-10. Localização em Araguaína com link de rota.
+9. Localização em Araguaína com link de rota.
 
 ### Comportamento
 
@@ -111,8 +112,8 @@ A rota funciona como página de links e mídia, não como segunda landing page.
 - Cada composição toca todos os seus vídeos simultaneamente apenas enquanto está visível; ambas pausam fora da viewport, em aba oculta e reduced motion.
 - A galeria avança a cada 3,9 s, pausa por 6,5 s após gesto e retoma automaticamente.
 - O rail de marcas reutiliza a mesma normalização óptica da home em escala menor.
-- O carrossel de notícias avança sozinho, espera a próxima mídia, pausa após interação e respeita visibilidade e reduced motion.
 - Não incluir seção LAB separada, lista longa ou mais de seis imagens na galeria de armações.
+- Não incluir notícias: após galeria e marcas, a página segue diretamente para localização e encerramento.
 
 ## Links oficiais
 
@@ -121,7 +122,7 @@ A rota funciona como página de links e mídia, não como segunda landing page.
 | WhatsApp | `https://api.whatsapp.com/send/?phone=5563992231522&text&type=phone_number&app_absent=0&utm_source=ig` |
 | Instagram | `https://www.instagram.com/oticavisionaraguaina/` |
 | Rota | `https://maps.app.goo.gl/4WeumQSuU4hg6yuv6` |
-| Site | `/` |
+| Site completo | `/` |
 
 ## Dados deliberadamente ausentes
 

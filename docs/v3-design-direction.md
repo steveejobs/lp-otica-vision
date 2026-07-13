@@ -112,10 +112,10 @@ Regras:
 | Galeria | Foco central, laterais parciais, profundidade sutil; sem legenda em cada foto |
 | Marcas | Grid de slots iguais, logos com escala óptica individual; nenhuma afirmação de estoque |
 | LAB | Faixa curta com copy e díptico da série 5; precisão no alinhamento, não em selos técnicos |
-| Notícias | Copy curta e três matérias reais; falha da fonte reduz a seção à copy e ao link da Exame |
+| Notícias | Copy curta e até seis matérias reais em carrossel cíclico; falha da fonte reduz a seção à copy e ao link da Exame |
 | Localização | Encerramento claro, dois CTAs e nenhum mapa pesado |
 | Footer | Logo ou nome, Instagram e direitos essenciais; sem sitemap fictício |
-| `/instagram` | Página concentrada, centrada em mídia, quatro links oficiais, marcas e notícias reais da Exame |
+| `/instagram` | Página concentrada, centrada em mídia, quatro links oficiais empilhados, marcas e encerramento local |
 
 ## Anti-template
 

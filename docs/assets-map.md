@@ -15,7 +15,7 @@ O inventário mestre, as dimensões e a curadoria estão em `docs/v3-assets-mani
 - Hero: `2 (1).jpg`.
 - Home: séries 1, 3 e 4; três vídeos; dez logos de marcas.
 - LAB: série 5 completa, `5 (1).jpg` e `5 (2).jpg`, em um mini-capítulo visual.
-- `/instagram`: séries 6 e 7; três vídeos em duas composições; dez logos de marcas; notícias reais da Exame.
+- `/instagram`: séries 6 e 7; três vídeos em duas composições; dez logos de marcas.
 - Identidade: logo transparente e favicon.
 
 ## Regra

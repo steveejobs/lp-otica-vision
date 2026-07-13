@@ -4,7 +4,7 @@ import type { AnyNode } from "domhandler";
 
 export const EXAME_TOPIC_URL = "https://exame.com/noticias-sobre/oculos/";
 export const EXAME_REVALIDATE_SECONDS = 8 * 60 * 60;
-const MAX_NEWS_ITEMS = 3;
+const MAX_NEWS_ITEMS = 6;
 
 export type ExameNewsItem = {
   title: string;

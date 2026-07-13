@@ -9,11 +9,9 @@ import { BrandLogo } from "@/components/brand-logo";
 import { BrandRail } from "@/components/brand-rail";
 import { InstagramIcon } from "@/components/instagram-icon";
 import { InstagramImageRail } from "@/components/instagram-image-rail";
-import { InstagramNewsCarousel } from "@/components/instagram-news-carousel";
 import { ObservedVideo } from "@/components/observed-video";
 import { VideoComposition } from "@/components/video-composition";
 import { brandLogos, instagramImages, instagramVideos } from "@/lib/assets";
-import { getExameNews } from "@/lib/exame-news";
 import { LINKS } from "@/lib/links";
 import { getMetadataBase } from "@/lib/metadata";
 
@@ -54,9 +52,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function InstagramPage() {
-  const newsItems = await getExameNews();
-
+export default function InstagramPage() {
   return (
     <main className={styles.page} id="main-content">
       <header className={styles.identity}>
@@ -104,7 +100,7 @@ export default async function InstagramPage() {
             </a>
             <a href={LINKS.home}>
               <Home aria-hidden="true" size={21} strokeWidth={1.55} />
-              <span>Site</span>
+              <span>Site completo</span>
             </a>
           </nav>
         </div>
@@ -128,8 +124,6 @@ export default async function InstagramPage() {
           ariaLabel="Marcas premium na Ótica Vision"
         />
       </section>
-
-      <InstagramNewsCarousel items={newsItems} />
 
       <section className={styles.location} aria-labelledby="instagram-location-title">
         <div>

@@ -38,7 +38,7 @@
 - Ler mais na Exame
 - Ver rota
 - Rota
-- Site
+- Site completo
 - Ler na Exame
 
 ## Indicadores

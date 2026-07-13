@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ArrowUpRight,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -16,17 +11,16 @@ import {
   type PointerEvent,
 } from "react";
 
-import {
-  EXAME_TOPIC_URL,
-  type ExameNewsItem,
-} from "@/lib/exame-news";
+import type { ExameNewsItem } from "@/lib/exame-news";
 
 import { NewsImage } from "./news-image";
-import styles from "./instagram-news-carousel.module.css";
+import styles from "./news-carousel.module.css";
 
-type InstagramNewsCarouselProps = {
+type NewsCarouselProps = {
   items: readonly ExameNewsItem[];
 };
+
+type CarouselPosition = "active" | "previous" | "next" | "nextFar" | "resting";
 
 type CarouselStyle = CSSProperties & {
   "--drag-offset": string;
@@ -39,13 +33,14 @@ type DragState = {
   startedAt: number;
 };
 
-const AUTOPLAY_DELAY = 5_200;
-const INTERACTION_PAUSE = 7_200;
+const AUTOPLAY_DELAY = 6_400;
+const INTERACTION_PAUSE = 8_200;
 
-export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
+export function NewsCarousel({ items }: NewsCarouselProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const pauseUntil = useRef(0);
   const dragState = useRef<DragState | null>(null);
+  const suppressClick = useRef(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [readyIndexes, setReadyIndexes] = useState<Set<number>>(
     () => new Set(items.flatMap((item, index) => (item.imageUrl ? [] : [index]))),
@@ -75,7 +70,12 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
 
   const markFailed = useCallback(
     (index: number) => {
-      setFailedIndexes((current) => new Set(current).add(index));
+      setFailedIndexes((current) => {
+        if (current.has(index)) return current;
+        const next = new Set(current);
+        next.add(index);
+        return next;
+      });
       markReady(index);
     },
     [markReady],
@@ -115,8 +115,8 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.3),
-      { threshold: [0, 0.3, 0.62], rootMargin: "0px 0px -4%" },
+      ([entry]) => setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.24),
+      { threshold: [0, 0.24, 0.58], rootMargin: "0px 0px -4%" },
     );
     observer.observe(viewport);
     return () => observer.disconnect();
@@ -137,13 +137,14 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
   }, []);
 
   useEffect(() => {
+    const canAdvance = readyIndexes.has(activeIndex) && readyIndexes.has(nextIndex);
     if (
       itemCount < 2 ||
       reducedMotion ||
       !isInView ||
       !isPageVisible ||
       isDragging ||
-      !readyIndexes.has(nextIndex)
+      !canAdvance
     ) {
       return;
     }
@@ -170,10 +171,12 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
     showNext,
   ]);
 
-  const getPosition = (index: number) => {
+  const getPosition = (index: number): CarouselPosition => {
     if (index === activeIndex) return "active";
-    if (index === previousIndex) return "previous";
-    if (index === nextIndex) return "next";
+    const forwardDistance = (index - activeIndex + itemCount) % itemCount;
+    if (forwardDistance === 1) return "next";
+    if (forwardDistance === 2) return "nextFar";
+    if (forwardDistance === itemCount - 1) return "previous";
     return "resting";
   };
 
@@ -191,6 +194,7 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
   const beginDrag = (event: PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary || itemCount < 2) return;
     pauseAfterInteraction();
+    suppressClick.current = false;
     setIsDragging(true);
     dragState.current = {
       pointerId: event.pointerId,
@@ -207,7 +211,7 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
     const distanceX = event.clientX - drag.startX;
     const distanceY = event.clientY - drag.startY;
     if (Math.abs(distanceY) > Math.abs(distanceX) && Math.abs(distanceY) > 12) return;
-    setDragOffset(Math.max(-72, Math.min(72, distanceX * 0.48)));
+    setDragOffset(Math.max(-76, Math.min(76, distanceX * 0.5)));
   };
 
   const endDrag = (event: PointerEvent<HTMLDivElement>, cancelled = false) => {
@@ -222,16 +226,20 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
     const distanceY = event.clientY - drag.startY;
     const elapsed = Math.max(1, performance.now() - drag.startedAt);
     const velocity = Math.abs(distanceX) / elapsed;
-    if (
-      (Math.abs(distanceX) < 38 && velocity < 0.4) ||
-      Math.abs(distanceX) <= Math.abs(distanceY)
-    ) {
-      return;
-    }
+    const isSwipe =
+      (Math.abs(distanceX) >= 40 || velocity >= 0.42) &&
+      Math.abs(distanceX) > Math.abs(distanceY);
+
+    if (!isSwipe) return;
+    suppressClick.current = true;
+    window.setTimeout(() => {
+      suppressClick.current = false;
+    }, 280);
     if (distanceX > 0) showPrevious();
     else showNext();
   };
 
+  const canAdvance = readyIndexes.has(activeIndex) && readyIndexes.has(nextIndex);
   const autoplayRunning =
     itemCount > 1 &&
     !reducedMotion &&
@@ -239,117 +247,122 @@ export function InstagramNewsCarousel({ items }: InstagramNewsCarouselProps) {
     isPageVisible &&
     !isDragging &&
     !interactionPaused &&
-    readyIndexes.has(nextIndex);
+    canAdvance;
   const viewportStyle: CarouselStyle = { "--drag-offset": `${dragOffset}px` };
 
   return (
-    <section className={styles.section} aria-labelledby="instagram-news-title">
-      <header className={styles.intro}>
-        <p className="eyebrow">Exame</p>
-        <div className={styles.titleRow}>
-          <h2 id="instagram-news-title">Óculos em pauta.</h2>
-          <a href={EXAME_TOPIC_URL} target="_blank" rel="noopener noreferrer">
-            <ExternalLink aria-hidden="true" size={17} strokeWidth={1.6} />
-            <span>Ler mais na Exame</span>
-          </a>
-        </div>
-      </header>
+    <div className={styles.root} onFocusCapture={pauseAfterInteraction}>
+      <div
+        ref={viewportRef}
+        className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
+        role="region"
+        aria-roledescription="carrossel"
+        aria-label="Matérias recentes da Exame"
+        tabIndex={0}
+        data-news-carousel
+        data-active-index={activeIndex}
+        data-item-count={itemCount}
+        data-autoplay-state={autoplayRunning ? "running" : "paused"}
+        data-reduced-motion={reducedMotion ? "true" : "false"}
+        style={viewportStyle}
+        onClickCapture={(event) => {
+          if (!suppressClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onKeyDown={handleKeyDown}
+        onPointerDown={beginDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={(event) => endDrag(event)}
+        onPointerCancel={(event) => endDrag(event, true)}
+      >
+        {items.map((item, index) => {
+          const position = getPosition(index);
+          const imageFailed = failedIndexes.has(index);
+          const hasImage = Boolean(item.imageUrl) && !imageFailed;
+          const isActive = position === "active";
 
-      {itemCount > 0 ? (
-        <>
-          <div
-            ref={viewportRef}
-            className={`${styles.viewport} ${isDragging ? styles.dragging : ""}`}
-            role="region"
-            aria-roledescription="carrossel"
-            aria-label="Matérias recentes da Exame"
-            tabIndex={0}
-            data-news-carousel
-            data-active-index={activeIndex}
-            data-autoplay-state={autoplayRunning ? "running" : "paused"}
-            style={viewportStyle}
-            onBlur={pauseAfterInteraction}
-            onKeyDown={handleKeyDown}
-            onPointerDown={beginDrag}
-            onPointerMove={moveDrag}
-            onPointerUp={(event) => endDrag(event)}
-            onPointerCancel={(event) => endDrag(event, true)}
+          return (
+            <article
+              id={`home-news-card-${index}`}
+              className={`${styles.card} ${styles[position]} ${hasImage ? "" : styles.textOnly}`}
+              aria-hidden={!isActive}
+              key={item.url}
+            >
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                tabIndex={isActive ? 0 : -1}
+                aria-label={`${item.title} — ler na Exame`}
+                onDragStart={(event) => event.preventDefault()}
+              >
+                {hasImage && item.imageUrl ? (
+                  <NewsImage
+                    className={styles.media}
+                    src={item.imageUrl}
+                    alt={item.imageAlt ?? item.title}
+                    sizes="(max-width: 899px) 82vw, (max-width: 1200px) 26vw, 300px"
+                    onLoad={() => markReady(index)}
+                    onError={() => markFailed(index)}
+                  />
+                ) : null}
+
+                <div className={styles.body}>
+                  {imageFailed ? (
+                    <span className={styles.imageFallback}>Imagem indisponível</span>
+                  ) : null}
+                  <p className={styles.meta}>
+                    <span>{item.category}</span>
+                    {item.timeLabel ? <span>{item.timeLabel}</span> : null}
+                    <span>{item.source}</span>
+                  </p>
+                  <h3>{item.title}</h3>
+                  <span className={styles.readLink}>
+                    Ler na Exame
+                    <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
+                  </span>
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </div>
+
+      {itemCount > 1 ? (
+        <div className={styles.navigation}>
+          <div className={styles.progress} aria-hidden="true">
+            {items.map((item, index) => (
+              <span className={index === activeIndex ? styles.current : ""} key={item.url} />
+            ))}
+          </div>
+          <span
+            className={styles.counter}
+            aria-live={announceChanges ? "polite" : "off"}
+            aria-atomic="true"
           >
-            {items.map((item, index) => {
-              const position = getPosition(index);
-              const imageFailed = failedIndexes.has(index);
-              const hasImage = Boolean(item.imageUrl) && !imageFailed;
-              return (
-                <article
-                  className={`${styles.card} ${styles[position]} ${hasImage ? "" : styles.textOnly}`}
-                  aria-hidden={position !== "active"}
-                  key={item.url}
-                >
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    tabIndex={position === "active" ? 0 : -1}
-                    aria-label={`${item.title} — ler na Exame`}
-                  >
-                    {hasImage && item.imageUrl ? (
-                      <NewsImage
-                        className={styles.media}
-                        src={item.imageUrl}
-                        alt={item.imageAlt ?? item.title}
-                        sizes="(max-width: 720px) 82vw, 380px"
-                        onLoad={() => markReady(index)}
-                        onError={() => markFailed(index)}
-                      />
-                    ) : null}
-                    <div className={styles.body}>
-                      <p className={styles.meta}>
-                        <span>{item.category}</span>
-                        {item.timeLabel ? <span>{item.timeLabel}</span> : null}
-                        <span>{item.source}</span>
-                      </p>
-                      <h3>{item.title}</h3>
-                      <span className={styles.readLink}>
-                        Ler na Exame
-                        <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
-                      </span>
-                    </div>
-                  </a>
-                </article>
-              );
-            })}
+            {String(activeIndex + 1).padStart(2, "0")} / {String(itemCount).padStart(2, "0")}
+          </span>
+          <div className={styles.controls} aria-label="Navegar pelas notícias">
+            <button
+              type="button"
+              onClick={showPrevious}
+              disabled={!readyIndexes.has(previousIndex)}
+              aria-label="Mostrar notícia anterior"
+            >
+              <ChevronLeft aria-hidden="true" size={18} strokeWidth={1.6} />
+            </button>
+            <button
+              type="button"
+              onClick={() => showNext()}
+              disabled={!readyIndexes.has(nextIndex)}
+              aria-label="Mostrar próxima notícia"
+            >
+              <ChevronRight aria-hidden="true" size={18} strokeWidth={1.6} />
+            </button>
           </div>
-
-          <div className={styles.navigation}>
-            <div className={styles.progress} aria-hidden="true">
-              {items.map((item, index) => (
-                <span className={index === activeIndex ? styles.current : ""} key={item.url} />
-              ))}
-            </div>
-            <span className={styles.counter} aria-live={announceChanges ? "polite" : "off"}>
-              {String(activeIndex + 1).padStart(2, "0")} / {String(itemCount).padStart(2, "0")}
-            </span>
-            <div className={styles.controls} aria-label="Navegar pelas notícias">
-              <button
-                type="button"
-                onClick={showPrevious}
-                disabled={!readyIndexes.has(previousIndex)}
-                aria-label="Mostrar notícia anterior"
-              >
-                <ChevronLeft aria-hidden="true" size={18} strokeWidth={1.6} />
-              </button>
-              <button
-                type="button"
-                onClick={() => showNext()}
-                disabled={!readyIndexes.has(nextIndex)}
-                aria-label="Mostrar próxima notícia"
-              >
-                <ChevronRight aria-hidden="true" size={18} strokeWidth={1.6} />
-              </button>
-            </div>
-          </div>
-        </>
+        </div>
       ) : null}
-    </section>
+    </div>
   );
 }
