@@ -26,9 +26,9 @@ export default async function EditUserPage({ params, searchParams }: { params: P
   const isSelf = profile.id === session.profile.id;
   return (
     <>
-      <AdminPageHeader eyebrow="Usuários" description="Papéis e ativação são validados no servidor e novamente por RLS/trigger." title={profile.name ?? "Usuário autorizado"} />
+      <AdminPageHeader eyebrow="Usuários" description="Papéis e aprovação são validados no servidor e novamente por RLS/trigger." title={profile.name ?? "Usuário autorizado"} />
       <AdminFeedback error={query.error} status={query.status} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/usuarios">Voltar para usuários</Link><AdminStatus active={profile.active} /></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/usuarios">Voltar para usuários</Link><AdminStatus active={profile.active} falseLabel="Pendente" /></div>
       <section className={styles.formPanel} aria-labelledby="user-access-title">
         <div className={styles.panelHeading}><div><h2 id="user-access-title">Identidade e acesso</h2><p>Atualizado em {formatAdminDateTime(profile.updated_at)}.</p></div></div>
         <form action={updateUserAction} className={styles.adminForm}>
@@ -41,7 +41,7 @@ export default async function EditUserPage({ params, searchParams }: { params: P
             ) : (
               <label className={styles.field}><span>Papel</span><select defaultValue={profile.role} name="role"><option value="admin">Administrador</option><option value="editor">Editor</option><option value="attendant">Atendimento</option></select></label>
             )}
-            <label className={styles.checkboxField}><input defaultChecked={profile.active} name="active" type="checkbox" /><span>Acesso ativo</span></label>
+            <label className={styles.checkboxField}><input defaultChecked={profile.active} name="active" type="checkbox" /><span>Acesso aprovado</span></label>
             {isSelf ? (
               <label className={`${styles.field} ${styles.fieldWide}`}><span>Para desativar o próprio acesso, digite DESATIVAR MEU ACESSO</span><input autoComplete="off" name="confirmation" /></label>
             ) : null}
@@ -53,4 +53,3 @@ export default async function EditUserPage({ params, searchParams }: { params: P
     </>
   );
 }
-

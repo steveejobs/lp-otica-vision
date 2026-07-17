@@ -33,7 +33,7 @@ As mutações passam por Server Actions, validação de entrada e autorização 
 
 Usuário inativo não passa pelo proxy/layout nem pelas políticas de conteúdo. Usuário anônimo é redirecionado ao login. Acesso direto por URL sem o papel necessário volta para `/admin?status=forbidden`.
 
-O convite usa o fluxo de convite do Supabase Auth e nunca define senha. A aplicação verifica e remove a identidade recém-convidada se o profile não puder ser configurado. O próprio admin não altera seu papel pela interface; desativar o próprio acesso exige a frase explícita e outro admin ativo. Um trigger impede que a base fique sem administrador ativo.
+O convite usa o fluxo de convite do Supabase Auth e nunca define senha. A aplicação verifica e remove a identidade recém-convidada se o profile não puder ser configurado. Por padrão, o profile nasce pendente (`active = false`) e só entra no ADM após aprovação de um administrador na tela de usuários. O próprio admin não altera seu papel pela interface; desativar o próprio acesso exige a frase explícita e outro admin ativo. Um trigger impede que a base fique sem administrador ativo.
 
 ## Produtos e disponibilidade
 

@@ -19,6 +19,39 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const roles = ["admin", "editor", "attendant"] as const;
 
+async function setUserActiveState(formData: FormData, active: boolean) {
+  const session = await requireAdminRole(["admin"]);
+  const id = uuidValue(formData, "id");
+  let errorCode: string | null = null;
+
+  try {
+    if (id === session.profile.id) {
+      throw new AdminValidationError("constraint");
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { data: existing, error } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (error || !existing) {
+      throw error ?? new AdminValidationError("invalid");
+    }
+
+    const { error: updateError } = await supabase.from("profiles").update({ active }).eq("id", id);
+    if (updateError) throw updateError;
+  } catch (error) {
+    errorCode = mutationErrorCode(error);
+  }
+
+  if (errorCode) redirect(appendFeedback("/admin/usuarios", "error", errorCode));
+  revalidatePath("/admin/usuarios");
+  revalidatePath(`/admin/usuarios/${id}`);
+  redirect(appendFeedback("/admin/usuarios", "status", active ? "approved" : "blocked"));
+}
+
 export async function inviteUserAction(formData: FormData) {
   await requireAdminRole(["admin"]);
   const admin = createSupabaseAdminClient();
@@ -52,6 +85,14 @@ export async function inviteUserAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback("/admin/usuarios", "error", errorCode));
   revalidatePath("/admin/usuarios");
   redirect(appendFeedback("/admin/usuarios", "status", "invited"));
+}
+
+export async function approveUserAction(formData: FormData) {
+  await setUserActiveState(formData, true);
+}
+
+export async function blockUserAction(formData: FormData) {
+  await setUserActiveState(formData, false);
 }
 
 export async function updateUserAction(formData: FormData) {

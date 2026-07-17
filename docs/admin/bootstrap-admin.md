@@ -20,7 +20,7 @@ O script consulta usuários com o cliente server-only, exige correspondência ex
 
 ## Novos usuários depois do bootstrap
 
-O administrador poderá futuramente liberar papéis pela interface específica. Até essa tela existir, novos usuários devem ser convidados no painel e ativados por um processo server-only revisado. Nunca editar `auth.users` por tabela pública.
+O administrador convida novos usuários pela tela `/admin/usuarios`. O Supabase Auth envia o fluxo de definição de senha, mas o profile fica pendente por padrão e só recebe acesso quando um administrador clica em aprovar no dashboard. Nunca editar `auth.users` por tabela pública.
 
 ## Recuperação
 

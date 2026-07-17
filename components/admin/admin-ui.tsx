@@ -2,6 +2,8 @@ import styles from "./admin.module.css";
 
 const feedbackMessages: Record<string, string> = {
   archived: "Registro arquivado com segurança.",
+  approved: "Acesso aprovado.",
+  blocked: "Acesso bloqueado.",
   constraint: "A operação viola uma regra de integridade. Revise os campos e vínculos.",
   created: "Registro criado com sucesso.",
   date: "Informe uma data e hora válidas.",
@@ -14,7 +16,7 @@ const feedbackMessages: Record<string, string> = {
   image: "A imagem não passou na validação de formato, tamanho ou dimensões.",
   invalid: "Revise os campos informados.",
   invalid_order: "A ordenação enviada não corresponde aos itens atuais.",
-  invited: "Convite enviado e perfil autorizado configurado.",
+  invited: "Convite enviado. O perfil ficou pendente para aprovação do administrador.",
   length: "Um ou mais campos excedem o tamanho permitido.",
   linked: "O registro possui vínculos e não pode ser excluído diretamente.",
   number: "Informe um número válido e não negativo.",
@@ -62,7 +64,11 @@ export function AdminEmptyState({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function AdminStatus({ active, falseLabel = "Inativo", trueLabel = "Ativo" }: {
+export function AdminStatus({
+  active,
+  falseLabel = "Inativo",
+  trueLabel = "Ativo",
+}: {
   active: boolean;
   falseLabel?: string;
   trueLabel?: string;

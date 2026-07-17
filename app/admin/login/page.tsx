@@ -16,7 +16,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const message =
     params.status === "inactive"
-      ? "Seu acesso ainda não está ativo. Solicite a liberação a um administrador."
+      ? "Seu acesso ainda não foi aprovado. Solicite a liberação a um administrador."
       : params.error === "invalid"
         ? "Não foi possível entrar. Confira as credenciais e tente novamente."
         : null;
@@ -75,7 +75,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
         </form>
 
         <p className={styles.loginFootnote}>
-          Não existe cadastro público. Novos acessos são liberados somente por convite.
+          Não existe cadastro público. Novos acessos ficam pendentes até aprovação.
         </p>
       </section>
     </main>
