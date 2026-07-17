@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, MessageCircle } from "lucide-react";
+import { Suspense } from "react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
@@ -58,7 +59,7 @@ function groupByBrand(products: CatalogProductCardData[]) {
   return [...groups.values()];
 }
 
-export default async function CatalogPage({
+async function CatalogContent({
   searchParams,
 }: {
   searchParams: Promise<CatalogSearchParams>;
@@ -256,5 +257,39 @@ export default async function CatalogPage({
       </main>
       <SiteFooter />
     </div>
+  );
+}
+
+function CatalogLoading() {
+  return (
+    <div className={styles.page}>
+      <SiteHeader />
+      <main id="main-content">
+        <section className={styles.hero}>
+          <div className={styles.heroInner}>
+            <p className="eyebrow">Vitrine Vision</p>
+            <h1>Catálogo</h1>
+            <p className={styles.intro}>Preparando a seleção publicada.</p>
+          </div>
+        </section>
+        <section className={styles.results} aria-busy="true" aria-label="Carregando catálogo">
+          <div className={styles.resultsInner}>
+            <div className={styles.loadingGrid}>
+              {Array.from({ length: 8 }, (_, index) => (
+                <span className={styles.loadingItem} key={index} />
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
+export default function CatalogPage(props: { searchParams: Promise<CatalogSearchParams> }) {
+  return (
+    <Suspense fallback={<CatalogLoading />}>
+      <CatalogContent {...props} />
+    </Suspense>
   );
 }

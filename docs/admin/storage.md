@@ -1,4 +1,4 @@
-# Storage de imagens — Fases 1 e 2
+# Storage de imagens — Fases 1 a 3
 
 ## Buckets
 
@@ -17,7 +17,7 @@ Os quatro buckets são privados, têm limite de 8 MiB e aceitam somente `image/j
 - atendente ativo: somente leitura administrativa;
 - anônimo: sem acesso direto ao objeto.
 
-O catálogo público futuro deve chamar `createPublishedImageUrl`. O utilitário confirma no banco que produto, galeria/item ou destaque estão publicados e somente então cria uma URL assinada entre 60 e 3.600 segundos.
+O catálogo público não acessa o Storage diretamente e não recebe URL assinada curta no HTML. Imagens de produto são servidas por `/api/catalogo/imagem/[id]`, onde `id` é o UUID do registro de `product_images`, nunca um caminho escolhido pelo visitante.
 
 ## Validação server-side
 
@@ -40,4 +40,14 @@ Objetos são removidos pela API de Storage, e não por `delete` direto em `stora
 
 O campo `storage_path` é a referência persistida. URLs públicas permanentes não são armazenadas. Essa decisão evita que um registro despublicado continue acessível por um endereço público conhecido.
 
-`createPublishedImageUrl` também cobre logo de marca ativa e capa de coleção vigente. A checagem de publicação ocorre antes da assinatura e a expiração permitida é de 60 a 3.600 segundos.
+O Route Handler público repete as seguintes verificações antes de baixar o objeto com credencial server-only:
+
+1. o identificador recebido é um UUID válido;
+2. o registro de imagem existe e pertence ao produto consultado;
+3. o produto está publicado, não está arquivado e possui marca/categoria ativas quando vinculadas;
+4. o caminho persistido começa exatamente pelo UUID do produto e possui extensão permitida;
+5. o MIME do download e a assinatura binária são compatíveis com JPEG, PNG, WebP ou AVIF.
+
+Uma versão derivada de `updated_at` compõe a URL usada pelo Next Image. Respostas válidas recebem cache público imutável e `ETag`; o identificador continua sendo revalidado no primeiro acesso de cada versão. Falha transitória do Storage retorna uma imagem PNG bege controlada, nunca uma área branca. Registro ausente, rascunho ou UUID arbitrário recebe 404.
+
+O ADM continua usando URLs assinadas curtas exclusivamente em páginas administrativas protegidas. A chave secreta fica em módulos `server-only` e não é enviada ao navegador.

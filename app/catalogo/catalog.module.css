@@ -44,7 +44,7 @@
   position: relative;
   z-index: 3;
   border-bottom: 1px solid var(--vision-line);
-  background: rgba(251, 248, 243, 0.96);
+  background: var(--vision-paper);
 }
 
 .filterInner {
@@ -237,7 +237,7 @@
 
 .chapterHeader a {
   display: inline-flex;
-  min-height: 42px;
+  min-height: 44px;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.76rem;

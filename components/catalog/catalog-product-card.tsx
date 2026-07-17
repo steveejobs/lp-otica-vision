@@ -31,7 +31,7 @@ export function CatalogProductCard({
         href={`/catalogo/${product.slug}`}
         tabIndex={clone ? -1 : undefined}
       >
-        <div className={styles.media} {...(!clone ? { "data-focus-reveal": true } : {})}>
+        <div className={styles.media}>
           <Image
             alt={product.cover.altText}
             blurDataURL={blurDataUrl}

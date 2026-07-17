@@ -1,4 +1,4 @@
-# Schema do banco — Fases 1 e 2
+# Schema do banco — Fases 1 a 3
 
 As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema remoto não deve ser alterado manualmente sem que a mudança equivalente seja versionada.
 
@@ -9,6 +9,11 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 3. `20260717005905_phase1_storage.sql`: buckets privados e políticas de objetos.
 4. `20260717030000_phase2_admin_operations.sql`: arquivamento, metadados completos de mídia, proteção do último admin, validação de publicação, RPCs atômicas de ordem e bucket de logos.
 5. `20260717030500_phase2_media_integrity.sql`: SKU sem diferenciar caixa, limites de campos e triggers diferidos que preservam mídia mínima de conteúdo publicado.
+6. `20260717060000_phase3_analytics_event_types.sql`: eventos `catalog_search` e `catalog_filter`.
+7. `20260717060500_phase3_public_catalog.sql`: busca pública, opções de filtro, sitemap, índices de catálogo, validação editorial, analytics agregado e rate limit distribuído.
+8. `20260717061000_phase3_product_price_integrity.sql`: preço obrigatório quando a visibilidade é `visible`.
+9. `20260717061500_phase3_attendant_search_document.sql`: mantém a alteração rápida do atendente compatível com a coluna de busca gerada, sem ampliar os campos editáveis.
+10. `20260717062000_phase3_audit_function_volatility.sql`: declara corretamente como `stable` a rotina recursiva de mascaramento apontada pelo lint do banco.
 
 ## Tabelas
 
@@ -35,7 +40,7 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 - preço: `visible`, `consult`, `hidden`;
 - disponibilidade: `available`, `last_unit`, `consultation`, `unavailable`;
 - destaque: `promotion`, `highlight`, `launch`, `collection`;
-- analytics: `page_view`, `product_view`, `product_whatsapp_click`, `collection_view`, `promotion_view`, `promotion_click`, `gallery_interaction`.
+- analytics: `page_view`, `product_view`, `product_whatsapp_click`, `collection_view`, `promotion_view`, `promotion_click`, `gallery_interaction`, `catalog_search`, `catalog_filter`.
 
 `products.availability_status` começa em `consultation`. Não existe quantidade de estoque.
 
@@ -50,12 +55,14 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 - FKs impedem órfãos e usam `restrict`, `cascade` ou `set null` conforme a relação.
 - produto arquivado é despublicado e não pode aparecer para anônimo;
 - produto publicado exige capa completa, e galeria publicada exige ao menos um item publicado completo;
+- produto em destaque exige publicação, e preço visível exige valor cadastrado;
+- marca ou categoria vinculada a produto publicado não pode ser desativada silenciosamente;
 - o último administrador ativo não pode ser removido ou desativado no banco;
 - RPCs de ordem validam a sequência inteira e impedem a quebra silenciosa de séries visuais.
 
 ## Índices
 
-Além dos índices de PK/unique, existem índices para publicação, destaque, marca, categoria, disponibilidade, relações de imagem, série visual, datas de destaque, eventos e auditoria. A migration mantém os nomes explícitos para revisão e diagnóstico.
+Além dos índices de PK/unique, existem índices para publicação, destaque, marca, categoria, disponibilidade, relações de imagem, série visual, datas de destaque, eventos e auditoria. A Fase 3 adiciona documento de busca normalizado sem acentos, GIN trigram e índices parciais para a vitrine publicada. A migration mantém os nomes explícitos para revisão e diagnóstico.
 
 ## Datas e autoria
 

@@ -17,6 +17,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
   const secondSequenceRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
+  const automaticOffsetRef = useRef(0);
   const pauseUntilRef = useRef(0);
   const visibleRef = useRef(false);
   const documentVisibleRef = useRef(true);
@@ -37,8 +38,17 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
     if (!viewport || !first || !second) return;
     const loopWidth = second.offsetLeft - first.offsetLeft;
     if (loopWidth <= 0) return;
-    while (viewport.scrollLeft >= loopWidth) viewport.scrollLeft -= loopWidth;
-    while (viewport.scrollLeft < 0) viewport.scrollLeft += loopWidth;
+    let next = viewport.scrollLeft;
+    while (next >= loopWidth) next -= loopWidth;
+    while (next < 0) next += loopWidth;
+    viewport.scrollLeft = next;
+    automaticOffsetRef.current = next;
+  }, []);
+
+  const loopWidth = useCallback(() => {
+    const first = firstSequenceRef.current;
+    const second = secondSequenceRef.current;
+    return first && second ? second.offsetLeft - first.offsetLeft : 0;
   }, []);
 
   useEffect(() => {
@@ -47,6 +57,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotionRef.current = reducedMotion.matches;
     documentVisibleRef.current = document.visibilityState === "visible";
+    automaticOffsetRef.current = viewport.scrollLeft;
 
     const onMotionChange = (event: MediaQueryListEvent) => {
       reducedMotionRef.current = event.matches;
@@ -80,8 +91,13 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
         !focusedRef.current &&
         time >= pauseUntilRef.current;
       if (canMove) {
-        viewport.scrollLeft += (SPEED_PX_PER_SECOND * delta) / 1000;
-        normalizeLoop();
+        const width = loopWidth();
+        let next = automaticOffsetRef.current + (SPEED_PX_PER_SECOND * delta) / 1000;
+        if (width > 0 && next >= width) next -= width;
+        automaticOffsetRef.current = next;
+        viewport.scrollLeft = next;
+      } else {
+        automaticOffsetRef.current = viewport.scrollLeft;
       }
       animationRef.current = requestAnimationFrame(tick);
     };
@@ -93,7 +109,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
       document.removeEventListener("visibilitychange", onVisibilityChange);
       if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
     };
-  }, [manualPaused, normalizeLoop, products.length]);
+  }, [loopWidth, manualPaused, products.length]);
 
   const keyboardStep = () => {
     const firstItem = firstSequenceRef.current?.firstElementChild as HTMLElement | null;
