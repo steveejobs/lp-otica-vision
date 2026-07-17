@@ -16,6 +16,7 @@ import {
   uuidValue,
 } from "@/lib/admin/validation";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -123,6 +124,7 @@ export async function updateBrandAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/marcas");
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -142,6 +144,7 @@ export async function toggleBrandAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback("/admin/marcas", "error", errorCode));
   revalidatePath("/admin/marcas");
+  revalidatePublicCatalog();
   redirect(appendFeedback("/admin/marcas", "status", "saved"));
 }
 
@@ -173,6 +176,6 @@ export async function removeBrandLogoAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/marcas");
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "removed"));
 }
-

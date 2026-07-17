@@ -19,6 +19,7 @@ import {
   uuidValue,
 } from "@/lib/admin/validation";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -78,6 +79,7 @@ export async function updateCollectionAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/colecoes");
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -133,6 +135,7 @@ export async function uploadCollectionCoverAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "uploaded"));
 }
 
@@ -170,6 +173,7 @@ export async function removeCollectionCoverAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "removed"));
 }
 
@@ -185,6 +189,7 @@ export async function syncCollectionProductsAction(formData: FormData) {
   });
   if (error) redirect(appendFeedback(destination, "error", mutationErrorCode(error)));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
@@ -205,6 +210,6 @@ export async function deleteCollectionAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/colecoes");
+  revalidatePublicCatalog();
   redirect(appendFeedback("/admin/colecoes", "status", "deleted"));
 }
-

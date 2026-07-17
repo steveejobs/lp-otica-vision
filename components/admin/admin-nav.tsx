@@ -17,6 +17,7 @@ const navigation = [
   { href: "/admin/marcas", label: "Marcas", roles: ["admin", "editor"] },
   { href: "/admin/categorias", label: "Categorias", roles: ["admin", "editor"] },
   { href: "/admin/usuarios", label: "Usuários", roles: ["admin"] },
+  { href: "/admin/analytics", label: "Analytics", roles: ["admin"] },
   { href: "/admin/auditoria", label: "Auditoria", roles: ["admin"] },
   { href: "/admin/configuracoes", label: "Configurações", roles: ["admin"] },
 ] as const satisfies readonly {

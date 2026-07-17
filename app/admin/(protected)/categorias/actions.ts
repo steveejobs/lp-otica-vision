@@ -14,6 +14,7 @@ import {
   uuidValue,
 } from "@/lib/admin/validation";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function categoryPayload(formData: FormData) {
@@ -57,6 +58,7 @@ export async function updateCategoryAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/categorias");
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -75,6 +77,7 @@ export async function toggleCategoryAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback("/admin/categorias", "error", errorCode));
   revalidatePath("/admin/categorias");
+  revalidatePublicCatalog();
   redirect(appendFeedback("/admin/categorias", "status", "saved"));
 }
 
@@ -109,6 +112,6 @@ export async function deleteCategoryAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/categorias");
+  revalidatePublicCatalog();
   redirect(appendFeedback("/admin/categorias", "status", resultStatus));
 }
-

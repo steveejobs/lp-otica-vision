@@ -16,7 +16,10 @@ export function SiteHeader() {
           <BrandLogo priority />
         </Link>
 
-        <nav className={styles.actions} aria-label="Canais oficiais">
+        <nav className={styles.actions} aria-label="Navegação principal">
+          <Link className={styles.catalog} href={LINKS.catalog}>
+            Catálogo
+          </Link>
           <a
             className={styles.instagram}
             href={LINKS.instagram}
@@ -28,6 +31,7 @@ export function SiteHeader() {
             <span>Instagram</span>
           </a>
           <VisionButton
+            className={styles.whatsapp}
             href={LINKS.whatsapp}
             icon={MessageCircle}
             external

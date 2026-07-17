@@ -21,6 +21,7 @@ import {
   uuidValue,
 } from "@/lib/admin/validation";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/supabase";
@@ -100,6 +101,7 @@ export async function updateProductAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/produtos");
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -159,6 +161,7 @@ export async function archiveProductAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/produtos");
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "archived"));
 }
 
@@ -196,6 +199,7 @@ export async function updateAvailabilityAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/produtos");
   revalidatePath("/admin/disponibilidade");
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -246,6 +250,7 @@ export async function uploadProductImagesAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "uploaded"));
 }
 
@@ -270,6 +275,7 @@ export async function updateProductImageAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -282,6 +288,7 @@ export async function setProductCoverAction(formData: FormData) {
   const { error } = await supabase.rpc("set_product_cover", { target_image_id: imageId, target_product_id: productId });
   if (error) redirect(appendFeedback(destination, "error", mutationErrorCode(error)));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -294,6 +301,7 @@ export async function reorderProductImagesAction(formData: FormData) {
   const { error } = await supabase.rpc("reorder_product_images", { ordered_ids: orderedIds, target_product_id: productId });
   if (error) redirect(appendFeedback(destination, "error", mutationErrorCode(error)));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
@@ -337,6 +345,7 @@ export async function replaceProductImageAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "uploaded"));
 }
 
@@ -364,6 +373,6 @@ export async function removeProductImageAction(formData: FormData) {
   }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);
+  revalidatePublicCatalog();
   redirect(appendFeedback(destination, "status", "removed"));
 }
-

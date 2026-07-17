@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
+import { createHmac } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
@@ -19,17 +19,23 @@ const eventNames = new Set<EventName>([
   "promotion_view",
   "promotion_click",
   "gallery_interaction",
+  "catalog_search",
+  "catalog_filter",
 ]);
 const metadataKeys = new Set([
+  "filter",
   "item_index",
   "position",
+  "query",
   "source",
   "surface",
   "test",
+  "value",
   "viewport",
 ]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const rateBuckets = new Map<string, { count: number; expiresAt: number }>();
+const FILTER_NAMES = new Set(["categoria", "colecao", "disponibilidade", "marca"]);
+const FILTER_VALUE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function jsonResponse(body: object, status: number) {
   return NextResponse.json(body, {
@@ -54,8 +60,24 @@ function sanitizeMetadata(value: unknown): Json {
     if (!metadataKeys.has(key)) continue;
     if (typeof item === "boolean" || typeof item === "number") {
       clean[key] = item;
-    } else if (typeof item === "string" && item.length <= 100) {
-      clean[key] = item;
+    } else if (typeof item === "string") {
+      const normalized = item.normalize("NFKC").replace(/\s+/g, " ").trim();
+      if (!normalized || normalized.length > 100) continue;
+      if (key === "query") {
+        if (
+          normalized.length > 60 ||
+          normalized.includes("@") ||
+          /https?:\/\//i.test(normalized) ||
+          /\d{6,}/.test(normalized)
+        ) continue;
+        clean[key] = normalized.toLocaleLowerCase("pt-BR");
+      } else if (key === "filter") {
+        if (FILTER_NAMES.has(normalized)) clean[key] = normalized;
+      } else if (key === "value") {
+        if (FILTER_VALUE_PATTERN.test(normalized)) clean[key] = normalized;
+      } else {
+        clean[key] = normalized;
+      }
     }
   }
 
@@ -71,25 +93,27 @@ function referrerDomain(value: string | null) {
   }
 }
 
-function rateLimitKey(request: Request, sessionId: string | null) {
-  const address = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const agent = request.headers.get("user-agent")?.slice(0, 160) ?? "unknown";
-  return createHash("sha256")
-    .update(`${sessionId ?? "no-session"}|${address}|${agent}`)
-    .digest("hex");
-}
-
-function exceedsRateLimit(key: string) {
-  const now = Date.now();
-  const bucket = rateBuckets.get(key);
-
-  if (!bucket || bucket.expiresAt <= now) {
-    rateBuckets.set(key, { count: 1, expiresAt: now + 60_000 });
+function hasSameOrigin(request: Request, origin: string) {
+  try {
+    const parsed = new URL(origin);
+    const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+    const requestHost = forwardedHost || request.headers.get("host") || new URL(request.url).host;
+    const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+    const requestProtocol = forwardedProtocol || new URL(request.url).protocol.replace(":", "");
+    return parsed.host === requestHost && parsed.protocol === `${requestProtocol}:`;
+  } catch {
     return false;
   }
+}
 
-  bucket.count += 1;
-  return bucket.count > 30;
+function rateLimitKey(request: Request, sessionId: string | null) {
+  const secret = process.env.SUPABASE_SECRET_KEY?.trim();
+  if (!secret) return null;
+  const address = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const agent = request.headers.get("user-agent")?.slice(0, 160) ?? "unknown";
+  return createHmac("sha256", secret)
+    .update(`${sessionId ?? "no-session"}|${address}|${agent}`)
+    .digest("hex");
 }
 
 export async function POST(request: Request) {
@@ -99,7 +123,7 @@ export async function POST(request: Request) {
   }
 
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
+  if (origin && !hasSameOrigin(request, origin)) {
     return jsonResponse({ accepted: false }, 403);
   }
 
@@ -137,25 +161,31 @@ export async function POST(request: Request) {
     return jsonResponse({ accepted: false }, 400);
   }
 
-  if (exceedsRateLimit(rateLimitKey(request, sessionId))) {
-    return jsonResponse({ accepted: false }, 429);
-  }
+  const fingerprintHash = rateLimitKey(request, sessionId);
+  if (!fingerprintHash) return jsonResponse({ accepted: false }, 503);
 
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase.from("analytics_events").insert({
-    anonymous_session_id: sessionId,
-    collection_id: collectionId,
-    event_name: eventName as EventName,
-    metadata: sanitizeMetadata(body.metadata),
-    product_id: productId,
-    promotion_id: promotionId,
-    referrer_domain: referrerDomain(request.headers.get("referer")),
-    route,
-  });
+  const rpcArgs = {
+    p_anonymous_session_id: sessionId,
+    p_collection_id: collectionId,
+    p_event_name: eventName as EventName,
+    p_fingerprint_hash: fingerprintHash,
+    p_metadata: sanitizeMetadata(body.metadata),
+    p_product_id: productId,
+    p_promotion_id: promotionId,
+    p_referrer_domain: referrerDomain(request.headers.get("referer")),
+    p_route: route,
+  } as unknown as Database["public"]["Functions"]["record_public_analytics_event"]["Args"];
+  const { data: accepted, error } = await supabase.rpc(
+    "record_public_analytics_event",
+    rpcArgs,
+  );
 
   if (error) {
-    return jsonResponse({ accepted: false }, 400);
+    return jsonResponse({ accepted: false }, 503);
   }
+
+  if (!accepted) return jsonResponse({ accepted: false }, 429);
 
   return jsonResponse({ accepted: true }, 202);
 }

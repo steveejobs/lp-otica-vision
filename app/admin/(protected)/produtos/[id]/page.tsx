@@ -45,17 +45,39 @@ export default async function EditProductPage({
     signedUrl: signed.get(image.storage_path) ?? null,
     width: image.width,
   }));
+  const hasCover = imageResult.data.some((image) => image.is_cover && image.width && image.height && image.alt_text.trim());
+  const linkedBrand = brandResult.data.find((brand) => brand.id === product.brand_id);
+  const linkedCategory = categoryResult.data.find((category) => category.id === product.category_id);
+  const blockingIssues = [
+    ...(!product.sku.trim() ? ["SKU ausente"] : []),
+    ...(!product.name.trim() ? ["nome ausente"] : []),
+    ...(!product.slug.trim() ? ["slug ausente"] : []),
+    ...(!hasCover ? ["capa completa ausente"] : []),
+    ...(linkedBrand && !linkedBrand.active ? ["marca vinculada inativa"] : []),
+    ...(linkedCategory && !linkedCategory.active ? ["categoria vinculada inativa"] : []),
+  ];
+  const editorialIndicators = [
+    ...(!product.brand_id ? ["sem marca vinculada"] : []),
+    ...(!product.category_id ? ["sem categoria vinculada"] : []),
+  ];
 
   return (
     <>
       <AdminPageHeader eyebrow="Produtos" description="Edite dados, publicação e mídia. Toda mudança é autorizada no servidor e registrada na auditoria." title={product.name} />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}>
-        <div className={styles.toolbarActions}><Link className={styles.buttonLink} href="/admin/produtos">Voltar para produtos</Link><Link className={styles.buttonLink} href="/admin/disponibilidade">Disponibilidade rápida</Link></div>
+        <div className={styles.toolbarActions}><Link className={styles.buttonLink} href="/admin/produtos">Voltar para produtos</Link><Link className={styles.buttonLink} href="/admin/disponibilidade">Disponibilidade rápida</Link>{product.published && !product.archived_at && hasCover ? <Link className={styles.buttonLink} href={`/catalogo/${product.slug}`} target="_blank">Ver página pública</Link> : null}</div>
         <AdminStatus active={product.published && !product.archived_at} trueLabel={product.featured ? "Publicado · destaque" : "Publicado"} falseLabel={product.archived_at ? "Arquivado" : "Rascunho"} />
       </div>
 
       {product.archived_at ? <p className={styles.notice}>Produto arquivado. Restaure-o antes de editar ou publicar.</p> : null}
+      {!product.archived_at && (blockingIssues.length || editorialIndicators.length) ? (
+        <p className={styles.notice}>
+          <strong>Prontidão do catálogo:</strong>{" "}
+          {blockingIssues.length ? `corrija antes de publicar: ${blockingIssues.join(", ")}.` : "validações obrigatórias atendidas."}
+          {editorialIndicators.length ? ` Indicadores editoriais: ${editorialIndicators.join(", ")}.` : ""}
+        </p>
+      ) : null}
       <section className={styles.formPanel} aria-labelledby="product-data-title">
         <div className={styles.panelHeading}><h2 id="product-data-title">Dados do produto</h2><p>SKU e slug são únicos.</p></div>
         <ProductForm action={updateProductAction} archived={Boolean(product.archived_at)} brands={brandResult.data} categories={categoryResult.data} defaults={product} editing />

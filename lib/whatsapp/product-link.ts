@@ -3,7 +3,9 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type ProductWhatsappInput = {
+  brand?: string | null;
   color?: string | null;
+  model?: string | null;
   productName: string;
   productUrl: string;
   sku: string;
@@ -28,7 +30,8 @@ function validateProductUrl(value: string) {
     throw new Error("URL do produto invalida para gerar o link do WhatsApp.");
   }
 
-  if (url.protocol !== "https:" && url.hostname !== "localhost") {
+  const localHttp = url.protocol === "http:" && url.hostname === "localhost";
+  if (url.protocol !== "https:" && !localHttp) {
     throw new Error("A URL do produto deve usar HTTPS.");
   }
 
@@ -59,6 +62,12 @@ async function getOfficialPhone() {
 export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
   const productName = cleanLine(input.productName, "Nome do produto", 160);
   const sku = cleanLine(input.sku, "SKU", 80);
+  const brand = input.brand?.trim()
+    ? cleanLine(input.brand, "Marca", 120)
+    : null;
+  const model = input.model?.trim()
+    ? cleanLine(input.model, "Modelo", 120)
+    : null;
   const color = input.color?.trim()
     ? cleanLine(input.color, "Cor", 100)
     : null;
@@ -69,6 +78,8 @@ export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
     "",
     productName,
     `Código: ${sku}`,
+    ...(brand ? [`Marca: ${brand}`] : []),
+    ...(model ? [`Modelo: ${model}`] : []),
     ...(color ? [`Cor: ${color}`] : []),
     "",
     "Link:",

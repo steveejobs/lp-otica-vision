@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -375,6 +375,7 @@ export type Database = {
           object_position: string
           product_id: string
           storage_path: string
+          updated_at: string
           width: number | null
         }
         Insert: {
@@ -387,6 +388,7 @@ export type Database = {
           object_position?: string
           product_id: string
           storage_path: string
+          updated_at?: string
           width?: number | null
         }
         Update: {
@@ -399,6 +401,7 @@ export type Database = {
           object_position?: string
           product_id?: string
           storage_path?: string
+          updated_at?: string
           width?: number | null
         }
         Relationships: [
@@ -428,6 +431,7 @@ export type Database = {
           price: number | null
           price_visibility: Database["public"]["Enums"]["price_visibility"]
           published: boolean
+          search_document: string | null
           short_description: string | null
           sku: string
           slug: string
@@ -451,6 +455,7 @@ export type Database = {
           price?: number | null
           price_visibility?: Database["public"]["Enums"]["price_visibility"]
           published?: boolean
+          search_document?: string | null
           short_description?: string | null
           sku: string
           slug: string
@@ -474,6 +479,7 @@ export type Database = {
           price?: number | null
           price_visibility?: Database["public"]["Enums"]["price_visibility"]
           published?: boolean
+          search_document?: string | null
           short_description?: string | null
           sku?: string
           slug?: string
@@ -672,6 +678,39 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_catalog_analytics: { Args: { p_days?: number }; Returns: Json }
+      catalog_filter_options: {
+        Args: never
+        Returns: {
+          display_order: number
+          option_key: string
+          option_name: string
+          option_type: string
+          product_count: number
+        }[]
+      }
+      catalog_sitemap_products: {
+        Args: never
+        Returns: {
+          slug: string
+          updated_at: string
+        }[]
+      }
+      normalize_catalog_search: { Args: { value: string }; Returns: string }
+      record_public_analytics_event: {
+        Args: {
+          p_anonymous_session_id: string
+          p_collection_id: string
+          p_event_name: Database["public"]["Enums"]["analytics_event_name"]
+          p_fingerprint_hash: string
+          p_metadata: Json
+          p_product_id: string
+          p_promotion_id: string
+          p_referrer_domain: string
+          p_route: string
+        }
+        Returns: boolean
+      }
       reorder_gallery_items: {
         Args: { ordered_ids: string[]; target_gallery_id: string }
         Returns: undefined
@@ -679,6 +718,45 @@ export type Database = {
       reorder_product_images: {
         Args: { ordered_ids: string[]; target_product_id: string }
         Returns: undefined
+      }
+      search_catalog_products: {
+        Args: {
+          p_availability?: Database["public"]["Enums"]["availability_status"]
+          p_brand_slug?: string
+          p_category_slug?: string
+          p_collection_slug?: string
+          p_page_offset?: number
+          p_page_size?: number
+          p_search_term?: string
+        }
+        Returns: {
+          availability_status: Database["public"]["Enums"]["availability_status"]
+          brand_id: string
+          brand_name: string
+          brand_slug: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          color: string
+          cover_alt_text: string
+          cover_height: number
+          cover_image_id: string
+          cover_object_position: string
+          cover_updated_at: string
+          cover_width: number
+          display_order: number
+          featured: boolean
+          model: string
+          price: number
+          price_visibility: Database["public"]["Enums"]["price_visibility"]
+          product_id: string
+          product_name: string
+          short_description: string
+          sku: string
+          slug: string
+          total_count: number
+          updated_at: string
+        }[]
       }
       set_product_cover: {
         Args: { target_image_id: string; target_product_id: string }
@@ -703,6 +781,8 @@ export type Database = {
         | "promotion_view"
         | "promotion_click"
         | "gallery_interaction"
+        | "catalog_search"
+        | "catalog_filter"
       availability_status:
         | "available"
         | "last_unit"
@@ -846,6 +926,8 @@ export const Constants = {
         "promotion_view",
         "promotion_click",
         "gallery_interaction",
+        "catalog_search",
+        "catalog_filter",
       ],
       availability_status: [
         "available",

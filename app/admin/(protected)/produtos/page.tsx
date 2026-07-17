@@ -45,7 +45,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
   let query = supabase
     .from("products")
     .select(
-      "id, name, sku, published, featured, availability_status, archived_at, updated_at, brand:brands(name), category:categories(name)",
+      "id, name, slug, sku, published, featured, availability_status, archived_at, updated_at, brand:brands(name), category:categories(name), images:product_images(id, is_cover)",
       { count: "exact" },
     );
   if (q) query = query.or(`sku.ilike.%${q}%,name.ilike.%${q}%,model.ilike.%${q}%`);
@@ -99,9 +99,19 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
         <AdminTable label="Produtos cadastrados">
           <thead><tr><th>Produto</th><th>SKU</th><th>Marca / categoria</th><th>Disponibilidade</th><th>Publicação</th><th>Atualização</th><th>Ações</th></tr></thead>
           <tbody>
-            {products.map((product) => (
+            {products.map((product) => {
+              const hasCover = product.images.some((image) => image.is_cover);
+              const indicators = [
+                ...(!hasCover ? ["Sem capa"] : []),
+                ...(!product.brand ? ["Sem marca"] : []),
+                ...(!product.category ? ["Sem categoria"] : []),
+              ];
+              return (
               <tr key={product.id}>
-                <td>{product.name}{product.archived_at ? " · arquivado" : ""}</td>
+                <td>
+                  {product.name}{product.archived_at ? " · arquivado" : ""}
+                  {indicators.length ? <span className={styles.recordWarnings}>{indicators.join(" · ")}</span> : null}
+                </td>
                 <td>{product.sku}</td>
                 <td>{product.brand?.name ?? "Sem marca"} · {product.category?.name ?? "Sem categoria"}</td>
                 <td>{availabilityLabels[product.availability_status]}</td>
@@ -110,6 +120,9 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                 <td>
                   <div className={styles.rowActions}>
                     <Link className={styles.textButton} href={`/admin/produtos/${product.id}`}>Editar</Link>
+                    {product.published && !product.archived_at && hasCover ? (
+                      <Link className={styles.textButton} href={`/catalogo/${product.slug}`} target="_blank">Abrir público</Link>
+                    ) : null}
                     <form action={duplicateProductAction} className={styles.inlineForm}><input name="id" type="hidden" value={product.id} /><AdminSubmitButton pendingLabel="Duplicando..." variant="secondary">Duplicar</AdminSubmitButton></form>
                     {!product.archived_at ? (
                       <form action={archiveProductAction} className={styles.inlineForm}>
@@ -120,7 +133,8 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </AdminTable>
       )}

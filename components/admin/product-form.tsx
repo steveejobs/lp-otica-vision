@@ -111,7 +111,7 @@ export function ProductForm({
               </label>
               <label className={styles.checkboxField}>
                 <input defaultChecked={defaults.featured} name="featured" type="checkbox" />
-                <span>Destaque</span>
+                <span>Destaque na home</span>
               </label>
             </>
           ) : (
@@ -135,4 +135,3 @@ export function ProductForm({
     </form>
   );
 }
-

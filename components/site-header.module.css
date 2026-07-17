@@ -26,6 +26,7 @@
 }
 
 .actions,
+.catalog,
 .instagram {
   display: flex;
   align-items: center;
@@ -52,6 +53,31 @@
   font-weight: 600;
   color: var(--vision-ink);
   transition: color 180ms var(--ease-vision);
+}
+
+.catalog {
+  position: relative;
+  min-height: 44px;
+  padding-inline: 0.35rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.catalog::after {
+  content: "";
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.52rem;
+  left: 0.35rem;
+  height: 1px;
+  background: var(--vision-bronze);
+  transform: scaleX(0.24);
+  transform-origin: left;
+  transition: transform 180ms var(--ease-vision);
+}
+
+.catalog:hover::after {
+  transform: scaleX(1);
 }
 
 .instagram:hover {
@@ -98,6 +124,20 @@
     gap: 0.45rem;
   }
 
+  .brand {
+    max-width: 106px;
+  }
+
+  .catalog {
+    padding-inline: 0.2rem;
+    font-size: 0.78rem;
+  }
+
+  .catalog::after {
+    right: 0.2rem;
+    left: 0.2rem;
+  }
+
   .instagram {
     width: 44px;
     justify-content: center;
@@ -115,9 +155,27 @@
     white-space: nowrap;
     border: 0;
   }
+
+  .whatsapp {
+    width: 44px;
+    padding-inline: 0;
+  }
+
+  .whatsapp span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .catalog::after,
   .instagram {
     transition: none;
   }

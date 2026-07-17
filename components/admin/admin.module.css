@@ -829,6 +829,15 @@
   font-size: 0.7rem;
 }
 
+.recordWarnings {
+  display: block;
+  margin-top: 0.28rem;
+  color: #8a4a37;
+  font-size: 0.67rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
 .orderList {
   display: grid;
   gap: 1px;

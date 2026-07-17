@@ -1,0 +1,215 @@
+.page {
+  background: var(--vision-paper);
+}
+
+.main {
+  width: min(92vw, 100%);
+  max-width: 1320px;
+  margin-inline: auto;
+  padding: 1.25rem 0 clamp(5rem, 9vw, 8rem);
+}
+
+.back {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--vision-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.product {
+  display: grid;
+  grid-template-columns: minmax(0, 1.22fr) minmax(18rem, 0.78fr);
+  gap: clamp(2.4rem, 6vw, 6rem);
+  align-items: start;
+  padding-top: 1rem;
+}
+
+.details {
+  display: grid;
+  gap: 1.35rem;
+  padding-top: clamp(0.5rem, 2vw, 2rem);
+}
+
+.detailsHeader {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.brand {
+  color: var(--vision-bronze);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.details h1 {
+  max-width: 11ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.description {
+  max-width: 39rem;
+  color: var(--vision-muted);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.commercial {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-block: 1px solid var(--vision-line);
+}
+
+.availability {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.price {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 400;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--vision-line);
+}
+
+.specs div {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 0.65rem 0.85rem 0;
+  border-bottom: 1px solid var(--vision-line);
+}
+
+.specs dt {
+  color: var(--vision-muted);
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.specs dd {
+  margin: 0;
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.consultationNote {
+  color: var(--vision-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.related {
+  margin-top: clamp(5rem, 10vw, 9rem);
+  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+  border-top: 1px solid var(--vision-line);
+}
+
+.relatedHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.relatedHeader div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.related h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  font-weight: 400;
+  line-height: 0.95;
+}
+
+.relatedHeader a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 901px) {
+  .details {
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .main {
+    width: min(88vw, 1320px);
+  }
+}
+
+@media (max-width: 900px) {
+  .product {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+
+  .relatedGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .main {
+    padding-top: 0.65rem;
+  }
+
+  .product {
+    padding-top: 0.35rem;
+  }
+
+  .details {
+    padding-top: 0.5rem;
+  }
+
+  .details h1 {
+    font-size: clamp(3.1rem, 15vw, 5rem);
+  }
+
+  .relatedHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .relatedGrid {
+    gap: 1.3rem 0.8rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .relatedGrid,
+  .specs {
+    grid-template-columns: 1fr;
+  }
+}

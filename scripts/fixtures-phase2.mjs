@@ -141,7 +141,7 @@ async function seedFixtures() {
         category_id: state.categoryIds[index % state.categoryIds.length],
         color: `Cor de teste ${index + 1}`,
         display_order: index,
-        featured: index === 0,
+        featured: false,
         id,
         model: `Modelo fixture ${index + 1}`,
         name: `${FIXTURE_LABEL} Produto ${index + 1}`,
@@ -171,7 +171,10 @@ async function seedFixtures() {
       trackEntity(state, "productImageIds", imageId);
 
       if (index < 3) {
-        const { error } = await actor.from("products").update({ published: true }).eq("id", id);
+        const { error } = await actor
+          .from("products")
+          .update({ featured: index === 0, published: true })
+          .eq("id", id);
         if (error) throw new Error("Falha ao publicar produto fixture.");
       }
     }
