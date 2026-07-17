@@ -625,11 +625,35 @@
 }
 
 .field > span,
+.fieldLabel,
 .checkboxField > span,
 .searchForm label > span {
   color: var(--admin-muted);
   font-size: 0.69rem;
   font-weight: 650;
+}
+
+.skuControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.skuControl .secondaryButton {
+  white-space: nowrap;
+}
+
+.fieldStatus {
+  min-height: 1.1rem;
+  margin: 0;
+  color: #37624b;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.fieldStatus[data-error="true"] {
+  color: #733f38;
 }
 
 .field input,
@@ -1160,6 +1184,14 @@
 
   .fieldWide {
     grid-column: auto;
+  }
+
+  .skuControl {
+    grid-template-columns: 1fr;
+  }
+
+  .skuControl .secondaryButton {
+    width: 100%;
   }
 
   .adminToolbar,

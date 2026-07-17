@@ -10,6 +10,14 @@ A camada técnica da Fase 4 foi validada contra o build local de produção. Os 
 
 O banco terminou a rodada com exatamente um administrador ativo, nenhum produto de QA e nenhum upload temporário. Nenhum deploy, alias ou ambiente de produção foi alterado. O preview comercial ainda não foi criado porque não há uma fonte confirmada de inventário real no repositório ou no banco.
 
+## Gerador de SKU
+
+O cadastro de novo produto oferece o botão `Gerar SKU` ao lado do campo ainda editável. O servidor aloca códigos no formato `OV-00000001` usando uma sequence `bigint`, `NO CYCLE` e sem reutilização de valores consumidos. Depois de oito dígitos o código cresce sem truncamento, portanto não volta a uma faixa anterior. É normal haver saltos quando alguém gera um código e abandona o formulário.
+
+A função de alocação aceita somente a chave server-only depois da autorização de admin/editor. Chamadas anônimas, diretas pelo editor ou pelo atendente são bloqueadas. A sequence resolve concorrência entre cliques e o índice único case-insensitive de `products.sku` continua sendo a barreira definitiva durante a gravação.
+
+QA específico: **12/12** cenários aprovados, incluindo 16 alocações simultâneas sem repetição, dois cliques consecutivos, persistência, colisão forçada em minúsculas, acesso mobile e limpeza. Evidências em `sku-generator-results.json` e `sku-generator-mobile-390x844.png`.
+
 ## Pipeline de imagens
 
 Cada upload é enviado diretamente para um bucket privado por token assinado e de curta duração. A finalização acontece no servidor uma única vez: valida assinatura e dimensões, corrige orientação, remove metadata, cria o master normalizado e persiste cinco derivados. Nenhuma transformação pesada ocorre no proxy público.

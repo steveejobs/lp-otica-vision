@@ -1,4 +1,5 @@
 import { AdminSubmitButton } from "./admin-form-controls";
+import { ProductSkuField } from "./product-sku-field";
 import styles from "./admin.module.css";
 
 type ProductDefaults = {
@@ -40,10 +41,7 @@ export function ProductForm({
       {defaults.id ? <input name="id" type="hidden" value={defaults.id} /> : null}
       <fieldset className={styles.formFieldset} disabled={archived}>
         <div className={styles.formGrid}>
-          <label className={styles.field}>
-            <span>SKU</span>
-            <input defaultValue={defaults.sku} maxLength={80} name="sku" required />
-          </label>
+          <ProductSkuField defaultValue={defaults.sku} generateEnabled={!editing} />
           <label className={styles.field}>
             <span>Slug</span>
             <input defaultValue={defaults.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />

@@ -788,6 +788,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allocate_product_sku: { Args: never; Returns: string }
       admin_catalog_analytics: { Args: { p_days?: number }; Returns: Json }
       catalog_filter_options: {
         Args: never

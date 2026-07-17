@@ -41,6 +41,7 @@ import type { Database } from "@/types/supabase";
 
 const availabilityValues = ["available", "last_unit", "consultation", "unavailable"] as const;
 const priceVisibilityValues = ["visible", "consult", "hidden"] as const;
+const generatedProductSkuPattern = /^OV-\d{8,}$/;
 
 type ProductImageUploadDescriptor = {
   mimeType: string;
@@ -204,6 +205,18 @@ function productPayload(formData: FormData) {
     slug: slugValue(formData),
     whatsapp_message_override: optionalTextValue(formData, "whatsapp_message_override", { max: 1200 }),
   } satisfies Database["public"]["Tables"]["products"]["Update"];
+}
+
+export async function generateProductSkuAction(): Promise<
+  { ok: true; sku: string } | { ok: false; error: string }
+> {
+  await requireAdminRole(["admin", "editor"]);
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin.rpc("allocate_product_sku");
+  if (error || typeof data !== "string" || !generatedProductSkuPattern.test(data)) {
+    return { ok: false, error: "Não foi possível gerar o SKU. Tente novamente." };
+  }
+  return { ok: true, sku: data };
 }
 
 export async function createProductAction(formData: FormData) {
