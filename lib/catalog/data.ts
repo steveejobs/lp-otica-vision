@@ -65,6 +65,14 @@ function genericCatalogError() {
   return new Error("Não foi possível carregar o catálogo agora.");
 }
 
+function createOptionalSupabasePublicClient() {
+  try {
+    return createSupabasePublicClient();
+  } catch {
+    return null;
+  }
+}
+
 export async function getCatalogPage(query: CatalogQuery): Promise<CatalogPageResult> {
   const supabase = createSupabasePublicClient();
   const args: Database["public"]["Functions"]["search_catalog_products"]["Args"] = {
@@ -221,7 +229,9 @@ const embeddedCardSelect = `
 
 const getCachedFeaturedProducts = unstable_cache(
   async (): Promise<CatalogProductCard[]> => {
-    const supabase = createSupabasePublicClient();
+    const supabase = createOptionalSupabasePublicClient();
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from("products")
       .select(embeddedCardSelect)
@@ -340,7 +350,9 @@ export async function getRelatedCatalogProducts(product: CatalogProduct) {
 }
 
 export async function getCatalogSitemapProducts() {
-  const supabase = createSupabasePublicClient();
+  const supabase = createOptionalSupabasePublicClient();
+  if (!supabase) return [];
+
   const { data, error } = await supabase.rpc("catalog_sitemap_products");
   if (error || !data) return [];
   return data;
