@@ -206,7 +206,7 @@ async function CatalogContent({
               </div>
             ) : (
               <div className={styles.chapters}>
-                {groups.map((group, groupIndex) => (
+                {groups.map((group) => (
                   <section className={styles.chapter} key={group.slug ?? "vision"}>
                     <div className={styles.chapterHeader}>
                       <div className={styles.chapterTitle}>
@@ -221,10 +221,9 @@ async function CatalogContent({
                       ) : null}
                     </div>
                     <div className={styles.grid}>
-                      {group.products.map((product, productIndex) => (
+                      {group.products.map((product) => (
                         <CatalogProductCard
                           key={product.id}
-                          priority={groupIndex === 0 && productIndex < 2}
                           product={product}
                         />
                       ))}

@@ -172,7 +172,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
           <div className={styles.sequence} ref={firstSequenceRef}>
             {products.map((product) => (
               <div className={styles.item} key={product.id}>
-                <CatalogProductCard product={product} />
+                <CatalogProductCard imageVariant="home_preview" product={product} />
               </div>
             ))}
           </div>
@@ -180,7 +180,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
             <div aria-hidden="true" className={styles.sequence} ref={secondSequenceRef}>
               {products.map((product) => (
                 <div className={styles.item} key={`clone-${product.id}`}>
-                  <CatalogProductCard clone product={product} />
+                  <CatalogProductCard clone imageVariant="home_preview" product={product} />
                 </div>
               ))}
             </div>

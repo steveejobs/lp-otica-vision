@@ -17,15 +17,26 @@ export function ProductGallery({ images, productName }: { images: CatalogImage[]
   const frameRef = useRef<number | null>(null);
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const [loadedIndexes, setLoadedIndexes] = useState(() => new Set([initialIndex]));
+
+  const ensureLoaded = useCallback((index: number) => {
+    setLoadedIndexes((current) => {
+      if (current.has(index)) return current;
+      const next = new Set(current);
+      next.add(index);
+      return next;
+    });
+  }, []);
 
   const goTo = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
     const rail = railRef.current;
     if (!rail) return;
     const safeIndex = Math.max(0, Math.min(index, images.length - 1));
     const item = rail.children.item(safeIndex) as HTMLElement | null;
+    ensureLoaded(safeIndex);
     item?.scrollIntoView({ behavior, block: "nearest", inline: "start" });
     setActiveIndex(safeIndex);
-  }, [images.length]);
+  }, [ensureLoaded, images.length]);
 
   useEffect(() => {
     goTo(initialIndex, "auto");
@@ -40,7 +51,9 @@ export function ProductGallery({ images, productName }: { images: CatalogImage[]
     frameRef.current = requestAnimationFrame(() => {
       const rail = railRef.current;
       if (!rail || !rail.clientWidth) return;
-      setActiveIndex(Math.max(0, Math.min(Math.round(rail.scrollLeft / rail.clientWidth), images.length - 1)));
+      const nextIndex = Math.max(0, Math.min(Math.round(rail.scrollLeft / rail.clientWidth), images.length - 1));
+      ensureLoaded(nextIndex);
+      setActiveIndex(nextIndex);
     });
   }
 
@@ -74,16 +87,29 @@ export function ProductGallery({ images, productName }: { images: CatalogImage[]
       >
         {images.map((image, index) => (
           <figure className={styles.slide} key={image.id}>
-            <Image
-              alt={image.altText}
-              blurDataURL={blurDataUrl}
-              fill
-              loading={index === initialIndex || index === initialIndex + 1 ? "eager" : "lazy"}
-              placeholder="blur"
-              sizes="(max-width: 900px) 92vw, 58vw"
-              src={catalogImageUrl(image)}
-              style={{ objectPosition: image.objectPosition }}
-            />
+            {loadedIndexes.has(index) ? (
+              <Image
+                alt={image.altText}
+                blurDataURL={image.blurDataUrl ?? blurDataUrl}
+                fetchPriority={index === initialIndex ? "high" : "auto"}
+                fill
+                loading={index === initialIndex ? "eager" : "lazy"}
+                placeholder="blur"
+                sizes="(max-width: 900px) 92vw, 58vw"
+                src={catalogImageUrl(image, "product_detail")}
+                style={{ objectPosition: image.objectPosition }}
+                unoptimized
+              />
+            ) : (
+              <span
+                aria-hidden="true"
+                className={styles.lazyPlaceholder}
+                style={{
+                  backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
+                  backgroundPosition: image.objectPosition,
+                }}
+              />
+            )}
           </figure>
         ))}
       </div>

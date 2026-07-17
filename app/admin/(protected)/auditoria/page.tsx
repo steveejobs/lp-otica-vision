@@ -10,7 +10,7 @@ import { requireAdminRole } from "@/lib/auth/admin-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const PAGE_SIZE = 50;
-const entities = ["profiles", "brands", "categories", "products", "product_images", "collections", "collection_products", "galleries", "gallery_items", "promotions", "promotion_products", "site_settings"];
+const entities = ["profiles", "brands", "categories", "products", "product_images", "product_image_variants", "collections", "collection_products", "galleries", "gallery_items", "promotions", "promotion_products", "site_settings"];
 const actions = ["insert", "update", "delete"];
 
 type AuditParams = { action?: string; entity?: string; from?: string; page?: string; to?: string; user?: string };
@@ -76,4 +76,3 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
     </>
   );
 }
-

@@ -5,24 +5,40 @@ import { useState } from "react";
 import {
   removeProductImageAction,
   reorderProductImagesAction,
-  replaceProductImageAction,
   setProductCoverAction,
   updateProductImageAction,
 } from "@/app/admin/(protected)/produtos/actions";
 
 import { AdminSubmitButton, ConfirmSubmitButton } from "./admin-form-controls";
-import { FilePreviewInput } from "./file-preview-input";
 import styles from "./admin.module.css";
+import { ProductImageUploader } from "./product-image-uploader";
 
 type ManagedProductImage = {
   altText: string;
   height: number | null;
   id: string;
   isCover: boolean;
+  mimeType: string | null;
   objectPosition: string;
   signedUrl: string | null;
+  sizeBytes: number | null;
+  variants: Array<{
+    height: number;
+    kind: string;
+    mime_type: string;
+    size_bytes: number;
+    storage_path: string;
+    width: number;
+  }>;
   width: number | null;
 };
+
+function fileSize(bytes: number | null) {
+  if (!bytes) return "tamanho pendente";
+  if (bytes < 1_024) return `${bytes} B`;
+  if (bytes < 1_048_576) return `${Math.round(bytes / 1_024)} KB`;
+  return `${(bytes / 1_048_576).toFixed(1)} MB`;
+}
 
 export function ProductImageManager({
   images,
@@ -93,6 +109,8 @@ export function ProductImageManager({
             <p className={styles.recordMeta}>
               <span>{index + 1} de {ordered.length}</span>
               <span>{image.width ?? "?"} × {image.height ?? "?"}</span>
+              <span>{image.mimeType?.replace("image/", "").toUpperCase() ?? "MIME pendente"} · {fileSize(image.sizeBytes)}</span>
+              <span>{image.variants.length} derivados</span>
               {image.isCover ? <strong>Capa</strong> : null}
             </p>
             {!readOnly ? <div className={styles.rowActions}>
@@ -119,12 +137,7 @@ export function ProductImageManager({
               </form>
             ) : null}
 
-            <form action={replaceProductImageAction} className={styles.adminForm}>
-              <input name="image_id" type="hidden" value={image.id} />
-              <input name="product_id" type="hidden" value={productId} />
-              <FilePreviewInput id={`replace-${image.id}`} name="file" required />
-              <AdminSubmitButton pendingLabel="Substituindo..." variant="secondary">Substituir arquivo</AdminSubmitButton>
-            </form>
+            <ProductImageUploader imageId={image.id} productId={productId} />
 
             <form action={removeProductImageAction}>
               <input name="image_id" type="hidden" value={image.id} />

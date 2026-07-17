@@ -5,14 +5,18 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./admin.module.css";
 
 export function FilePreviewInput({
+  disabled = false,
   id,
   multiple = false,
   name = "file",
+  onFilesChange,
   required = false,
 }: {
+  disabled?: boolean;
   id: string;
   multiple?: boolean;
   name?: string;
+  onFilesChange?: (files: File[]) => void;
   required?: boolean;
 }) {
   const [files, setFiles] = useState<File[]>([]);
@@ -24,10 +28,15 @@ export function FilePreviewInput({
     <div className={styles.filePicker}>
       <input
         accept="image/avif,image/jpeg,image/png,image/webp"
+        disabled={disabled}
         id={id}
         multiple={multiple}
         name={name}
-        onChange={(event) => setFiles(Array.from(event.currentTarget.files ?? []))}
+        onChange={(event) => {
+          const selectedFiles = Array.from(event.currentTarget.files ?? []);
+          setFiles(selectedFiles);
+          onFilesChange?.(selectedFiles);
+        }}
         required={required}
         type="file"
       />
@@ -44,4 +53,3 @@ export function FilePreviewInput({
     </div>
   );
 }
-

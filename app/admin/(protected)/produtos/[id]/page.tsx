@@ -4,14 +4,15 @@ import { notFound } from "next/navigation";
 import { AdminSubmitButton, ConfirmSubmitButton } from "@/components/admin/admin-form-controls";
 import styles from "@/components/admin/admin.module.css";
 import { AdminFeedback, AdminPageHeader, AdminStatus } from "@/components/admin/admin-ui";
-import { FilePreviewInput } from "@/components/admin/file-preview-input";
 import { ProductForm } from "@/components/admin/product-form";
 import { ProductImageManager } from "@/components/admin/product-image-manager";
+import { ProductImageUploader } from "@/components/admin/product-image-uploader";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import { PRODUCT_IMAGE_VARIANT_KINDS } from "@/lib/catalog/image-variants";
 import { createAdminImageUrls } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { archiveProductAction, duplicateProductAction, restoreProductAction, updateProductAction, uploadProductImagesAction } from "../actions";
+import { archiveProductAction, duplicateProductAction, restoreProductAction, updateProductAction } from "../actions";
 
 export default async function EditProductPage({
   params,
@@ -27,7 +28,11 @@ export default async function EditProductPage({
     supabase.from("products").select("*").eq("id", id).maybeSingle(),
     supabase.from("brands").select("id, name, active").order("name"),
     supabase.from("categories").select("id, name, active").order("name"),
-    supabase.from("product_images").select("id, alt_text, object_position, is_cover, storage_path, width, height, display_order").eq("product_id", id).order("display_order"),
+    supabase
+      .from("product_images")
+      .select("id, alt_text, object_position, is_cover, storage_path, width, height, mime_type, size_bytes, asset_version, display_order, variants:product_image_variants(kind, storage_path, width, height, mime_type, size_bytes, asset_version)")
+      .eq("product_id", id)
+      .order("display_order"),
   ]);
   if (productResult.error || !productResult.data) notFound();
   if (brandResult.error || categoryResult.error || imageResult.error || !brandResult.data || !categoryResult.data || !imageResult.data) {
@@ -35,17 +40,43 @@ export default async function EditProductPage({
   }
   const product = productResult.data;
   const query = await searchParams;
-  const signed = await createAdminImageUrls("catalog-products", imageResult.data.map((image) => image.storage_path));
+  const previewPaths = imageResult.data.map((image) => {
+    const thumbnail = image.variants.find(
+      (variant) => variant.kind === "admin_thumbnail" && variant.asset_version === image.asset_version,
+    );
+    return thumbnail?.storage_path ?? image.storage_path;
+  });
+  const signed = await createAdminImageUrls("catalog-products", previewPaths);
   const images = imageResult.data.map((image) => ({
     altText: image.alt_text,
     height: image.height,
     id: image.id,
     isCover: image.is_cover,
+    mimeType: image.mime_type,
     objectPosition: image.object_position,
-    signedUrl: signed.get(image.storage_path) ?? null,
+    signedUrl: signed.get(
+      image.variants.find(
+        (variant) => variant.kind === "admin_thumbnail" && variant.asset_version === image.asset_version,
+      )?.storage_path ?? image.storage_path,
+    ) ?? null,
+    sizeBytes: image.size_bytes,
+    variants: image.variants.filter((variant) => variant.asset_version === image.asset_version),
     width: image.width,
   }));
-  const hasCover = imageResult.data.some((image) => image.is_cover && image.width && image.height && image.alt_text.trim());
+  const hasCover = imageResult.data.some((image) => {
+    const kinds = new Set(
+      image.variants
+        .filter((variant) => variant.asset_version === image.asset_version)
+        .map((variant) => variant.kind),
+    );
+    return image.is_cover
+      && image.width
+      && image.height
+      && image.mime_type
+      && image.size_bytes
+      && image.alt_text.trim()
+      && PRODUCT_IMAGE_VARIANT_KINDS.every((kind) => kinds.has(kind));
+  });
   const linkedBrand = brandResult.data.find((brand) => brand.id === product.brand_id);
   const linkedCategory = categoryResult.data.find((category) => category.id === product.category_id);
   const blockingIssues = [
@@ -85,16 +116,8 @@ export default async function EditProductPage({
 
       {!product.archived_at ? (
         <section className={styles.formPanel} aria-labelledby="product-upload-title">
-          <div className={styles.panelHeading}><div><h2 id="product-upload-title">Adicionar imagens</h2><p>A primeira imagem vira capa quando ainda não existe capa.</p></div></div>
-          <form action={uploadProductImagesAction} className={styles.adminForm}>
-            <input name="product_id" type="hidden" value={product.id} />
-            <div className={styles.formGrid}>
-              <label className={styles.field}><span>Texto alternativo base</span><input maxLength={170} name="alt_base" required /></label>
-              <label className={styles.field}><span>Object-position</span><input defaultValue="50% 50%" maxLength={40} name="object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
-              <div className={styles.fieldWide}><FilePreviewInput id="product-images" multiple name="files" required /></div>
-            </div>
-            <AdminSubmitButton pendingLabel="Enviando imagens...">Enviar imagens</AdminSubmitButton>
-          </form>
+          <div className={styles.panelHeading}><div><h2 id="product-upload-title">Adicionar imagens</h2><p>A primeira imagem vira capa quando ainda não existe capa. Miniatura, card, home, detalhe e Open Graph são gerados uma vez no upload.</p></div></div>
+          <ProductImageUploader productId={product.id} />
         </section>
       ) : null}
 

@@ -11,6 +11,7 @@ export type CatalogTaxonomy = {
 
 export type CatalogImage = {
   altText: string;
+  blurDataUrl: string | null;
   height: number;
   id: string;
   isCover: boolean;

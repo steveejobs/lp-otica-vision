@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { availabilityLabels, formatCatalogPrice } from "@/lib/catalog/format";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
+import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
 
 import styles from "./catalog-product-card.module.css";
@@ -13,10 +14,12 @@ const blurDataUrl =
 
 export function CatalogProductCard({
   clone = false,
+  imageVariant = "catalog_card",
   priority = false,
   product,
 }: {
   clone?: boolean;
+  imageVariant?: Extract<ProductImageVariantKind, "catalog_card" | "home_preview">;
   priority?: boolean;
   product: CatalogProductCardData;
 }) {
@@ -34,13 +37,14 @@ export function CatalogProductCard({
         <div className={styles.media}>
           <Image
             alt={product.cover.altText}
-            blurDataURL={blurDataUrl}
+            blurDataURL={product.cover.blurDataUrl ?? blurDataUrl}
             fill
             placeholder="blur"
             priority={priority}
             sizes="(max-width: 380px) 92vw, (max-width: 720px) 45vw, (max-width: 1100px) 30vw, 22vw"
-            src={catalogImageUrl(product.cover)}
+            src={catalogImageUrl(product.cover, imageVariant)}
             style={{ objectPosition: product.cover.objectPosition }}
+            unoptimized
           />
         </div>
 

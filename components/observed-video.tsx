@@ -23,7 +23,7 @@ export function ObservedVideo({
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         poster={asset.poster}
         aria-label={asset.label}
         data-video-asset={asset.src}

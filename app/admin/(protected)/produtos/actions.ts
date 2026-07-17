@@ -11,6 +11,7 @@ import {
   booleanValue,
   enumValue,
   integerValue,
+  isUuidString,
   mutationErrorCode,
   objectPositionValue,
   optionalMoneyValue,
@@ -21,13 +22,159 @@ import {
   uuidValue,
 } from "@/lib/admin/validation";
 import { requireAdminRole } from "@/lib/auth/admin-access";
+import {
+  isProductImageUploadMime,
+  productImageUploadExtension,
+  PRODUCT_IMAGE_UPLOAD_MAX_BYTES,
+  PRODUCT_IMAGE_UPLOAD_MAX_FILES,
+  type ProductImageUploadMime,
+} from "@/lib/catalog/image-upload";
 import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
-import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
+import {
+  removeManagedImages,
+  uploadProductImageSet,
+  type UploadedProductImageSet,
+} from "@/lib/storage/images";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/supabase";
 
 const availabilityValues = ["available", "last_unit", "consultation", "unavailable"] as const;
 const priceVisibilityValues = ["visible", "consult", "hidden"] as const;
+
+type ProductImageUploadDescriptor = {
+  mimeType: string;
+  sizeBytes: number;
+};
+
+type ProductImageUploadToken = {
+  id: string;
+  path: string;
+  token: string;
+};
+
+type ProductImageActionResult =
+  | { ok: true; cleanupPending?: boolean; uploads?: ProductImageUploadToken[] }
+  | { ok: false; error: string };
+
+type StagedProductImage = Database["public"]["Tables"]["product_image_uploads"]["Row"];
+
+function imageActionError(error: unknown) {
+  const code = mutationErrorCode(error);
+  return code === "failed" ? "image" : code;
+}
+
+function parseUploadDescriptors(input: {
+  files: ProductImageUploadDescriptor[];
+  productId: string;
+}) {
+  if (!isUuidString(input.productId) || !Array.isArray(input.files)) {
+    throw new AdminValidationError("invalid");
+  }
+  if (!input.files.length || input.files.length > PRODUCT_IMAGE_UPLOAD_MAX_FILES) {
+    throw new AdminValidationError("image");
+  }
+  return input.files.map((file) => {
+    if (
+      !file ||
+      !isProductImageUploadMime(file.mimeType) ||
+      !Number.isSafeInteger(file.sizeBytes) ||
+      file.sizeBytes < 1 ||
+      file.sizeBytes > PRODUCT_IMAGE_UPLOAD_MAX_BYTES
+    ) {
+      throw new AdminValidationError("image");
+    }
+    return { mimeType: file.mimeType, sizeBytes: file.sizeBytes };
+  });
+}
+
+function parseUploadIds(uploadIds: string[], expectedMaximum = PRODUCT_IMAGE_UPLOAD_MAX_FILES) {
+  if (
+    !Array.isArray(uploadIds) ||
+    !uploadIds.length ||
+    uploadIds.length > expectedMaximum ||
+    uploadIds.some((id) => !isUuidString(id)) ||
+    new Set(uploadIds).size !== uploadIds.length
+  ) {
+    throw new AdminValidationError("image");
+  }
+  return uploadIds;
+}
+
+function normalizedObjectPosition(value: string) {
+  const formData = new FormData();
+  formData.set("object_position", value);
+  return objectPositionValue(formData, "object_position");
+}
+
+async function cleanupExpiredProductImageUploads() {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("product_image_uploads")
+    .select("id, storage_path")
+    .lt("expires_at", new Date().toISOString())
+    .limit(100);
+  if (error || !data?.length) return;
+  const { error: storageError } = await admin.storage
+    .from("catalog-products")
+    .remove(data.map((upload) => upload.storage_path));
+  if (storageError) return;
+  await admin.from("product_image_uploads").delete().in("id", data.map((upload) => upload.id));
+}
+
+async function removeStagedProductImages(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  uploads: StagedProductImage[],
+) {
+  if (!uploads.length) return true;
+  const { error: storageError } = await supabase.storage
+    .from("catalog-products")
+    .remove(uploads.map((upload) => upload.storage_path));
+  if (storageError) return false;
+  const { error: deleteError } = await supabase
+    .from("product_image_uploads")
+    .delete()
+    .in("id", uploads.map((upload) => upload.id));
+  return !deleteError;
+}
+
+async function stagedProductImageFile(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  upload: StagedProductImage,
+) {
+  if (new Date(upload.expires_at).getTime() <= Date.now() || !isProductImageUploadMime(upload.mime_type)) {
+    throw new AdminValidationError("image");
+  }
+  const { data, error } = await supabase.storage
+    .from("catalog-products")
+    .download(upload.storage_path);
+  if (error || !data || data.size !== upload.size_bytes) {
+    throw new AdminValidationError("image");
+  }
+  return new File(
+    [data],
+    `upload.${productImageUploadExtension(upload.mime_type as ProductImageUploadMime)}`,
+    { type: upload.mime_type },
+  );
+}
+
+function variantRows(imageId: string, imageSet: UploadedProductImageSet) {
+  return imageSet.variants.map((variant) => ({
+    asset_version: imageSet.assetVersion,
+    etag: variant.etag,
+    height: variant.height,
+    kind: variant.kind,
+    mime_type: variant.mime,
+    product_image_id: imageId,
+    size_bytes: variant.sizeBytes,
+    storage_path: variant.path,
+    width: variant.width,
+  }));
+}
+
+function storedPaths(imageSet: UploadedProductImageSet) {
+  return [imageSet.master.path, ...imageSet.variants.map((variant) => variant.path)];
+}
 
 function safeReturnPath(formData: FormData, fallback: string) {
   const value = formData.get("return_to");
@@ -87,11 +234,13 @@ export async function updateProductAction(formData: FormData) {
   const destination = `/admin/produtos/${id}`;
   const supabase = await createSupabaseServerClient();
   let errorCode: string | null = null;
+  let productSlug: string | null = null;
   try {
     const { data: product, error: readError } = await supabase.from("products").select("archived_at").eq("id", id).single();
     if (readError) throw readError;
     if (product.archived_at) throw new AdminValidationError("constraint");
     const payload = productPayload(formData);
+    productSlug = payload.slug;
     if (payload.featured && !payload.published) throw new AdminValidationError("constraint");
     const { error } = await supabase.from("products").update(payload).eq("id", id);
     if (error) throw error;
@@ -101,7 +250,7 @@ export async function updateProductAction(formData: FormData) {
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath("/admin/produtos");
   revalidatePath(destination);
-  revalidatePublicCatalog();
+  revalidatePublicCatalog(productSlug ?? undefined);
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
@@ -203,55 +352,171 @@ export async function updateAvailabilityAction(formData: FormData) {
   redirect(appendFeedback(destination, "status", "saved"));
 }
 
-export async function uploadProductImagesAction(formData: FormData) {
-  await requireAdminRole(["admin", "editor"]);
-  const productId = uuidValue(formData, "product_id");
-  const destination = `/admin/produtos/${productId}`;
+export async function createProductImageUploadTokensAction(input: {
+  files: ProductImageUploadDescriptor[];
+  productId: string;
+}): Promise<ProductImageActionResult> {
+  const session = await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();
   const createdIds: string[] = [];
-  const uploadedPaths: string[] = [];
-  let errorCode: string | null = null;
   try {
-    const altBase = textValue(formData, "alt_base", { max: 170 });
-    const position = objectPositionValue(formData, "object_position");
-    const files = formData
-      .getAll("files")
-      .filter((value): value is File => value instanceof File && value.size > 0);
-    if (!files.length || files.length > 10) throw new AdminValidationError("image");
-    const [{ count, error: countError }, { count: coverCount, error: coverError }] = await Promise.all([
-      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", productId),
-      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", productId).eq("is_cover", true),
-    ]);
-    if (countError || coverError) throw countError ?? coverError;
-    for (const [index, file] of files.entries()) {
-      const uploaded = await uploadManagedImage({ bucket: "catalog-products", file, parentId: productId });
-      uploadedPaths.push(uploaded.path);
-      const imageId = randomUUID();
-      const { error } = await supabase.from("product_images").insert({
-        alt_text: files.length > 1 ? `${altBase} — imagem ${index + 1}` : altBase,
-        display_order: (count ?? 0) + index,
-        height: uploaded.height,
-        id: imageId,
-        is_cover: (coverCount ?? 0) === 0 && index === 0,
-        object_position: position,
-        product_id: productId,
-        storage_path: uploaded.path,
-        width: uploaded.width,
-      });
-      if (error) throw error;
-      createdIds.push(imageId);
+    const files = parseUploadDescriptors(input);
+    await cleanupExpiredProductImageUploads();
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", input.productId)
+      .is("archived_at", null)
+      .maybeSingle();
+    if (productError || !product) throw productError ?? new AdminValidationError("invalid");
+
+    const expiresAt = new Date(Date.now() + 130 * 60 * 1_000).toISOString();
+    const rows = files.map((file) => {
+      const id = randomUUID();
+      createdIds.push(id);
+      return {
+        created_by: session.profile.id,
+        expires_at: expiresAt,
+        id,
+        mime_type: file.mimeType,
+        product_id: input.productId,
+        size_bytes: file.sizeBytes,
+        storage_path: `${input.productId}/${randomUUID()}.${productImageUploadExtension(file.mimeType)}`,
+      } satisfies Database["public"]["Tables"]["product_image_uploads"]["Insert"];
+    });
+    const { error: insertError } = await supabase.from("product_image_uploads").insert(rows);
+    if (insertError) throw insertError;
+
+    const uploads: ProductImageUploadToken[] = [];
+    for (const row of rows) {
+      const { data, error } = await supabase.storage
+        .from("catalog-products")
+        .createSignedUploadUrl(row.storage_path, { upsert: false });
+      if (error || !data?.token) throw error ?? new AdminValidationError("image");
+      uploads.push({ id: row.id, path: row.storage_path, token: data.token });
     }
+    return { ok: true, uploads };
   } catch (error) {
-    if (createdIds.length) await supabase.from("product_images").delete().in("id", createdIds);
-    for (const path of uploadedPaths) {
-      try { await removeManagedImage("catalog-products", path); } catch { /* Report the sanitized primary failure. */ }
+    if (createdIds.length) {
+      await supabase.from("product_image_uploads").delete().in("id", createdIds);
     }
-    errorCode = mutationErrorCode(error) === "failed" ? "image" : mutationErrorCode(error);
+    return { error: imageActionError(error), ok: false };
   }
-  if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
-  revalidatePath(destination);
-  revalidatePublicCatalog();
-  redirect(appendFeedback(destination, "status", "uploaded"));
+}
+
+export async function discardProductImageUploadsAction(input: {
+  uploadIds: string[];
+}): Promise<ProductImageActionResult> {
+  const session = await requireAdminRole(["admin", "editor"]);
+  const supabase = await createSupabaseServerClient();
+  try {
+    const uploadIds = parseUploadIds(input.uploadIds);
+    const { data, error } = await supabase
+      .from("product_image_uploads")
+      .select("*")
+      .eq("created_by", session.profile.id)
+      .in("id", uploadIds);
+    if (error) throw error;
+    if (!data.length) return { ok: true };
+    if (!(await removeStagedProductImages(supabase, data))) {
+      throw new AdminValidationError("image");
+    }
+    return { ok: true };
+  } catch (error) {
+    return { error: imageActionError(error), ok: false };
+  }
+}
+
+export async function finalizeProductImageUploadsAction(input: {
+  altBase: string;
+  objectPosition: string;
+  productId: string;
+  uploadIds: string[];
+}): Promise<ProductImageActionResult> {
+  const session = await requireAdminRole(["admin", "editor"]);
+  const supabase = await createSupabaseServerClient();
+  const createdIds: string[] = [];
+  const generatedSets: UploadedProductImageSet[] = [];
+  let stagedUploads: StagedProductImage[] = [];
+  try {
+    if (!isUuidString(input.productId)) throw new AdminValidationError("invalid");
+    const uploadIds = parseUploadIds(input.uploadIds);
+    const altBase = input.altBase?.trim();
+    if (!altBase || altBase.length > 170) throw new AdminValidationError("image");
+    const objectPosition = normalizedObjectPosition(input.objectPosition);
+
+    const [productResult, uploadResult, countResult, coverResult] = await Promise.all([
+      supabase.from("products").select("id").eq("id", input.productId).is("archived_at", null).maybeSingle(),
+      supabase
+        .from("product_image_uploads")
+        .select("*")
+        .eq("product_id", input.productId)
+        .eq("created_by", session.profile.id)
+        .in("id", uploadIds),
+      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", input.productId),
+      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", input.productId).eq("is_cover", true),
+    ]);
+    if (productResult.error || !productResult.data) {
+      throw productResult.error ?? new AdminValidationError("invalid");
+    }
+    if (uploadResult.error || countResult.error || coverResult.error) {
+      throw uploadResult.error ?? countResult.error ?? coverResult.error;
+    }
+    if (uploadResult.data.length !== uploadIds.length) throw new AdminValidationError("image");
+    const stagedById = new Map(uploadResult.data.map((upload) => [upload.id, upload]));
+    stagedUploads = uploadIds
+      .map((id) => stagedById.get(id))
+      .filter((upload): upload is StagedProductImage => Boolean(upload));
+    if (stagedUploads.length !== uploadIds.length) throw new AdminValidationError("image");
+
+    for (const [index, staged] of stagedUploads.entries()) {
+      const file = await stagedProductImageFile(supabase, staged);
+      const uploaded = await uploadProductImageSet({ file, parentId: input.productId });
+      generatedSets.push(uploaded);
+      const imageId = randomUUID();
+      const { error: imageError } = await supabase.from("product_images").insert({
+        alt_text: stagedUploads.length > 1 ? `${altBase} — imagem ${index + 1}` : altBase,
+        asset_version: uploaded.assetVersion,
+        blur_data_url: uploaded.blurDataUrl,
+        display_order: (countResult.count ?? 0) + index,
+        height: uploaded.master.height,
+        id: imageId,
+        is_cover: (coverResult.count ?? 0) === 0 && index === 0,
+        mime_type: uploaded.master.mime,
+        object_position: objectPosition,
+        product_id: input.productId,
+        size_bytes: uploaded.master.sizeBytes,
+        storage_path: uploaded.master.path,
+        width: uploaded.master.width,
+      });
+      if (imageError) throw imageError;
+      createdIds.push(imageId);
+      const { error: variantError } = await supabase
+        .from("product_image_variants")
+        .insert(variantRows(imageId, uploaded));
+      if (variantError) throw variantError;
+    }
+
+    const cleanupComplete = await removeStagedProductImages(supabase, stagedUploads);
+    revalidatePath(`/admin/produtos/${input.productId}`);
+    revalidatePublicCatalog();
+    return { cleanupPending: !cleanupComplete || undefined, ok: true };
+  } catch (error) {
+    let databaseRollbackComplete = true;
+    if (createdIds.length) {
+      const { error: rollbackError } = await supabase.from("product_images").delete().in("id", createdIds);
+      databaseRollbackComplete = !rollbackError;
+    }
+    if (databaseRollbackComplete && generatedSets.length) {
+      try {
+        await removeManagedImages("catalog-products", generatedSets.flatMap(storedPaths));
+      } catch {
+        // The database no longer references these paths; the failure remains visible to the QA orphan audit.
+      }
+    }
+    if (stagedUploads.length) await removeStagedProductImages(supabase, stagedUploads);
+    return { error: imageActionError(error), ok: false };
+  }
 }
 
 export async function updateProductImageAction(formData: FormData) {
@@ -305,48 +570,117 @@ export async function reorderProductImagesAction(formData: FormData) {
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
-export async function replaceProductImageAction(formData: FormData) {
-  await requireAdminRole(["admin", "editor"]);
-  const imageId = uuidValue(formData, "image_id");
-  const productId = uuidValue(formData, "product_id");
-  const destination = `/admin/produtos/${productId}`;
-  const file = formData.get("file");
+export async function finalizeProductImageReplacementAction(input: {
+  imageId: string;
+  productId: string;
+  uploadId: string;
+}): Promise<ProductImageActionResult> {
+  const session = await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();
-  let uploadedPath: string | null = null;
-  let errorCode: string | null = null;
+  let stagedUploads: StagedProductImage[] = [];
+  let uploaded: UploadedProductImageSet | null = null;
   try {
-    if (!(file instanceof File) || !file.size) throw new AdminValidationError("image");
-    const { data: existing, error } = await supabase.from("product_images").select("*").eq("id", imageId).eq("product_id", productId).single();
-    if (error) throw error;
-    const uploaded = await uploadManagedImage({ bucket: "catalog-products", file, parentId: productId });
-    uploadedPath = uploaded.path;
+    if (!isUuidString(input.imageId) || !isUuidString(input.productId)) {
+      throw new AdminValidationError("invalid");
+    }
+    parseUploadIds([input.uploadId], 1);
+    const [productResult, uploadResult, existingResult, existingVariantsResult] = await Promise.all([
+      supabase.from("products").select("id").eq("id", input.productId).is("archived_at", null).maybeSingle(),
+      supabase
+        .from("product_image_uploads")
+        .select("*")
+        .eq("id", input.uploadId)
+        .eq("product_id", input.productId)
+        .eq("created_by", session.profile.id)
+        .maybeSingle(),
+      supabase.from("product_images").select("*").eq("id", input.imageId).eq("product_id", input.productId).single(),
+      supabase.from("product_image_variants").select("*").eq("product_image_id", input.imageId),
+    ]);
+    if (productResult.error || !productResult.data || uploadResult.error || !uploadResult.data) {
+      throw productResult.error ?? uploadResult.error ?? new AdminValidationError("image");
+    }
+    if (existingResult.error || existingVariantsResult.error) {
+      throw existingResult.error ?? existingVariantsResult.error;
+    }
+    stagedUploads = [uploadResult.data];
+    const existing = existingResult.data;
+    const existingVariants = existingVariantsResult.data;
+    const file = await stagedProductImageFile(supabase, uploadResult.data);
+    uploaded = await uploadProductImageSet({ file, parentId: input.productId });
+    const { error: variantInsertError } = await supabase
+      .from("product_image_variants")
+      .insert(variantRows(input.imageId, uploaded));
+    if (variantInsertError) throw variantInsertError;
+
     const { error: updateError } = await supabase
       .from("product_images")
-      .update({ height: uploaded.height, storage_path: uploaded.path, width: uploaded.width })
-      .eq("id", imageId)
-      .eq("product_id", productId);
+      .update({
+        asset_version: uploaded.assetVersion,
+        blur_data_url: uploaded.blurDataUrl,
+        height: uploaded.master.height,
+        mime_type: uploaded.master.mime,
+        size_bytes: uploaded.master.sizeBytes,
+        storage_path: uploaded.master.path,
+        width: uploaded.master.width,
+      })
+      .eq("id", input.imageId)
+      .eq("product_id", input.productId)
+      .eq("asset_version", existing.asset_version)
+      .select("id")
+      .single();
     if (updateError) throw updateError;
+
+    const { error: oldVariantDeleteError } = await supabase
+      .from("product_image_variants")
+      .delete()
+      .eq("product_image_id", input.imageId)
+      .eq("asset_version", existing.asset_version);
+    if (oldVariantDeleteError) {
+      await supabase.from("product_images").update(existing).eq("id", input.imageId);
+      throw oldVariantDeleteError;
+    }
+
     try {
-      await removeManagedImage("catalog-products", existing.storage_path);
+      await removeManagedImages("catalog-products", [
+        existing.storage_path,
+        ...existingVariants.map((variant) => variant.storage_path),
+      ]);
     } catch (storageError) {
-      const { error: rollbackError } = await supabase.from("product_images").update(existing).eq("id", imageId);
-      try { await removeManagedImage("catalog-products", uploaded.path); } catch { /* QA catches cleanup failures. */ }
-      if (rollbackError) throw rollbackError;
+      const { error: rollbackError } = await supabase.from("product_images").update(existing).eq("id", input.imageId);
+      const { error: restoreVariantsError } = existingVariants.length
+        ? await supabase.from("product_image_variants").insert(existingVariants)
+        : { error: null };
+      if (rollbackError || restoreVariantsError) throw rollbackError ?? restoreVariantsError;
       throw storageError;
     }
+
+    const cleanupComplete = await removeStagedProductImages(supabase, stagedUploads);
+    revalidatePath(`/admin/produtos/${input.productId}`);
+    revalidatePublicCatalog();
+    return { cleanupPending: !cleanupComplete || undefined, ok: true };
   } catch (error) {
-    if (uploadedPath) {
-      const { data } = await supabase.from("product_images").select("storage_path").eq("id", imageId).maybeSingle();
-      if (data?.storage_path !== uploadedPath) {
-        try { await removeManagedImage("catalog-products", uploadedPath); } catch { /* QA catches cleanup failures. */ }
+    if (uploaded) {
+      const { data } = await supabase
+        .from("product_images")
+        .select("asset_version")
+        .eq("id", input.imageId)
+        .maybeSingle();
+      if (data?.asset_version !== uploaded.assetVersion) {
+        await supabase
+          .from("product_image_variants")
+          .delete()
+          .eq("product_image_id", input.imageId)
+          .eq("asset_version", uploaded.assetVersion);
+        try {
+          await removeManagedImages("catalog-products", storedPaths(uploaded));
+        } catch {
+          // The orphan audit reports a failed compensating Storage cleanup.
+        }
       }
     }
-    errorCode = mutationErrorCode(error) === "failed" ? "image" : mutationErrorCode(error);
+    if (stagedUploads.length) await removeStagedProductImages(supabase, stagedUploads);
+    return { error: imageActionError(error), ok: false };
   }
-  if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
-  revalidatePath(destination);
-  revalidatePublicCatalog();
-  redirect(appendFeedback(destination, "status", "uploaded"));
 }
 
 export async function removeProductImageAction(formData: FormData) {
@@ -357,15 +691,28 @@ export async function removeProductImageAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   let errorCode: string | null = null;
   try {
-    const { data: existing, error } = await supabase.from("product_images").select("*").eq("id", imageId).eq("product_id", productId).single();
-    if (error) throw error;
+    const [existingResult, existingVariantsResult] = await Promise.all([
+      supabase.from("product_images").select("*").eq("id", imageId).eq("product_id", productId).single(),
+      supabase.from("product_image_variants").select("*").eq("product_image_id", imageId),
+    ]);
+    if (existingResult.error || existingVariantsResult.error) {
+      throw existingResult.error ?? existingVariantsResult.error;
+    }
+    const existing = existingResult.data;
+    const existingVariants = existingVariantsResult.data;
     const { error: deleteError } = await supabase.from("product_images").delete().eq("id", imageId).eq("product_id", productId);
     if (deleteError) throw deleteError;
     try {
-      await removeManagedImage("catalog-products", existing.storage_path);
+      await removeManagedImages("catalog-products", [
+        existing.storage_path,
+        ...existingVariants.map((variant) => variant.storage_path),
+      ]);
     } catch (storageError) {
       const { error: restoreError } = await supabase.from("product_images").insert(existing);
-      if (restoreError) throw restoreError;
+      const { error: restoreVariantsError } = !restoreError && existingVariants.length
+        ? await supabase.from("product_image_variants").insert(existingVariants)
+        : { error: null };
+      if (restoreError || restoreVariantsError) throw restoreError ?? restoreVariantsError;
       throw storageError;
     }
   } catch (error) {

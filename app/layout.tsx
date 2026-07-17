@@ -18,8 +18,6 @@ export const metadata: Metadata = {
   description,
   icons: {
     icon: identityAssets.favicon,
-    shortcut: identityAssets.favicon,
-    apple: identityAssets.favicon,
   },
   openGraph: {
     title,

@@ -30,6 +30,7 @@ function taxonomy(id: string | null, name: string | null, slug: string | null): 
 function coverFromSearch(row: SearchRow): CatalogImage {
   return {
     altText: row.cover_alt_text,
+    blurDataUrl: row.cover_blur_data_url,
     height: row.cover_height,
     id: row.cover_image_id,
     isCover: true,
@@ -148,6 +149,7 @@ type EmbeddedCardRow = {
   color: string | null;
   cover: Array<{
     alt_text: string;
+    blur_data_url: string | null;
     height: number | null;
     id: string;
     is_cover: boolean;
@@ -186,6 +188,7 @@ function cardFromEmbedded(row: EmbeddedCardRow): CatalogProductCard | null {
     color: row.color,
     cover: {
       altText: cover.alt_text,
+      blurDataUrl: cover.blur_data_url,
       height: cover.height,
       id: cover.id,
       isCover: true,
@@ -213,7 +216,7 @@ const embeddedCardSelect = `
   archived_at, updated_at,
   brand:brands(id, name, slug, active),
   category:categories(id, name, slug, active),
-  cover:product_images!inner(id, alt_text, object_position, width, height, is_cover, updated_at)
+  cover:product_images!inner(id, alt_text, blur_data_url, object_position, width, height, is_cover, updated_at)
 `;
 
 const getCachedFeaturedProducts = unstable_cache(
@@ -255,7 +258,7 @@ const getCachedPublishedProduct = unstable_cache(
         archived_at, updated_at,
         brand:brands(id, name, slug, active),
         category:categories(id, name, slug, active),
-        images:product_images(id, alt_text, object_position, width, height, is_cover, display_order, updated_at)
+        images:product_images(id, alt_text, blur_data_url, object_position, width, height, is_cover, display_order, updated_at)
       `)
       .eq("slug", slug)
       .eq("published", true)
@@ -273,6 +276,7 @@ const getCachedPublishedProduct = unstable_cache(
       .sort((left, right) => left.display_order - right.display_order)
       .map((image): CatalogImage => ({
         altText: image.alt_text,
+        blurDataUrl: image.blur_data_url,
         height: image.height as number,
         id: image.id,
         isCover: image.is_cover,

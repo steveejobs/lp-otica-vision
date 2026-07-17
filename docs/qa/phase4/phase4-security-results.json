@@ -1,0 +1,40 @@
+{
+  "failed": 0,
+  "fatalError": null,
+  "passed": 7,
+  "results": [
+    {
+      "name": "all_managed_buckets_remain_private_with_eight_megabyte_limit",
+      "passed": true
+    },
+    {
+      "name": "editor_can_stage_direct_private_upload_with_controlled_signed_token",
+      "passed": true
+    },
+    {
+      "name": "attendant_cannot_stage_or_sign_product_image_uploads",
+      "passed": true
+    },
+    {
+      "name": "attendant_changes_only_availability",
+      "passed": true
+    },
+    {
+      "name": "editor_cannot_list_or_manage_other_users",
+      "passed": true
+    },
+    {
+      "name": "anonymous_user_cannot_download_private_object_or_read_draft",
+      "passed": true
+    },
+    {
+      "name": "security_cleanup_restores_one_admin_and_zero_staged_uploads",
+      "passed": true,
+      "details": {
+        "activeAdmins": 1,
+        "stagedUploads": 0
+      }
+    }
+  ],
+  "total": 7
+}

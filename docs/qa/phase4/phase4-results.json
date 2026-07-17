@@ -1,0 +1,629 @@
+{
+  "failed": 0,
+  "fatalError": null,
+  "passed": 59,
+  "results": [
+    {
+      "name": "admin_creates_confirmed_brand_with_private_logo",
+      "passed": true
+    },
+    {
+      "name": "admin_creates_active_category",
+      "passed": true
+    },
+    {
+      "name": "admin_creates_product_as_draft_consultation",
+      "passed": true
+    },
+    {
+      "name": "upload_generates_two_complete_persistent_derivative_sets",
+      "passed": true
+    },
+    {
+      "name": "orientation_ratio_and_premium_quality_are_preserved",
+      "passed": true,
+      "details": {
+        "sourceBytes": 1259138,
+        "storedMasterAndDerivativesBytes": 2449992
+      }
+    },
+    {
+      "name": "admin_uses_thumbnail_instead_of_master",
+      "passed": true
+    },
+    {
+      "name": "admin_changes_cover",
+      "passed": true
+    },
+    {
+      "name": "admin_reorders_images_atomically",
+      "passed": true
+    },
+    {
+      "name": "replacement_regenerates_all_derivatives_and_removes_old_objects",
+      "passed": true
+    },
+    {
+      "name": "admin_publishes_and_features_only_after_valid_cover",
+      "passed": true
+    },
+    {
+      "name": "home_autoplay_fixture_has_two_valid_featured_products",
+      "passed": true
+    },
+    {
+      "name": "catalog_backend_paginates_without_duplicates",
+      "passed": true
+    },
+    {
+      "name": "catalog_rpc_returns_persisted_cover_blur_placeholder",
+      "passed": true
+    },
+    {
+      "name": "catalog_filter_options_exclude_empty_values",
+      "passed": true
+    },
+    {
+      "name": "public_catalog_renders_published_product",
+      "passed": true
+    },
+    {
+      "name": "public_pages_expose_no_administrative_links",
+      "passed": true
+    },
+    {
+      "name": "brand_filter_has_shareable_url",
+      "passed": true
+    },
+    {
+      "name": "catalog_search_finds_sku",
+      "passed": true
+    },
+    {
+      "name": "catalog_search_finds_name",
+      "passed": true
+    },
+    {
+      "name": "catalog_search_finds_model",
+      "passed": true
+    },
+    {
+      "name": "catalog_combines_brand_category_availability_and_search",
+      "passed": true
+    },
+    {
+      "name": "catalog_empty_state_keeps_filters_and_clear_action",
+      "passed": true
+    },
+    {
+      "name": "catalog_browser_back_and_forward_restore_shareable_filters",
+      "passed": true,
+      "details": {
+        "backUrl": "http://127.0.0.1:3023/catalogo",
+        "forwardUrl": "http://127.0.0.1:3023/catalogo?marca=qa-fase4-marca-72ac18e2"
+      }
+    },
+    {
+      "name": "public_proxy_serves_persisted_card_with_complete_security_cache_headers",
+      "passed": true
+    },
+    {
+      "name": "public_proxy_reuses_persisted_etag_without_body",
+      "passed": true
+    },
+    {
+      "name": "derivatives_respect_dimensions_mime_and_size_budget",
+      "passed": true,
+      "details": [
+        {
+          "masterBytes": 515364,
+          "variants": [
+            {
+              "bytes": 19140,
+              "height": 400,
+              "kind": "admin_thumbnail",
+              "width": 300
+            },
+            {
+              "bytes": 91312,
+              "height": 900,
+              "kind": "catalog_card",
+              "width": 675
+            },
+            {
+              "bytes": 112642,
+              "height": 1000,
+              "kind": "home_preview",
+              "width": 750
+            },
+            {
+              "bytes": 243348,
+              "height": 1599,
+              "kind": "product_detail",
+              "width": 1200
+            },
+            {
+              "bytes": 205708,
+              "height": 1200,
+              "kind": "open_graph",
+              "width": 900
+            }
+          ]
+        },
+        {
+          "masterBytes": 471396,
+          "variants": [
+            {
+              "bytes": 14282,
+              "height": 400,
+              "kind": "admin_thumbnail",
+              "width": 300
+            },
+            {
+              "bytes": 62526,
+              "height": 900,
+              "kind": "catalog_card",
+              "width": 675
+            },
+            {
+              "bytes": 79726,
+              "height": 1000,
+              "kind": "home_preview",
+              "width": 750
+            },
+            {
+              "bytes": 183268,
+              "height": 1599,
+              "kind": "product_detail",
+              "width": 1200
+            },
+            {
+              "bytes": 174548,
+              "height": 1200,
+              "kind": "open_graph",
+              "width": 900
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "public_proxy_blocks_admin_variant_and_arbitrary_path",
+      "passed": true
+    },
+    {
+      "name": "public_proxy_returns_controlled_nonwhite_fallback",
+      "passed": true
+    },
+    {
+      "name": "product_gallery_responds_to_mobile_swipe",
+      "passed": true
+    },
+    {
+      "name": "product_without_authorized_price_shows_consultation_without_currency",
+      "passed": true
+    },
+    {
+      "name": "related_products_render_only_when_published",
+      "passed": true
+    },
+    {
+      "name": "whatsapp_message_contains_only_context_and_confirmation_request",
+      "passed": true
+    },
+    {
+      "name": "whatsapp_click_is_recorded_exactly_once",
+      "passed": true
+    },
+    {
+      "name": "home_preview_pauses_outside_viewport",
+      "passed": true
+    },
+    {
+      "name": "home_preview_limits_products_and_hides_loop_clones_semantically",
+      "passed": true
+    },
+    {
+      "name": "home_preview_autoplay_moves_only_when_visible",
+      "passed": true,
+      "details": {
+        "autoplayEnd": 9,
+        "autoplayStart": 0,
+        "clientWidth": 390,
+        "scrollWidth": 1265
+      }
+    },
+    {
+      "name": "home_preview_supports_drag_then_pauses_and_resumes",
+      "passed": true,
+      "details": {
+        "dragMoved": true,
+        "interactionPaused": true,
+        "interactionResumed": true
+      }
+    },
+    {
+      "name": "home_preview_respects_reduced_motion",
+      "passed": true
+    },
+    {
+      "name": "slow_mobile_catalog_has_stable_bounded_first_viewport",
+      "passed": true,
+      "details": {
+        "cls": 0,
+        "documentRequestMs": 1871,
+        "duplicates": [],
+        "imageRequestCount": 0,
+        "imageTransferBytes": 0,
+        "jsHeapBytes": 6100124,
+        "jsTransferBytes": 163118,
+        "lcpElement": "P",
+        "lcpMs": 3944,
+        "requestCount": 31,
+        "totalTransferBytes": 235054
+      }
+    },
+    {
+      "name": "slow_mobile_product_uses_only_persisted_detail_derivatives",
+      "passed": true,
+      "details": {
+        "imageHeaders": [
+          {
+            "contentLength": "91312",
+            "contentType": "image/webp",
+            "nosniff": "nosniff",
+            "url": "http://127.0.0.1:3023/api/catalogo/imagem/9b71a2f2-7c12-4505-81d5-07bdbc9a0749?v=2026-07-17T16%3A10%3A10.848556%2B00%3A00&variant=catalog_card",
+            "variant": "catalog_card"
+          },
+          {
+            "contentLength": "91312",
+            "contentType": "image/webp",
+            "nosniff": "nosniff",
+            "url": "http://127.0.0.1:3023/api/catalogo/imagem/1b757723-a68d-4b6e-8035-d3227c07ad08?v=2026-07-17T16%3A10%3A29.090728%2B00%3A00&variant=catalog_card",
+            "variant": "catalog_card"
+          },
+          {
+            "contentLength": "243348",
+            "contentType": "image/webp",
+            "nosniff": "nosniff",
+            "url": "http://127.0.0.1:3023/api/catalogo/imagem/9b71a2f2-7c12-4505-81d5-07bdbc9a0749?v=2026-07-17T16%3A10%3A10.848556%2B00%3A00&variant=product_detail",
+            "variant": "product_detail"
+          },
+          {
+            "contentLength": "91312",
+            "contentType": "image/webp",
+            "nosniff": "nosniff",
+            "url": "http://127.0.0.1:3023/api/catalogo/imagem/1b757723-a68d-4b6e-8035-d3227c07ad08?v=2026-07-17T16%3A10%3A29.090728%2B00%3A00&variant=catalog_card",
+            "variant": "catalog_card"
+          }
+        ],
+        "metrics": {
+          "cls": 0,
+          "documentRequestMs": 239,
+          "duplicates": [],
+          "imageRequestCount": 2,
+          "imageTransferBytes": 335260,
+          "jsHeapBytes": 8376490,
+          "jsTransferBytes": 172241,
+          "lcpElement": "IMG",
+          "lcpMs": 3488,
+          "requestCount": 24,
+          "totalTransferBytes": 562281
+        }
+      }
+    },
+    {
+      "name": "responsive_360x800_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 360,
+          "maxScrollWidth": 360,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 360,
+          "maxScrollWidth": 360,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 360,
+          "maxScrollWidth": 360,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 360,
+          "maxScrollWidth": 360,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_375x812_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 375,
+          "maxScrollWidth": 375,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 375,
+          "maxScrollWidth": 375,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 375,
+          "maxScrollWidth": 375,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 375,
+          "maxScrollWidth": 375,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_390x844_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 390,
+          "maxScrollWidth": 390,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 390,
+          "maxScrollWidth": 390,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 390,
+          "maxScrollWidth": 390,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 390,
+          "maxScrollWidth": 390,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_412x915_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 412,
+          "maxScrollWidth": 412,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 412,
+          "maxScrollWidth": 412,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 412,
+          "maxScrollWidth": 412,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 412,
+          "maxScrollWidth": 412,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_430x932_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 430,
+          "maxScrollWidth": 430,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 430,
+          "maxScrollWidth": 430,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 430,
+          "maxScrollWidth": 430,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 430,
+          "maxScrollWidth": 430,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_768x1024_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 768,
+          "maxScrollWidth": 768,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 768,
+          "maxScrollWidth": 768,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 768,
+          "maxScrollWidth": 768,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 768,
+          "maxScrollWidth": 768,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_1366x768_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 1366,
+          "maxScrollWidth": 1366,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 1366,
+          "maxScrollWidth": 1366,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 1366,
+          "maxScrollWidth": 1366,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 1366,
+          "maxScrollWidth": 1366,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "responsive_1440x900_has_no_document_overflow",
+      "passed": true,
+      "details": [
+        {
+          "clientWidth": 1440,
+          "maxScrollWidth": 1440,
+          "pathname": "/catalogo"
+        },
+        {
+          "clientWidth": 1440,
+          "maxScrollWidth": 1440,
+          "pathname": "/catalogo/qa-phase4-produto-72ac18e2"
+        },
+        {
+          "clientWidth": 1440,
+          "maxScrollWidth": 1440,
+          "pathname": "/"
+        },
+        {
+          "clientWidth": 1440,
+          "maxScrollWidth": 1440,
+          "pathname": "/admin/produtos/36fd9d82-dad9-44e2-9020-694f8620ff69"
+        }
+      ]
+    },
+    {
+      "name": "mobile_quick_availability_revalidates_public_product",
+      "passed": true
+    },
+    {
+      "name": "availability_filter_includes_unavailable_product_without_stock_claim",
+      "passed": true
+    },
+    {
+      "name": "admin_links_product_to_collection",
+      "passed": true
+    },
+    {
+      "name": "admin_filters_audit_by_entity_and_action",
+      "passed": true
+    },
+    {
+      "name": "home_preview_disappears_without_valid_featured_products",
+      "passed": true
+    },
+    {
+      "name": "draft_product_and_images_are_not_public",
+      "passed": true,
+      "details": {
+        "draftImageStatus": 404,
+        "draftPageStatus": 404
+      }
+    },
+    {
+      "name": "catalog_hides_taxonomies_without_published_products",
+      "passed": true
+    },
+    {
+      "name": "image_delete_removes_master_and_all_derivatives_without_orphans",
+      "passed": true
+    },
+    {
+      "name": "analytics_rate_limit_allows_45_per_minute_and_rejects_overflow",
+      "passed": true,
+      "details": [
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        429
+      ]
+    },
+    {
+      "name": "qa_has_no_console_or_page_errors",
+      "passed": true,
+      "details": {
+        "consoleErrors": [],
+        "pageErrors": []
+      }
+    },
+    {
+      "name": "cleanup_restores_exactly_one_admin_and_zero_phase4_products",
+      "passed": true,
+      "details": {
+        "activeAdmins": 1,
+        "fixtureProducts": 0
+      }
+    }
+  ],
+  "total": 59
+}

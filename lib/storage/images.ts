@@ -1,8 +1,18 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+
+import sharp from "sharp";
 
 import { requireAdminRole, requireAdminSession } from "@/lib/auth/admin-access";
+import {
+  PRODUCT_IMAGE_VARIANT_KINDS,
+  type ProductImageVariantKind,
+} from "@/lib/catalog/image-variants";
+import {
+  PRODUCT_IMAGE_UPLOAD_MAX_BYTES,
+  type ProductImageUploadMime,
+} from "@/lib/catalog/image-upload";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -15,8 +25,8 @@ export const MANAGED_IMAGE_BUCKETS = [
 
 export type ManagedImageBucket = (typeof MANAGED_IMAGE_BUCKETS)[number];
 
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_IMAGE_DIMENSION = 20_000;
+const MAX_IMAGE_PIXELS = 80_000_000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const MANAGED_PATH_PATTERN = new RegExp(
   `^${UUID_PATTERN.source.slice(1, -1)}/${UUID_PATTERN.source.slice(1, -1)}\\.(?:jpe?g|png|webp|avif)$`,
@@ -30,7 +40,50 @@ const imageFormats = {
   "image/webp": "webp",
 } as const;
 
-type AllowedMime = keyof typeof imageFormats;
+type AllowedMime = ProductImageUploadMime;
+
+export { PRODUCT_IMAGE_VARIANT_KINDS };
+export type { ProductImageVariantKind };
+
+type StoredImageFile = {
+  etag: string;
+  height: number;
+  mime: "image/jpeg" | "image/webp";
+  path: string;
+  sizeBytes: number;
+  width: number;
+};
+
+export type ProductImageVariantFile = StoredImageFile & {
+  kind: ProductImageVariantKind;
+};
+
+export type UploadedProductImageSet = {
+  assetVersion: string;
+  blurDataUrl: string;
+  master: StoredImageFile;
+  source: {
+    height: number;
+    mime: AllowedMime;
+    sizeBytes: number;
+    width: number;
+  };
+  variants: ProductImageVariantFile[];
+};
+
+const productVariantSpecs: ReadonlyArray<{
+  format: "jpeg" | "webp";
+  kind: ProductImageVariantKind;
+  maxHeight: number;
+  maxWidth: number;
+  quality: number;
+}> = [
+  { format: "webp", kind: "admin_thumbnail", maxHeight: 400, maxWidth: 320, quality: 82 },
+  { format: "webp", kind: "catalog_card", maxHeight: 900, maxWidth: 720, quality: 86 },
+  { format: "webp", kind: "home_preview", maxHeight: 1_000, maxWidth: 800, quality: 87 },
+  { format: "webp", kind: "product_detail", maxHeight: 1_600, maxWidth: 1_200, quality: 88 },
+  { format: "jpeg", kind: "open_graph", maxHeight: 1_200, maxWidth: 1_200, quality: 88 },
+];
 
 function hasBytes(bytes: Uint8Array, expected: readonly number[], offset = 0) {
   return expected.every((value, index) => bytes[offset + index] === value);
@@ -135,7 +188,7 @@ function assertManagedPath(path: string) {
 
 async function validateImage(file: File, parentId: string) {
   if (!UUID_PATTERN.test(parentId)) throw new Error("Identificador de destino invalido para upload.");
-  if (!file.size || file.size > MAX_IMAGE_BYTES) throw new Error("A imagem deve possuir no maximo 8 MB.");
+  if (!file.size || file.size > PRODUCT_IMAGE_UPLOAD_MAX_BYTES) throw new Error("A imagem deve possuir no maximo 8 MB.");
   if (!(file.type in imageFormats)) throw new Error("Formato nao permitido. Use JPEG, PNG, WebP ou AVIF.");
 
   const mime = file.type as AllowedMime;
@@ -161,6 +214,130 @@ async function validateImage(file: File, parentId: string) {
   };
 }
 
+function contentEtag(bytes: Uint8Array) {
+  return `"${createHash("sha256").update(bytes).digest("base64url")}"`;
+}
+
+function storedImageFile(input: {
+  bytes: Uint8Array;
+  extension: "jpg" | "webp";
+  height: number;
+  mime: "image/jpeg" | "image/webp";
+  parentId: string;
+  width: number;
+}): StoredImageFile & { bytes: Uint8Array } {
+  return {
+    bytes: input.bytes,
+    etag: contentEtag(input.bytes),
+    height: input.height,
+    mime: input.mime,
+    path: `${input.parentId}/${randomUUID()}.${input.extension}`,
+    sizeBytes: input.bytes.byteLength,
+    width: input.width,
+  };
+}
+
+async function createProductImageSet(
+  validated: Awaited<ReturnType<typeof validateImage>>,
+  parentId: string,
+) {
+  const masterOutput = await sharp(validated.bytes, {
+    failOn: "error",
+    limitInputPixels: MAX_IMAGE_PIXELS,
+    sequentialRead: true,
+  })
+    .rotate()
+    .resize({
+      fit: "inside",
+      height: 2_400,
+      kernel: sharp.kernel.lanczos3,
+      withoutEnlargement: true,
+      width: 2_400,
+    })
+    .webp({ alphaQuality: 95, effort: 5, quality: 92, smartSubsample: true })
+    .toBuffer({ resolveWithObject: true });
+
+  if (!masterOutput.info.width || !masterOutput.info.height || !masterOutput.data.byteLength) {
+    throw new Error("Nao foi possivel normalizar a imagem enviada.");
+  }
+
+  const master = storedImageFile({
+    bytes: masterOutput.data,
+    extension: "webp",
+    height: masterOutput.info.height,
+    mime: "image/webp",
+    parentId,
+    width: masterOutput.info.width,
+  });
+
+  const variants: Array<ProductImageVariantFile & { bytes: Uint8Array }> = [];
+  for (const spec of productVariantSpecs) {
+    const pipeline = sharp(masterOutput.data, {
+      failOn: "error",
+      limitInputPixels: MAX_IMAGE_PIXELS,
+      sequentialRead: true,
+    }).resize({
+      fit: "inside",
+      height: spec.maxHeight,
+      kernel: sharp.kernel.lanczos3,
+      withoutEnlargement: true,
+      width: spec.maxWidth,
+    });
+
+    const output = spec.format === "jpeg"
+      ? await pipeline
+          .flatten({ background: "#f4eee6" })
+          .jpeg({ chromaSubsampling: "4:4:4", mozjpeg: true, quality: spec.quality })
+          .toBuffer({ resolveWithObject: true })
+      : await pipeline
+          .webp({ alphaQuality: 94, effort: 5, quality: spec.quality, smartSubsample: true })
+          .toBuffer({ resolveWithObject: true });
+
+    if (!output.info.width || !output.info.height || !output.data.byteLength) {
+      throw new Error("Nao foi possivel gerar os derivados da imagem.");
+    }
+
+    variants.push({
+      ...storedImageFile({
+        bytes: output.data,
+        extension: spec.format === "jpeg" ? "jpg" : "webp",
+        height: output.info.height,
+        mime: spec.format === "jpeg" ? "image/jpeg" : "image/webp",
+        parentId,
+        width: output.info.width,
+      }),
+      kind: spec.kind,
+    });
+  }
+
+  const placeholder = await sharp(masterOutput.data, {
+    failOn: "error",
+    limitInputPixels: MAX_IMAGE_PIXELS,
+  })
+    .resize({ fit: "inside", height: 30, withoutEnlargement: true, width: 24 })
+    .blur(0.6)
+    .webp({ effort: 4, quality: 48 })
+    .toBuffer();
+  const blurDataUrl = `data:image/webp;base64,${placeholder.toString("base64")}`;
+  if (blurDataUrl.length > 4_096) throw new Error("O placeholder gerado excedeu o limite seguro.");
+
+  return {
+    assetVersion: randomUUID(),
+    blurDataUrl,
+    master,
+    source: {
+      height: validated.height,
+      mime: validated.mime,
+      sizeBytes: validated.bytes.byteLength,
+      width: validated.width,
+    },
+    variants,
+  } satisfies UploadedProductImageSet & {
+    master: StoredImageFile & { bytes: Uint8Array };
+    variants: Array<ProductImageVariantFile & { bytes: Uint8Array }>;
+  };
+}
+
 export async function uploadManagedImage(input: {
   bucket: ManagedImageBucket;
   file: File;
@@ -183,11 +360,57 @@ export async function uploadManagedImage(input: {
   };
 }
 
-export async function removeManagedImage(bucket: ManagedImageBucket, path: string) {
+export async function uploadProductImageSet(input: { file: File; parentId: string }) {
   await requireAdminRole(["admin", "editor"]);
-  assertManagedPath(path);
+  const validated = await validateImage(input.file, input.parentId);
+  const generated = await createProductImageSet(validated, input.parentId);
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.storage.from(bucket).remove([path]);
+  const uploadedPaths: string[] = [];
+
+  try {
+    for (const file of [generated.master, ...generated.variants]) {
+      const { error } = await supabase.storage.from("catalog-products").upload(file.path, file.bytes, {
+        cacheControl: "31536000",
+        contentType: file.mime,
+        upsert: false,
+      });
+      if (error) throw error;
+      uploadedPaths.push(file.path);
+    }
+  } catch {
+    if (uploadedPaths.length) {
+      await supabase.storage.from("catalog-products").remove(uploadedPaths);
+    }
+    throw new Error("Nao foi possivel armazenar todos os derivados da imagem.");
+  }
+
+  const { bytes: _masterBytes, ...master } = generated.master;
+  void _masterBytes;
+  const variants = generated.variants.map(({ bytes: _variantBytes, ...variant }) => {
+    void _variantBytes;
+    return variant;
+  });
+
+  return {
+    assetVersion: generated.assetVersion,
+    blurDataUrl: generated.blurDataUrl,
+    master,
+    source: generated.source,
+    variants,
+  } satisfies UploadedProductImageSet;
+}
+
+export async function removeManagedImage(bucket: ManagedImageBucket, path: string) {
+  return removeManagedImages(bucket, [path]);
+}
+
+export async function removeManagedImages(bucket: ManagedImageBucket, paths: string[]) {
+  await requireAdminRole(["admin", "editor"]);
+  const uniquePaths = [...new Set(paths)];
+  uniquePaths.forEach(assertManagedPath);
+  if (!uniquePaths.length) return;
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.storage.from(bucket).remove(uniquePaths);
   if (error) throw new Error("Nao foi possivel remover a imagem armazenada.");
 }
 

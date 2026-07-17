@@ -36,6 +36,15 @@
   object-fit: cover;
 }
 
+.lazyPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-color: var(--vision-bg-soft);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .controls {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) auto 44px;

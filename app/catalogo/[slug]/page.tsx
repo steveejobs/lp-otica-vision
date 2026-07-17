@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = `${product.name} | Catálogo Ótica Vision`;
   const description = metadataDescription(product.name, product.brand?.name ?? null, product.shortDescription);
-  const image = catalogImageUrl(product.cover);
+  const image = catalogImageUrl(product.cover, "open_graph");
   return {
     alternates: { canonical: `/catalogo/${product.slug}` },
     description,
@@ -41,9 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       images: [{
         alt: product.cover.altText,
-        height: product.cover.height,
         url: image,
-        width: product.cover.width,
       }],
       title,
       type: "website",
@@ -77,7 +75,7 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
   ]);
   const price = formatCatalogPrice(product.price, product.priceVisibility);
   const canonicalUrl = getCatalogProductUrl(product.slug);
-  const imageUrl = new URL(catalogImageUrl(product.cover), getCatalogSiteBase()).toString();
+  const imageUrl = new URL(catalogImageUrl(product.cover, "open_graph"), getCatalogSiteBase()).toString();
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Product",

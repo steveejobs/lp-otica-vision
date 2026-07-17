@@ -4,10 +4,11 @@ import { revalidatePath, updateTag } from "next/cache";
 
 import { CATALOG_CACHE_TAG } from "./cache";
 
-export function revalidatePublicCatalog() {
+export function revalidatePublicCatalog(productSlug?: string) {
   updateTag(CATALOG_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/catalogo");
-  revalidatePath("/catalogo/[slug]", "page");
+  if (productSlug) revalidatePath(`/catalogo/${productSlug}`);
+  else revalidatePath("/catalogo/[slug]", "page");
   revalidatePath("/sitemap.xml");
 }

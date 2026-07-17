@@ -367,39 +367,51 @@ export type Database = {
       product_images: {
         Row: {
           alt_text: string
+          asset_version: string
+          blur_data_url: string | null
           created_at: string
           display_order: number
           height: number | null
           id: string
           is_cover: boolean
+          mime_type: string | null
           object_position: string
           product_id: string
+          size_bytes: number | null
           storage_path: string
           updated_at: string
           width: number | null
         }
         Insert: {
           alt_text: string
+          asset_version?: string
+          blur_data_url?: string | null
           created_at?: string
           display_order?: number
           height?: number | null
           id?: string
           is_cover?: boolean
+          mime_type?: string | null
           object_position?: string
           product_id: string
+          size_bytes?: number | null
           storage_path: string
           updated_at?: string
           width?: number | null
         }
         Update: {
           alt_text?: string
+          asset_version?: string
+          blur_data_url?: string | null
           created_at?: string
           display_order?: number
           height?: number | null
           id?: string
           is_cover?: boolean
+          mime_type?: string | null
           object_position?: string
           product_id?: string
+          size_bytes?: number | null
           storage_path?: string
           updated_at?: string
           width?: number | null
@@ -410,6 +422,104 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_image_uploads: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          mime_type: string
+          product_id: string
+          size_bytes: number
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          mime_type: string
+          product_id: string
+          size_bytes: number
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          mime_type?: string
+          product_id?: string
+          size_bytes?: number
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_image_uploads_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_image_uploads_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_image_variants: {
+        Row: {
+          asset_version: string
+          created_at: string
+          etag: string
+          height: number
+          id: string
+          kind: Database["public"]["Enums"]["product_image_variant_kind"]
+          mime_type: string
+          product_image_id: string
+          size_bytes: number
+          storage_path: string
+          width: number
+        }
+        Insert: {
+          asset_version: string
+          created_at?: string
+          etag: string
+          height: number
+          id?: string
+          kind: Database["public"]["Enums"]["product_image_variant_kind"]
+          mime_type: string
+          product_image_id: string
+          size_bytes: number
+          storage_path: string
+          width: number
+        }
+        Update: {
+          asset_version?: string
+          created_at?: string
+          etag?: string
+          height?: number
+          id?: string
+          kind?: Database["public"]["Enums"]["product_image_variant_kind"]
+          mime_type?: string
+          product_image_id?: string
+          size_bytes?: number
+          storage_path?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_image_variants_product_image_id_fkey"
+            columns: ["product_image_id"]
+            isOneToOne: false
+            referencedRelation: "product_images"
             referencedColumns: ["id"]
           },
         ]
@@ -739,6 +849,7 @@ export type Database = {
           category_slug: string
           color: string
           cover_alt_text: string
+          cover_blur_data_url: string
           cover_height: number
           cover_image_id: string
           cover_object_position: string
@@ -789,6 +900,12 @@ export type Database = {
         | "consultation"
         | "unavailable"
       price_visibility: "visible" | "consult" | "hidden"
+      product_image_variant_kind:
+        | "admin_thumbnail"
+        | "catalog_card"
+        | "home_preview"
+        | "product_detail"
+        | "open_graph"
       promotion_type: "promotion" | "highlight" | "launch" | "collection"
     }
     CompositeTypes: {
@@ -936,6 +1053,13 @@ export const Constants = {
         "unavailable",
       ],
       price_visibility: ["visible", "consult", "hidden"],
+      product_image_variant_kind: [
+        "admin_thumbnail",
+        "catalog_card",
+        "home_preview",
+        "product_detail",
+        "open_graph",
+      ],
       promotion_type: ["promotion", "highlight", "launch", "collection"],
     },
   },
