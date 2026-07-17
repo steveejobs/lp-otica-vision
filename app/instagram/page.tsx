@@ -25,6 +25,7 @@ const instagramDescription =
 export const metadata: Metadata = {
   title: instagramTitle,
   description: instagramDescription,
+  ...(metadataBase ? { alternates: { canonical: "/instagram" } } : {}),
   openGraph: {
     title: instagramTitle,
     description: instagramDescription,
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
     type: "website",
     ...(metadataBase
       ? {
+          url: "/instagram",
           images: [
             {
               url: instagramImages[0].src,

@@ -36,7 +36,7 @@
 .copy p {
   max-width: 460px;
   margin-top: 1rem;
-  color: rgba(25, 22, 20, 0.68);
+  color: var(--vision-ink);
   font-size: 0.96rem;
   line-height: 1.5;
 }

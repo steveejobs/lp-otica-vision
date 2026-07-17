@@ -20,6 +20,7 @@ Before making decisions, read:
 7. `docs/assets-map.md`
 8. `docs/v3-assets-manifest.md`
 9. `docs/anti-erros.md`
+10. `docs/v4-refinement-and-admin.md`
 
 ## Core Rule
 

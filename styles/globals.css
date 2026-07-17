@@ -74,13 +74,13 @@ button {
     clip-path 900ms var(--ease-vision),
     filter 900ms var(--ease-vision),
     transform 900ms var(--ease-vision);
-  will-change: clip-path, filter, transform;
 }
 
 html[data-motion-ready="true"] [data-focus-reveal]:not(.is-focus-visible) {
   clip-path: inset(0 6% 0 0);
   filter: blur(2px) saturate(0.82);
   transform: scale(1.018);
+  will-change: clip-path, filter, transform;
 }
 
 h1,

@@ -9,13 +9,9 @@ import { NewsSection } from "@/components/news-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { VideoStory } from "@/components/video-story";
-import {
-  brandLogos,
-  editorialGalleryImages,
-  homeVideos,
-  labMedia,
-} from "@/lib/assets";
+import { homeVideos, labMedia } from "@/lib/assets";
 import { getExameNews } from "@/lib/exame-news";
+import { featuredBrands, featuredCollection } from "@/lib/showcase-content";
 
 export const revalidate = 28_800;
 
@@ -32,8 +28,8 @@ export default function HomePage() {
       <main id="main-content">
         <HomeHero />
         <VideoStory videos={homeVideos} />
-        <EditorialGallery images={editorialGalleryImages} />
-        <BrandGrid brands={brandLogos} />
+        <EditorialGallery collection={featuredCollection} />
+        <BrandGrid content={featuredBrands} />
         <LabSection media={labMedia} />
         <Suspense fallback={<NewsSection items={[]} loading />}>
           <ExameNewsSection />

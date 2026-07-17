@@ -3,10 +3,13 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
+    "admin:bootstrap": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "qa:supabase": "node --env-file=.env.local scripts/qa-phase1.mjs",
+    "qa:admin-ui": "node --env-file=.env.local scripts/qa-admin-ui.mjs",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
@@ -16,6 +19,8 @@
     "postcss": "8.5.16"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.7",
     "cheerio": "1.2.0",
     "lucide-react": "1.24.0",
     "next": "16.2.10",
@@ -29,6 +34,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.2.10",
     "playwright-core": "1.61.1",
+    "supabase": "^2.109.1",
     "typescript": "6.0.3"
   }
 }

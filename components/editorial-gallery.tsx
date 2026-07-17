@@ -14,12 +14,20 @@ import {
 } from "react";
 
 import type { ImageAsset } from "@/lib/assets";
+import type { FeaturedCollectionContent } from "@/lib/showcase-content";
 
+import { InstagramIcon } from "./instagram-icon";
 import { SectionShell } from "./section-shell";
+import { VisionButton } from "./vision-button";
 import styles from "./editorial-gallery.module.css";
 
 type EditorialGalleryProps = {
+  collection: FeaturedCollectionContent;
+};
+
+type FocusSequenceProps = {
   images: readonly ImageAsset[];
+  ariaLabel: string;
 };
 
 type DragStart = {
@@ -40,7 +48,7 @@ type CardStyle = CSSProperties & {
 const AUTOPLAY_DELAY = 4_800;
 const INTERACTION_PAUSE = 7_200;
 
-function FocusSequence({ images }: EditorialGalleryProps) {
+function FocusSequence({ images, ariaLabel }: FocusSequenceProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [loadedIndexes, setLoadedIndexes] = useState<Set<number>>(() => new Set());
   const [dragOffset, setDragOffset] = useState(0);
@@ -281,7 +289,7 @@ function FocusSequence({ images }: EditorialGalleryProps) {
         className={`${styles.viewport} ${isDragging ? styles.dragging : ""} ${chapterTransition ? styles.chapterTransition : ""}`}
         role="region"
         aria-roledescription="carrossel"
-        aria-label="Galeria de armações da Ótica Vision"
+        aria-label={ariaLabel}
         tabIndex={0}
         data-series={images[activeIndex]?.seriesId}
         data-active-index={activeIndex}
@@ -369,19 +377,45 @@ function FocusSequence({ images }: EditorialGalleryProps) {
   );
 }
 
-export function EditorialGallery({ images }: EditorialGalleryProps) {
+export function EditorialGallery({ collection }: EditorialGalleryProps) {
+  const {
+    sectionId,
+    eyebrow,
+    title,
+    description,
+    galleryLabel,
+    action,
+    images,
+  } = collection;
+  const titleId = `${sectionId}-title`;
+
   return (
     <SectionShell
+      id={sectionId}
       className={styles.section}
       innerClassName={styles.inner}
-      aria-labelledby="editorial-gallery-title"
+      aria-labelledby={titleId}
     >
       <header className={styles.intro}>
-        <h2 id="editorial-gallery-title">A escolha ganha contorno.</h2>
-        <p>Linhas, proporções e acabamentos reunidos pela Vision.</p>
+        <div className={styles.headingGroup}>
+          <p className={`eyebrow ${styles.eyebrow}`}>{eyebrow}</p>
+          <h2 id={titleId}>{title}</h2>
+        </div>
+        <div className={styles.introAside}>
+          <p>{description}</p>
+          <VisionButton
+            href={action.href}
+            icon={InstagramIcon}
+            variant="secondary"
+            external={action.external}
+            ariaLabel={action.ariaLabel}
+          >
+            {action.label}
+          </VisionButton>
+        </div>
       </header>
 
-      <FocusSequence images={images} />
+      <FocusSequence images={images} ariaLabel={galleryLabel} />
     </SectionShell>
   );
 }

@@ -240,7 +240,7 @@
 }
 
 .counter {
-  color: var(--vision-steel-dark);
+  color: var(--vision-muted);
   font-size: 0.62rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;

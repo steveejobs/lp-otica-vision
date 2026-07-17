@@ -8,12 +8,30 @@
 
 .intro {
   display: grid;
-  grid-template-columns: minmax(300px, 0.95fr) minmax(260px, 0.8fr) 1fr;
+  grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 0.7fr);
   align-items: end;
-  gap: 2rem;
+  gap: clamp(2rem, 7vw, 7rem);
 }
 
-.intro h2 {
+.headingGroup {
+  position: relative;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.78rem;
+}
+
+.eyebrow::after {
+  content: "";
+  width: min(8vw, 88px);
+  height: 1px;
+  background: rgba(143, 150, 157, 0.58);
+}
+
+.headingGroup h2 {
   max-width: 530px;
   font-family: var(--font-display);
   font-size: clamp(3.25rem, 4.5vw, 4.25rem);
@@ -23,21 +41,18 @@
   text-wrap: balance;
 }
 
-.intro p {
-  max-width: 360px;
+.introAside {
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
   padding-bottom: 0.35rem;
+}
+
+.introAside p {
+  max-width: 360px;
   color: var(--vision-muted);
   font-size: 0.98rem;
   line-height: 1.55;
-}
-
-.intro > span {
-  justify-self: end;
-  padding-bottom: 0.45rem;
-  color: var(--vision-steel-dark);
-  font-size: 0.62rem;
-  font-weight: 600;
-  text-transform: uppercase;
 }
 
 .sequence {
@@ -331,7 +346,7 @@
   }
 
   .intro {
-    grid-template-columns: minmax(460px, 1.1fr) minmax(280px, 0.72fr) 1fr;
+    grid-template-columns: minmax(460px, 1.1fr) minmax(280px, 0.72fr);
   }
 
   .intro h2 {
@@ -361,10 +376,6 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .intro > span {
-    display: none;
-  }
-
   .viewport {
     height: 500px;
   }
@@ -389,9 +400,15 @@
     line-height: 0.98;
   }
 
-  .intro p {
+  .introAside {
+    gap: 0.9rem;
+    margin-top: 1rem;
+    padding-bottom: 0;
+  }
+
+  .introAside p {
     max-width: 315px;
-    margin-top: 0.75rem;
+    margin: 0;
     padding: 0;
     font-size: 0.92rem;
   }

@@ -294,7 +294,6 @@ export function NewsCarousel({ items }: NewsCarouselProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 tabIndex={isActive ? 0 : -1}
-                aria-label={`${item.title} — ler na Exame`}
                 onDragStart={(event) => event.preventDefault()}
               >
                 {hasImage && item.imageUrl ? (

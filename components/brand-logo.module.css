@@ -34,8 +34,22 @@
 }
 
 .header {
-  width: 118px;
-  height: 58px;
+  width: 132px;
+  height: 64px;
+}
+
+.header::before {
+  top: 63%;
+  width: 112%;
+  height: 32%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(25, 22, 20, 0.24),
+    rgba(25, 22, 20, 0.075) 50%,
+    transparent 82%
+  );
+  filter: blur(12px);
+  opacity: 0.58;
 }
 
 .header .image {
@@ -55,12 +69,12 @@
 
 @media (max-width: 720px) {
   .header {
-    width: 96px;
-    height: 48px;
+    width: 114px;
+    height: 56px;
   }
 
-  .wrap::before {
-    filter: blur(13px);
-    opacity: 0.44;
+  .header::before {
+    filter: blur(11px);
+    opacity: 0.54;
   }
 }

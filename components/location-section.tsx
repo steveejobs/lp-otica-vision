@@ -24,7 +24,7 @@ export function LocationSection() {
           href={LINKS.whatsapp}
           icon={MessageCircle}
           external
-          ariaLabel="Falar com a Ótica Vision pelo WhatsApp"
+          ariaLabel="Falar no WhatsApp"
         >
           Falar no WhatsApp
         </VisionButton>
@@ -33,7 +33,7 @@ export function LocationSection() {
           icon={MapPin}
           variant="secondary"
           external
-          ariaLabel="Ver rota até a Ótica Vision"
+          ariaLabel="Ver rota"
         >
           Ver rota
         </VisionButton>

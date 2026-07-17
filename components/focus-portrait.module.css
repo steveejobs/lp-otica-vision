@@ -49,23 +49,14 @@
   pointer-events: none;
 }
 
-.baseImage,
-.focusImage {
+.baseImage {
   object-fit: cover;
   -webkit-user-drag: none;
 }
 
 .baseImage {
-  filter: brightness(0.84) contrast(0.94) saturate(0.66);
-  transform: scale(1.012);
-}
-
-.focusImage {
-  z-index: 1;
-  opacity: 0;
-  filter: brightness(1.03) contrast(1.035) saturate(1.04);
-  transform: scale(1.035);
-  transform-origin: var(--focus-x) var(--focus-y);
+  filter: brightness(0.97) contrast(1.01) saturate(0.94);
+  transform: scale(1.006);
 }
 
 .lens {
@@ -77,12 +68,18 @@
   height: 31%;
   border: 1px solid rgba(229, 232, 234, 0.92);
   border-radius: 50%;
+  background: rgba(251, 248, 243, 0.025);
+  backdrop-filter: brightness(1.08) contrast(1.035) saturate(1.12);
   box-shadow:
     inset 0 0 0 1px rgba(25, 22, 20, 0.2),
     inset 0 0 22px rgba(251, 248, 243, 0.14),
     0 6px 20px rgba(25, 22, 20, 0.2);
-  opacity: 0.86;
+  opacity: 0;
   transform: translate(-50%, -50%) perspective(600px) rotateX(-2deg) rotateY(3deg);
+  transition:
+    opacity 260ms var(--ease-vision),
+    border-color 260ms var(--ease-vision),
+    box-shadow 260ms var(--ease-vision);
   pointer-events: none;
 }
 
@@ -115,21 +112,21 @@
   width: 1px;
   height: 13%;
   background: rgba(251, 248, 243, 0.58);
-  opacity: 0.72;
+  opacity: 0;
   transform: rotate(24deg);
   transform-origin: center;
+  transition: opacity 260ms var(--ease-vision);
   pointer-events: none;
 }
 
-@supports (clip-path: ellipse(20% 20% at 50% 50%)) {
-  .focusImage {
-    clip-path: ellipse(28.5% 15.5% at var(--focus-x) var(--focus-y));
-    opacity: 1;
-  }
+.portrait:hover .lens,
+.portrait:active .lens {
+  opacity: 0.9;
 }
 
-.portrait[data-focus-static="true"] .focusImage {
-  transform: none;
+.portrait:hover .glint,
+.portrait:active .glint {
+  opacity: 0.72;
 }
 
 @media (max-width: 720px) {
@@ -138,19 +135,18 @@
     height: 29%;
   }
 
-  @supports (clip-path: ellipse(20% 20% at 50% 50%)) {
-    .focusImage {
-      clip-path: ellipse(30% 14.5% at var(--focus-x) var(--focus-y));
-    }
+  .lens {
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .focusImage {
-    transform: none;
-  }
-
   .lens {
     transform: translate(-50%, -50%);
+    transition: none;
+  }
+
+  .glint {
+    transition: none;
   }
 }

@@ -24,7 +24,7 @@ export function BrandLogo({
         height={1086}
         sizes={
           size === "header"
-            ? "120px"
+            ? "(max-width: 720px) 114px, 132px"
             : size === "instagram"
               ? "160px"
               : "(max-width: 720px) 160px, 220px"

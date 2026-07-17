@@ -13,6 +13,7 @@ const description =
 
 export const metadata: Metadata = {
   ...(metadataBase ? { metadataBase } : {}),
+  ...(metadataBase ? { alternates: { canonical: "/" } } : {}),
   title,
   description,
   icons: {
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
     type: "website",
     ...(metadataBase
       ? {
+          url: "/",
           images: [
             {
               url: heroMedia.src,
