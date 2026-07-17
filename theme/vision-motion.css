@@ -1,0 +1,141 @@
+[data-motion-reveal],
+[data-focus-reveal] {
+  --motion-distance: 14px;
+  --motion-duration: var(--duration-editorial);
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity var(--motion-duration) var(--ease-vision-out),
+    filter var(--motion-duration) var(--ease-vision-out),
+    transform var(--motion-duration) var(--ease-vision-out);
+  transition-delay: var(--motion-delay, 0ms);
+}
+
+[data-focus-reveal] {
+  clip-path: inset(0 0 0 0);
+  transition:
+    clip-path var(--duration-media) var(--ease-vision-out),
+    opacity var(--duration-media) var(--ease-vision-out),
+    filter var(--duration-media) var(--ease-vision-out),
+    transform var(--duration-media) var(--ease-vision-out);
+}
+
+[data-motion-variant="hero"] {
+  --motion-distance: 18px;
+  --motion-duration: 760ms;
+}
+
+[data-motion-variant="media"],
+[data-motion-variant="section"] {
+  --motion-distance: 20px;
+}
+
+[data-motion-variant="catalog-card"] {
+  --motion-distance: 16px;
+  --motion-duration: 560ms;
+}
+
+html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible),
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
+  opacity: 0;
+  filter: blur(3px);
+  transform: translate3d(0, var(--motion-distance), 0) scale(0.992);
+  will-change: opacity, filter, transform;
+}
+
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
+  clip-path: inset(0 7% 0 0);
+  filter: blur(2px) saturate(0.86);
+  transform: translate3d(0, 18px, 0) scale(1.018);
+  will-change: clip-path, filter, transform;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  z-index: 2147483000;
+  inset: 0;
+  border-left: 1px solid rgba(143, 150, 157, 0.34);
+  background: var(--vision-paper);
+  box-shadow: -18px 0 40px rgba(25, 22, 20, 0.08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-104%);
+}
+
+html[data-route-state="leaving"] body::before {
+  animation: visionRouteLeave var(--route-exit-duration) var(--ease-vision-in) both;
+}
+
+html[data-route-state="entering"] body::before {
+  animation: visionRouteEnter var(--route-enter-duration) var(--ease-vision-out) both;
+}
+
+html[data-route-state="entering"] main {
+  animation: visionPageEnter var(--route-enter-duration) var(--ease-vision-out) both;
+}
+
+@keyframes visionRouteLeave {
+  from {
+    opacity: 0.96;
+    transform: translateX(-104%);
+  }
+
+  to {
+    opacity: 0.98;
+    transform: translateX(0);
+  }
+}
+
+@keyframes visionRouteEnter {
+  from {
+    opacity: 0.98;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0.96;
+    transform: translateX(104%);
+  }
+}
+
+@keyframes visionPageEnter {
+  from {
+    opacity: 0.84;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-motion-reveal],
+  [data-focus-reveal] {
+    clip-path: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible),
+  html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
+    clip-path: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  body::before,
+  html[data-route-state="leaving"] body::before,
+  html[data-route-state="entering"] body::before,
+  html[data-route-state="entering"] main {
+    animation: none;
+    opacity: 0;
+    transform: none;
+  }
+}

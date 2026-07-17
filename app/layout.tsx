@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 
-import { VisionMotion } from "@/components/vision-motion";
+import { VisionMotion } from "@/components/motion";
 import { heroMedia, identityAssets } from "@/lib/assets";
 import { getMetadataBase } from "@/lib/metadata";
 

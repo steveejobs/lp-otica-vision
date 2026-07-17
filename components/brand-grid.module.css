@@ -44,6 +44,33 @@
   line-height: 1.5;
 }
 
+.railWrap {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 190px;
+  align-content: center;
+  padding-block: clamp(1.2rem, 3vw, 2.1rem);
+}
+
+.railWrap::before,
+.railWrap::after {
+  content: "";
+  position: absolute;
+  left: clamp(0rem, 3vw, 2rem);
+  right: clamp(0rem, 3vw, 2rem);
+  height: 1px;
+  background: rgba(143, 150, 157, 0.26);
+}
+
+.railWrap::before {
+  top: 0;
+}
+
+.railWrap::after {
+  bottom: 0;
+}
+
 @media (min-width: 901px) {
   .inner {
     grid-template-columns: minmax(310px, 0.7fr) minmax(600px, 1.3fr);
@@ -59,5 +86,10 @@
   .inner {
     gap: 1.75rem;
     padding-block: 3.2rem 3.45rem;
+  }
+
+  .railWrap {
+    min-height: 154px;
+    margin-inline: calc((100vw - 100%) / -2);
   }
 }

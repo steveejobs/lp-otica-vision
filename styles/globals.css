@@ -1,22 +1,5 @@
-:root {
-  --vision-bg: #b19475;
-  --vision-bg-soft: #f4eee6;
-  --vision-paper: #fbf8f3;
-  --vision-ink: #191614;
-  --vision-muted: #74675d;
-  --vision-steel: #d9dde1;
-  --vision-steel-dark: #8f969d;
-  --vision-champagne: #c7ad8e;
-  --vision-bronze: #7a6049;
-  --vision-line: rgba(25, 22, 20, 0.12);
-  --vision-shadow: rgba(25, 22, 20, 0.14);
-  --vision-red: #8e1f28;
-  --font-display: "Iowan Old Style", Baskerville, Georgia, "Times New Roman", serif;
-  --font-body: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
-  --ease-vision: cubic-bezier(0.22, 0.8, 0.24, 1);
-  --radius-sm: 6px;
-  --radius-md: 8px;
-}
+@import "../theme/vision-theme.css";
+@import "../theme/vision-motion.css";
 
 *,
 *::before,
@@ -64,23 +47,6 @@ video {
 
 button {
   color: inherit;
-}
-
-[data-focus-reveal] {
-  clip-path: inset(0 0 0 0);
-  filter: blur(0) saturate(1);
-  transform: scale(1);
-  transition:
-    clip-path 900ms var(--ease-vision),
-    filter 900ms var(--ease-vision),
-    transform 900ms var(--ease-vision);
-}
-
-html[data-motion-ready="true"] [data-focus-reveal]:not(.is-focus-visible) {
-  clip-path: inset(0 6% 0 0);
-  filter: blur(2px) saturate(0.82);
-  transform: scale(1.018);
-  will-change: clip-path, filter, transform;
 }
 
 h1,
@@ -142,12 +108,5 @@ figure {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
-  }
-
-  [data-focus-reveal] {
-    clip-path: none;
-    filter: none;
-    transform: none;
-    transition: none;
   }
 }

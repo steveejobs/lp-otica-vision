@@ -80,7 +80,12 @@ async function CatalogContent({
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        <section className={styles.hero} aria-labelledby="catalog-title">
+        <section
+          className={styles.hero}
+          data-motion-reveal
+          data-motion-variant="hero"
+          aria-labelledby="catalog-title"
+        >
           <div className={styles.heroInner}>
             <p className="eyebrow">Vitrine Vision</p>
             <h1 id="catalog-title">Catálogo</h1>
@@ -91,7 +96,12 @@ async function CatalogContent({
           </div>
         </section>
 
-        <section className={styles.filters} aria-label="Filtros do catálogo">
+        <section
+          className={styles.filters}
+          data-motion-reveal
+          data-motion-variant="section"
+          aria-label="Filtros do catálogo"
+        >
           <div className={styles.filterInner}>
             <div className={styles.brandBlock}>
               <span className={styles.filterLabel}>Navegar por marca</span>
@@ -177,7 +187,12 @@ async function CatalogContent({
           </div>
         </section>
 
-        <section className={styles.results} aria-labelledby="catalog-results-title">
+        <section
+          className={styles.results}
+          data-motion-reveal
+          data-motion-variant="section"
+          aria-labelledby="catalog-results-title"
+        >
           <div className={styles.resultsInner}>
             <div className={styles.resultSummary}>
               <h2 id="catalog-results-title">
@@ -205,9 +220,14 @@ async function CatalogContent({
                 </div>
               </div>
             ) : (
-              <div className={styles.chapters}>
+              <div className={styles.chapters} data-motion-stagger>
                 {groups.map((group) => (
-                  <section className={styles.chapter} key={group.slug ?? "vision"}>
+                  <section
+                    className={styles.chapter}
+                    data-motion-reveal
+                    data-motion-variant="section"
+                    key={group.slug ?? "vision"}
+                  >
                     <div className={styles.chapterHeader}>
                       <div className={styles.chapterTitle}>
                         <h2>{group.name}</h2>
@@ -264,14 +284,20 @@ function CatalogLoading() {
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        <section className={styles.hero}>
+        <section className={styles.hero} data-motion-reveal data-motion-variant="hero">
           <div className={styles.heroInner}>
             <p className="eyebrow">Vitrine Vision</p>
             <h1>Catálogo</h1>
             <p className={styles.intro}>Preparando a seleção publicada.</p>
           </div>
         </section>
-        <section className={styles.results} aria-busy="true" aria-label="Carregando catálogo">
+        <section
+          className={styles.results}
+          data-motion-reveal
+          data-motion-variant="section"
+          aria-busy="true"
+          aria-label="Carregando catálogo"
+        >
           <div className={styles.resultsInner}>
             <div className={styles.loadingGrid}>
               {Array.from({ length: 8 }, (_, index) => (

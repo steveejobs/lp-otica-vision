@@ -16,6 +16,8 @@ export function SectionShell({
 }: SectionShellProps) {
   return (
     <section
+      data-motion-reveal
+      data-motion-variant="section"
       className={`${styles.shell} ${styles[tone]} ${className}`}
       {...props}
     >

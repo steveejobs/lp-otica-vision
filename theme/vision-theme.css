@@ -1,0 +1,35 @@
+:root {
+  --vision-bg: #b19475;
+  --vision-bg-soft: #f4eee6;
+  --vision-paper: #fbf8f3;
+  --vision-ink: #191614;
+  --vision-muted: #74675d;
+  --vision-steel: #d9dde1;
+  --vision-steel-dark: #8f969d;
+  --vision-champagne: #c7ad8e;
+  --vision-bronze: #7a6049;
+  --vision-line: rgba(25, 22, 20, 0.12);
+  --vision-shadow: rgba(25, 22, 20, 0.14);
+  --vision-red: #8e1f28;
+  --vision-positive: #49624e;
+
+  --font-display: "Iowan Old Style", Baskerville, Georgia, "Times New Roman", serif;
+  --font-body: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+
+  --ease-vision: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --ease-vision-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-vision-in: cubic-bezier(0.74, 0, 0.24, 1);
+
+  --duration-fast: 180ms;
+  --duration-medium: 420ms;
+  --duration-editorial: 680ms;
+  --duration-media: 860ms;
+  --route-exit-duration: 320ms;
+  --route-enter-duration: 560ms;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+
+  --container-mobile: min(92vw, 100%);
+  --container-desktop: min(88vw, 1320px);
+}

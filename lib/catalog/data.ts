@@ -236,9 +236,9 @@ const getCachedFeaturedProducts = unstable_cache(
       .from("products")
       .select(embeddedCardSelect)
       .eq("published", true)
-      .eq("featured", true)
       .is("archived_at", null)
       .eq("cover.is_cover", true)
+      .order("featured", { ascending: false })
       .order("display_order", { ascending: true })
       .order("updated_at", { ascending: false })
       .limit(HOME_CATALOG_PREVIEW_SIZE);
@@ -249,7 +249,7 @@ const getCachedFeaturedProducts = unstable_cache(
       .filter((item): item is CatalogProductCard => Boolean(item))
       .slice(0, HOME_CATALOG_PREVIEW_SIZE);
   },
-  ["home-catalog-featured-v1"],
+  ["home-catalog-preview-v2"],
   { revalidate: 300, tags: [CATALOG_CACHE_TAG] },
 );
 

@@ -15,11 +15,13 @@ const blurDataUrl =
 export function CatalogProductCard({
   clone = false,
   imageVariant = "catalog_card",
+  presentation = "catalog",
   priority = false,
   product,
 }: {
   clone?: boolean;
   imageVariant?: Extract<ProductImageVariantKind, "catalog_card" | "home_preview">;
+  presentation?: "catalog" | "preview";
   priority?: boolean;
   product: CatalogProductCardData;
 }) {
@@ -27,7 +29,14 @@ export function CatalogProductCard({
   const price = formatCatalogPrice(product.price, product.priceVisibility);
 
   return (
-    <article aria-hidden={clone || undefined} className={styles.card} data-availability={product.availability}>
+    <article
+      aria-hidden={clone || undefined}
+      className={styles.card}
+      data-availability={product.availability}
+      data-motion-reveal={clone ? undefined : ""}
+      data-motion-variant={clone ? undefined : "catalog-card"}
+      data-presentation={presentation}
+    >
       <Link
         aria-label={`Ver ${product.name}, código ${product.sku}`}
         className={styles.link}
@@ -52,12 +61,14 @@ export function CatalogProductCard({
           <p className={styles.brand}>{product.brand?.name ?? "Seleção Vision"}</p>
           <h3>{product.name}</h3>
           {descriptor ? <p className={styles.descriptor}>{descriptor}</p> : null}
-          <div className={styles.commercialLine}>
-            <span className={styles.availability}>{availabilityLabels[product.availability]}</span>
-            {price ? <strong>{price}</strong> : null}
-          </div>
+          {presentation === "catalog" ? (
+            <div className={styles.commercialLine}>
+              <span className={styles.availability}>{availabilityLabels[product.availability]}</span>
+              {price ? <strong>{price}</strong> : null}
+            </div>
+          ) : null}
           <span className={styles.action}>
-            Ver produto
+            {presentation === "preview" ? "Ver modelo" : "Ver produto"}
             <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
           </span>
         </div>

@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 
 import type { FeaturedBrandsContent } from "@/lib/showcase-content";
 
-import { BrandSpotlight } from "./brand-spotlight";
+import { BrandRail } from "./brand-rail";
 import { SectionShell } from "./section-shell";
 import { VisionButton } from "./vision-button";
 import styles from "./brand-grid.module.css";
@@ -12,8 +12,7 @@ type BrandGridProps = {
 };
 
 export function BrandGrid({ content }: BrandGridProps) {
-  const { sectionId, eyebrow, title, description, action, initialBrandName, brands } =
-    content;
+  const { sectionId, eyebrow, title, description, action, brands } = content;
   const titleId = `${sectionId}-title`;
 
   return (
@@ -38,7 +37,12 @@ export function BrandGrid({ content }: BrandGridProps) {
         </VisionButton>
       </header>
 
-      <BrandSpotlight brands={brands} initialBrandName={initialBrandName} />
+      <div className={styles.railWrap}>
+        <BrandRail
+          brands={brands}
+          ariaLabel="Marcas premium na selecao da Otica Vision"
+        />
+      </div>
     </SectionShell>
   );
 }

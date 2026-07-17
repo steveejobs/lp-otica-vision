@@ -116,10 +116,12 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
     return firstItem ? firstItem.offsetWidth + 16 : 280;
   };
 
+  if (!products.length) return null;
+
   return (
-    <div className={styles.railRegion}>
+    <div className={styles.railRegion} data-catalog-preview-rail>
       <div
-        aria-label="Prévia automática do catálogo. Use as setas para navegar."
+        aria-label="Prévia do catálogo"
         className={styles.viewport}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -172,7 +174,7 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
           <div className={styles.sequence} ref={firstSequenceRef}>
             {products.map((product) => (
               <div className={styles.item} key={product.id}>
-                <CatalogProductCard imageVariant="home_preview" product={product} />
+                <CatalogProductCard imageVariant="home_preview" presentation="preview" product={product} />
               </div>
             ))}
           </div>
@@ -180,7 +182,12 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
             <div aria-hidden="true" className={styles.sequence} ref={secondSequenceRef}>
               {products.map((product) => (
                 <div className={styles.item} key={`clone-${product.id}`}>
-                  <CatalogProductCard clone imageVariant="home_preview" product={product} />
+                  <CatalogProductCard
+                    clone
+                    imageVariant="home_preview"
+                    presentation="preview"
+                    product={product}
+                  />
                 </div>
               ))}
             </div>
@@ -189,13 +196,14 @@ export function CatalogPreviewRail({ products }: { products: CatalogProductCardD
       </div>
       {products.length > 1 ? (
         <button
+          aria-label={manualPaused ? "Retomar movimento" : "Pausar movimento"}
           aria-pressed={manualPaused}
           className={styles.pauseButton}
           onClick={() => setManualPaused((value) => !value)}
+          title={manualPaused ? "Retomar movimento" : "Pausar movimento"}
           type="button"
         >
           {manualPaused ? <Play aria-hidden="true" size={15} /> : <Pause aria-hidden="true" size={15} />}
-          {manualPaused ? "Retomar movimento" : "Pausar movimento"}
         </button>
       ) : null}
     </div>

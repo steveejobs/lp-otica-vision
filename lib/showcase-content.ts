@@ -55,7 +55,7 @@ export const featuredCollection = {
 
 export const featuredBrands = {
   sectionId: "marcas-em-destaque",
-  eyebrow: "Marca em destaque",
+  eyebrow: "Marcas em destaque",
   title: "Marcas premium. Seleção Vision.",
   description: "Consulte os modelos pelo WhatsApp.",
   action: {
