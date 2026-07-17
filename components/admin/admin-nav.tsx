@@ -9,12 +9,15 @@ import styles from "./admin.module.css";
 
 const navigation = [
   { href: "/admin", label: "Visão geral", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/produtos", label: "Produtos", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/colecoes", label: "Coleções", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/galerias", label: "Galerias", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/promocoes", label: "Destaques", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/marcas", label: "Marcas", roles: ["admin", "editor", "attendant"] },
-  { href: "/admin/categorias", label: "Categorias", roles: ["admin", "editor", "attendant"] },
+  { href: "/admin/produtos", label: "Produtos", roles: ["admin", "editor"] },
+  { href: "/admin/disponibilidade", label: "Disponibilidade", roles: ["admin", "editor", "attendant"] },
+  { href: "/admin/colecoes", label: "Coleções", roles: ["admin", "editor"] },
+  { href: "/admin/galerias", label: "Galerias", roles: ["admin", "editor"] },
+  { href: "/admin/promocoes", label: "Destaques", roles: ["admin", "editor"] },
+  { href: "/admin/marcas", label: "Marcas", roles: ["admin", "editor"] },
+  { href: "/admin/categorias", label: "Categorias", roles: ["admin", "editor"] },
+  { href: "/admin/usuarios", label: "Usuários", roles: ["admin"] },
+  { href: "/admin/auditoria", label: "Auditoria", roles: ["admin"] },
   { href: "/admin/configuracoes", label: "Configurações", roles: ["admin"] },
 ] as const satisfies readonly {
   href: string;

@@ -214,7 +214,11 @@ export type Database = {
       }
       collections: {
         Row: {
+          cover_alt_text: string | null
+          cover_height: number | null
+          cover_object_position: string
           cover_path: string | null
+          cover_width: number | null
           created_at: string
           description: string | null
           display_order: number
@@ -228,7 +232,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cover_alt_text?: string | null
+          cover_height?: number | null
+          cover_object_position?: string
           cover_path?: string | null
+          cover_width?: number | null
           created_at?: string
           description?: string | null
           display_order?: number
@@ -242,7 +250,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cover_alt_text?: string | null
+          cover_height?: number | null
+          cover_object_position?: string
           cover_path?: string | null
+          cover_width?: number | null
           created_at?: string
           description?: string | null
           display_order?: number
@@ -300,6 +312,7 @@ export type Database = {
           desktop_object_position: string
           display_order: number
           gallery_id: string
+          height: number | null
           id: string
           mobile_object_position: string
           published: boolean
@@ -307,6 +320,7 @@ export type Database = {
           storage_path: string
           updated_at: string
           visual_series: string | null
+          width: number | null
         }
         Insert: {
           alt_text: string
@@ -314,6 +328,7 @@ export type Database = {
           desktop_object_position?: string
           display_order?: number
           gallery_id: string
+          height?: number | null
           id?: string
           mobile_object_position?: string
           published?: boolean
@@ -321,6 +336,7 @@ export type Database = {
           storage_path: string
           updated_at?: string
           visual_series?: string | null
+          width?: number | null
         }
         Update: {
           alt_text?: string
@@ -328,6 +344,7 @@ export type Database = {
           desktop_object_position?: string
           display_order?: number
           gallery_id?: string
+          height?: number | null
           id?: string
           mobile_object_position?: string
           published?: boolean
@@ -335,6 +352,7 @@ export type Database = {
           storage_path?: string
           updated_at?: string
           visual_series?: string | null
+          width?: number | null
         }
         Relationships: [
           {
@@ -395,6 +413,7 @@ export type Database = {
       }
       products: {
         Row: {
+          archived_at: string | null
           availability_status: Database["public"]["Enums"]["availability_status"]
           brand_id: string | null
           category_id: string | null
@@ -417,6 +436,7 @@ export type Database = {
           whatsapp_message_override: string | null
         }
         Insert: {
+          archived_at?: string | null
           availability_status?: Database["public"]["Enums"]["availability_status"]
           brand_id?: string | null
           category_id?: string | null
@@ -439,6 +459,7 @@ export type Database = {
           whatsapp_message_override?: string | null
         }
         Update: {
+          archived_at?: string | null
           availability_status?: Database["public"]["Enums"]["availability_status"]
           brand_id?: string | null
           category_id?: string | null
@@ -556,10 +577,15 @@ export type Database = {
           active: boolean
           created_at: string
           cta_label: string
+          cta_target: string
           ends_at: string
           featured: boolean
           id: string
+          image_alt_text: string | null
+          image_height: number | null
+          image_object_position: string
           image_path: string
+          image_width: number | null
           priority: number
           short_description: string | null
           slug: string
@@ -572,10 +598,15 @@ export type Database = {
           active?: boolean
           created_at?: string
           cta_label: string
+          cta_target?: string
           ends_at: string
           featured?: boolean
           id?: string
+          image_alt_text?: string | null
+          image_height?: number | null
+          image_object_position?: string
           image_path: string
+          image_width?: number | null
           priority?: number
           short_description?: string | null
           slug: string
@@ -588,10 +619,15 @@ export type Database = {
           active?: boolean
           created_at?: string
           cta_label?: string
+          cta_target?: string
           ends_at?: string
           featured?: boolean
           id?: string
+          image_alt_text?: string | null
+          image_height?: number | null
+          image_object_position?: string
           image_path?: string
+          image_width?: number | null
           priority?: number
           short_description?: string | null
           slug?: string
@@ -636,7 +672,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reorder_gallery_items: {
+        Args: { ordered_ids: string[]; target_gallery_id: string }
+        Returns: undefined
+      }
+      reorder_product_images: {
+        Args: { ordered_ids: string[]; target_product_id: string }
+        Returns: undefined
+      }
+      set_product_cover: {
+        Args: { target_image_id: string; target_product_id: string }
+        Returns: undefined
+      }
+      sync_collection_products: {
+        Args: { ordered_product_ids: string[]; target_collection_id: string }
+        Returns: undefined
+      }
+      sync_promotion_products: {
+        Args: { ordered_product_ids: string[]; target_promotion_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       admin_role: "admin" | "editor" | "attendant"

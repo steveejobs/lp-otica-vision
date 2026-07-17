@@ -1,4 +1,4 @@
-# Schema do banco — Fase 1
+# Schema do banco — Fases 1 e 2
 
 As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema remoto não deve ser alterado manualmente sem que a mudança equivalente seja versionada.
 
@@ -7,6 +7,8 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 1. `20260717005857_phase1_core_schema.sql`: tipos, tabelas, FKs, constraints, índices e triggers de `updated_at`/perfil.
 2. `20260717005902_phase1_security_rls_audit.sql`: funções de papel, grants, RLS, escopo do atendente e auditoria.
 3. `20260717005905_phase1_storage.sql`: buckets privados e políticas de objetos.
+4. `20260717030000_phase2_admin_operations.sql`: arquivamento, metadados completos de mídia, proteção do último admin, validação de publicação, RPCs atômicas de ordem e bucket de logos.
+5. `20260717030500_phase2_media_integrity.sql`: SKU sem diferenciar caixa, limites de campos e triggers diferidos que preservam mídia mínima de conteúdo publicado.
 
 ## Tabelas
 
@@ -39,13 +41,17 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 
 ## Integridade
 
-- `slug` e `sku` são únicos;
+- `slug` é único e SKU é único sem diferenciar maiúsculas/minúsculas;
 - `galleries.route_key` é único;
 - uma constraint parcial permite somente uma imagem com `is_cover = true` por produto;
 - janelas de publicação não aceitam fim anterior ao início;
 - preços, dimensões e ordens não aceitam valores negativos;
 - metadados de analytics precisam ser objeto JSON e ter no máximo 4 KiB;
 - FKs impedem órfãos e usam `restrict`, `cascade` ou `set null` conforme a relação.
+- produto arquivado é despublicado e não pode aparecer para anônimo;
+- produto publicado exige capa completa, e galeria publicada exige ao menos um item publicado completo;
+- o último administrador ativo não pode ser removido ou desativado no banco;
+- RPCs de ordem validam a sequência inteira e impedem a quebra silenciosa de séries visuais.
 
 ## Índices
 

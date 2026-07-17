@@ -28,4 +28,4 @@ Se nenhum administrador ativo permanecer, repita o processo com outro usuário c
 
 ## Estado desta entrega
 
-Nenhum administrador foi criado porque não foi fornecido `BOOTSTRAP_ADMIN_EMAIL`. A tela de login e a proteção de sessão estão implementadas; o dashboard autenticado ficará disponível após o convite e bootstrap explícitos.
+O bootstrap foi executado para o usuário explicitamente autorizado. Foi confirmada uma única identidade correspondente, um único profile com o mesmo UUID, papel `admin`, `active = true`, além de login, dashboard, área exclusiva de admin e logout reais. O processo não criou duplicata nem alterou senha.

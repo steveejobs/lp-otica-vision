@@ -1,4 +1,4 @@
-# Políticas RLS — Fase 1
+# Políticas RLS — Fases 1 e 2
 
 RLS está explicitamente ativo nas 14 tabelas do schema público. Papéis são consultados em `profiles` por funções `security definer` no schema `private`; a verificação sempre exige `active = true`.
 
@@ -7,7 +7,7 @@ RLS está explicitamente ativo nas 14 tabelas do schema público. Papéis são c
 | Recurso | Anônimo | Atendente | Editor | Admin |
 | --- | --- | --- | --- | --- |
 | marcas/categorias | lê ativas | lê tudo | CRUD | CRUD |
-| produtos | lê publicados | lê tudo; altera apenas disponibilidade | CRUD | CRUD |
+| produtos | lê publicados e não arquivados | lê tudo; altera apenas disponibilidade | CRUD/arquivo | CRUD/arquivo |
 | imagens de produto | lê metadados de produto publicado | lê tudo | CRUD | CRUD |
 | coleções/relações | lê publicadas e dentro da janela | lê tudo | CRUD | CRUD |
 | galerias/itens | lê publicados | lê tudo | CRUD | CRUD |
@@ -28,6 +28,7 @@ Essa proteção não depende de botões ou formulários.
 ## Conteúdo público
 
 - produtos: `published = true`;
+- produtos arquivados nunca são públicos, mesmo se uma mutação defeituosa tentar manter `published = true`;
 - marcas/categorias: `active = true`;
 - coleções: publicadas e com início/fim válidos no instante da leitura;
 - galeria e item: ambos publicados;
@@ -43,6 +44,8 @@ Um usuário autenticado pode ler apenas o próprio perfil para receber uma respo
 Triggers registram `insert`, `update` e `delete` em perfis, conteúdo, relações e configurações. Editores não recebem grant de escrita em `audit_logs`; o teste automatizado confirma que uma tentativa de exclusão não remove o registro.
 
 O cliente administrativo pode acessar o banco sem RLS e, por isso, só pode existir em módulos `server-only`. Mutações editoriais normais devem usar o cliente SSR para preservar identidade e políticas.
+
+As funções públicas de ordenação executam como `security invoker`, exigem admin/editor e validam todos os IDs. A função de galeria também exige que cada série permaneça contígua e crescente.
 
 ## Teste reproduzível
 

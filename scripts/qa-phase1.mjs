@@ -111,7 +111,7 @@ try {
     category_id: categoryId,
     id: publishedId,
     name: "QA Published",
-    published: true,
+    published: false,
     sku: `QA-${publishedId.slice(0, 8)}`,
     slug: `qa-published-${publishedId.slice(0, 8)}`,
   });
@@ -125,6 +125,34 @@ try {
     slug: `qa-draft-${draftId.slice(0, 8)}`,
   });
   record("editor_create_products", !publishedError && !draftError);
+
+  const imagePath = `${publishedId}/${randomUUID()}.png`;
+  cleanup.storagePaths.push(imagePath);
+  const png = Uint8Array.from(
+    Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  );
+  const { error: uploadError } = await editor.client.storage
+    .from("catalog-products")
+    .upload(imagePath, png, { contentType: "image/png", upsert: false });
+  const { error: imageRecordError } = await editor.client.from("product_images").insert({
+    alt_text: "Imagem de QA da Fase 1",
+    height: 1,
+    is_cover: true,
+    product_id: publishedId,
+    storage_path: imagePath,
+    width: 1,
+  });
+  const { error: publishError } = await editor.client
+    .from("products")
+    .update({ published: true })
+    .eq("id", publishedId);
+  record(
+    "editor_uploads_allowed_image",
+    !uploadError && !imageRecordError && !publishError,
+  );
 
   const anonymous = publicClient();
   const { data: publicRows, error: publicReadError } = await anonymous
@@ -176,19 +204,6 @@ try {
     .select("id")
     .in("id", [publishedId, draftId]);
   record("inactive_user_loses_admin_read", !inactiveError && inactiveRows?.length === 0);
-
-  const imagePath = `${publishedId}/${randomUUID()}.png`;
-  cleanup.storagePaths.push(imagePath);
-  const png = Uint8Array.from(
-    Buffer.from(
-      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-      "base64",
-    ),
-  );
-  const { error: uploadError } = await editor.client.storage
-    .from("catalog-products")
-    .upload(imagePath, png, { contentType: "image/png", upsert: false });
-  record("editor_uploads_allowed_image", !uploadError);
 
   const { error: forbiddenMimeError } = await editor.client.storage
     .from("catalog-products")

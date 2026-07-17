@@ -1,5 +1,35 @@
 import styles from "./admin.module.css";
 
+const feedbackMessages: Record<string, string> = {
+  archived: "Registro arquivado com segurança.",
+  constraint: "A operação viola uma regra de integridade. Revise os campos e vínculos.",
+  created: "Registro criado com sucesso.",
+  date: "Informe uma data e hora válidas.",
+  date_window: "A data final não pode ser anterior à inicial.",
+  deleted: "Registro removido com segurança.",
+  duplicate: "Já existe um registro com esse slug, SKU ou identificador.",
+  email: "Informe um e-mail válido.",
+  failed: "Não foi possível concluir a operação. Tente novamente.",
+  forbidden: "Seu papel não permite executar esta ação.",
+  image: "A imagem não passou na validação de formato, tamanho ou dimensões.",
+  invalid: "Revise os campos informados.",
+  invalid_order: "A ordenação enviada não corresponde aos itens atuais.",
+  invited: "Convite enviado e perfil autorizado configurado.",
+  length: "Um ou mais campos excedem o tamanho permitido.",
+  linked: "O registro possui vínculos e não pode ser excluído diretamente.",
+  number: "Informe um número válido e não negativo.",
+  position: "Use um enquadramento como “50% 50%”.",
+  price: "Informe um preço válido e não negativo.",
+  removed: "Imagem removida com segurança.",
+  reordered: "Nova ordem salva.",
+  required: "Preencha todos os campos obrigatórios.",
+  role: "Alteração de papel bloqueada por segurança.",
+  route: "A chave de rota contém caracteres inválidos.",
+  saved: "Alterações salvas.",
+  slug: "Use um slug em minúsculas, sem espaços ou acentos.",
+  uploaded: "Imagem armazenada e vinculada com sucesso.",
+};
+
 export function AdminPageHeader({
   description,
   eyebrow = "Ótica Vision",
@@ -41,6 +71,16 @@ export function AdminStatus({ active, falseLabel = "Inativo", trueLabel = "Ativo
     <span className={active ? styles.statusPositive : styles.statusNeutral}>
       {active ? trueLabel : falseLabel}
     </span>
+  );
+}
+
+export function AdminFeedback({ error, status }: { error?: string; status?: string }) {
+  const code = error ?? status;
+  if (!code) return null;
+  return (
+    <p className={error ? styles.formError : styles.formSuccess} role={error ? "alert" : "status"}>
+      {feedbackMessages[code] ?? (error ? feedbackMessages.failed : feedbackMessages.saved)}
+    </p>
   );
 }
 

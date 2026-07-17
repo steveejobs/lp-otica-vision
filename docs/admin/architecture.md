@@ -1,8 +1,8 @@
-# Arquitetura do ADM — Fase 1
+# Arquitetura do ADM — Fases 1 e 2
 
 ## Escopo
 
-Esta fase cria a fundação do ADM e do catálogo da Ótica Vision. Ela não publica o catálogo público, não altera a landing page atual e não implementa estoque, PDV, fiscal, carrinho, checkout ou formulários avançados.
+As duas fases entregam a fundação e o painel administrativo da Ótica Vision. Elas não publicam o catálogo público, não alteram a landing page atual e não implementam estoque, PDV, fiscal, carrinho ou checkout.
 
 ## Camadas
 
@@ -46,9 +46,9 @@ Ocultar links no menu é apenas ergonomia. As permissões continuam válidas mes
 
 ## Estado do ADM
 
-As rotas `/admin`, `/admin/produtos`, `/admin/colecoes`, `/admin/galerias`, `/admin/promocoes`, `/admin/marcas`, `/admin/categorias` e `/admin/configuracoes` estão navegáveis. As páginas leem dados reais e mostram estado vazio sem cadastrar conteúdo fictício.
+O painel possui CRUDs funcionais de marcas, categorias, produtos/imagens, coleções, galerias e destaques, além de disponibilidade rápida, usuários e auditoria. A relação completa de rotas e decisões operacionais está em `docs/admin/phase-2.md`.
 
-`/admin/configuracoes` exige o papel `admin`. Os demais módulos podem ser consultados por toda a equipe ativa, respeitando as mutações permitidas pelo banco.
+Admin e editor acessam conteúdo editorial. Atendente acessa somente visão geral e disponibilidade rápida. Usuários, auditoria e configurações exigem admin. Cada página e cada Server Action repete a checagem de papel; RLS e triggers permanecem como última camada.
 
 ## Decisões de segurança
 
@@ -59,9 +59,9 @@ As rotas `/admin`, `/admin/produtos`, `/admin/colecoes`, `/admin/galerias`, `/ad
 - auditoria central por trigger, com remoção recursiva de campos que pareçam senha, segredo, token, chave, autorização ou cookie;
 - analytics anônimo somente por endpoint server-side e sem telefone, nome, e-mail, mensagem ou IP em texto.
 
-## Limites da Fase 1
+## Limites atuais
 
-- não há administrador criado porque nenhum e-mail autorizado foi fornecido;
-- formulários CRUD avançados entram na Fase 2;
+- existe um administrador real autorizado e validado; nenhum dado de identidade é versionado;
 - o rate limit de analytics é básico e por instância; uma solução distribuída deve ser adotada antes de tráfego elevado;
-- as imagens privadas usam URLs assinadas curtas; a integração com o catálogo público será feita somente na fase correspondente.
+- as imagens privadas usam URLs assinadas curtas; a integração com o catálogo público será feita somente na Fase 3;
+- não há estoque quantitativo, PDV, carrinho, pagamento ou fiscal.

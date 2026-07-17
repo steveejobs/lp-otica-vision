@@ -45,7 +45,14 @@ export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
       <div className={styles.adminCanvas}>
         <header className={styles.mobileHeader}>
           <Link href="/admin">Ótica Vision · ADM</Link>
-          <span>{roleLabels[profile.role]}</span>
+          <div>
+            <span>{roleLabels[profile.role]}</span>
+            <form action={onLogout}>
+              <button className={styles.logoutButton} type="submit">
+                Sair
+              </button>
+            </form>
+          </div>
         </header>
         <main className={styles.adminMain} id="main-content">
           {children}
