@@ -1,35 +1,31 @@
 .viewport {
-  --rail-item-width: 150px;
-  --rail-item-height: 66px;
-  --rail-item-gap: 16px;
-  --rail-separator-offset: -8px;
-  --rail-group-gap: 24px;
-  --rail-half-gap: 12px;
-  --rail-duration: 38s;
-  --rail-logo-shell-scale: 1;
-  --rail-edge-size: clamp(2.8rem, 7vw, 6.5rem);
+  --rail-item-width: 184px;
+  --rail-item-height: 86px;
+  --rail-item-gap: 24px;
+  --rail-separator-offset: -12px;
+  --rail-group-gap: 32px;
+  --rail-half-gap: 16px;
+  --rail-duration: 36s;
+  --rail-logo-shell-scale: 1.16;
+  --rail-edge-size: clamp(4rem, 10vw, 9rem);
   --rail-fade-surface: var(--vision-bg-soft);
   position: relative;
   width: 100%;
   min-width: 0;
   overflow: hidden;
-  border-top: 1px solid rgba(143, 150, 157, 0.34);
-  border-bottom: 1px solid rgba(251, 248, 243, 0.86);
   outline-offset: 5px;
   touch-action: pan-y pinch-zoom;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent 0,
     #000 var(--rail-edge-size),
-    #000 calc(100% - var(--rail-edge-size)),
-    transparent 100%
+    #000 100%
   );
   mask-image: linear-gradient(
     90deg,
     transparent 0,
     #000 var(--rail-edge-size),
-    #000 calc(100% - var(--rail-edge-size)),
-    transparent 100%
+    #000 100%
   );
 }
 
@@ -47,12 +43,16 @@
 
 .viewport::before {
   left: 0;
-  background: linear-gradient(90deg, var(--rail-fade-surface), rgba(244, 238, 230, 0));
+  background:
+    linear-gradient(90deg, var(--rail-fade-surface), rgba(244, 238, 230, 0)),
+    linear-gradient(90deg, rgba(251, 248, 243, 0.78), rgba(251, 248, 243, 0));
 }
 
 .viewport::after {
-  right: 0;
-  background: linear-gradient(270deg, var(--rail-fade-surface), rgba(244, 238, 230, 0));
+  content: none;
+  display: none;
+  width: 0;
+  backdrop-filter: none;
 }
 
 .track {
@@ -121,14 +121,14 @@
 }
 
 .compact {
-  --rail-item-width: 116px;
-  --rail-item-height: 50px;
-  --rail-item-gap: 12px;
-  --rail-separator-offset: -6px;
-  --rail-group-gap: 16px;
-  --rail-half-gap: 8px;
+  --rail-item-width: 136px;
+  --rail-item-height: 64px;
+  --rail-item-gap: 16px;
+  --rail-separator-offset: -8px;
+  --rail-group-gap: 22px;
+  --rail-half-gap: 11px;
   --rail-duration: 32s;
-  --rail-logo-shell-scale: 0.84;
+  --rail-logo-shell-scale: 0.98;
   --rail-fade-surface: var(--vision-paper);
 }
 
@@ -166,20 +166,20 @@
 
 @media (max-width: 720px) {
   .home {
-    --rail-item-width: 144px;
-    --rail-item-height: 66px;
-    --rail-item-gap: 14px;
-    --rail-separator-offset: -7px;
-    --rail-group-gap: 20px;
-    --rail-half-gap: 10px;
-    --rail-duration: 38s;
-    --rail-logo-shell-scale: 1.08;
-    --rail-edge-size: clamp(2.2rem, 11vw, 4.2rem);
+    --rail-item-width: 164px;
+    --rail-item-height: 78px;
+    --rail-item-gap: 18px;
+    --rail-separator-offset: -9px;
+    --rail-group-gap: 24px;
+    --rail-half-gap: 12px;
+    --rail-duration: 36s;
+    --rail-logo-shell-scale: 1.16;
+    --rail-edge-size: clamp(2.8rem, 16vw, 5.4rem);
   }
 
   .compact {
-    --rail-item-width: 142px;
-    --rail-item-height: 64px;
+    --rail-item-width: 150px;
+    --rail-item-height: 70px;
     --rail-item-gap: 14px;
     --rail-separator-offset: -7px;
     --rail-group-gap: 18px;

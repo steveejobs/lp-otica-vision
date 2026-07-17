@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Glasses } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Glasses, MessageCircle } from "lucide-react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogProductCard } from "@/lib/catalog/types";
+import { LINKS } from "@/lib/links";
 
 import { CatalogPreviewRail } from "./catalog-preview-rail";
 import styles from "./catalog-preview.module.css";
@@ -28,13 +29,13 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
       <div className={styles.inner}>
         <header className={styles.header}>
           <div>
-            <p className="eyebrow">Catálogo Vision</p>
-            <h2 id="catalog-preview-title">Óculos em foco.</h2>
+            <p className="eyebrow">Vitrine Vision</p>
+            <h2 id="catalog-preview-title">A vitrine passa diante dos olhos.</h2>
           </div>
           <div className={styles.headerAside}>
-            <p>Uma prévia dos modelos publicados no catálogo Vision.</p>
+            <p>Modelos publicados no catálogo, com caminho direto para consultar pelo WhatsApp.</p>
             <Link className={styles.cta} href="/catalogo">
-              Ver catálogo
+              Ver catálogo geral
               <ArrowRight aria-hidden="true" size={17} />
             </Link>
           </div>
@@ -60,11 +61,11 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
                 />
               </span>
               <span className={styles.featureContent}>
-                <span className={styles.featureMeta}>No catálogo</span>
+                <span className={styles.featureMeta}>Destaque da vitrine</span>
                 <span className={styles.featureTitle}>{featuredProduct.name}</span>
                 {descriptor ? <span className={styles.featureDescriptor}>{descriptor}</span> : null}
                 <span className={styles.featureAction}>
-                  Ver modelo
+                  Abrir modelo
                   <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
                 </span>
               </span>
@@ -73,7 +74,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
             {supportingProducts.length ? (
               <div className={styles.railColumn}>
                 <div className={styles.railHeader}>
-                  <p>Mais modelos</p>
+                  <p>Em movimento</p>
                 </div>
                 <CatalogPreviewRail products={supportingProducts} />
               </div>
@@ -87,19 +88,31 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
                 <span />
                 <span />
               </div>
+              <div className={styles.emptyPreviewRail}>
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
               <div className={styles.emptyMonogram}>
                 <Glasses aria-hidden="true" size={44} strokeWidth={1.35} />
               </div>
             </div>
 
             <div className={styles.emptyCopy}>
-              <p className={styles.featureMeta}>Catálogo ativo</p>
-              <h3>Seleção em curadoria.</h3>
-              <p>Os modelos publicados pela equipe Vision aparecem neste espaço.</p>
-              <Link className={styles.emptyAction} href="/catalogo">
-                Abrir catálogo
-                <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
-              </Link>
+              <p className={styles.featureMeta}>Vitrine Vision</p>
+              <h3>A vitrine começa aqui.</h3>
+              <p>Acesse o catálogo geral ou fale com a equipe Vision pelo WhatsApp.</p>
+              <div className={styles.emptyActions}>
+                <Link className={styles.emptyAction} href="/catalogo">
+                  Ver catálogo geral
+                  <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
+                </Link>
+                <a className={styles.emptyActionSecondary} href={LINKS.whatsapp} rel="noopener noreferrer" target="_blank">
+                  <MessageCircle aria-hidden="true" size={16} strokeWidth={1.8} />
+                  WhatsApp
+                </a>
+              </div>
             </div>
           </div>
         )}

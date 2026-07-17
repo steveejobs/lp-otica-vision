@@ -5,8 +5,9 @@ import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
-const ROUTE_EXIT_MS = 240;
-const ROUTE_ENTER_MS = 540;
+const ROUTE_EXIT_MS = 340;
+const ROUTE_ENTER_MS = 620;
+const HYDRATION_SETTLE_MS = 1_200;
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0;
@@ -63,13 +64,28 @@ export function VisionMotion() {
     const root = document.documentElement;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const observedTargets = new WeakSet<HTMLElement>();
+    const queuedTargets = new WeakSet<HTMLElement>();
     let animationFrame = 0;
+    let startTimer = 0;
+    let observer: IntersectionObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
+    let disposed = false;
 
     const revealTarget = (target: HTMLElement) => {
       target.classList.add("is-motion-visible");
       if (target.matches("[data-focus-reveal]")) {
         target.classList.add("is-focus-visible");
       }
+    };
+
+    const queueRevealTarget = (target: HTMLElement) => {
+      if (queuedTargets.has(target)) return;
+      queuedTargets.add(target);
+      window.setTimeout(() => {
+        window.requestAnimationFrame(() => {
+          revealTarget(target);
+        });
+      }, 80);
     };
 
     const syncStaggerOrder = () => {
@@ -85,25 +101,8 @@ export function VisionMotion() {
     const targetsInDocument = () =>
       Array.from(document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
 
-    if (reducedMotion.matches || !("IntersectionObserver" in window)) {
-      root.dataset.motionReady = "true";
-      syncStaggerOrder();
-      targetsInDocument().forEach(revealTarget);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          revealTarget(entry.target as HTMLElement);
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.16, rootMargin: "0px 0px -8%" },
-    );
-
     const observeNewTargets = () => {
+      root.dataset.motionReady = "true";
       syncStaggerOrder();
 
       targetsInDocument().forEach((target) => {
@@ -111,32 +110,66 @@ export function VisionMotion() {
 
         const bounds = target.getBoundingClientRect();
         if (bounds.top < window.innerHeight * 1.04 && bounds.bottom > 0) {
-          revealTarget(target);
+          queueRevealTarget(target);
           return;
         }
 
         if (!observedTargets.has(target)) {
-          observer.observe(target);
+          observer?.observe(target);
           observedTargets.add(target);
         }
       });
 
-      root.dataset.motionReady = "true";
     };
 
-    observeNewTargets();
+    const startRevealSystem = () => {
+      if (disposed) return;
 
-    const mutationObserver = new MutationObserver(() => {
-      window.cancelAnimationFrame(animationFrame);
-      animationFrame = window.requestAnimationFrame(observeNewTargets);
-    });
+      if (reducedMotion.matches || !("IntersectionObserver" in window)) {
+        root.dataset.motionReady = "true";
+        syncStaggerOrder();
+        targetsInDocument().forEach(revealTarget);
+        return;
+      }
 
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            revealTarget(entry.target as HTMLElement);
+            observer?.unobserve(entry.target);
+          });
+        },
+        { threshold: 0.16, rootMargin: "0px 0px -8%" },
+      );
+
+      observeNewTargets();
+
+      mutationObserver = new MutationObserver(() => {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = window.requestAnimationFrame(observeNewTargets);
+      });
+
+      mutationObserver.observe(document.body, { childList: true, subtree: true });
+    };
+
+    const scheduleStart = () => {
+      startTimer = window.setTimeout(startRevealSystem, HYDRATION_SETTLE_MS);
+    };
+
+    if (document.readyState === "complete") {
+      scheduleStart();
+    } else {
+      window.addEventListener("load", scheduleStart, { once: true });
+    }
 
     return () => {
+      disposed = true;
+      window.clearTimeout(startTimer);
       window.cancelAnimationFrame(animationFrame);
-      observer.disconnect();
-      mutationObserver.disconnect();
+      window.removeEventListener("load", scheduleStart);
+      observer?.disconnect();
+      mutationObserver?.disconnect();
     };
   }, [pathname]);
 

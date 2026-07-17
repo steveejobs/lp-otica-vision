@@ -29,6 +29,23 @@ function validateUrl(value: string) {
   return parsed.origin;
 }
 
+function validatePublishableKey(value: string) {
+  if (value.startsWith("sb_publishable_")) {
+    return value;
+  }
+
+  // Supabase projects created before publishable keys may still use the legacy
+  // public anon JWT in deployment environments. It is browser-safe, unlike
+  // `sb_secret_`, and keeps older Vercel envs from crashing the admin proxy.
+  if (value.startsWith("eyJ") && value.split(".").length === 3) {
+    return value;
+  }
+
+  throw new Error(
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY deve conter uma chave publicavel do Supabase.",
+  );
+}
+
 export function getSupabasePublicEnv(): SupabasePublicEnv {
   const url = requirePublicValue(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -39,14 +56,8 @@ export function getSupabasePublicEnv(): SupabasePublicEnv {
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   );
 
-  if (!publishableKey.startsWith("sb_publishable_")) {
-    throw new Error(
-      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY deve conter uma chave publicavel do Supabase.",
-    );
-  }
-
   return {
-    publishableKey,
+    publishableKey: validatePublishableKey(publishableKey),
     url: validateUrl(url),
   };
 }

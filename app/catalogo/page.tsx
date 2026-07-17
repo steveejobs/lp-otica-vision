@@ -18,12 +18,14 @@ import {
   parseCatalogQuery,
   type CatalogSearchParams,
 } from "@/lib/catalog/query";
+import { getCatalogProductUrl } from "@/lib/catalog/site-url";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
 import { LINKS } from "@/lib/links";
+import { buildProductWhatsappUrl } from "@/lib/whatsapp/product-link";
 
 import styles from "./catalog.module.css";
 
-const title = "Catálogo | Ótica Vision";
+const title = "Vitrine Vision | Ótica Vision";
 const description =
   "Explore armações nacionais e importadas da Ótica Vision e consulte cada modelo pelo WhatsApp.";
 
@@ -59,6 +61,23 @@ function groupByBrand(products: CatalogProductCardData[]) {
   return [...groups.values()];
 }
 
+async function buildProductConsultationLinks(products: CatalogProductCardData[]) {
+  const entries = await Promise.all(
+    products.map(async (product) => [
+      product.id,
+      await buildProductWhatsappUrl({
+        brand: product.brand?.name,
+        model: product.model,
+        productName: product.name,
+        productUrl: getCatalogProductUrl(product.slug),
+        sku: product.sku,
+      }),
+    ] as const),
+  );
+
+  return new Map(entries);
+}
+
 async function CatalogContent({
   searchParams,
 }: {
@@ -75,6 +94,7 @@ async function CatalogContent({
     ? [{ name: activeBrand?.name ?? "Produtos", products: catalog.products, slug: query.brand }]
     : groupByBrand(catalog.products);
   const hasFilters = hasActiveCatalogFilters(query);
+  const productConsultationLinks = await buildProductConsultationLinks(catalog.products);
 
   return (
     <div className={styles.page}>
@@ -87,11 +107,11 @@ async function CatalogContent({
           aria-labelledby="catalog-title"
         >
           <div className={styles.heroInner}>
-            <p className="eyebrow">Vitrine Vision</p>
-            <h1 id="catalog-title">Catálogo</h1>
+            <p className="eyebrow">Catálogo geral</p>
+            <h1 id="catalog-title">Vitrine Vision</h1>
             <p className={styles.intro}>
-              Explore nossa seleção de armações nacionais e importadas. Consulte cada
-              modelo diretamente com a equipe em Araguaína - TO.
+              Explore armações nacionais e importadas em uma vitrine sem carrinho:
+              cada modelo abre uma conversa direta com a equipe em Araguaína - TO.
             </p>
           </div>
         </section>
@@ -240,13 +260,20 @@ async function CatalogContent({
                         </Link>
                       ) : null}
                     </div>
-                    <div className={styles.grid}>
-                      {group.products.map((product) => (
-                        <CatalogProductCard
-                          key={product.id}
-                          product={product}
-                        />
-                      ))}
+                    <div className={styles.grid} data-motion-stagger>
+                      {group.products.map((product) => {
+                        const whatsappUrl = productConsultationLinks.get(product.id);
+
+                        return (
+                          <CatalogProductCard
+                            actionLabel={whatsappUrl ? "Consultar no WhatsApp" : undefined}
+                            external={Boolean(whatsappUrl)}
+                            href={whatsappUrl}
+                            key={product.id}
+                            product={product}
+                          />
+                        );
+                      })}
                     </div>
                   </section>
                 ))}
@@ -286,9 +313,9 @@ function CatalogLoading() {
       <main id="main-content">
         <section className={styles.hero} data-motion-reveal data-motion-variant="hero">
           <div className={styles.heroInner}>
-            <p className="eyebrow">Vitrine Vision</p>
-            <h1>Catálogo</h1>
-            <p className={styles.intro}>Preparando a seleção publicada.</p>
+            <p className="eyebrow">Catálogo geral</p>
+            <h1>Vitrine Vision</h1>
+            <p className={styles.intro}>Preparando a vitrine publicada.</p>
           </div>
         </section>
         <section

@@ -37,6 +37,7 @@ export function NewsImage({
           fill
           sizes={sizes}
           loading="lazy"
+          unoptimized
           onLoad={() => {
             setLoaded(true);
             onLoad?.();

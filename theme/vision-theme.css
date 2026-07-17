@@ -24,8 +24,8 @@
   --duration-medium: 420ms;
   --duration-editorial: 680ms;
   --duration-media: 860ms;
-  --route-exit-duration: 260ms;
-  --route-enter-duration: 540ms;
+  --route-exit-duration: 340ms;
+  --route-enter-duration: 620ms;
 
   --radius-sm: 6px;
   --radius-md: 8px;

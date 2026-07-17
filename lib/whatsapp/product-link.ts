@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type ProductWhatsappInput = {
@@ -38,7 +40,7 @@ function validateProductUrl(value: string) {
   return url.toString();
 }
 
-async function getOfficialPhone() {
+const getOfficialPhone = cache(async function getOfficialPhone() {
   const supabase = createSupabaseAdminClient();
   const { data, error } = await supabase
     .from("site_settings")
@@ -57,9 +59,9 @@ async function getOfficialPhone() {
   }
 
   return phone;
-}
+});
 
-export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
+export function buildProductWhatsappUrlWithPhone(phone: string, input: ProductWhatsappInput) {
   const productName = cleanLine(input.productName, "Nome do produto", 160);
   const sku = cleanLine(input.sku, "SKU", 80);
   const brand = input.brand?.trim()
@@ -72,7 +74,6 @@ export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
     ? cleanLine(input.color, "Cor", 100)
     : null;
   const productUrl = validateProductUrl(input.productUrl);
-  const phone = await getOfficialPhone();
   const message = [
     "Olá! Tenho interesse neste produto:",
     "",
@@ -89,4 +90,9 @@ export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
   ].join("\n");
 
   return `https://api.whatsapp.com/send/?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+}
+
+export async function buildProductWhatsappUrl(input: ProductWhatsappInput) {
+  const phone = await getOfficialPhone();
+  return buildProductWhatsappUrlWithPhone(phone, input);
 }

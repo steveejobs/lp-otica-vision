@@ -48,27 +48,9 @@
   position: relative;
   display: grid;
   min-width: 0;
-  min-height: 190px;
+  min-height: 216px;
   align-content: center;
-  padding-block: clamp(1.2rem, 3vw, 2.1rem);
-}
-
-.railWrap::before,
-.railWrap::after {
-  content: "";
-  position: absolute;
-  left: clamp(0rem, 3vw, 2rem);
-  right: clamp(0rem, 3vw, 2rem);
-  height: 1px;
-  background: rgba(143, 150, 157, 0.26);
-}
-
-.railWrap::before {
-  top: 0;
-}
-
-.railWrap::after {
-  bottom: 0;
+  padding-block: clamp(1.6rem, 3.5vw, 2.7rem);
 }
 
 @media (min-width: 901px) {
@@ -89,7 +71,7 @@
   }
 
   .railWrap {
-    min-height: 154px;
+    min-height: 180px;
     margin-inline: calc((100vw - 100%) / -2);
   }
 }

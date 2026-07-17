@@ -5,7 +5,7 @@
 | Nome | Browser | Servidor | Uso |
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | sim | sim | URL do projeto Supabase |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | sim | sim | cliente público e SSR |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | sim | sim | cliente público e SSR; aceita chave `sb_publishable_` ou anon pública legada |
 | `SUPABASE_SECRET_KEY` | nunca | sim | tarefas server-only controladas |
 | `SUPABASE_PROJECT_REF` | não é necessário no bundle | CLI/automação | vínculo do projeto |
 | `BOOTSTRAP_ADMIN_EMAIL` | nunca | script local | escolha explícita do primeiro admin |
@@ -21,7 +21,7 @@
 - `.env.local` permanece ignorado pelo Git;
 - não usar fallback com valor real;
 - não imprimir, registrar ou capturar credenciais em screenshots;
-- somente a chave publicável recebe prefixo `NEXT_PUBLIC_`;
+- somente a chave pública do Supabase recebe prefixo `NEXT_PUBLIC_`; ela pode ser `sb_publishable_` ou anon pública legada;
 - `SUPABASE_SECRET_KEY` é validada e importada somente por `server-only`;
 - tokens da CLI devem ser rotacionados se aparecerem em Git, log ou screenshot.
 
