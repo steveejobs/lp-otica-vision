@@ -18,6 +18,7 @@ import {
   textValue,
   uuidValue,
 } from "@/lib/admin/validation";
+import { getCollectionPreset } from "@/lib/admin/collection-presets";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
@@ -62,6 +63,39 @@ export async function createCollectionAction(formData: FormData) {
   if (errorCode || !id) redirect(appendFeedback("/admin/colecoes", "error", errorCode ?? "failed"));
   revalidatePath("/admin/colecoes");
   redirect(appendFeedback(`/admin/colecoes/${id}`, "status", "created"));
+}
+
+export async function createPresetCollectionAction(formData: FormData) {
+  await requireAdminRole(["admin", "editor"]);
+  const preset = getCollectionPreset(formData.get("preset_id"));
+  if (!preset) redirect(appendFeedback("/admin/colecoes", "error", "invalid"));
+
+  const supabase = await createSupabaseServerClient();
+  const { data: existing, error: lookupError } = await supabase
+    .from("collections")
+    .select("id")
+    .eq("slug", preset.slug)
+    .maybeSingle();
+
+  if (lookupError) redirect(appendFeedback("/admin/colecoes", "error", mutationErrorCode(lookupError)));
+  if (existing) redirect(appendFeedback(`/admin/colecoes/${existing.id}`, "status", "existing"));
+
+  const { data, error } = await supabase
+    .from("collections")
+    .insert({
+      description: preset.description,
+      display_order: preset.displayOrder,
+      featured: false,
+      name: preset.name,
+      published: false,
+      slug: preset.slug,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) redirect(appendFeedback("/admin/colecoes", "error", mutationErrorCode(error)));
+  revalidatePath("/admin/colecoes");
+  redirect(appendFeedback(`/admin/colecoes/${data.id}`, "status", "created"));
 }
 
 export async function updateCollectionAction(formData: FormData) {

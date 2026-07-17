@@ -320,6 +320,81 @@
   font-weight: 400;
 }
 
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 0.6rem;
+  background: var(--admin-line);
+}
+
+.presetCard {
+  display: grid;
+  min-height: 16rem;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 253, 249, 0.76);
+}
+
+.presetCardHeader {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.presetCardHeader > span:first-child {
+  overflow: hidden;
+  color: var(--admin-bronze);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.presetCardBody {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.presetCardBody h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.presetCardBody p,
+.presetGuide {
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  line-height: 1.55;
+}
+
+.presetGuide {
+  min-height: 3.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--admin-line);
+}
+
+.presetCard form,
+.presetCard .buttonLink {
+  align-self: end;
+}
+
+.presetCard .primaryButton,
+.presetCard .secondaryButton,
+.presetCard .buttonLink {
+  width: 100%;
+}
+
 .notice {
   margin-bottom: 1.5rem;
   padding: 0.9rem 1rem;
@@ -1066,6 +1141,10 @@
     display: block;
   }
 
+  .presetGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .sidebar {
     position: static;
     display: block;
@@ -1153,6 +1232,10 @@
   .metricsGrid,
   .quickGrid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .presetGrid {
+    grid-template-columns: 1fr;
   }
 
   .metricCard {

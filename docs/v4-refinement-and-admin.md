@@ -92,6 +92,12 @@ A ADM deve controlar:
 - texto editorial sem claim comercial não comprovado;
 - data de início e fim opcional, sem criar urgência pública automática.
 
+### Preview do catálogo na home
+
+- ativação e desativação pela chave `home.catalog_preview.enabled` em `site_settings`;
+- exibição somente de produtos publicados, não arquivados e com capa válida;
+- estado vazio permitido apenas como composição editorial neutra, sem produto, marca, preço, prazo ou disponibilidade inventados.
+
 ### Marca em destaque
 
 - seleção somente entre marcas cadastradas e confirmadas;

@@ -11,6 +11,7 @@ const feedbackMessages: Record<string, string> = {
   deleted: "Registro removido com segurança.",
   duplicate: "Já existe um registro com esse slug, SKU ou identificador.",
   email: "Informe um e-mail válido.",
+  existing: "A coleção já existia; carreguei o editor dela.",
   failed: "Não foi possível concluir a operação. Tente novamente.",
   forbidden: "Seu papel não permite executar esta ação.",
   image: "A imagem não passou na validação de formato, tamanho ou dimensões.",

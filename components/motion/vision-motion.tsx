@@ -5,8 +5,8 @@ import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
-const ROUTE_EXIT_MS = 280;
-const ROUTE_ENTER_MS = 560;
+const ROUTE_EXIT_MS = 240;
+const ROUTE_ENTER_MS = 540;
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0;

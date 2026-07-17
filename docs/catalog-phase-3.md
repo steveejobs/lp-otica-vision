@@ -17,7 +17,7 @@ Somente produtos publicados, não arquivados, com capa completa e taxonomias vin
 
 ## Home e motion
 
-A home consulta no máximo seis produtos `featured = true`, publicados e com capa válida. Quando não há produto elegível, a seção não é renderizada e o restante da landing permanece intacto.
+A home consulta no máximo seis produtos `featured = true`, publicados e com capa válida. A exibição do preview é controlada pela chave `home.catalog_preview.enabled` em `site_settings`. Quando a chave está ausente, o preview fica ativo por padrão. Quando não há produto elegível, a home renderiza apenas um estado editorial neutro, sem SKU, marca, preço, disponibilidade ou produto fictício.
 
 O rail editorial usa duas sequências iguais para loop contínuo. A cópia semântica é a primeira; clones têm `aria-hidden` e links fora da ordem de tabulação. O autoplay pausa durante interação, fora da viewport e com a aba oculta, retoma suavemente e é desativado por `prefers-reduced-motion`. Drag, swipe, teclado e um controle explícito de pausa continuam disponíveis conforme o contexto.
 
@@ -59,5 +59,5 @@ O ADM expõe para admin uma visão simples por 7, 30 ou 90 dias: produtos mais v
 - não há página dedicada de coleção ou marca; os parâmetros compartilháveis evitam duplicar a lógica;
 - o proxy entrega o original responsivo; transformação derivada no servidor fica para uma próxima fase;
 - analytics é operacional e aproximado, sem atribuição de campanha;
-- sem produtos reais publicados, o catálogo permanece em estado vazio e o preview da home é omitido;
+- sem produtos reais publicados, o catálogo permanece em estado vazio e o preview da home usa apenas um estado editorial neutro;
 - o preview criado nesta fase não é promoção para produção.

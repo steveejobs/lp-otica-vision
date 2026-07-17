@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/site-header";
 import { VideoStory } from "@/components/video-story";
 import { homeVideos, labMedia } from "@/lib/assets";
 import { getFeaturedCatalogProducts } from "@/lib/catalog/data";
+import { getHomeCatalogPreviewSettings } from "@/lib/catalog/home-preview-settings";
 import { getExameNews } from "@/lib/exame-news";
 import { featuredBrands, featuredCollection } from "@/lib/showcase-content";
 
@@ -24,6 +25,9 @@ async function ExameNewsSection() {
 }
 
 async function CatalogPreviewSection() {
+  const settings = await getHomeCatalogPreviewSettings();
+  if (!settings.enabled) return null;
+
   const products = await getFeaturedCatalogProducts();
   return <CatalogPreview products={products} />;
 }

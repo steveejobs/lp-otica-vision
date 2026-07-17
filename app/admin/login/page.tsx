@@ -45,7 +45,12 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
         ) : null}
 
         <form action={loginAdmin} className={styles.loginForm}>
-          <input name="next" type="hidden" value={params.next ?? "/admin"} />
+          <input
+            name="next"
+            suppressHydrationWarning
+            type="hidden"
+            value={params.next ?? "/admin"}
+          />
 
           <label>
             <span>E-mail</span>
@@ -55,6 +60,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
               maxLength={254}
               name="email"
               required
+              suppressHydrationWarning
               type="email"
             />
           </label>
@@ -67,6 +73,7 @@ export default async function AdminLoginPage({ searchParams }: LoginPageProps) {
               minLength={8}
               name="password"
               required
+              suppressHydrationWarning
               type="password"
             />
           </label>
