@@ -67,6 +67,7 @@ async function buildProductConsultationLinks(products: CatalogProductCardData[])
       product.id,
       await buildProductWhatsappUrl({
         brand: product.brand?.name,
+        color: product.color,
         model: product.model,
         productName: product.name,
         productUrl: getCatalogProductUrl(product.slug),
