@@ -1,0 +1,150 @@
+.viewport {
+  --rail-slot-width: 146px;
+  --rail-slot-height: 104px;
+  --rail-gap: 28px;
+  --rail-half-gap: 14px;
+  --rail-padding: clamp(2.5rem, 5vw, 5rem);
+  --rail-edge-fade: 16px;
+  --rail-duration: 34s;
+  position: relative;
+  width: 100%;
+  min-height: var(--rail-slot-height);
+  overflow: hidden;
+  padding-inline: var(--rail-padding);
+  outline-offset: -5px;
+  touch-action: pan-y pinch-zoom;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--rail-padding) - var(--rail-edge-fade)),
+    #000 var(--rail-padding),
+    #000 calc(100% - var(--rail-padding)),
+    transparent calc(100% - var(--rail-padding) + var(--rail-edge-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--rail-padding) - var(--rail-edge-fade)),
+    #000 var(--rail-padding),
+    #000 calc(100% - var(--rail-padding)),
+    transparent calc(100% - var(--rail-padding) + var(--rail-edge-fade)),
+    transparent 100%
+  );
+}
+
+.track {
+  --rail-shift: calc(-50% - var(--rail-half-gap));
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: var(--rail-gap);
+  animation: home-brand-loop var(--rail-duration) linear infinite;
+  animation-play-state: running;
+  will-change: transform;
+}
+
+.group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--rail-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.slot {
+  display: grid;
+  width: var(--rail-slot-width);
+  height: var(--rail-slot-height);
+  flex: 0 0 var(--rail-slot-width);
+  place-items: center;
+}
+
+.logoShell {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+}
+
+.logo {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(var(--brand-max-width), calc(var(--rail-slot-width) * 0.78));
+  max-height: min(var(--brand-max-height), calc(var(--rail-slot-height) * 0.5));
+  object-fit: contain;
+  filter: grayscale(1) contrast(0.96);
+  opacity: 0.88;
+  transform: scale(var(--brand-scale));
+  transform-origin: center;
+}
+
+.viewport[data-paused="true"] .track {
+  animation-play-state: paused;
+}
+
+@keyframes home-brand-loop {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(var(--rail-shift), 0, 0);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .viewport:hover .track {
+    animation-play-state: paused;
+  }
+}
+
+@media (min-width: 1200px) {
+  .viewport {
+    --rail-padding: calc((100vw - 1190px) / 2);
+  }
+}
+
+@media (max-width: 720px) {
+  .viewport {
+    --rail-slot-width: 84px;
+    --rail-slot-height: 84px;
+    --rail-gap: 6px;
+    --rail-half-gap: 3px;
+    --rail-padding: calc((100vw - 264px) / 2);
+    --rail-edge-fade: 6px;
+    --rail-duration: 30s;
+  }
+
+  .logo {
+    max-width: min(var(--brand-max-width), calc(var(--rail-slot-width) * 0.88));
+    max-height: min(
+      var(--brand-max-height),
+      calc(var(--rail-slot-height) * 0.52)
+    );
+    opacity: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .track {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+
+  .group[aria-hidden="true"] {
+    display: none;
+  }
+}

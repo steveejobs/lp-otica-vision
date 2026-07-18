@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 
 import type { FeaturedBrandsContent } from "@/lib/showcase-content";
 
-import { BrandRail } from "./brand-rail";
+import { HomeBrandRail } from "./home-brand-rail";
 import { SectionShell } from "./section-shell";
 import { VisionButton } from "./vision-button";
 import styles from "./brand-grid.module.css";
@@ -38,7 +38,7 @@ export function BrandGrid({ content }: BrandGridProps) {
       </header>
 
       <div className={styles.railWrap}>
-        <BrandRail
+        <HomeBrandRail
           brands={brands}
           ariaLabel="Marcas premium na selecao da Otica Vision"
         />

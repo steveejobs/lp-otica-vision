@@ -4,13 +4,13 @@
 
 .inner {
   display: grid;
-  gap: clamp(2rem, 5vw, 4.5rem);
-  padding-block: 4rem 4.25rem;
+  gap: clamp(2rem, 4vw, 3rem);
+  padding-block: 4rem 3.4rem;
 }
 
 .intro {
-  align-self: center;
-  max-width: 500px;
+  display: grid;
+  max-width: 100%;
 }
 
 .eyebrow {
@@ -29,7 +29,7 @@
 
 .intro h2 {
   font-family: var(--font-display);
-  font-size: clamp(2.65rem, 9.8vw, 3.25rem);
+  font-size: clamp(2.65rem, 9.8vw, 3.4rem);
   font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
@@ -37,7 +37,7 @@
 }
 
 .description {
-  max-width: 350px;
+  max-width: 320px;
   margin: 1rem 0 1.25rem;
   color: var(--vision-muted);
   font-size: 0.94rem;
@@ -46,36 +46,49 @@
 
 .railWrap {
   position: relative;
-  display: grid;
+  width: 100vw;
   min-width: 0;
-  min-height: 324px;
-  align-content: center;
-  padding-block: clamp(2.4rem, 4.6vw, 3.9rem);
+  margin-inline: calc((100vw - 100%) / -2);
 }
 
 @media (min-width: 901px) {
-  .inner {
-    grid-template-columns: minmax(310px, 0.7fr) minmax(600px, 1.3fr);
-    align-items: center;
+  .intro {
+    grid-template-areas:
+      "eyebrow description action"
+      "title description action";
+    grid-template-columns: minmax(420px, 1fr) minmax(230px, 320px) auto;
+    align-items: end;
+    column-gap: clamp(2rem, 4.5vw, 4.5rem);
+  }
+
+  .eyebrow {
+    grid-area: eyebrow;
   }
 
   .intro h2 {
+    grid-area: title;
+    max-width: 13ch;
     font-size: clamp(3rem, 3.75vw, 3.85rem);
   }
 
-  .railWrap {
-    margin-right: calc((100vw - min(88vw, 1320px)) / -2);
+  .description {
+    grid-area: description;
+    margin: 0;
+  }
+
+  .intro > a {
+    grid-area: action;
+    align-self: end;
   }
 }
 
 @media (max-width: 720px) {
   .inner {
-    gap: 1.75rem;
-    padding-block: 3.2rem 3.45rem;
+    gap: 2rem;
+    padding-block: 3.2rem 3rem;
   }
 
-  .railWrap {
-    min-height: 270px;
-    margin-inline: calc((100vw - 100%) / -2);
+  .intro h2 {
+    max-width: 10ch;
   }
 }
