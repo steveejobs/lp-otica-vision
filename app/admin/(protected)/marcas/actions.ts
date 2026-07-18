@@ -15,6 +15,7 @@ import {
   textValue,
   uuidValue,
 } from "@/lib/admin/validation";
+import { brandSlugFromName, normalizeBrandIdentity } from "@/lib/admin/brand-identity";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { revalidatePublicCatalog } from "@/lib/catalog/revalidate";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
@@ -32,6 +33,71 @@ function brandPayload(formData: FormData) {
     name: textValue(formData, "name", { max: 120 }),
     slug: slugValue(formData),
   };
+}
+
+export type InlineBrandState = {
+  brand?: { active: boolean; id: string; name: string };
+  message?: string;
+  status: "created" | "duplicate" | "error" | "idle";
+};
+
+export async function createInlineBrandAction(
+  _previous: InlineBrandState,
+  formData: FormData,
+): Promise<InlineBrandState> {
+  await requireAdminRole(["admin", "editor"]);
+  const supabase = await createSupabaseServerClient();
+  const id = randomUUID();
+  let uploadedPath: string | null = null;
+
+  try {
+    const name = textValue(formData, "name", { max: 120 });
+    const identity = normalizeBrandIdentity(name);
+    const slug = brandSlugFromName(name);
+    if (!identity || !slug) throw new AdminValidationError("slug");
+    const displayOrderRaw = formData.get("display_order");
+    const displayOrder = displayOrderRaw === null || displayOrderRaw === ""
+      ? 0
+      : integerValue(formData, "display_order", { max: 100_000 });
+
+    const { data: existingBrands, error: lookupError } = await supabase
+      .from("brands")
+      .select("id, name, slug, active")
+      .limit(500);
+    if (lookupError || !existingBrands) throw lookupError ?? new Error("brand_lookup");
+    const existing = existingBrands.find((brand) =>
+      normalizeBrandIdentity(brand.name) === identity || brand.slug === slug,
+    );
+    if (existing) {
+      return {
+        brand: { active: existing.active, id: existing.id, name: existing.name },
+        message: `Já existe a marca ${existing.name}.`,
+        status: "duplicate",
+      };
+    }
+
+    const file = imageFile(formData);
+    if (file) uploadedPath = (await uploadManagedImage({ bucket: "brand-logos", file, parentId: id })).path;
+    const { data, error } = await supabase
+      .from("brands")
+      .insert({ active: true, display_order: displayOrder, id, logo_url: uploadedPath, name, slug })
+      .select("id, name, active")
+      .single();
+    if (error || !data) throw error ?? new Error("brand_insert");
+    revalidatePath("/admin/marcas");
+    revalidatePath("/admin/produtos");
+    revalidatePublicCatalog();
+    return { brand: data, message: `${data.name} foi criada e selecionada.`, status: "created" };
+  } catch (error) {
+    if (uploadedPath) {
+      try { await removeManagedImage("brand-logos", uploadedPath); } catch { /* Storage QA reports cleanup failures. */ }
+    }
+    if (mutationErrorCode(error) === "duplicate") {
+      const { data } = await supabase.from("brands").select("id, name, active").eq("slug", brandSlugFromName(String(formData.get("name") ?? ""))).maybeSingle();
+      if (data) return { brand: data, message: `Já existe a marca ${data.name}.`, status: "duplicate" };
+    }
+    return { message: "Não foi possível criar a marca. O formulário do produto foi preservado.", status: "error" };
+  }
 }
 
 export async function createBrandAction(formData: FormData) {

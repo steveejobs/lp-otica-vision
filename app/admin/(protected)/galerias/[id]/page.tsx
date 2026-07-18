@@ -6,6 +6,8 @@ import styles from "@/components/admin/admin.module.css";
 import { AdminFeedback, AdminPageHeader, AdminStatus } from "@/components/admin/admin-ui";
 import { FilePreviewInput } from "@/components/admin/file-preview-input";
 import { GalleryItemManager } from "@/components/admin/gallery-item-manager";
+import { GalleryLocationCard } from "@/components/admin/gallery-location-card";
+import { GALLERY_LOCATIONS, getGalleryLocation } from "@/lib/admin/gallery-locations";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { createAdminImageUrls } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -41,7 +43,8 @@ export default async function EditGalleryPage({ params, searchParams }: { params
     <>
       <AdminPageHeader eyebrow="Galerias" description="A interface separa ordem geral e ordem de série; o banco impede que uma série seja fragmentada silenciosamente." title={gallery.name} />
       <AdminFeedback error={query.error} status={query.status} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/galerias">Voltar para galerias</Link><AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" /></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/galerias" prefetch={false}>Voltar para galerias</Link><AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" /></div>
+      <GalleryLocationCard location={getGalleryLocation(gallery.route_key)} published={gallery.published} />
       <section className={styles.formPanel} aria-labelledby="gallery-data-title">
         <div className={styles.panelHeading}><h2 id="gallery-data-title">Configuração da galeria</h2><p>Rota e slug são únicos.</p></div>
         <form action={updateGalleryAction} className={styles.adminForm}>
@@ -49,7 +52,7 @@ export default async function EditGalleryPage({ params, searchParams }: { params
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome</span><input defaultValue={gallery.name} maxLength={160} name="name" required /></label>
             <label className={styles.field}><span>Slug</span><input defaultValue={gallery.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
-            <label className={styles.field}><span>Chave de rota</span><input defaultValue={gallery.route_key} maxLength={120} name="route_key" pattern="[a-z0-9]+(?:[._-][a-z0-9]+)*" required /></label>
+            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue={gallery.route_key} name="route_key" required>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.pageLabel} › {location.sectionLabel} — {location.position}</option>)}</select></label>
             <label className={styles.field}><span>Ordem</span><input defaultValue={gallery.display_order} min="0" name="display_order" required type="number" /></label>
             <label className={styles.checkboxField}><input defaultChecked={gallery.published} name="published" type="checkbox" /><span>Publicada</span></label>
             <label className={styles.checkboxField}><input defaultChecked={gallery.autoplay} name="autoplay" type="checkbox" /><span>Autoplay</span></label>
@@ -75,7 +78,7 @@ export default async function EditGalleryPage({ params, searchParams }: { params
       </section>
       <section className={styles.formPanel} aria-labelledby="gallery-items-title">
         <div className={styles.panelHeading}><div><h2 id="gallery-items-title">Itens e séries</h2><p>Os limites visuais marcam o início de cada série.</p></div><span className={styles.phaseBadge}>{items.length} itens</span></div>
-        <GalleryItemManager galleryId={gallery.id} items={items} />
+        <GalleryItemManager galleryId={gallery.id} items={items} location={getGalleryLocation(gallery.route_key)} />
       </section>
       <section className={styles.dangerZone} aria-labelledby="delete-gallery-title">
         <div className={styles.panelHeading}><div><h2 id="delete-gallery-title">Excluir galeria</h2><p>Remova todos os itens e arquivos antes de excluir o contêiner.</p></div></div>
@@ -84,4 +87,3 @@ export default async function EditGalleryPage({ params, searchParams }: { params
     </>
   );
 }
-

@@ -81,7 +81,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
       <div className={styles.adminToolbar}>
         <div className={styles.toolbarActions} aria-label="Período do relatório">
           {[7, 30, 90].map((period) => (
-            <Link className={period === days ? styles.buttonLink : styles.textButton} href={`/admin/analytics?dias=${period}`} key={period}>
+            <Link className={period === days ? styles.buttonLink : styles.textButton} href={`/admin/analytics?dias=${period}`} key={period} prefetch={false}>
               {period} dias
             </Link>
           ))}

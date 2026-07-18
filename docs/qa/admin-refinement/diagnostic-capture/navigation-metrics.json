@@ -1,0 +1,93 @@
+{
+  "base_url": "http://127.0.0.1:3400",
+  "console_errors": [],
+  "measured_at": "2026-07-18T14:55:13.241Z",
+  "navigations": [
+    {
+      "content_ms": 772,
+      "feedback_ms": 270,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 6,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=T8SXw79kTG645oTr"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=4_DfhW40N1eU1OS7"
+        }
+      ],
+      "resource_types": {
+        "fetch": 5,
+        "script": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 5,
+      "settled_ms": 1227,
+      "shell_persisted": true,
+      "transferred_bytes": 6404,
+      "url_ms": 317,
+      "warmed": false
+    },
+    {
+      "content_ms": 2044,
+      "feedback_ms": null,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 1,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=7P3FwQ4gmASwvt7i"
+        }
+      ],
+      "resource_types": {
+        "fetch": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 1,
+      "settled_ms": 2503,
+      "shell_persisted": true,
+      "transferred_bytes": 2392,
+      "url_ms": 2039,
+      "warmed": true
+    }
+  ],
+  "phase": "diagnostic-capture",
+  "viewport": {
+    "height": 900,
+    "width": 1440
+  }
+}

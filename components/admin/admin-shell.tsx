@@ -5,6 +5,7 @@ import type { AdminRole, AdminSession } from "@/lib/auth/admin-access";
 
 import styles from "./admin.module.css";
 import { AdminNav } from "./admin-nav";
+import { AdminRouteFocus } from "./admin-route-focus";
 
 const roleLabels: Record<AdminRole, string> = {
   admin: "Administrador",
@@ -22,7 +23,7 @@ export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
   return (
     <div className={styles.adminRoot}>
       <aside className={styles.sidebar}>
-        <Link className={styles.sidebarBrand} href="/admin" aria-label="Início do ADM">
+        <Link className={styles.sidebarBrand} href="/admin" aria-label="Início do ADM" prefetch={false}>
           <BrandLogo priority />
           <span>Content studio</span>
         </Link>
@@ -44,7 +45,7 @@ export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
 
       <div className={styles.adminCanvas}>
         <header className={styles.mobileHeader}>
-          <Link href="/admin">Ótica Vision · ADM</Link>
+          <Link href="/admin" prefetch={false}>Ótica Vision · ADM</Link>
           <div>
             <span>{roleLabels[profile.role]}</span>
             <form action={onLogout}>
@@ -55,6 +56,7 @@ export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
           </div>
         </header>
         <main className={styles.adminMain} id="main-content">
+          <AdminRouteFocus />
           {children}
         </main>
       </div>

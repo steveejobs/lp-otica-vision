@@ -68,7 +68,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
                         <AdminSubmitButton pendingLabel="Bloqueando..." variant="secondary">Bloquear</AdminSubmitButton>
                       </form>
                     )}
-                    <Link className={styles.textButton} href={`/admin/usuarios/${profile.id}`}>Gerenciar</Link>
+                    <Link className={styles.textButton} href={`/admin/usuarios/${profile.id}`} prefetch={false}>Gerenciar</Link>
                   </div>
                 </td>
               </tr>

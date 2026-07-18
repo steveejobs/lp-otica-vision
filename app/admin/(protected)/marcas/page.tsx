@@ -11,21 +11,26 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { createBrandAction, toggleBrandAction } from "./actions";
 
+const PAGE_SIZE = 24;
+
 export default async function AdminBrandsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; status?: string }>;
+  searchParams: Promise<{ error?: string; page?: string; status?: string }>;
 }) {
   await requireAdminRole(["admin", "editor"]);
+  const params = await searchParams;
+  const requestedPage = Number(params.page ?? "1");
+  const currentPage = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const supabase = await createSupabaseServerClient();
-  const { data: brands, error } = await supabase
+  const { data: brands, error, count } = await supabase
     .from("brands")
-    .select("id, name, slug, logo_url, active, display_order, updated_at")
+    .select("id, name, slug, logo_url, active, display_order, updated_at", { count: "exact" })
     .order("display_order")
     .order("name")
-    .limit(200);
+    .range((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE - 1);
   if (error) throw new Error("Não foi possível carregar as marcas administrativas.");
-  const params = await searchParams;
+  const totalPages = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
   const signedLogos = await createAdminImageUrls("brand-logos", brands.map((brand) => brand.logo_url));
 
   return (
@@ -73,7 +78,7 @@ export default async function AdminBrandsPage({
 
       <div className={styles.sectionBar}>
         <h2>Marcas cadastradas</h2>
-        <span className={styles.phaseBadge}>{brands.length} registros</span>
+        <span className={styles.phaseBadge}>{count ?? 0} registros</span>
       </div>
       {brands.length === 0 ? (
         <AdminEmptyState>Cadastre somente marcas confirmadas pela Ótica Vision.</AdminEmptyState>
@@ -110,7 +115,7 @@ export default async function AdminBrandsPage({
                   <td>{formatAdminDate(brand.updated_at)}</td>
                   <td>
                     <div className={styles.rowActions}>
-                      <Link className={styles.textButton} href={`/admin/marcas/${brand.id}`}>Editar</Link>
+                      <Link className={styles.textButton} href={`/admin/marcas/${brand.id}`} prefetch={false}>Editar</Link>
                       <form action={toggleBrandAction} className={styles.inlineForm}>
                         <input name="id" type="hidden" value={brand.id} />
                         <AdminSubmitButton pendingLabel="Salvando..." variant="secondary">
@@ -125,6 +130,11 @@ export default async function AdminBrandsPage({
           </tbody>
         </AdminTable>
       )}
+      <nav aria-label="Paginação de marcas" className={styles.pagination}>
+        {currentPage > 1 ? <Link className={styles.buttonLink} href={`/admin/marcas?page=${currentPage - 1}`} prefetch={false}>Anterior</Link> : <span />}
+        <span>Página {currentPage} de {totalPages}</span>
+        {currentPage < totalPages ? <Link className={styles.buttonLink} href={`/admin/marcas?page=${currentPage + 1}`} prefetch={false}>Próxima</Link> : <span />}
+      </nav>
     </>
   );
 }

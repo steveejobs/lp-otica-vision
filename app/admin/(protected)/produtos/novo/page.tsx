@@ -21,9 +21,8 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
     <>
       <AdminPageHeader eyebrow="Produtos" description="O produto nasce como rascunho e com disponibilidade sob consulta. Adicione uma capa validada antes de publicar." title="Novo produto" />
       <AdminFeedback error={query.error} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/produtos">Voltar para produtos</Link></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link></div>
       <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Dados do rascunho</h2><ProductForm action={createProductAction} brands={brands} categories={categories} /></section>
     </>
   );
 }
-

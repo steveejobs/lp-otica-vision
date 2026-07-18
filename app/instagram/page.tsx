@@ -62,7 +62,7 @@ export default function InstagramPage() {
         <h1>@oticavisionaraguaina</h1>
       </header>
 
-      <section className={styles.poster} aria-label="Ótica Vision em movimento">
+      <section className={styles.poster} id="hero-instagram" aria-label="Ótica Vision em movimento">
         <VideoComposition className={styles.mediaStage}>
           <span className={styles.aperture} aria-hidden="true" />
           <ObservedVideo asset={instagramVideos[0]} className={styles.mainVideo} />
@@ -116,7 +116,7 @@ export default function InstagramPage() {
 
       <InstagramImageRail images={instagramImages} />
 
-      <section className={styles.brandSignature} aria-labelledby="instagram-brands-title">
+      <section className={styles.brandSignature} id="marcas-em-destaque" aria-labelledby="instagram-brands-title">
         <header className={styles.brandIntro}>
           <h2 id="instagram-brands-title">Marcas premium. Seleção Vision.</h2>
         </header>

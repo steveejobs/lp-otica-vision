@@ -31,7 +31,7 @@ export default async function EditCollectionPage({ params, searchParams }: { par
     <>
       <AdminPageHeader eyebrow="Coleções" description="Capa, conteúdo, produtos e ordem permanecem reunidos neste editor." title={collection.name} />
       <AdminFeedback error={query.error} status={query.status} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/colecoes">Voltar para coleções</Link><AdminStatus active={collection.published} trueLabel={collection.featured ? "Publicada · destaque" : "Publicada"} falseLabel="Rascunho" /></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/colecoes" prefetch={false}>Voltar para coleções</Link><AdminStatus active={collection.published} trueLabel={collection.featured ? "Publicada · destaque" : "Publicada"} falseLabel="Rascunho" /></div>
       <section className={styles.formPanel} aria-labelledby="collection-data-title">
         <div className={styles.panelHeading}><h2 id="collection-data-title">Dados editoriais</h2><p>Publicação exige capa completa.</p></div>
         <form action={updateCollectionAction} className={styles.adminForm}>
@@ -77,4 +77,3 @@ export default async function EditCollectionPage({ params, searchParams }: { par
     </>
   );
 }
-

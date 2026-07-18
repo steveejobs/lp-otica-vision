@@ -8,27 +8,23 @@ import {
   replaceGalleryItemAction,
   updateGalleryItemAction,
 } from "@/app/admin/(protected)/galerias/actions";
+import type { GalleryLocation } from "@/lib/admin/gallery-locations";
 
 import { AdminSubmitButton, ConfirmSubmitButton } from "./admin-form-controls";
 import { FilePreviewInput } from "./file-preview-input";
+import { GalleryPreviewEditor, type GalleryPreviewItem } from "./gallery-preview-editor";
 import styles from "./admin.module.css";
 
-type GalleryItem = {
-  altText: string;
-  desktopObjectPosition: string;
-  height: number | null;
-  id: string;
-  mobileObjectPosition: string;
-  published: boolean;
-  seriesOrder: number | null;
-  signedUrl: string | null;
-  visualSeries: string | null;
-  width: number | null;
-};
-
-export function GalleryItemManager({ galleryId, items }: { galleryId: string; items: GalleryItem[] }) {
+export function GalleryItemManager({ galleryId, items, location }: { galleryId: string; items: GalleryPreviewItem[]; location: GalleryLocation | null }) {
   const [ordered, setOrdered] = useState(items);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState(items[0]?.id ?? "");
+
+  function updatePosition(id: string, device: "desktop" | "mobile", value: string) {
+    setOrdered((current) => current.map((item) => item.id === id
+      ? { ...item, [device === "desktop" ? "desktopObjectPosition" : "mobileObjectPosition"]: value }
+      : item));
+  }
 
   function move(id: string, offset: number) {
     setOrdered((current) => {
@@ -58,6 +54,7 @@ export function GalleryItemManager({ galleryId, items }: { galleryId: string; it
   return (
     <div className={styles.stack}>
       <p className={styles.notice}>Itens da mesma série devem permanecer contíguos e na ordem interna indicada. O servidor rejeita qualquer sequência que quebre silenciosamente essa regra.</p>
+      <GalleryPreviewEditor activeId={activeId} items={ordered} location={location} onActiveChange={setActiveId} onPositionChange={updatePosition} />
       <form action={reorderGalleryItemsAction} className={styles.formActions}>
         <input name="gallery_id" type="hidden" value={galleryId} />
         <input name="ordered_ids" type="hidden" value={JSON.stringify(ordered.map((item) => item.id))} />
@@ -96,8 +93,9 @@ export function GalleryItemManager({ galleryId, items }: { galleryId: string; it
                   <label className={`${styles.field} ${styles.fieldWide}`}><span>Texto alternativo</span><input defaultValue={item.altText} maxLength={220} name="alt_text" required /></label>
                   <label className={styles.field}><span>Série visual</span><input defaultValue={item.visualSeries ?? ""} maxLength={80} name="visual_series" /></label>
                   <label className={styles.field}><span>Ordem na série</span><input defaultValue={item.seriesOrder ?? ""} min="0" name="series_order" type="number" /></label>
-                  <label className={styles.field}><span>Enquadramento mobile</span><input defaultValue={item.mobileObjectPosition} name="mobile_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
-                  <label className={styles.field}><span>Enquadramento desktop</span><input defaultValue={item.desktopObjectPosition} name="desktop_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
+                  <input name="mobile_object_position" type="hidden" value={item.mobileObjectPosition} />
+                  <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
+                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>Mobile: {item.mobileObjectPosition}<br />Desktop: {item.desktopObjectPosition}</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
                   <label className={styles.checkboxField}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Publicado</span></label>
                 </div>
                 <AdminSubmitButton pendingLabel="Salvando item..." variant="secondary">Salvar item</AdminSubmitButton>
@@ -118,4 +116,3 @@ export function GalleryItemManager({ galleryId, items }: { galleryId: string; it
     </div>
   );
 }
-

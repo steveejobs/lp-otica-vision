@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, type MouseEvent } from "react";
 
 import type { AdminRole } from "@/lib/auth/admin-access";
 
@@ -28,6 +29,25 @@ const navigation = [
 
 export function AdminNav({ role }: { role: AdminRole }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  function isPrimaryNavigation(event: MouseEvent<HTMLAnchorElement>) {
+    return !(
+      event.button !== 0 ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    );
+  }
+
+  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!isPrimaryNavigation(event)) return;
+    event.preventDefault();
+    setPendingHref(href);
+    router.push(href);
+  }
 
   return (
     <nav aria-label="Navegação administrativa" className={styles.nav}>
@@ -38,13 +58,19 @@ export function AdminNav({ role }: { role: AdminRole }) {
             item.href === "/admin"
               ? pathname === item.href
               : pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const pending = pendingHref === item.href && !active;
 
           return (
             <Link
               aria-current={active ? "page" : undefined}
-              className={active ? styles.navLinkActive : styles.navLink}
+              aria-label={pending ? `${item.label}, carregando` : item.label}
+              className={active ? styles.navLinkActive : pending ? styles.navLinkPending : styles.navLink}
+              data-pending={pending || undefined}
               href={item.href}
               key={item.href}
+              onClickCapture={(event) => { if (isPrimaryNavigation(event)) event.preventDefault(); }}
+              onClick={(event) => navigate(event, item.href)}
+              prefetch={false}
             >
               <span aria-hidden="true" className={styles.navDot} />
               {item.label}

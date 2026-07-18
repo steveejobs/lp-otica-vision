@@ -58,7 +58,8 @@
 }
 
 .navLink,
-.navLinkActive {
+.navLinkActive,
+.navLinkPending {
   display: flex;
   min-height: 2.9rem;
   align-items: center;
@@ -87,6 +88,17 @@
   border-color: rgba(199, 173, 142, 0.2);
   background: rgba(199, 173, 142, 0.12);
   color: #fffdf9;
+}
+
+.navLinkPending {
+  border-color: rgba(199, 173, 142, 0.16);
+  background: rgba(199, 173, 142, 0.08);
+  color: #fffdf9;
+}
+
+.navLinkPending .navDot {
+  border-color: #d3b694;
+  animation: adminPendingPulse 700ms ease-in-out infinite alternate;
 }
 
 .navDot {
@@ -161,7 +173,49 @@
   min-height: 100svh;
   margin: 0 auto;
   padding: clamp(2rem, 4vw, 4.5rem) clamp(1.2rem, 4vw, 4.5rem) 5rem;
-  animation: adminReveal 440ms var(--ease-vision) both;
+}
+
+.routeSkeleton {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  padding-top: 0.25rem;
+}
+
+.skeletonEyebrow,
+.skeletonTitle,
+.skeletonLine,
+.skeletonGrid > span {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  background: #e8e0d7;
+}
+
+.skeletonEyebrow {
+  width: 6rem;
+  height: 0.65rem;
+}
+
+.skeletonTitle {
+  width: min(62%, 28rem);
+  height: clamp(2.8rem, 6vw, 4.5rem);
+}
+
+.skeletonLine {
+  width: min(82%, 42rem);
+  height: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.skeletonGrid > span {
+  min-height: 10rem;
 }
 
 .pageHeader {
@@ -233,6 +287,11 @@
   font-size: clamp(2.7rem, 5vw, 4.3rem);
   font-weight: 400;
   line-height: 0.9;
+}
+
+.metricSkeleton {
+  min-height: 10.5rem;
+  background: #e8e0d7;
 }
 
 .sectionBar {
@@ -402,6 +461,281 @@
   background: rgba(255, 253, 249, 0.72);
   color: var(--admin-muted);
   font-size: 0.82rem;
+}
+
+.locationCard {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.1rem;
+  border: 1px solid var(--admin-line);
+  border-radius: 0.55rem;
+  background: var(--admin-surface);
+}
+
+.locationMissing {
+  border-color: rgba(138, 74, 55, 0.32);
+  background: #f7eeea;
+}
+
+.locationCard > strong,
+.locationHeader strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+}
+
+.locationCard > p {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.locationHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.locationDetails {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.55fr) minmax(14rem, 1.7fr) minmax(9rem, 0.8fr) minmax(9rem, 0.8fr);
+  gap: 1px;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 0.4rem;
+  background: var(--admin-line);
+}
+
+.locationDetails > div {
+  min-width: 0;
+  padding: 0.7rem;
+  background: #fffdf9;
+}
+
+.locationDetails dt {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.locationDetails dd {
+  margin: 0.3rem 0 0;
+  color: var(--admin-ink);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.locationCard > .buttonLink {
+  justify-self: start;
+}
+
+.galleryPreviewPanel {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--admin-line);
+  border-radius: 0.65rem;
+  background: #eee8e0;
+}
+
+.previewDeviceSwitch {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  border: 1px solid rgba(27, 24, 22, 0.2);
+  border-radius: 0.4rem;
+}
+
+.previewDeviceSwitch button {
+  min-height: 2.6rem;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  background: var(--admin-surface);
+  color: var(--admin-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.previewDeviceSwitch button + button {
+  border-left: 1px solid var(--admin-line);
+}
+
+.previewDeviceSwitch button[aria-pressed="true"] {
+  background: var(--admin-dark);
+  color: #fffdf9;
+}
+
+.previewWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(16rem, 0.55fr);
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.previewWorkspace[data-device="mobile"] {
+  grid-template-columns: minmax(18rem, 0.9fr) minmax(16rem, 1.1fr);
+}
+
+.previewSequence {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.4rem, 1.5vw, 1rem);
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.previewFrame {
+  position: relative;
+  width: min(58%, 25rem);
+  flex: 0 0 auto;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgba(27, 24, 22, 0.2);
+  border-radius: 0.45rem;
+  background: #ddd4ca;
+  box-shadow: 0 1.2rem 2.5rem rgba(27, 24, 22, 0.12);
+}
+
+.previewWorkspace[data-device="mobile"] .previewFrame {
+  width: min(64%, 18rem);
+}
+
+.previewFrame[data-context="previous"],
+.previewFrame[data-context="next"] {
+  width: min(28%, 12rem);
+  opacity: 0.48;
+  transform: scale(0.9);
+}
+
+.previewFrame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewFrame > span:not(.safeArea) {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.safeArea {
+  position: absolute;
+  inset: 10%;
+  border: 1px dashed rgba(255, 255, 255, 0.72);
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0 999px rgba(27, 24, 22, 0.08);
+  pointer-events: none;
+}
+
+.cropControls {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: rgba(255, 253, 249, 0.9);
+}
+
+.cropControls > p:first-child {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.cropControls label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cropControls label > span {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.cropControls input[type="range"] {
+  width: 100%;
+  accent-color: var(--admin-bronze);
+}
+
+.previewWarnings {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.75rem 0.75rem 0.75rem 1.7rem;
+  border-left: 3px solid #9a624e;
+  background: #f7eae4;
+  color: #733f38;
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.previewReady {
+  padding: 0.7rem;
+  border-left: 3px solid #52704f;
+  background: #e9f0e7;
+  color: #365033;
+  font-size: 0.68rem;
+}
+
+.previewItemRail {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.15rem 0 0.35rem;
+}
+
+.previewItemRail button {
+  position: relative;
+  width: 3.5rem;
+  aspect-ratio: 3 / 4;
+  flex: 0 0 auto;
+  overflow: hidden;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0.3rem;
+  background: #d8d0c7;
+  cursor: pointer;
+}
+
+.previewItemRail button[aria-pressed="true"] {
+  border-color: var(--admin-bronze);
+  box-shadow: 0 0 0 2px rgba(128, 98, 71, 0.14);
+}
+
+.previewItemRail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewItemRail button > span {
+  position: absolute;
+  z-index: 1;
+  top: 0.2rem;
+  left: 0.2rem;
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(27, 24, 22, 0.78);
+  color: #fff;
+  font-size: 0.58rem;
 }
 
 .tableFrame {
@@ -717,6 +1051,64 @@
 
 .skuControl .secondaryButton {
   white-space: nowrap;
+}
+
+.inlineSelectAction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.inlineSelectAction .secondaryButton {
+  white-space: nowrap;
+}
+
+.inlineDialog {
+  width: min(calc(100% - 2rem), 39rem);
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--admin-ink);
+  box-shadow: 0 2rem 5rem rgba(27, 24, 22, 0.28);
+}
+
+.inlineDialog::backdrop {
+  background: rgba(27, 24, 22, 0.48);
+  backdrop-filter: blur(3px);
+}
+
+.inlineDialogCard {
+  display: grid;
+  gap: 1.2rem;
+  padding: clamp(1rem, 4vw, 1.7rem);
+  border: 1px solid var(--admin-line);
+  border-radius: 0.7rem;
+  background: var(--admin-surface);
+}
+
+.inlineDialogCard .panelHeading {
+  align-items: flex-start;
+  margin: 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.inlineSuggestion {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border-left: 3px solid var(--admin-bronze);
+  background: #f3eadf;
+  color: #5d4938;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.inlineSuggestion .secondaryButton {
+  justify-self: start;
 }
 
 .fieldStatus {
@@ -1114,14 +1506,10 @@
   text-align: center;
 }
 
-@keyframes adminReveal {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+@keyframes adminPendingPulse {
   to {
-    opacity: 1;
-    transform: translateY(0);
+    background: #d3b694;
+    box-shadow: 0 0 0 4px rgba(211, 182, 148, 0.09);
   }
 }
 
@@ -1168,7 +1556,8 @@
   }
 
   .navLink,
-  .navLinkActive {
+  .navLinkActive,
+  .navLinkPending {
     flex: 0 0 auto;
     min-height: 2.75rem;
     padding-inline: 0.85rem;
@@ -1230,7 +1619,8 @@
   }
 
   .metricsGrid,
-  .quickGrid {
+  .quickGrid,
+  .skeletonGrid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1273,6 +1663,14 @@
     grid-template-columns: 1fr;
   }
 
+  .inlineSelectAction {
+    grid-template-columns: 1fr;
+  }
+
+  .inlineSelectAction .secondaryButton {
+    width: 100%;
+  }
+
   .skuControl .secondaryButton {
     width: 100%;
   }
@@ -1300,6 +1698,32 @@
 
   .imageRow {
     grid-template-columns: 1fr;
+  }
+
+  .locationHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .locationDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .locationCard > .buttonLink {
+    width: 100%;
+  }
+
+  .previewWorkspace,
+  .previewWorkspace[data-device="mobile"] {
+    grid-template-columns: 1fr;
+  }
+
+  .previewFrame {
+    width: min(68%, 20rem);
+  }
+
+  .previewWorkspace[data-device="mobile"] .previewFrame {
+    width: min(72%, 17rem);
   }
 
   .imageRow .imagePreview {
@@ -1333,8 +1757,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .adminMain,
-  .loginCard {
+  .loginCard,
+  .navLinkPending .navDot {
     animation: none;
   }
 

@@ -49,7 +49,7 @@ export function CollectionPresetGrid({ collections }: { collections: CollectionP
               </div>
               <p className={styles.presetGuide}>{preset.guide}</p>
               {collection ? (
-                <Link className={styles.buttonLink} href={`/admin/colecoes/${collection.id}`}>
+                <Link className={styles.buttonLink} href={`/admin/colecoes/${collection.id}`} prefetch={false}>
                   Editar coleção
                 </Link>
               ) : (

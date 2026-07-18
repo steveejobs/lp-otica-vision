@@ -46,7 +46,7 @@ export function AdminPageHeader({
     <header className={styles.pageHeader}>
       <div>
         <p className={styles.eyebrow}>{eyebrow}</p>
-        <h1>{title}</h1>
+        <h1 tabIndex={-1}>{title}</h1>
       </div>
       <p>{description}</p>
     </header>

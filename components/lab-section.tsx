@@ -24,6 +24,7 @@ export function LabSection({ media }: LabSectionProps) {
 
   return (
     <SectionShell
+      id="lab-digital"
       className={styles.section}
       innerClassName={styles.inner}
       aria-labelledby="lab-section-title"

@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 import { AdminSubmitButton } from "@/components/admin/admin-form-controls";
+import { GalleryLocationCard } from "@/components/admin/gallery-location-card";
 import styles from "@/components/admin/admin.module.css";
 import { AdminEmptyState, AdminFeedback, AdminPageHeader, AdminStatus, AdminTable } from "@/components/admin/admin-ui";
 import { formatAdminDate } from "@/lib/admin/format";
+import { GALLERY_LOCATIONS, getGalleryLocation } from "@/lib/admin/gallery-locations";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -30,7 +32,7 @@ export default async function AdminGalleriesPage({ searchParams }: { searchParam
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome</span><input maxLength={160} name="name" required /></label>
             <label className={styles.field}><span>Slug</span><input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
-            <label className={styles.field}><span>Chave de rota</span><input maxLength={120} name="route_key" pattern="[a-z0-9]+(?:[._-][a-z0-9]+)*" required /></label>
+            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue="" name="route_key" required><option disabled value="">Selecione a rota e a seção pública</option>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.pageLabel} › {location.sectionLabel} — {location.position}</option>)}</select></label>
             <label className={styles.field}><span>Ordem</span><input defaultValue="0" min="0" name="display_order" required type="number" /></label>
             <label className={styles.checkboxField}><input name="autoplay" type="checkbox" /><span>Autoplay</span></label>
           </div>
@@ -42,7 +44,7 @@ export default async function AdminGalleriesPage({ searchParams }: { searchParam
         <AdminTable label="Galerias cadastradas">
           <thead><tr><th>Galeria</th><th>Rota</th><th>Itens</th><th>Ordem</th><th>Publicação</th><th>Reprodução</th><th>Atualização</th><th>Ações</th></tr></thead>
           <tbody>{galleries.map((gallery) => (
-            <tr key={gallery.id}><td>{gallery.name}</td><td>{gallery.route_key}</td><td>{counts.get(gallery.id) ?? 0}</td><td>{gallery.display_order}</td><td><AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" /></td><td>{gallery.autoplay ? "Automática" : "Manual"}</td><td>{formatAdminDate(gallery.updated_at)}</td><td><Link className={styles.textButton} href={`/admin/galerias/${gallery.id}`}>Editar</Link></td></tr>
+            <tr key={gallery.id}><td>{gallery.name}</td><td><GalleryLocationCard location={getGalleryLocation(gallery.route_key)} published={gallery.published} /></td><td>{counts.get(gallery.id) ?? 0}</td><td>{gallery.display_order}</td><td><AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" /></td><td>{gallery.autoplay ? "Automática" : "Manual"}</td><td>{formatAdminDate(gallery.updated_at)}</td><td><Link className={styles.textButton} href={`/admin/galerias/${gallery.id}`} prefetch={false}>Editar</Link></td></tr>
           ))}</tbody>
         </AdminTable>
       )}

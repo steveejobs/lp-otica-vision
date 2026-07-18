@@ -34,7 +34,7 @@ Supabase
 - `lib/supabase/client.ts`: Client Components, somente URL e chave publicável.
 - `lib/supabase/server.ts`: Server Components e Server Actions, sessão SSR em cookies.
 - `lib/supabase/admin.ts`: importa `server-only`, usa `SUPABASE_SECRET_KEY` e não persiste sessão.
-- `lib/supabase/proxy.ts`: atualiza cookies, valida claims e nega `/admin` a perfil ausente ou inativo.
+- `lib/supabase/proxy.ts`: atualiza cookies e faz somente a checagem otimista de claims. Não reconstrói headers RSC nem consulta perfil em cada request; o layout server-side valida perfil ativo/papel uma vez por render e as Server Actions/RLS repetem a autorização na mutação.
 - `lib/supabase/public.ts`: consultas públicas anônimas sem cookies, impedindo que uma sessão administrativa faça o catálogo enxergar rascunhos.
 
 Todos os clientes são criados por chamada. Não existe cliente autenticado compartilhado em escopo de módulo no servidor.

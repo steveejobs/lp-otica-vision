@@ -21,6 +21,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
 
   return (
     <section
+      id="preview-catalogo"
       className={styles.section}
       aria-labelledby="catalog-preview-title"
       data-motion-reveal

@@ -89,7 +89,7 @@ export default async function AdminCategoriesPage({
                 <td>{formatAdminDate(category.updated_at)}</td>
                 <td>
                   <div className={styles.rowActions}>
-                    <Link className={styles.textButton} href={`/admin/categorias/${category.id}`}>Editar</Link>
+                    <Link className={styles.textButton} href={`/admin/categorias/${category.id}`} prefetch={false}>Editar</Link>
                     <form action={toggleCategoryAction} className={styles.inlineForm}>
                       <input name="id" type="hidden" value={category.id} />
                       <AdminSubmitButton pendingLabel="Salvando..." variant="secondary">

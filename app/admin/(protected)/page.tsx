@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import styles from "@/components/admin/admin.module.css";
 import { AdminPageHeader } from "@/components/admin/admin-ui";
@@ -11,6 +12,59 @@ type DashboardPageProps = {
 
 export default async function AdminDashboardPage({ searchParams }: DashboardPageProps) {
   const { profile } = await requireAdminSession();
+  const params = await searchParams;
+
+  return (
+    <>
+      <AdminPageHeader
+        description="Uma leitura objetiva do conteúdo editorial e da disponibilidade, respeitando as ações permitidas para cada papel."
+        eyebrow="Painel editorial"
+        title="Visão geral"
+      />
+
+      {params.status === "forbidden" ? (
+        <p className={styles.notice} role="alert">
+          Seu papel não permite acessar essa configuração.
+        </p>
+      ) : null}
+
+      <Suspense fallback={<DashboardMetricsSkeleton />}>
+        <DashboardMetrics />
+      </Suspense>
+
+      <div className={styles.sectionBar}>
+        <h2>Acessos rápidos</h2>
+        <span className={styles.phaseBadge}>Fase 2 · operação administrativa</span>
+      </div>
+
+      <section aria-label="Acessos rápidos" className={styles.quickGrid}>
+        {profile.role === "attendant" ? (
+          <Link className={styles.quickLink} href="/admin/disponibilidade" prefetch={false}>
+            <span>Atendimento</span>
+            <strong>Atualizar disponibilidade</strong>
+          </Link>
+        ) : (
+          <>
+            <Link className={styles.quickLink} href="/admin/produtos" prefetch={false}>
+              <span>Catálogo</span>
+              <strong>Organizar produtos</strong>
+            </Link>
+            <Link className={styles.quickLink} href="/admin/galerias" prefetch={false}>
+              <span>Imagem editorial</span>
+              <strong>Revisar galerias</strong>
+            </Link>
+            <Link className={styles.quickLink} href="/admin/colecoes" prefetch={false}>
+              <span>Curadoria</span>
+              <strong>Revisar coleções</strong>
+            </Link>
+          </>
+        )}
+      </section>
+    </>
+  );
+}
+
+async function DashboardMetrics() {
   const supabase = await createSupabaseServerClient();
   const now = new Date().toISOString();
   const [
@@ -36,7 +90,6 @@ export default async function AdminDashboardPage({ searchParams }: DashboardPage
       .gte("ends_at", now),
     supabase.from("galleries").select("id", { count: "exact", head: true }).eq("published", true),
   ]);
-  const params = await searchParams;
   const databaseError = [
     publishedProducts,
     featuredProducts,
@@ -57,18 +110,6 @@ export default async function AdminDashboardPage({ searchParams }: DashboardPage
 
   return (
     <>
-      <AdminPageHeader
-        description="Uma leitura objetiva do conteúdo editorial e da disponibilidade, respeitando as ações permitidas para cada papel."
-        eyebrow="Painel editorial"
-        title="Visão geral"
-      />
-
-      {params.status === "forbidden" ? (
-        <p className={styles.notice} role="alert">
-          Seu papel não permite acessar essa configuração.
-        </p>
-      ) : null}
-
       {databaseError ? (
         <p className={styles.notice} role="alert">
           Não foi possível atualizar todos os indicadores. Tente novamente em instantes.
@@ -83,35 +124,10 @@ export default async function AdminDashboardPage({ searchParams }: DashboardPage
           </article>
         ))}
       </section>
-
-      <div className={styles.sectionBar}>
-        <h2>Acessos rápidos</h2>
-        <span className={styles.phaseBadge}>Fase 2 · operação administrativa</span>
-      </div>
-
-      <section aria-label="Acessos rápidos" className={styles.quickGrid}>
-        {profile.role === "attendant" ? (
-          <Link className={styles.quickLink} href="/admin/disponibilidade">
-            <span>Atendimento</span>
-            <strong>Atualizar disponibilidade</strong>
-          </Link>
-        ) : (
-          <>
-            <Link className={styles.quickLink} href="/admin/produtos">
-              <span>Catálogo</span>
-              <strong>Organizar produtos</strong>
-            </Link>
-            <Link className={styles.quickLink} href="/admin/galerias">
-              <span>Imagem editorial</span>
-              <strong>Revisar galerias</strong>
-            </Link>
-            <Link className={styles.quickLink} href="/admin/colecoes">
-              <span>Curadoria</span>
-              <strong>Revisar coleções</strong>
-            </Link>
-          </>
-        )}
-      </section>
     </>
   );
+}
+
+function DashboardMetricsSkeleton() {
+  return <div aria-label="Carregando indicadores" className={styles.metricsGrid} role="status">{Array.from({ length: 6 }, (_, index) => <span className={styles.metricSkeleton} key={index} />)}</div>;
 }

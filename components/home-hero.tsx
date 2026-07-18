@@ -12,6 +12,7 @@ import styles from "./home-hero.module.css";
 export function HomeHero() {
   return (
     <SectionShell
+      id="hero"
       className={styles.hero}
       innerClassName={styles.inner}
       aria-labelledby="hero-title"

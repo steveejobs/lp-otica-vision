@@ -87,8 +87,8 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
           <label className={styles.field}><span>Arquivo</span><select defaultValue={params.archive ?? "active"} name="archive"><option value="active">Ativos</option><option value="archived">Arquivados</option><option value="all">Todos</option></select></label>
         </form>
         <div className={styles.toolbarActions}>
-          <Link className={styles.buttonLink} href="/admin/produtos/novo">Novo produto</Link>
-          <Link className={styles.buttonLink} href="/admin/disponibilidade">Disponibilidade rápida</Link>
+          <Link className={styles.buttonLink} href="/admin/produtos/novo" prefetch={false}>Novo produto</Link>
+          <Link className={styles.buttonLink} href="/admin/disponibilidade" prefetch={false}>Disponibilidade rápida</Link>
         </div>
       </div>
 
@@ -119,7 +119,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
                 <td>{formatAdminDate(product.updated_at)}</td>
                 <td>
                   <div className={styles.rowActions}>
-                    <Link className={styles.textButton} href={`/admin/produtos/${product.id}`}>Editar</Link>
+                    <Link className={styles.textButton} href={`/admin/produtos/${product.id}`} prefetch={false}>Editar</Link>
                     {product.published && !product.archived_at && hasCover ? (
                       <Link className={styles.textButton} href={`/catalogo/${product.slug}`} target="_blank">Abrir público</Link>
                     ) : null}
@@ -139,9 +139,9 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
         </AdminTable>
       )}
       <nav aria-label="Paginação de produtos" className={styles.pagination}>
-        {currentPage > 1 ? <Link className={styles.buttonLink} href={pageUrl(params, currentPage - 1)}>Anterior</Link> : <span />}
+        {currentPage > 1 ? <Link className={styles.buttonLink} href={pageUrl(params, currentPage - 1)} prefetch={false}>Anterior</Link> : <span />}
         <span>Página {currentPage} de {totalPages}</span>
-        {currentPage < totalPages ? <Link className={styles.buttonLink} href={pageUrl(params, currentPage + 1)}>Próxima</Link> : <span />}
+        {currentPage < totalPages ? <Link className={styles.buttonLink} href={pageUrl(params, currentPage + 1)} prefetch={false}>Próxima</Link> : <span />}
       </nav>
     </>
   );

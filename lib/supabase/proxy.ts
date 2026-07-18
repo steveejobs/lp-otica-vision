@@ -20,7 +20,7 @@ function safeAdminNextPath(value: string) {
 }
 
 export async function updateAdminSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
+  let response = NextResponse.next();
   response.headers.set("Cache-Control", "private, no-store, max-age=0");
 
   const { publishableKey, url } = getSupabasePublicEnv();
@@ -29,7 +29,7 @@ export async function updateAdminSession(request: NextRequest) {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = NextResponse.next();
         response.headers.set("Cache-Control", "private, no-store, max-age=0");
         cookiesToSet.forEach(({ name, options, value }) => {
           response.cookies.set(name, value, options);
@@ -54,24 +54,6 @@ export async function updateAdminSession(request: NextRequest) {
       "next",
       safeAdminNextPath(`${request.nextUrl.pathname}${request.nextUrl.search}`),
     );
-    return copyCookies(response, NextResponse.redirect(loginUrl));
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("active, role")
-    .eq("id", subject)
-    .maybeSingle();
-
-  if (!profile?.active) {
-    if (isLogin) {
-      return response;
-    }
-
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
-    loginUrl.search = "";
-    loginUrl.searchParams.set("status", "inactive");
     return copyCookies(response, NextResponse.redirect(loginUrl));
   }
 

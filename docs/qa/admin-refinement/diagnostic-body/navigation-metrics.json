@@ -1,0 +1,133 @@
+{
+  "base_url": "http://127.0.0.1:3400",
+  "console_errors": [],
+  "measured_at": "2026-07-18T14:53:15.357Z",
+  "navigations": [
+    {
+      "content_ms": 879,
+      "feedback_ms": 360,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 21,
+      "request_details": [
+        {
+          "bodyPrefix": "1:\"$Sreact.fragment\"\n2:I[39756,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"default\"]\n3:I[37457,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"default\"]\n5:I[97367,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"OutletBoundary\"]\n6:\"$Sreact.suspense\"\n9:I[97367,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"ViewportBoundary\"]\nb:I[97367,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"MetadataBoundary\"]\n0:{\"f\":[[\"children\",\"admin\",\"children\",\"(protected)\",\"children\",\"produtos\",[\"produtos\",{\"children\":[\"__PAGE__\",{}]}],[[\"$\",\"$1\",\"c\",{\"children\":[null,[\"$\",\"$L2\",null,{\"parallelRouterKey\":\"children\",\"error\":\"$undefined\",\"errorStyles\":\"$undefined\",\"errorScripts\":\"$undefined\",\"template\":[\"$\",\"$L3\",null,{}],\"templateStyles\":\"$undefined\",\"templateScripts\":\"$undefined\",\"notFound\":\"$undefined\",\"forbidden\":\"$undefined\",\"unauthorized\":\"$undefined\"}]]}],{\"children\":[[\"$\",\"$1\",\"c\",{\"children\":[\"$L4\",[[\"$\",\"script\",\"script-0\",{\"src\":\"/_next/static/chunks/3-6vzng7kzmle.js\",\"async\":true,\"nonce\":\"$undefined\"}]],[\"$\",\"$L5\",null,{\"children\":[\"$\",\"$6\",null,{\"name\":\"Next.MetadataOutlet\",\"children\":\"$@7\"}]}]]}],{},null,false,null]},null,false,\"$@8\"],[\"$\",\"$1\",\"h\",{\"children\":[null,[\"$\",\"$L9\",\"nOTYPkXEd6-xelt49TDR-v\",{\"children\":\"$La\"}],[\"$\",\"div\",\"nOTYPkXEd6-xelt49TDR-m\",{\"hidden\":true,\"children\":[\"$\",\"$Lb\",null,{\"children\":[\"$\",\"$6\",null,{\"name\":\"Next.Metadata\",\"children\":\"$Lc\"}]}]}]]}],false]],\"q\":\"\",\"i\":false,\"S\":false,\"h\":null,\"b\":\"0oBcw1j2Et_TJhFoqsQ28\"}\nd:[]\n8:\"$Wd\"\na:[[\"$\",\"meta\",\"0\",{\"charSet\":\"utf-8\"}],[\"$\",\"meta\",\"1\",{\"name\":\"viewport\",\"content\":\"width=device-width, initial-scale=1\"}],[\"$\",\"meta\",\"2\",{\"name\":\"theme-color\",\"content\":\"#fbf8f3\"}]]\ne:I[27201,[\"/_next/static/chunks/18z-y64gi53i4.js\",\"/_next/static/chunks/14mrh2-p_w84d.js\"],\"IconMark\"]\n7:null\nc:[[\"$\",\"title\",\"0\",{\"children\":\"AdministraÃ§Ã£o | Ã",
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=T8SXw79kTG645oTr"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/html; charset=utf-8",
+          "encoded": 0,
+          "status": 200,
+          "type": "document",
+          "url": "http://127.0.0.1:3400/admin/produtos"
+        }
+      ],
+      "resource_types": {
+        "script": 11,
+        "fetch": 5,
+        "document": 1,
+        "stylesheet": 3,
+        "image": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 5,
+      "settled_ms": 1338,
+      "shell_persisted": false,
+      "transferred_bytes": 0,
+      "url_ms": 413,
+      "warmed": false
+    },
+    {
+      "content_ms": 2363,
+      "feedback_ms": null,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 5,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "bodyPrefix": "",
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=7P3FwQ4gmASwvt7i"
+        }
+      ],
+      "resource_types": {
+        "fetch": 5
+      },
+      "route": "Produtos",
+      "rsc_requests": 5,
+      "settled_ms": 2824,
+      "shell_persisted": true,
+      "transferred_bytes": 5961,
+      "url_ms": 2354,
+      "warmed": true
+    }
+  ],
+  "phase": "diagnostic-body",
+  "viewport": {
+    "height": 900,
+    "width": 1440
+  }
+}

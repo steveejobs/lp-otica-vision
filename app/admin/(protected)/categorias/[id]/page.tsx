@@ -32,7 +32,7 @@ export default async function EditCategoryPage({
       <AdminPageHeader eyebrow="Categorias" description="Edite a taxonomia sem romper os vínculos existentes." title={category.name} />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}>
-        <Link className={styles.buttonLink} href="/admin/categorias">Voltar para categorias</Link>
+        <Link className={styles.buttonLink} href="/admin/categorias" prefetch={false}>Voltar para categorias</Link>
         <AdminStatus active={category.active} />
       </div>
       <section className={styles.formPanel} aria-labelledby="category-form-title">
@@ -78,4 +78,3 @@ export default async function EditCategoryPage({
     </>
   );
 }
-

@@ -31,7 +31,7 @@ export default async function EditPromotionPage({ params, searchParams }: { para
     <>
       <AdminPageHeader eyebrow="Destaques" description="Janela, imagem, CTA e produtos relacionados são validados antes de salvar." title={promotion.title} />
       <AdminFeedback error={query.error} status={query.status} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/promocoes">Voltar para destaques</Link><AdminStatus active={promotion.active} trueLabel={promotion.featured ? "Ativo · destaque" : "Ativo"} /></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/promocoes" prefetch={false}>Voltar para destaques</Link><AdminStatus active={promotion.active} trueLabel={promotion.featured ? "Ativo · destaque" : "Ativo"} /></div>
       <section className={styles.formPanel} aria-labelledby="promotion-data-title">
         <div className={styles.panelHeading}><h2 id="promotion-data-title">Conteúdo e período</h2><p>O fim nunca pode anteceder o início.</p></div>
         <form action={updatePromotionAction} className={styles.adminForm}>
@@ -76,4 +76,3 @@ export default async function EditPromotionPage({ params, searchParams }: { para
     </>
   );
 }
-

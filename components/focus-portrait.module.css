@@ -68,9 +68,7 @@
   opacity: 0;
   pointer-events: none;
   transform: translateX(0) rotate(9deg);
-  transition:
-    opacity var(--duration-medium) var(--ease-vision),
-    transform 760ms var(--ease-vision-out);
+  transition: opacity var(--duration-medium) var(--ease-vision);
 }
 
 .frame::after {
@@ -155,6 +153,22 @@
   pointer-events: none;
 }
 
+.portrait[data-motion-enabled="true"] .lens {
+  opacity: 0.48;
+}
+
+.portrait[data-motion-enabled="true"] .glint {
+  opacity: 0.42;
+}
+
+.portrait[data-motion-enabled="true"] .frame::before {
+  animation: portraitLightSweep 7.2s var(--ease-vision) infinite;
+}
+
+.portrait[data-motion-state="paused"] .frame::before {
+  animation-play-state: paused;
+}
+
 .portrait:hover .lens,
 .portrait:active .lens {
   opacity: 0.9;
@@ -168,12 +182,34 @@
 .portrait:hover .frame::before,
 .portrait:active .frame::before {
   opacity: 0.78;
-  transform: translateX(520%) rotate(9deg);
 }
 
 .portrait:hover .glint,
 .portrait:active .glint {
   opacity: 0.72;
+}
+
+@keyframes portraitLightSweep {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateX(-18%) rotate(9deg);
+  }
+
+  31% {
+    opacity: 0.74;
+  }
+
+  54% {
+    opacity: 0.12;
+    transform: translateX(520%) rotate(9deg);
+  }
+
+  55%,
+  100% {
+    opacity: 0;
+    transform: translateX(520%) rotate(9deg);
+  }
 }
 
 @media (max-width: 720px) {
@@ -196,15 +232,18 @@
   }
 
   .frame::before {
+    animation: none;
     opacity: 0;
   }
 
   .lens {
+    opacity: 0;
     transform: translate(-50%, -50%);
     transition: none;
   }
 
   .glint {
+    opacity: 0;
     transition: none;
   }
 }

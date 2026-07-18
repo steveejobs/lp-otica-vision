@@ -250,6 +250,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
 
   return (
     <section
+      id="selecao-editorial"
       className={`${styles.section} ${chapterTransition ? styles.chapterTransition : ""}`}
       aria-labelledby="instagram-images-title"
     >

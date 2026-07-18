@@ -39,7 +39,7 @@ export default async function EditBrandPage({
       />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}>
-        <Link className={styles.buttonLink} href="/admin/marcas">Voltar para marcas</Link>
+        <Link className={styles.buttonLink} href="/admin/marcas" prefetch={false}>Voltar para marcas</Link>
         <AdminStatus active={brand.active} />
       </div>
 
@@ -99,4 +99,3 @@ export default async function EditBrandPage({
     </>
   );
 }
-

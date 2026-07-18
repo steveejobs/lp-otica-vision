@@ -47,7 +47,7 @@ export default async function AdminPromotionsPage({ searchParams }: { searchPara
         <AdminTable label="Destaques cadastrados">
           <thead><tr><th>Título</th><th>Tipo</th><th>Prioridade</th><th>Status</th><th>Início</th><th>Fim</th><th>Ações</th></tr></thead>
           <tbody>{promotions.map((promotion) => (
-            <tr key={promotion.id}><td>{promotion.title}</td><td>{promotionTypeLabels[promotion.type]}</td><td>{promotion.priority}</td><td><AdminStatus active={promotion.active} trueLabel={promotion.featured ? "Ativo · destaque" : "Ativo"} /></td><td>{formatAdminDate(promotion.starts_at)}</td><td>{formatAdminDate(promotion.ends_at)}</td><td><Link className={styles.textButton} href={`/admin/promocoes/${promotion.id}`}>Editar</Link></td></tr>
+            <tr key={promotion.id}><td>{promotion.title}</td><td>{promotionTypeLabels[promotion.type]}</td><td>{promotion.priority}</td><td><AdminStatus active={promotion.active} trueLabel={promotion.featured ? "Ativo · destaque" : "Ativo"} /></td><td>{formatAdminDate(promotion.starts_at)}</td><td>{formatAdminDate(promotion.ends_at)}</td><td><Link className={styles.textButton} href={`/admin/promocoes/${promotion.id}`} prefetch={false}>Editar</Link></td></tr>
           ))}</tbody>
         </AdminTable>
       )}

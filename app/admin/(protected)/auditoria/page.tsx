@@ -69,9 +69,9 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
         </AdminTable>
       )}
       <nav aria-label="Paginação da auditoria" className={styles.pagination}>
-        {currentPage > 1 ? <Link className={styles.buttonLink} href={auditPageUrl(params, currentPage - 1)}>Anterior</Link> : <span />}
+        {currentPage > 1 ? <Link className={styles.buttonLink} href={auditPageUrl(params, currentPage - 1)} prefetch={false}>Anterior</Link> : <span />}
         <span>Página {currentPage} de {totalPages}</span>
-        {currentPage < totalPages ? <Link className={styles.buttonLink} href={auditPageUrl(params, currentPage + 1)}>Próxima</Link> : <span />}
+        {currentPage < totalPages ? <Link className={styles.buttonLink} href={auditPageUrl(params, currentPage + 1)} prefetch={false}>Próxima</Link> : <span />}
       </nav>
     </>
   );

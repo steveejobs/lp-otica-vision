@@ -1,0 +1,65 @@
+{
+  "base_url": "http://127.0.0.1:3500",
+  "console_errors": [],
+  "measured_at": "2026-07-18T14:59:27.517Z",
+  "navigations": [
+    {
+      "content_ms": 827,
+      "feedback_ms": 24,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 2,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3500/admin/produtos?_rsc=T8SXw79kTG645oTr"
+        }
+      ],
+      "resource_types": {
+        "fetch": 1,
+        "script": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 1,
+      "settled_ms": 1279,
+      "shell_persisted": true,
+      "transferred_bytes": 2834,
+      "url_ms": 333,
+      "warmed": false
+    },
+    {
+      "content_ms": 2047,
+      "feedback_ms": null,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 1,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3500/admin/produtos?_rsc=7P3FwQ4gmASwvt7i"
+        }
+      ],
+      "resource_types": {
+        "fetch": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 1,
+      "settled_ms": 2500,
+      "shell_persisted": true,
+      "transferred_bytes": 2406,
+      "url_ms": 2042,
+      "warmed": true
+    }
+  ],
+  "phase": "diagnostic-feedback",
+  "viewport": {
+    "height": 900,
+    "width": 1440
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "base_url": "http://127.0.0.1:3400",
+  "console_errors": [],
+  "measured_at": "2026-07-18T14:49:27.173Z",
+  "navigations": [
+    {
+      "content_ms": 2189,
+      "feedback_ms": 307,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 25,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=T8SXw79kTG645oTr"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/html; charset=utf-8",
+          "encoded": 0,
+          "status": 200,
+          "type": "document",
+          "url": "http://127.0.0.1:3400/admin/produtos"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=MH4_QYErH0ItiRcM"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/disponibilidade?_rsc=4_DfhW40N1eU1OS7"
+        },
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos/novo?_rsc=4_DfhW40N1eU1OS7"
+        }
+      ],
+      "resource_types": {
+        "fetch": 9,
+        "script": 11,
+        "document": 1,
+        "stylesheet": 3,
+        "image": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 9,
+      "settled_ms": 2645,
+      "shell_persisted": false,
+      "transferred_bytes": 3887,
+      "url_ms": 348,
+      "warmed": false
+    },
+    {
+      "content_ms": 2143,
+      "feedback_ms": null,
+      "javascript_bytes": 0,
+      "path": "/admin/produtos",
+      "request_count": 1,
+      "request_details": [
+        {
+          "contentType": "text/x-component",
+          "encoded": 0,
+          "status": 200,
+          "type": "fetch",
+          "url": "http://127.0.0.1:3400/admin/produtos?_rsc=7P3FwQ4gmASwvt7i"
+        }
+      ],
+      "resource_types": {
+        "fetch": 1
+      },
+      "route": "Produtos",
+      "rsc_requests": 1,
+      "settled_ms": 2601,
+      "shell_persisted": true,
+      "transferred_bytes": 2393,
+      "url_ms": 2132,
+      "warmed": true
+    }
+  ],
+  "phase": "diagnostic-shell",
+  "viewport": {
+    "height": 900,
+    "width": 1440
+  }
+}

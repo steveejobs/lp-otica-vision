@@ -97,7 +97,7 @@ export default async function EditProductPage({
       <AdminPageHeader eyebrow="Produtos" description="Edite dados, publicação e mídia. Toda mudança é autorizada no servidor e registrada na auditoria." title={product.name} />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}>
-        <div className={styles.toolbarActions}><Link className={styles.buttonLink} href="/admin/produtos">Voltar para produtos</Link><Link className={styles.buttonLink} href="/admin/disponibilidade">Disponibilidade rápida</Link>{product.published && !product.archived_at && hasCover ? <Link className={styles.buttonLink} href={`/catalogo/${product.slug}`} target="_blank">Ver página pública</Link> : null}</div>
+        <div className={styles.toolbarActions}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link><Link className={styles.buttonLink} href="/admin/disponibilidade" prefetch={false}>Disponibilidade rápida</Link>{product.published && !product.archived_at && hasCover ? <Link className={styles.buttonLink} href={`/catalogo/${product.slug}`} target="_blank">Ver página pública</Link> : null}</div>
         <AdminStatus active={product.published && !product.archived_at} trueLabel={product.featured ? "Publicado · destaque" : "Publicado"} falseLabel={product.archived_at ? "Arquivado" : "Rascunho"} />
       </div>
 

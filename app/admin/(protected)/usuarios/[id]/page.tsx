@@ -28,7 +28,7 @@ export default async function EditUserPage({ params, searchParams }: { params: P
     <>
       <AdminPageHeader eyebrow="Usuários" description="Papéis e aprovação são validados no servidor e novamente por RLS/trigger." title={profile.name ?? "Usuário autorizado"} />
       <AdminFeedback error={query.error} status={query.status} />
-      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/usuarios">Voltar para usuários</Link><AdminStatus active={profile.active} falseLabel="Pendente" /></div>
+      <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/usuarios" prefetch={false}>Voltar para usuários</Link><AdminStatus active={profile.active} falseLabel="Pendente" /></div>
       <section className={styles.formPanel} aria-labelledby="user-access-title">
         <div className={styles.panelHeading}><div><h2 id="user-access-title">Identidade e acesso</h2><p>Atualizado em {formatAdminDateTime(profile.updated_at)}.</p></div></div>
         <form action={updateUserAction} className={styles.adminForm}>

@@ -20,17 +20,20 @@ import {
   textValue,
   uuidValue,
 } from "@/lib/admin/validation";
+import { isGalleryLocationKey } from "@/lib/admin/gallery-locations";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { removeManagedImage, uploadManagedImage } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function galleryPayload(formData: FormData) {
+  const routeKey = routeKeyValue(formData);
+  if (!isGalleryLocationKey(routeKey)) throw new AdminValidationError("route");
   return {
     autoplay: booleanValue(formData, "autoplay"),
     display_order: integerValue(formData, "display_order", { max: 100_000 }),
     name: textValue(formData, "name", { max: 160 }),
     published: booleanValue(formData, "published"),
-    route_key: routeKeyValue(formData),
+    route_key: routeKey,
     slug: slugValue(formData),
   };
 }
@@ -240,4 +243,3 @@ export async function deleteGalleryAction(formData: FormData) {
   revalidatePath("/admin/galerias");
   redirect(appendFeedback("/admin/galerias", "status", "deleted"));
 }
-

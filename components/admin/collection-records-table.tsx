@@ -54,7 +54,7 @@ export function CollectionRecordsTable({ collections }: { collections: Collectio
                 <td>{formatAdminDate(collection.starts_at)}</td>
                 <td>{formatAdminDate(collection.ends_at)}</td>
                 <td>
-                  <Link className={styles.textButton} href={`/admin/colecoes/${collection.id}`}>
+                  <Link className={styles.textButton} href={`/admin/colecoes/${collection.id}`} prefetch={false}>
                     Editar
                   </Link>
                 </td>
