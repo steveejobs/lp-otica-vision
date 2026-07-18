@@ -56,6 +56,11 @@ export function VisionMotion() {
       window.clearTimeout(enterTimerRef.current);
     }
 
+    if (pathname === "/") {
+      setRouteState("idle");
+      return;
+    }
+
     setRouteState("entering");
     enterTimerRef.current = window.setTimeout(() => {
       setRouteState("idle");

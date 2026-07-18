@@ -1,13 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
-} from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 
 import type { ImageAsset } from "@/lib/assets";
 
@@ -19,23 +13,14 @@ type FocusPortraitProps = {
   priority?: boolean;
 };
 
-type FocusStyle = CSSProperties & {
-  "--focus-x": string;
-  "--focus-y": string;
-  "--portrait-pan-x": string;
-  "--portrait-pan-y": string;
-  "--portrait-tilt-x": string;
-  "--portrait-tilt-y": string;
+type PortraitStyle = CSSProperties & {
+  "--portrait-shift-x": string;
+  "--portrait-shift-y": string;
 };
 
-const DEFAULT_X = 58;
-const DEFAULT_Y = 36;
-const DEFAULT_INTERACTION = {
-  panX: "0px",
-  panY: "0px",
-  tiltX: "0deg",
-  tiltY: "0deg",
-};
+const OPENING_DELAY_MS = 140;
+const OPENING_DURATION_MS = 2_300;
+const POINTER_SHIFT_PX = 2.2;
 
 const clamp = (value: number, minimum: number, maximum: number) =>
   Math.max(minimum, Math.min(maximum, value));
@@ -45,188 +30,275 @@ export function FocusPortrait({
   className = "",
   priority = false,
 }: FocusPortraitProps) {
-  const frameRef = useRef<HTMLElement>(null);
-  const pointerDownRef = useRef(false);
-  const pointerTargetRef = useRef({ active: false, holdUntil: 0, x: 0, y: 0 });
-  const scrollImpulseRef = useRef(0);
+  const portraitRef = useRef<HTMLElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const portrait = portraitRef.current;
     const frame = frameRef.current;
-    if (!frame) return;
+    const hero = portrait?.closest<HTMLElement>("#hero");
+    if (!portrait || !frame || !hero) return;
 
+    const mobileViewport = window.matchMedia("(max-width: 720px)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let animationFrame = 0;
-    let elapsed = 0;
+    let disposed = false;
+    let documentVisible = document.visibilityState === "visible";
+    let exitProgress = 0;
+    let geometry = { height: hero.offsetHeight, top: hero.getBoundingClientRect().top + window.scrollY };
     let inView = true;
-    let lastFrameTime = performance.now();
-    let lastScrollY = window.scrollY;
-    let pageVisible = document.visibilityState === "visible";
+    let openingAnimation: Animation | null = null;
+    let pendingFrame = 0;
+    let phase: "opening" | "reduced" | "rest" = "rest";
+    let pointerBounds: DOMRect | null = null;
     let pointerX = 0;
     let pointerY = 0;
 
-    const setStaticFrame = () => {
-      frame.style.setProperty("--focus-x", `${DEFAULT_X}%`);
-      frame.style.setProperty("--focus-y", `${DEFAULT_Y}%`);
-      frame.style.setProperty("--portrait-pan-x", DEFAULT_INTERACTION.panX);
-      frame.style.setProperty("--portrait-pan-y", DEFAULT_INTERACTION.panY);
-      frame.style.setProperty("--portrait-tilt-x", DEFAULT_INTERACTION.tiltX);
-      frame.style.setProperty("--portrait-tilt-y", DEFAULT_INTERACTION.tiltY);
+    const setPhase = (nextPhase: typeof phase) => {
+      phase = nextPhase;
+      portrait.dataset.motionPhase = nextPhase;
+      hero.dataset.heroMotionPhase = nextPhase;
     };
 
-    const renderFrame = (now: number) => {
-      const delta = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
-      lastFrameTime = now;
-      elapsed += delta;
+    const setPlaybackState = (state: "opening" | "paused" | "reduced" | "rest") => {
+      portrait.dataset.motionState = state;
+      hero.dataset.heroMotionState = state;
+    };
 
-      const pointer = pointerTargetRef.current;
-      const pointerIsEngaged = pointer.active || now < pointer.holdUntil;
-      const targetX = pointerIsEngaged ? pointer.x : 0;
-      const targetY = pointerIsEngaged ? pointer.y : 0;
-      const follow = 1 - Math.exp(-delta * (pointerIsEngaged ? 7.5 : 3.2));
-      pointerX += (targetX - pointerX) * follow;
-      pointerY += (targetY - pointerY) * follow;
+    const cacheGeometry = () => {
+      geometry = {
+        height: hero.offsetHeight,
+        top: hero.getBoundingClientRect().top + window.scrollY,
+      };
+      pointerBounds = null;
+    };
 
-      const scrollImpulse = scrollImpulseRef.current;
-      scrollImpulseRef.current *= Math.exp(-delta * 3.8);
+    const updateExitProgress = () => {
+      const start = geometry.top + geometry.height * 0.14;
+      const distance = Math.max(1, geometry.height * 0.64);
+      exitProgress = clamp((window.scrollY - start) / distance, 0, 1);
+    };
 
-      const idleX = Math.sin(elapsed * 0.72) * 3.5 + Math.sin(elapsed * 0.27) * 1.15;
-      const idleY = Math.cos(elapsed * 0.58) * 2.15;
-      const panX = idleX + pointerX * 6.5;
-      const panY = idleY + pointerY * 4.6 + scrollImpulse * 3.8;
-      const tiltX = Math.sin(elapsed * 0.43) * 0.62 - pointerY * 2.1 - scrollImpulse * 0.85;
-      const tiltY = Math.cos(elapsed * 0.37) * 0.76 + pointerX * 2.4;
-      const focusX = clamp(DEFAULT_X + Math.sin(elapsed * 0.34) * 4.2 + pointerX * 9, 28, 78);
-      const focusY = clamp(DEFAULT_Y + Math.cos(elapsed * 0.29) * 2.8 + pointerY * 7, 22, 68);
+    const commitFrame = () => {
+      pendingFrame = 0;
+      if (disposed || reducedMotion.matches || !inView || !documentVisible) return;
 
-      frame.style.setProperty("--focus-x", `${focusX.toFixed(2)}%`);
-      frame.style.setProperty("--focus-y", `${focusY.toFixed(2)}%`);
-      frame.style.setProperty("--portrait-pan-x", `${panX.toFixed(2)}px`);
-      frame.style.setProperty("--portrait-pan-y", `${panY.toFixed(2)}px`);
-      frame.style.setProperty("--portrait-tilt-x", `${tiltX.toFixed(2)}deg`);
-      frame.style.setProperty("--portrait-tilt-y", `${tiltY.toFixed(2)}deg`);
+      const inset = exitProgress * (mobileViewport.matches ? 32 : 21);
+      frame.style.clipPath = mobileViewport.matches
+        ? `inset(${inset.toFixed(2)}% 0 ${inset.toFixed(2)}% 0)`
+        : `inset(0 ${inset.toFixed(2)}% 0 ${inset.toFixed(2)}%)`;
 
-      animationFrame = window.requestAnimationFrame(renderFrame);
+      const pointerIsAvailable = phase === "rest" && exitProgress < 0.035;
+      portrait.style.setProperty(
+        "--portrait-shift-x",
+        `${(pointerIsAvailable ? pointerX : 0).toFixed(2)}px`,
+      );
+      portrait.style.setProperty(
+        "--portrait-shift-y",
+        `${(pointerIsAvailable ? pointerY : 0).toFixed(2)}px`,
+      );
+    };
+
+    const scheduleFrame = () => {
+      if (pendingFrame || !inView || !documentVisible || reducedMotion.matches) return;
+      pendingFrame = window.requestAnimationFrame(commitFrame);
+    };
+
+    const finishOpening = () => {
+      if (disposed) return;
+      frame.style.clipPath = "inset(0)";
+      openingAnimation?.cancel();
+      openingAnimation = null;
+      setPhase("rest");
+      setPlaybackState(inView && documentVisible ? "rest" : "paused");
+      updateExitProgress();
+      scheduleFrame();
+    };
+
+    const cancelOpeningForScroll = () => {
+      if (!openingAnimation) return;
+      openingAnimation.cancel();
+      openingAnimation = null;
+      frame.style.clipPath = "inset(0)";
+      setPhase("rest");
+    };
+
+    const startOpening = () => {
+      if (disposed) return;
+      if (reducedMotion.matches) {
+        setPhase("reduced");
+        setPlaybackState("reduced");
+        frame.style.clipPath = "inset(0)";
+        return;
+      }
+
+      const initialClip = mobileViewport.matches
+        ? "inset(36% 0 36% 0)"
+        : "inset(0 45% 0 45%)";
+      const developmentClip = mobileViewport.matches
+        ? "inset(15% 0 15% 0)"
+        : "inset(0 18% 0 18%)";
+      setPhase("opening");
+      setPlaybackState(inView && documentVisible ? "opening" : "paused");
+      openingAnimation = frame.animate(
+        [
+          { clipPath: initialClip, easing: "linear", offset: 0 },
+          {
+            clipPath: initialClip,
+            easing: "cubic-bezier(0.22, 0.78, 0.22, 1)",
+            offset: 0.17,
+          },
+          {
+            clipPath: developmentClip,
+            easing: "cubic-bezier(0.3, 0.72, 0.2, 1)",
+            offset: 0.64,
+          },
+          { clipPath: "inset(0)", offset: 1 },
+        ],
+        {
+          delay: OPENING_DELAY_MS,
+          duration: OPENING_DURATION_MS,
+          fill: "both",
+        },
+      );
+      openingAnimation.onfinish = finishOpening;
+      if (!inView || !documentVisible) openingAnimation.pause();
     };
 
     const syncPlayback = () => {
-      window.cancelAnimationFrame(animationFrame);
-      animationFrame = 0;
+      window.cancelAnimationFrame(pendingFrame);
+      pendingFrame = 0;
 
       if (reducedMotion.matches) {
-        frame.dataset.motionEnabled = "false";
-        frame.dataset.motionState = "reduced";
-        setStaticFrame();
+        openingAnimation?.cancel();
+        openingAnimation = null;
+        frame.style.clipPath = "inset(0)";
+        portrait.style.setProperty("--portrait-shift-x", "0px");
+        portrait.style.setProperty("--portrait-shift-y", "0px");
+        setPhase("reduced");
+        setPlaybackState("reduced");
         return;
       }
 
-      frame.dataset.motionEnabled = "true";
-      if (!inView || !pageVisible) {
-        frame.dataset.motionState = "paused";
+      if (!inView || !documentVisible) {
+        openingAnimation?.pause();
+        setPlaybackState("paused");
         return;
       }
 
-      frame.dataset.motionState = "running";
-      lastFrameTime = performance.now();
-      animationFrame = window.requestAnimationFrame(renderFrame);
+      if (openingAnimation) {
+        openingAnimation.play();
+        setPlaybackState("opening");
+        return;
+      }
+
+      setPlaybackState("rest");
+      scheduleFrame();
+    };
+
+    const handleScroll = () => {
+      updateExitProgress();
+      if (exitProgress > 0.015) {
+        cancelOpeningForScroll();
+        pointerX = 0;
+        pointerY = 0;
+      }
+      scheduleFrame();
+    };
+
+    const handlePointerEnter = () => {
+      pointerBounds = portrait.getBoundingClientRect();
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (
+        event.pointerType !== "mouse" ||
+        reducedMotion.matches ||
+        phase !== "rest" ||
+        exitProgress >= 0.035
+      ) {
+        return;
+      }
+
+      const bounds = pointerBounds ?? portrait.getBoundingClientRect();
+      pointerBounds = bounds;
+      const normalizedX = clamp((event.clientX - bounds.left) / bounds.width - 0.5, -0.5, 0.5);
+      const normalizedY = clamp((event.clientY - bounds.top) / bounds.height - 0.5, -0.5, 0.5);
+      pointerX = normalizedX * POINTER_SHIFT_PX * 2;
+      pointerY = normalizedY * POINTER_SHIFT_PX * 1.45;
+      scheduleFrame();
+    };
+
+    const handlePointerLeave = () => {
+      pointerBounds = null;
+      pointerX = 0;
+      pointerY = 0;
+      scheduleFrame();
+    };
+
+    const handleResize = () => {
+      cacheGeometry();
+      updateExitProgress();
+      scheduleFrame();
+    };
+
+    const handleVisibility = () => {
+      documentVisible = document.visibilityState === "visible";
+      syncPlayback();
     };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        inView = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.02);
+        inView = Boolean(entry?.isIntersecting && entry.intersectionRatio > 0.04);
         syncPlayback();
       },
-      { threshold: [0, 0.02, 0.2, 0.6] },
+      { threshold: [0, 0.04, 0.3, 0.7] },
     );
 
-    const handleVisibility = () => {
-      pageVisible = document.visibilityState === "visible";
-      syncPlayback();
-    };
-
-    const handleScroll = () => {
-      const delta = window.scrollY - lastScrollY;
-      lastScrollY = window.scrollY;
-      if (!inView || reducedMotion.matches || Math.abs(delta) < 0.5) return;
-
-      scrollImpulseRef.current = clamp(scrollImpulseRef.current + delta / 72, -1, 1);
-    };
-
-    observer.observe(frame);
+    observer.observe(hero);
     document.addEventListener("visibilitychange", handleVisibility);
+    portrait.addEventListener("pointerenter", handlePointerEnter);
+    portrait.addEventListener("pointerleave", handlePointerLeave);
+    portrait.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("resize", handleResize);
     window.addEventListener("scroll", handleScroll, { passive: true });
+    mobileViewport.addEventListener("change", handleResize);
     reducedMotion.addEventListener("change", syncPlayback);
-    syncPlayback();
+    cacheGeometry();
+    updateExitProgress();
+    startOpening();
 
     return () => {
-      window.cancelAnimationFrame(animationFrame);
+      disposed = true;
+      window.cancelAnimationFrame(pendingFrame);
+      openingAnimation?.cancel();
       observer.disconnect();
       document.removeEventListener("visibilitychange", handleVisibility);
+      portrait.removeEventListener("pointerenter", handlePointerEnter);
+      portrait.removeEventListener("pointerleave", handlePointerLeave);
+      portrait.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
+      mobileViewport.removeEventListener("change", handleResize);
       reducedMotion.removeEventListener("change", syncPlayback);
+      delete hero.dataset.heroMotionPhase;
+      delete hero.dataset.heroMotionState;
     };
   }, []);
 
-  const setTargetFromPointer = useCallback((event: ReactPointerEvent<HTMLElement>) => {
-    if (event.pointerType !== "mouse" && !pointerDownRef.current) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const frame = frameRef.current;
-    if (!frame) return;
-    const bounds = frame.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
-    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-    const normalizedX = Math.max(0, Math.min(1, x / 100));
-    const normalizedY = Math.max(0, Math.min(1, y / 100));
-
-    pointerTargetRef.current = {
-      active: true,
-      holdUntil: event.pointerType === "mouse" ? 0 : performance.now() + 1100,
-      x: normalizedX - 0.5,
-      y: normalizedY - 0.5,
-    };
-  }, []);
-
-  const resetInteraction = useCallback(() => {
-    pointerTargetRef.current.active = false;
-  }, []);
-
-  const focusStyle: FocusStyle = {
-    "--focus-x": `${DEFAULT_X}%`,
-    "--focus-y": `${DEFAULT_Y}%`,
-    "--portrait-pan-x": DEFAULT_INTERACTION.panX,
-    "--portrait-pan-y": DEFAULT_INTERACTION.panY,
-    "--portrait-tilt-x": DEFAULT_INTERACTION.tiltX,
-    "--portrait-tilt-y": DEFAULT_INTERACTION.tiltY,
+  const portraitStyle: PortraitStyle = {
+    "--portrait-shift-x": "0px",
+    "--portrait-shift-y": "0px",
   };
 
   return (
     <figure
-      ref={frameRef}
+      ref={portraitRef}
       className={`${styles.portrait} ${className}`}
-      style={focusStyle}
+      style={portraitStyle}
       data-focus-portrait
-      onPointerDown={(event) => {
-        pointerDownRef.current = true;
-        setTargetFromPointer(event);
-      }}
-      onPointerEnter={() => {
-        pointerDownRef.current = false;
-      }}
-      onPointerLeave={() => {
-        pointerDownRef.current = false;
-        resetInteraction();
-      }}
-      onPointerMove={setTargetFromPointer}
-      onPointerUp={() => {
-        pointerDownRef.current = false;
-        pointerTargetRef.current.active = false;
-      }}
-      onPointerCancel={() => {
-        pointerDownRef.current = false;
-        pointerTargetRef.current.active = false;
-      }}
     >
       <div
+        ref={frameRef}
         className={styles.frame}
         style={{ backgroundColor: asset.placeholderColor }}
       >
@@ -242,8 +314,6 @@ export function FocusPortrait({
           sizes="(max-width: 720px) 78vw, (max-width: 1040px) 43vw, 430px"
           style={{ objectPosition: asset.objectPosition }}
         />
-        <span className={styles.lens} aria-hidden="true" />
-        <span className={styles.glint} aria-hidden="true" />
       </div>
     </figure>
   );

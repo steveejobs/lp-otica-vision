@@ -15,29 +15,28 @@ export function HomeHero() {
       id="hero"
       className={styles.hero}
       innerClassName={styles.inner}
+      motion={false}
       aria-labelledby="hero-title"
     >
-      <div className={styles.copy} data-motion-stagger>
+      <div className={styles.copy}>
         <div className={styles.eyebrowRail}>
-          <p className="eyebrow" data-motion-reveal data-motion-variant="hero">
+          <p className="eyebrow">
             Armações e lentes · Araguaína - TO
           </p>
         </div>
 
         <h1
           className={styles.title}
-          data-motion-reveal
-          data-motion-variant="hero"
           id="hero-title"
         >
           Armações que dão forma à sua presença.
         </h1>
 
-        <p className={styles.support} data-motion-reveal data-motion-variant="hero">
+        <p className={styles.support}>
           Armações nacionais e importadas, com lentes confeccionadas pela Vision em
           Araguaína.
         </p>
-        <div className={styles.actions} data-motion-reveal data-motion-variant="hero">
+        <div className={styles.actions}>
           <VisionButton
             href={LINKS.whatsapp}
             icon={MessageCircle}
@@ -58,9 +57,8 @@ export function HomeHero() {
         </div>
       </div>
 
-      <div className={styles.mediaStage} data-focus-reveal data-motion-variant="media">
+      <div className={styles.mediaStage}>
         <FocusPortrait asset={heroMedia} className={styles.media} priority />
-        <span className={styles.mediaLine} aria-hidden="true" />
       </div>
     </SectionShell>
   );

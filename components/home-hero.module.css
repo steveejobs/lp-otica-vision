@@ -67,34 +67,15 @@
 
 .mediaStage {
   position: relative;
+  isolation: isolate;
   width: min(100%, 470px);
   grid-column: 7 / 12;
   justify-self: center;
 }
 
-.mediaStage::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 8%;
-  right: -14%;
-  width: 74%;
-  height: 83%;
-  border: 1px solid rgba(143, 150, 157, 0.3);
-}
-
 .media {
   width: min(100%, 430px);
   aspect-ratio: 3 / 4;
-}
-
-.mediaLine {
-  position: absolute;
-  right: -8%;
-  bottom: 9%;
-  width: 38%;
-  height: 1px;
-  background: rgba(122, 96, 73, 0.56);
 }
 
 .support {
@@ -210,22 +191,11 @@
     margin: 0.2rem 0 0;
   }
 
-  .mediaStage::before {
-    top: 9%;
-    right: -8%;
-    width: 75%;
-    height: 82%;
-  }
-
   .media {
     width: 100%;
     aspect-ratio: 4 / 5;
   }
 
-  .mediaLine {
-    right: -3%;
-    width: 43%;
-  }
 }
 
 @media (orientation: landscape) and (max-height: 540px) and (max-width: 960px) {
