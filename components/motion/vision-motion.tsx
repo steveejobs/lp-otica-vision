@@ -7,7 +7,7 @@ const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
 const ROUTE_EXIT_MS = 340;
 const ROUTE_ENTER_MS = 620;
-const HYDRATION_SETTLE_MS = 1_200;
+const HYDRATION_SETTLE_MS = 520;
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0;
@@ -92,7 +92,7 @@ export function VisionMotion() {
       document.querySelectorAll<HTMLElement>(STAGGER_SELECTOR).forEach((container) => {
         Array.from(container.children).forEach((child, index) => {
           if (child instanceof HTMLElement && !child.style.getPropertyValue("--motion-delay")) {
-            child.style.setProperty("--motion-delay", `${Math.min(index, 8) * 72}ms`);
+            child.style.setProperty("--motion-delay", `${Math.min(index, 10) * 86}ms`);
           }
         });
       });
@@ -102,7 +102,7 @@ export function VisionMotion() {
       Array.from(document.querySelectorAll<HTMLElement>(REVEAL_SELECTOR));
 
     const observeNewTargets = () => {
-      root.dataset.motionReady = "true";
+      const motionIsReady = root.dataset.motionReady === "true";
       syncStaggerOrder();
 
       targetsInDocument().forEach((target) => {
@@ -110,7 +110,8 @@ export function VisionMotion() {
 
         const bounds = target.getBoundingClientRect();
         if (bounds.top < window.innerHeight * 1.04 && bounds.bottom > 0) {
-          queueRevealTarget(target);
+          if (motionIsReady) queueRevealTarget(target);
+          else revealTarget(target);
           return;
         }
 
@@ -120,6 +121,7 @@ export function VisionMotion() {
         }
       });
 
+      root.dataset.motionReady = "true";
     };
 
     const startRevealSystem = () => {

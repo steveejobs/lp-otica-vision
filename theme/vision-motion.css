@@ -2,6 +2,7 @@
 [data-focus-reveal] {
   --motion-distance: 18px;
   --motion-duration: var(--duration-editorial);
+  --motion-child-distance: 16px;
   opacity: 1;
   filter: blur(0);
   transform: translate3d(0, 0, 0) scale(1);
@@ -24,12 +25,14 @@
 [data-motion-variant="hero"] {
   --motion-distance: 28px;
   --motion-duration: 860ms;
+  --motion-child-distance: 22px;
 }
 
 [data-motion-variant="media"],
 [data-motion-variant="section"] {
-  --motion-distance: 24px;
-  --motion-duration: 720ms;
+  --motion-distance: 26px;
+  --motion-duration: 780ms;
+  --motion-child-distance: 18px;
 }
 
 [data-motion-variant="section"] {
@@ -37,16 +40,52 @@
 }
 
 [data-motion-variant="catalog-card"] {
-  --motion-distance: 28px;
-  --motion-duration: 760ms;
+  --motion-distance: 34px;
+  --motion-duration: 780ms;
   transform-origin: 50% 18%;
+}
+
+[data-motion-reveal] :where(.eyebrow, h1, h2, h3),
+[data-focus-reveal] :where(.eyebrow, h1, h2, h3) {
+  clip-path: inset(0 0 0 0);
+  filter: blur(0);
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    clip-path calc(var(--motion-duration) + 120ms) var(--ease-vision-out),
+    opacity var(--motion-duration) var(--ease-vision-out),
+    filter var(--motion-duration) var(--ease-vision-out),
+    transform var(--motion-duration) var(--ease-vision-out);
+  transition-delay: calc(var(--motion-delay, 0ms) + 56ms);
+}
+
+[data-motion-reveal] :where(p, a, button, form, nav),
+[data-focus-reveal] :where(p, a, button, form, nav) {
+  filter: blur(0);
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity var(--motion-duration) var(--ease-vision-out),
+    filter var(--motion-duration) var(--ease-vision-out),
+    transform var(--motion-duration) var(--ease-vision-out);
+  transition-delay: calc(var(--motion-delay, 0ms) + 126ms);
+}
+
+[data-motion-reveal] :where(img, video),
+[data-focus-reveal] :where(img, video) {
+  filter: blur(0) saturate(1);
+  transform: scale(1);
+  transition:
+    filter calc(var(--motion-duration) + 180ms) var(--ease-vision-out),
+    transform calc(var(--motion-duration) + 180ms) var(--ease-vision-out);
+  transition-delay: calc(var(--motion-delay, 0ms) + 72ms);
 }
 
 html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible),
 html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
   opacity: 0;
-  filter: blur(7px) saturate(0.92);
-  transform: translate3d(0, var(--motion-distance), 0) scale(0.982);
+  filter: blur(6px) saturate(0.94);
+  transform: translate3d(0, var(--motion-distance), 0) scale(0.988);
   will-change: opacity, filter, transform;
 }
 
@@ -56,8 +95,29 @@ html[data-motion-ready="true"] [data-motion-variant="hero"]:not(.is-motion-visib
 }
 
 html[data-motion-ready="true"] [data-motion-variant="catalog-card"]:not(.is-motion-visible) {
-  filter: blur(6px) saturate(0.86);
-  transform: translate3d(0, var(--motion-distance), 0) rotateX(2deg) scale(0.97);
+  filter: blur(8px) saturate(0.84);
+  transform: translate3d(0, var(--motion-distance), 0) rotateX(5deg) scale(0.955);
+}
+
+html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible) :where(.eyebrow, h1, h2, h3),
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) :where(.eyebrow, h1, h2, h3) {
+  clip-path: inset(0 0 96% 0);
+  filter: blur(5px) saturate(0.9);
+  opacity: 0;
+  transform: translate3d(0, var(--motion-child-distance), 0);
+}
+
+html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible) :where(p, a, button, form, nav),
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) :where(p, a, button, form, nav) {
+  filter: blur(4px);
+  opacity: 0;
+  transform: translate3d(0, calc(var(--motion-child-distance) * 0.72), 0);
+}
+
+html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible) :where(img, video),
+html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) :where(img, video) {
+  filter: blur(5px) saturate(0.88);
+  transform: scale(1.035);
 }
 
 html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
@@ -170,7 +230,9 @@ html[data-route-state="entering"] main {
   }
 
   html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible),
-  html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) {
+  html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible),
+  html[data-motion-ready="true"] [data-motion-reveal]:not(.is-motion-visible) :where(.eyebrow, h1, h2, h3, p, a, button, form, nav, img, video),
+  html[data-motion-ready="true"] [data-focus-reveal]:not(.is-motion-visible) :where(.eyebrow, h1, h2, h3, p, a, button, form, nav, img, video) {
     clip-path: none;
     filter: none;
     opacity: 1;

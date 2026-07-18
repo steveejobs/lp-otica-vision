@@ -17,6 +17,7 @@ import { getExameNews } from "@/lib/exame-news";
 import { featuredBrands, featuredCollection } from "@/lib/showcase-content";
 
 export const revalidate = 28_800;
+const HOME_CATALOG_PREVIEW_MIN_PRODUCTS = 4;
 
 async function ExameNewsSection() {
   const newsItems = await getExameNews();
@@ -29,6 +30,8 @@ async function CatalogPreviewSection() {
   if (!settings.enabled) return null;
 
   const products = await getFeaturedCatalogProducts();
+  if (products.length < HOME_CATALOG_PREVIEW_MIN_PRODUCTS) return null;
+
   return <CatalogPreview products={products} />;
 }
 

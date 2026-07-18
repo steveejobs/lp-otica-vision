@@ -60,8 +60,8 @@ function BrandSequence({
                 height={brandItem.height}
                 sizes={
                   variant === "compact"
-                    ? "(max-width: 720px) 150px, 136px"
-                    : "(max-width: 720px) 164px, 184px"
+                    ? "(max-width: 720px) 160px, 156px"
+                    : "(max-width: 720px) 220px, 270px"
                 }
                 alt={duplicate ? "" : brandItem.alt}
                 loading="lazy"

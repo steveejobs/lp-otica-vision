@@ -1,32 +1,21 @@
 .viewport {
-  --rail-item-width: 184px;
-  --rail-item-height: 86px;
-  --rail-item-gap: 24px;
-  --rail-separator-offset: -12px;
-  --rail-group-gap: 32px;
-  --rail-half-gap: 16px;
-  --rail-duration: 36s;
-  --rail-logo-shell-scale: 1.16;
-  --rail-edge-size: clamp(4rem, 10vw, 9rem);
+  --rail-item-width: 270px;
+  --rail-item-height: 132px;
+  --rail-item-gap: 38px;
+  --rail-group-gap: 56px;
+  --rail-half-gap: 28px;
+  --rail-duration: 44s;
+  --rail-logo-shell-scale: 1.56;
+  --rail-edge-size: clamp(7.5rem, 18vw, 15rem);
   --rail-fade-surface: var(--vision-bg-soft);
   position: relative;
   width: 100%;
   min-width: 0;
+  min-height: var(--rail-item-height);
   overflow: hidden;
   outline-offset: 5px;
+  isolation: isolate;
   touch-action: pan-y pinch-zoom;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 var(--rail-edge-size),
-    #000 100%
-  );
-  mask-image: linear-gradient(
-    90deg,
-    transparent 0,
-    #000 var(--rail-edge-size),
-    #000 100%
-  );
 }
 
 .viewport::before,
@@ -34,18 +23,23 @@
   content: "";
   position: absolute;
   z-index: 2;
-  top: -1px;
-  bottom: -1px;
+  top: -12px;
+  bottom: -12px;
   width: var(--rail-edge-size);
   pointer-events: none;
-  backdrop-filter: blur(7px);
+  backdrop-filter: blur(12px);
 }
 
 .viewport::before {
-  left: 0;
+  left: calc(var(--rail-edge-size) * -0.18);
   background:
-    linear-gradient(90deg, var(--rail-fade-surface), rgba(244, 238, 230, 0)),
-    linear-gradient(90deg, rgba(251, 248, 243, 0.78), rgba(251, 248, 243, 0));
+    linear-gradient(
+      90deg,
+      var(--rail-fade-surface) 0%,
+      rgba(244, 238, 230, 0.96) 34%,
+      rgba(244, 238, 230, 0.52) 68%,
+      rgba(244, 238, 230, 0) 100%
+    );
 }
 
 .viewport::after {
@@ -91,13 +85,7 @@
 }
 
 .slot::after {
-  content: "";
-  position: absolute;
-  top: 20%;
-  right: var(--rail-separator-offset);
-  bottom: 20%;
-  width: 1px;
-  background: rgba(143, 150, 157, 0.22);
+  content: none;
 }
 
 .logoShell {
@@ -121,14 +109,13 @@
 }
 
 .compact {
-  --rail-item-width: 136px;
-  --rail-item-height: 64px;
-  --rail-item-gap: 16px;
-  --rail-separator-offset: -8px;
-  --rail-group-gap: 22px;
-  --rail-half-gap: 11px;
-  --rail-duration: 32s;
-  --rail-logo-shell-scale: 0.98;
+  --rail-item-width: 156px;
+  --rail-item-height: 74px;
+  --rail-item-gap: 20px;
+  --rail-group-gap: 28px;
+  --rail-half-gap: 14px;
+  --rail-duration: 34s;
+  --rail-logo-shell-scale: 1.04;
   --rail-fade-surface: var(--vision-paper);
 }
 
@@ -166,27 +153,25 @@
 
 @media (max-width: 720px) {
   .home {
-    --rail-item-width: 164px;
-    --rail-item-height: 78px;
-    --rail-item-gap: 18px;
-    --rail-separator-offset: -9px;
-    --rail-group-gap: 24px;
-    --rail-half-gap: 12px;
-    --rail-duration: 36s;
-    --rail-logo-shell-scale: 1.16;
-    --rail-edge-size: clamp(2.8rem, 16vw, 5.4rem);
+    --rail-item-width: 220px;
+    --rail-item-height: 112px;
+    --rail-item-gap: 26px;
+    --rail-group-gap: 36px;
+    --rail-half-gap: 18px;
+    --rail-duration: 42s;
+    --rail-logo-shell-scale: 1.38;
+    --rail-edge-size: clamp(5.5rem, 30vw, 8.5rem);
   }
 
   .compact {
-    --rail-item-width: 150px;
-    --rail-item-height: 70px;
-    --rail-item-gap: 14px;
-    --rail-separator-offset: -7px;
-    --rail-group-gap: 18px;
-    --rail-half-gap: 9px;
+    --rail-item-width: 160px;
+    --rail-item-height: 76px;
+    --rail-item-gap: 18px;
+    --rail-group-gap: 24px;
+    --rail-half-gap: 12px;
     --rail-duration: 36s;
-    --rail-logo-shell-scale: 1.08;
-    --rail-edge-size: clamp(2rem, 10vw, 3.8rem);
+    --rail-logo-shell-scale: 1.12;
+    --rail-edge-size: clamp(3.4rem, 22vw, 5.8rem);
   }
 
   .logo {
