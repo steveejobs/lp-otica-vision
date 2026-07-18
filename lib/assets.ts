@@ -248,7 +248,13 @@ const visualSeries = {
   ],
 } as const;
 
-export const heroMedia = visualSeries.series2[0];
+export const visionEditMedia = [
+  visualSeries.series2[0],
+  visualSeries.series6[2],
+  visualSeries.series7[0],
+] as const;
+
+export const heroMedia = visionEditMedia[0];
 
 export const homeVideos = [
   video(

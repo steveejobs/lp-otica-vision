@@ -1,0 +1,33 @@
+[
+  {
+    "file": "abertura-mobile-390x844.webm",
+    "fileSize": 1202228,
+    "frames": [
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-0_8s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-5_4s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-9_3s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-14_2s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-19_2s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-mobile-390x844-24_2s.png"
+    ],
+    "duration": 23.68,
+    "height": 844,
+    "readyState": 4,
+    "width": 390
+  },
+  {
+    "file": "abertura-desktop-1440x900.webm",
+    "fileSize": 2064267,
+    "frames": [
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-desktop-1440x900-0_8s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-desktop-1440x900-5_4s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-desktop-1440x900-9_3s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-desktop-1440x900-14_2s.png",
+      "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\.tmp\\vision-edit-video-frames\\abertura-desktop-1440x900-18_5s.png"
+    ],
+    "duration": 20.56,
+    "height": 900,
+    "readyState": 4,
+    "width": 1440
+  }
+]
