@@ -22,10 +22,10 @@
 
   --duration-fast: 180ms;
   --duration-medium: 420ms;
-  --duration-editorial: 680ms;
-  --duration-media: 860ms;
-  --route-exit-duration: 340ms;
-  --route-enter-duration: 620ms;
+  --duration-editorial: 1.02s;
+  --duration-media: 1.18s;
+  --route-exit-duration: 760ms;
+  --route-enter-duration: 1.08s;
 
   --radius-sm: 6px;
   --radius-md: 8px;

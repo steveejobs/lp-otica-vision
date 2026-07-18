@@ -1,13 +1,22 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
-const ROUTE_EXIT_MS = 340;
-const ROUTE_ENTER_MS = 620;
-const HYDRATION_SETTLE_MS = 520;
+const ROUTE_EXIT_MS = 760;
+const ROUTE_ENTER_MS = 1_080;
+const HYDRATION_SETTLE_MS = 420;
+const STAGGER_STEP_MS = 118;
+const STAGGER_LIMIT = 9;
+
+const STAGGER_MOTIONS = [
+  { x: "-18px", y: "38px", rotate: "-0.7deg" },
+  { x: "0px", y: "44px", rotate: "0deg" },
+  { x: "18px", y: "36px", rotate: "0.65deg" },
+  { x: "-8px", y: "46px", rotate: "0.38deg" },
+] as const;
 
 function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0;
@@ -39,7 +48,6 @@ function setRouteState(state: "idle" | "leaving" | "entering") {
 
 export function VisionMotion() {
   const pathname = usePathname();
-  const router = useRouter();
   const exitTimerRef = useRef<number | null>(null);
   const enterTimerRef = useRef<number | null>(null);
 
@@ -64,7 +72,7 @@ export function VisionMotion() {
     const root = document.documentElement;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const observedTargets = new WeakSet<HTMLElement>();
-    const queuedTargets = new WeakSet<HTMLElement>();
+    const revealTimers = new WeakMap<HTMLElement, number>();
     let animationFrame = 0;
     let startTimer = 0;
     let observer: IntersectionObserver | null = null;
@@ -72,28 +80,57 @@ export function VisionMotion() {
     let disposed = false;
 
     const revealTarget = (target: HTMLElement) => {
+      const queuedTimer = revealTimers.get(target);
+      if (queuedTimer) {
+        window.clearTimeout(queuedTimer);
+        revealTimers.delete(target);
+      }
+      target.dataset.motionExit = "";
       target.classList.add("is-motion-visible");
       if (target.matches("[data-focus-reveal]")) {
         target.classList.add("is-focus-visible");
       }
     };
 
+    const exitTarget = (target: HTMLElement, direction: "up" | "down") => {
+      const queuedTimer = revealTimers.get(target);
+      if (queuedTimer) {
+        window.clearTimeout(queuedTimer);
+        revealTimers.delete(target);
+      }
+      target.dataset.motionExit = direction;
+      target.classList.remove("is-motion-visible");
+      target.classList.remove("is-focus-visible");
+    };
+
     const queueRevealTarget = (target: HTMLElement) => {
-      if (queuedTargets.has(target)) return;
-      queuedTargets.add(target);
-      window.setTimeout(() => {
+      if (target.classList.contains("is-motion-visible")) return;
+
+      const queuedTimer = revealTimers.get(target);
+      if (queuedTimer) {
+        window.clearTimeout(queuedTimer);
+      }
+
+      const delay = Number.parseInt(target.style.getPropertyValue("--motion-delay") || "0", 10);
+      const timer = window.setTimeout(() => {
+        revealTimers.delete(target);
         window.requestAnimationFrame(() => {
           revealTarget(target);
         });
-      }, 80);
+      }, Math.min(delay * 0.24 + 120, 360));
+      revealTimers.set(target, timer);
     };
 
     const syncStaggerOrder = () => {
       document.querySelectorAll<HTMLElement>(STAGGER_SELECTOR).forEach((container) => {
         Array.from(container.children).forEach((child, index) => {
-          if (child instanceof HTMLElement && !child.style.getPropertyValue("--motion-delay")) {
-            child.style.setProperty("--motion-delay", `${Math.min(index, 10) * 86}ms`);
-          }
+          if (!(child instanceof HTMLElement)) return;
+
+          const motion = STAGGER_MOTIONS[index % STAGGER_MOTIONS.length];
+          child.style.setProperty("--motion-delay", `${Math.min(index, STAGGER_LIMIT) * STAGGER_STEP_MS}ms`);
+          child.style.setProperty("--motion-entry-x", motion.x);
+          child.style.setProperty("--motion-entry-y", motion.y);
+          child.style.setProperty("--motion-entry-rotate", motion.rotate);
         });
       });
     };
@@ -106,13 +143,12 @@ export function VisionMotion() {
       syncStaggerOrder();
 
       targetsInDocument().forEach((target) => {
-        if (target.classList.contains("is-motion-visible")) return;
-
         const bounds = target.getBoundingClientRect();
-        if (bounds.top < window.innerHeight * 1.04 && bounds.bottom > 0) {
+        const isWithinRevealBand = bounds.top < window.innerHeight * 0.92 && bounds.bottom > window.innerHeight * 0.06;
+
+        if (isWithinRevealBand && !target.classList.contains("is-motion-visible")) {
           if (motionIsReady) queueRevealTarget(target);
           else revealTarget(target);
-          return;
         }
 
         if (!observedTargets.has(target)) {
@@ -137,12 +173,25 @@ export function VisionMotion() {
       observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            revealTarget(entry.target as HTMLElement);
-            observer?.unobserve(entry.target);
+            const target = entry.target as HTMLElement;
+            const bounds = entry.boundingClientRect;
+            const isVisibleEnough = entry.isIntersecting && entry.intersectionRatio >= 0.12;
+
+            if (isVisibleEnough) {
+              queueRevealTarget(target);
+              return;
+            }
+
+            if (root.dataset.motionReady !== "true" || !target.classList.contains("is-motion-visible")) return;
+
+            if (bounds.bottom < window.innerHeight * 0.08) {
+              exitTarget(target, "up");
+            } else if (bounds.top > window.innerHeight * 0.92) {
+              exitTarget(target, "down");
+            }
           });
         },
-        { threshold: 0.16, rootMargin: "0px 0px -8%" },
+        { threshold: [0, 0.08, 0.12, 0.24, 0.42], rootMargin: "-4% 0px -8%" },
       );
 
       observeNewTargets();
@@ -183,6 +232,7 @@ export function VisionMotion() {
 
       const url = getInternalNavigationUrl(event.target);
       if (!url) return;
+      const destination = `${url.pathname}${url.search}${url.hash}`;
 
       event.preventDefault();
 
@@ -195,14 +245,7 @@ export function VisionMotion() {
 
       setRouteState("leaving");
       exitTimerRef.current = window.setTimeout(() => {
-        router.push(`${url.pathname}${url.search}${url.hash}`);
-
-        enterTimerRef.current = window.setTimeout(() => {
-          setRouteState("entering");
-          enterTimerRef.current = window.setTimeout(() => {
-            setRouteState("idle");
-          }, ROUTE_ENTER_MS);
-        }, 80);
+        window.location.assign(destination);
       }, ROUTE_EXIT_MS);
     };
 
@@ -217,7 +260,7 @@ export function VisionMotion() {
         window.clearTimeout(enterTimerRef.current);
       }
     };
-  }, [router]);
+  }, []);
 
   return null;
 }
