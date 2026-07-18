@@ -248,13 +248,13 @@ const visualSeries = {
   ],
 } as const;
 
-export const visionEditMedia = [
-  visualSeries.series2[0],
+export const visionTakeoverMedia = [
+  visualSeries.series7[1],
+  visualSeries.series6[0],
   visualSeries.series6[2],
-  visualSeries.series7[0],
 ] as const;
 
-export const heroMedia = visionEditMedia[0];
+export const heroMedia = visionTakeoverMedia[0];
 
 export const homeVideos = [
   video(
@@ -380,7 +380,7 @@ const assertUnique = (paths: readonly string[], route: string) => {
 
 assertUnique(
   [
-    heroMedia.src,
+    ...visionTakeoverMedia.map((item) => item.src),
     ...homeVideos.map((item) => item.src),
     ...editorialGalleryImages.map((item) => item.src),
     ...brandLogos.map((item) => item.src),
@@ -396,14 +396,4 @@ assertUnique(
     ...brandLogos.map((item) => item.src),
   ],
   "/instagram",
-);
-
-assertUnique(
-  [
-    heroMedia.src,
-    ...editorialGalleryImages.map((item) => item.src),
-    ...labMedia.map((item) => item.src),
-    ...instagramImages.map((item) => item.src),
-  ],
-  "curadoria de imagens do site",
 );

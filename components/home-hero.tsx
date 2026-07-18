@@ -1,12 +1,7 @@
-import { brandLogos, visionEditMedia } from "@/lib/assets";
+import { visionTakeoverMedia } from "@/lib/assets";
 
-import { VisionEdit } from "./vision-edit";
+import { VisionEditorialTakeover } from "./vision-editorial-takeover";
 
 export function HomeHero() {
-  return (
-    <VisionEdit
-      assets={visionEditMedia}
-      brandNames={brandLogos.map((brand) => brand.name)}
-    />
-  );
+  return <VisionEditorialTakeover assets={visionTakeoverMedia} />;
 }
