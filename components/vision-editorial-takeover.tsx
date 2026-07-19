@@ -1,164 +1,119 @@
 "use client";
 
-import Image from "next/image";
 import { BookOpenText, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-import type { ImageAsset } from "@/lib/assets";
+import type { HeroMedia } from "@/lib/gallery/hero";
 import { LINKS } from "@/lib/links";
 
 import { BrandLogo } from "./brand-logo";
 import { VisionButton } from "./vision-button";
 import styles from "./vision-editorial-takeover.module.css";
 
-type VisionEditorialTakeoverProps = {
-  assets: readonly ImageAsset[];
-};
+type Props = { media: HeroMedia[] };
+type StageStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-type SceneStyle = CSSProperties & {
-  "--takeover-placeholder": string;
-  "--takeover-position": string;
-};
+const HOLD_MS = 2_650;
+const SETTLE_MS = 2_350;
 
-const ACT_HOLDS_MS = [2_900, 2_800, 2_700] as const;
-const PREPARE_SECOND_MS = 320;
-const PREPARE_THIRD_MS = 1_900;
-
-export function VisionEditorialTakeover({ assets }: VisionEditorialTakeoverProps) {
+export function VisionEditorialTakeover({ media }: Props) {
+  const items = media.slice(0, 3);
   const rootRef = useRef<HTMLElement>(null);
   const [act, setAct] = useState(0);
-  const [documentVisible, setDocumentVisible] = useState(true);
+  const [prepared, setPrepared] = useState(1);
+  const [visible, setVisible] = useState(true);
+  const [inViewport, setInViewport] = useState(true);
+  const [reduced, setReduced] = useState(false);
   const [enhanced, setEnhanced] = useState(false);
-  const [intersects, setIntersects] = useState(true);
-  const [preparedCount, setPreparedCount] = useState(1);
-  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-
-    const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncReducedMotion = () => setReducedMotion(reducedQuery.matches);
-    const syncVisibility = () => setDocumentVisible(document.visibilityState === "visible");
-    const observer = "IntersectionObserver" in window
-      ? new IntersectionObserver(
-          ([entry]) => setIntersects(Boolean(entry?.isIntersecting && entry.intersectionRatio >= 0.12)),
-          { threshold: [0, 0.12, 0.5] },
-        )
-      : null;
-
-    setEnhanced(true);
-    syncReducedMotion();
-    syncVisibility();
-    observer?.observe(root);
-    document.addEventListener("visibilitychange", syncVisibility);
-    reducedQuery.addEventListener("change", syncReducedMotion);
-
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onVisibility = () => setVisible(document.visibilityState === "visible");
+    const onMotion = () => setReduced(query.matches);
+    const observer = new IntersectionObserver(([entry]) => setInViewport(Boolean(entry?.isIntersecting)), { threshold: 0.08 });
+    observer.observe(root);
+    onVisibility(); onMotion(); setEnhanced(true);
+    document.addEventListener("visibilitychange", onVisibility);
+    query.addEventListener("change", onMotion);
     return () => {
-      observer?.disconnect();
-      document.removeEventListener("visibilitychange", syncVisibility);
-      reducedQuery.removeEventListener("change", syncReducedMotion);
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+      query.removeEventListener("change", onMotion);
     };
   }, []);
 
   useEffect(() => {
-    if (!enhanced || reducedMotion) return;
-
-    const secondTimer = window.setTimeout(() => setPreparedCount(2), PREPARE_SECOND_MS);
-    const thirdTimer = window.setTimeout(() => setPreparedCount(3), PREPARE_THIRD_MS);
-
-    return () => {
-      window.clearTimeout(secondTimer);
-      window.clearTimeout(thirdTimer);
-    };
-  }, [enhanced, reducedMotion]);
+    if (!enhanced || reduced || items.length < 2) return;
+    const second = window.setTimeout(() => setPrepared(2), 260);
+    const third = window.setTimeout(() => setPrepared(3), 1_450);
+    return () => { window.clearTimeout(second); window.clearTimeout(third); };
+  }, [enhanced, items.length, reduced]);
 
   useEffect(() => {
-    if (!enhanced || reducedMotion || !documentVisible || !intersects || act >= 3) return;
-
-    const timer = window.setTimeout(() => {
-      setAct((current) => Math.min(current + 1, 3));
-    }, ACT_HOLDS_MS[act]);
-
+    if (!enhanced || reduced || !visible || !inViewport || items.length < 2 || act >= items.length) return;
+    const delay = act === items.length - 1 ? SETTLE_MS : HOLD_MS;
+    const timer = window.setTimeout(() => setAct((current) => Math.min(current + 1, items.length)), delay);
     return () => window.clearTimeout(timer);
-  }, [act, documentVisible, enhanced, intersects, reducedMotion]);
+  }, [act, enhanced, inViewport, items.length, reduced, visible]);
+
+  const style = items.reduce<StageStyle>((values, item, index) => {
+    values[`--stage-bg-${index}`] = item.backgroundColor;
+    return values;
+  }, {});
 
   return (
     <section
-      ref={rootRef}
       aria-labelledby="hero-title"
-      className={styles.takeover}
-      data-act={reducedMotion ? 0 : act}
-      data-enhanced={enhanced ? "true" : "false"}
-      data-motion={reducedMotion ? "reduced" : documentVisible && intersects ? "playing" : "paused"}
+      className={styles.stage}
+      data-act={reduced ? 0 : act}
+      data-count={items.length}
+      data-enhanced={enhanced}
+      data-motion={reduced ? "reduced" : visible && inViewport ? "playing" : "paused"}
       id="hero"
+      ref={rootRef}
+      style={style}
     >
-      <div aria-hidden="true" className={styles.scenes}>
-        {assets.slice(0, preparedCount).map((asset, index) => (
+      <div className={styles.identity}><BrandLogo size="hero" /></div>
+      <div aria-hidden="true" className={styles.folio}>VISION / CURADORIA / 01—03</div>
+
+      <div aria-hidden="true" className={styles.photoStage}>
+        {items.slice(0, prepared).map((item, index) => (
           <figure
-            className={`${styles.scene} ${styles[`scene${index + 1}`]}`}
-            key={asset.src}
-            style={
-              {
-                "--takeover-placeholder": asset.placeholderColor,
-                "--takeover-position": asset.objectPosition,
-              } as SceneStyle
-            }
+            className={styles.page}
+            data-index={index}
+            key={item.id}
+            style={{
+              "--desktop-focus": item.desktopObjectPosition,
+              "--desktop-scale": item.desktopScale,
+              "--mobile-focus": item.mobileObjectPosition,
+              "--mobile-scale": item.mobileScale,
+              "--placeholder": item.backgroundColor,
+              "--placeholder-image": item.blurDataUrl ? `url("${item.blurDataUrl}")` : "none",
+            } as StageStyle}
           >
-            <Image
-              alt=""
-              blurDataURL={asset.blurDataURL}
-              className={styles.photo}
-              fill
-              fetchPriority={index === 0 ? "high" : index === 1 ? "auto" : "low"}
-              loading={index === 0 ? "eager" : "lazy"}
-              placeholder={asset.blurDataURL ? "blur" : "empty"}
-              priority={index === 0}
-              sizes="100vw"
-              src={asset.src}
-            />
+            <picture>
+              <source media="(max-width: 720px)" sizes="78vw" srcSet={`/api/galerias/imagem/${item.id}?variant=mobile&v=${item.assetVersion} 800w`} />
+              <img alt="" className={styles.photo} decoding="async" fetchPriority={index === 0 ? "high" : "auto"} height={item.height} loading={index === 0 ? "eager" : "lazy"} sizes="(max-width: 1100px) 52vw, 36vw" src={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion}`} srcSet={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion} 1200w`} width={item.width} />
+            </picture>
           </figure>
         ))}
+        <span className={styles.pageEdge} />
       </div>
 
-      <div aria-hidden="true" className={`${styles.blade} ${styles.bladeTwo}`} />
-      <div aria-hidden="true" className={`${styles.blade} ${styles.bladeThree}`} />
-
-      <div className={styles.signature}>
-        <BrandLogo size="hero" />
-      </div>
-
-      <div aria-hidden="true" className={styles.copyPlane} />
       <div className={styles.copy}>
         <h1 className={styles.title} id="hero-title">
-          <span>Seleção Vision.</span>
-          <span>Marcas com presença.</span>
+          <span>Seleção Vision.</span><span>Marcas com presença.</span>
         </h1>
         <div className={styles.actions}>
-          <VisionButton
-            ariaLabel="Ver catálogo da Ótica Vision"
-            className={styles.primaryAction}
-            href={LINKS.catalog}
-            icon={BookOpenText}
-          >
-            Catálogo
-          </VisionButton>
-          <VisionButton
-            ariaLabel="Falar com a Ótica Vision pelo WhatsApp"
-            className={styles.secondaryAction}
-            external
-            href={LINKS.whatsapp}
-            icon={MessageCircle}
-            variant="secondary"
-          >
-            WhatsApp
-          </VisionButton>
+          <VisionButton ariaLabel="Ver catálogo da Ótica Vision" href={LINKS.catalog} icon={BookOpenText}>Catálogo</VisionButton>
+          <VisionButton ariaLabel="Falar com a Ótica Vision pelo WhatsApp" external href={LINKS.whatsapp} icon={MessageCircle} variant="secondary">WhatsApp</VisionButton>
         </div>
       </div>
 
-      <p className={styles.visualDescription}>
-        Retratos editoriais da seleção de armações da Ótica Vision.
-      </p>
+      <span aria-hidden="true" className={styles.transitionRail} />
+      <p className={styles.visualDescription}>{items.map((item) => item.altText).join(". ") || "Curadoria Ótica Vision."}</p>
     </section>
   );
 }

@@ -12,6 +12,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       analytics_events: {
@@ -276,6 +301,7 @@ export type Database = {
           display_order: number
           id: string
           name: string
+          placement_key: string
           published: boolean
           route_key: string
           slug: string
@@ -287,6 +313,7 @@ export type Database = {
           display_order?: number
           id?: string
           name: string
+          placement_key: string
           published?: boolean
           route_key: string
           slug: string
@@ -298,6 +325,7 @@ export type Database = {
           display_order?: number
           id?: string
           name?: string
+          placement_key?: string
           published?: boolean
           route_key?: string
           slug?: string
@@ -308,13 +336,20 @@ export type Database = {
       gallery_items: {
         Row: {
           alt_text: string
+          asset_version: string | null
+          background_color: string | null
+          blur_data_url: string | null
           created_at: string
           desktop_object_position: string
+          desktop_scale: number
           display_order: number
+          editorial_role: string
           gallery_id: string
           height: number | null
           id: string
+          media_manifest: Json | null
           mobile_object_position: string
+          mobile_scale: number
           published: boolean
           series_order: number | null
           storage_path: string
@@ -324,13 +359,20 @@ export type Database = {
         }
         Insert: {
           alt_text: string
+          asset_version?: string | null
+          background_color?: string | null
+          blur_data_url?: string | null
           created_at?: string
           desktop_object_position?: string
+          desktop_scale?: number
           display_order?: number
+          editorial_role?: string
           gallery_id: string
           height?: number | null
           id?: string
+          media_manifest?: Json | null
           mobile_object_position?: string
+          mobile_scale?: number
           published?: boolean
           series_order?: number | null
           storage_path: string
@@ -340,13 +382,20 @@ export type Database = {
         }
         Update: {
           alt_text?: string
+          asset_version?: string | null
+          background_color?: string | null
+          blur_data_url?: string | null
           created_at?: string
           desktop_object_position?: string
+          desktop_scale?: number
           display_order?: number
+          editorial_role?: string
           gallery_id?: string
           height?: number | null
           id?: string
+          media_manifest?: Json | null
           mobile_object_position?: string
+          mobile_scale?: number
           published?: boolean
           series_order?: number | null
           storage_path?: string
@@ -364,64 +413,115 @@ export type Database = {
           },
         ]
       }
-      product_images: {
+      gallery_publication_items: {
         Row: {
           alt_text: string
           asset_version: string
+          background_color: string | null
           blur_data_url: string | null
-          created_at: string
+          desktop_object_position: string
+          desktop_scale: number
           display_order: number
-          height: number | null
+          editorial_role: string
+          height: number
           id: string
-          is_cover: boolean
-          mime_type: string | null
-          object_position: string
-          product_id: string
-          size_bytes: number | null
+          media_manifest: Json
+          mobile_object_position: string
+          mobile_scale: number
+          publication_id: string
+          published_at: string
+          source_item_id: string | null
           storage_path: string
-          updated_at: string
-          width: number | null
+          width: number
         }
         Insert: {
           alt_text: string
-          asset_version?: string
+          asset_version: string
+          background_color?: string | null
           blur_data_url?: string | null
-          created_at?: string
-          display_order?: number
-          height?: number | null
+          desktop_object_position: string
+          desktop_scale: number
+          display_order: number
+          editorial_role: string
+          height: number
           id?: string
-          is_cover?: boolean
-          mime_type?: string | null
-          object_position?: string
-          product_id: string
-          size_bytes?: number | null
+          media_manifest: Json
+          mobile_object_position: string
+          mobile_scale: number
+          publication_id: string
+          published_at?: string
+          source_item_id?: string | null
           storage_path: string
-          updated_at?: string
-          width?: number | null
+          width: number
         }
         Update: {
           alt_text?: string
           asset_version?: string
+          background_color?: string | null
           blur_data_url?: string | null
-          created_at?: string
+          desktop_object_position?: string
+          desktop_scale?: number
           display_order?: number
-          height?: number | null
+          editorial_role?: string
+          height?: number
           id?: string
-          is_cover?: boolean
-          mime_type?: string | null
-          object_position?: string
-          product_id?: string
-          size_bytes?: number | null
+          media_manifest?: Json
+          mobile_object_position?: string
+          mobile_scale?: number
+          publication_id?: string
+          published_at?: string
+          source_item_id?: string | null
           storage_path?: string
-          updated_at?: string
-          width?: number | null
+          width?: number
         }
         Relationships: [
           {
-            foreignKeyName: "product_images_product_id_fkey"
-            columns: ["product_id"]
+            foreignKeyName: "gallery_publication_items_publication_id_fkey"
+            columns: ["publication_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "gallery_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gallery_publications: {
+        Row: {
+          active: boolean
+          gallery_id: string
+          id: string
+          published_at: string
+          published_by: string | null
+          revision: number
+        }
+        Insert: {
+          active?: boolean
+          gallery_id: string
+          id?: string
+          published_at?: string
+          published_by?: string | null
+          revision: number
+        }
+        Update: {
+          active?: boolean
+          gallery_id?: string
+          id?: string
+          published_at?: string
+          published_by?: string | null
+          revision?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_publications_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_publications_published_by_fkey"
+            columns: ["published_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -520,6 +620,68 @@ export type Database = {
             columns: ["product_image_id"]
             isOneToOne: false
             referencedRelation: "product_images"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_images: {
+        Row: {
+          alt_text: string
+          asset_version: string
+          blur_data_url: string | null
+          created_at: string
+          display_order: number
+          height: number | null
+          id: string
+          is_cover: boolean
+          mime_type: string | null
+          object_position: string
+          product_id: string
+          size_bytes: number | null
+          storage_path: string
+          updated_at: string
+          width: number | null
+        }
+        Insert: {
+          alt_text: string
+          asset_version?: string
+          blur_data_url?: string | null
+          created_at?: string
+          display_order?: number
+          height?: number | null
+          id?: string
+          is_cover?: boolean
+          mime_type?: string | null
+          object_position?: string
+          product_id: string
+          size_bytes?: number | null
+          storage_path: string
+          updated_at?: string
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string
+          asset_version?: string
+          blur_data_url?: string | null
+          created_at?: string
+          display_order?: number
+          height?: number | null
+          id?: string
+          is_cover?: boolean
+          mime_type?: string | null
+          object_position?: string
+          product_id?: string
+          size_bytes?: number | null
+          storage_path?: string
+          updated_at?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -788,8 +950,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      allocate_product_sku: { Args: never; Returns: string }
       admin_catalog_analytics: { Args: { p_days?: number }; Returns: Json }
+      allocate_product_sku: { Args: never; Returns: string }
       catalog_filter_options: {
         Args: never
         Returns: {
@@ -808,6 +970,10 @@ export type Database = {
         }[]
       }
       normalize_catalog_search: { Args: { value: string }; Returns: string }
+      publish_gallery_revision: {
+        Args: { target_gallery_id: string }
+        Returns: string
+      }
       record_public_analytics_event: {
         Args: {
           p_anonymous_session_id: string
@@ -1033,6 +1199,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       admin_role: ["admin", "editor", "attendant"],

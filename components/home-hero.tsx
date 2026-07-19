@@ -1,7 +1,8 @@
-import { visionTakeoverMedia } from "@/lib/assets";
+import { getHomeHeroMedia } from "@/lib/gallery/hero";
 
 import { VisionEditorialTakeover } from "./vision-editorial-takeover";
 
-export function HomeHero() {
-  return <VisionEditorialTakeover assets={visionTakeoverMedia} />;
+export async function HomeHero() {
+  const media = await getHomeHeroMedia();
+  return <VisionEditorialTakeover media={media} />;
 }

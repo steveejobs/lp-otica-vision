@@ -71,6 +71,21 @@ export type UploadedProductImageSet = {
   variants: ProductImageVariantFile[];
 };
 
+export type GalleryMediaFile = StoredImageFile;
+export type UploadedGalleryImageSet = {
+  assetVersion: string;
+  blurDataUrl: string;
+  height: number;
+  manifest: {
+    desktop: GalleryMediaFile;
+    master: GalleryMediaFile;
+    mobile: GalleryMediaFile;
+    thumbnail: GalleryMediaFile;
+  };
+  storagePath: string;
+  width: number;
+};
+
 const productVariantSpecs: ReadonlyArray<{
   format: "jpeg" | "webp";
   kind: ProductImageVariantKind;
@@ -398,6 +413,59 @@ export async function uploadProductImageSet(input: { file: File; parentId: strin
     source: generated.source,
     variants,
   } satisfies UploadedProductImageSet;
+}
+
+export async function uploadGalleryImageSet(input: { file: File; parentId: string }) {
+  await requireAdminRole(["admin", "editor"]);
+  const validated = await validateImage(input.file, input.parentId);
+  const generated = await createProductImageSet(validated, input.parentId);
+  const findVariant = (kind: ProductImageVariantKind) => {
+    const variant = generated.variants.find((item) => item.kind === kind);
+    if (!variant) throw new Error("Nao foi possivel gerar os derivados da galeria.");
+    return variant;
+  };
+  const selected = {
+    desktop: findVariant("product_detail"),
+    master: generated.master,
+    mobile: findVariant("home_preview"),
+    thumbnail: findVariant("admin_thumbnail"),
+  };
+  const supabase = await createSupabaseServerClient();
+  const uploadedPaths: string[] = [];
+
+  try {
+    for (const file of Object.values(selected)) {
+      const { error } = await supabase.storage.from("site-galleries").upload(file.path, file.bytes, {
+        cacheControl: "31536000",
+        contentType: file.mime,
+        upsert: false,
+      });
+      if (error) throw error;
+      uploadedPaths.push(file.path);
+    }
+  } catch {
+    if (uploadedPaths.length) await supabase.storage.from("site-galleries").remove(uploadedPaths);
+    throw new Error("Nao foi possivel armazenar todos os derivados da galeria.");
+  }
+
+  const clean = ({ bytes: _bytes, ...file }: StoredImageFile & { bytes: Uint8Array }) => {
+    void _bytes;
+    return file;
+  };
+  const manifest = {
+    desktop: clean(selected.desktop),
+    master: clean(selected.master),
+    mobile: clean(selected.mobile),
+    thumbnail: clean(selected.thumbnail),
+  };
+  return {
+    assetVersion: generated.assetVersion,
+    blurDataUrl: generated.blurDataUrl,
+    height: generated.master.height,
+    manifest,
+    storagePath: generated.master.path,
+    width: generated.master.width,
+  } satisfies UploadedGalleryImageSet;
 }
 
 export async function removeManagedImage(bucket: ManagedImageBucket, path: string) {

@@ -15,9 +15,9 @@ function findBrowser() {
   return executable;
 }
 
-const baseUrl = (process.env.QA_BASE_URL?.trim() || "http://127.0.0.1:3100").replace(/\/$/, "");
-const outputDir = path.resolve("docs/qa/hero-takeover");
-const videoTempDir = path.resolve(".tmp/hero-takeover/video");
+const baseUrl = (process.env.QA_BASE_URL?.trim() || "http://127.0.0.1:3000").replace(/\/$/, "");
+const outputDir = path.resolve("docs/qa/hero-editorial-stage");
+const videoTempDir = path.resolve(".tmp/hero-editorial-stage/video");
 fs.mkdirSync(outputDir, { recursive: true });
 fs.mkdirSync(videoTempDir, { recursive: true });
 
@@ -50,9 +50,12 @@ function observePage(page) {
 
 async function waitForHero(page) {
   await page.locator("#hero").waitFor({ state: "visible" });
-  await page.locator("#hero img").first().evaluate((image) => image.complete
-    ? undefined
-    : new Promise((resolve) => image.addEventListener("load", resolve, { once: true })));
+  await page.locator("#hero img").first().evaluate(async (image) => {
+    if (!image.complete || image.naturalWidth < 1) {
+      await new Promise((resolve) => image.addEventListener("load", resolve, { once: true }));
+    }
+    await image.decode?.();
+  });
 }
 
 async function recordViewport({ height, label, width }) {
@@ -72,13 +75,13 @@ async function recordViewport({ height, label, width }) {
   await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
   await waitForHero(page);
   await page.waitForTimeout(450);
-  await page.screenshot({ path: path.join(outputDir, `hero-${label}-start.png`) });
+  await page.screenshot({ path: path.join(outputDir, `hero-${label}-start.png`), timeout: 60_000 });
 
   await page.waitForTimeout(3_900);
-  await page.screenshot({ path: path.join(outputDir, `hero-${label}-middle.png`) });
+  await page.screenshot({ path: path.join(outputDir, `hero-${label}-middle.png`), timeout: 60_000 });
 
   await page.waitForTimeout(6_100);
-  await page.screenshot({ path: path.join(outputDir, `hero-${label}-end.png`) });
+  await page.screenshot({ path: path.join(outputDir, `hero-${label}-end.png`), timeout: 60_000 });
   await page.waitForTimeout(1_200);
 
   await page.locator("#video-story-title").evaluate((element) => element.scrollIntoView({ block: "start" }));
@@ -97,6 +100,7 @@ async function recordViewport({ height, label, width }) {
     });
     document.dispatchEvent(new Event("visibilitychange"));
   });
+  await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-motion") === "paused");
   const hiddenMotion = await page.locator("#hero").getAttribute("data-motion");
   await page.waitForTimeout(3_400);
   const hiddenActAfter = await page.locator("#hero").getAttribute("data-act");
@@ -107,6 +111,7 @@ async function recordViewport({ height, label, width }) {
     });
     document.dispatchEvent(new Event("visibilitychange"));
   });
+  await page.waitForFunction(() => document.querySelector("#hero")?.getAttribute("data-motion") === "playing");
   await page.waitForTimeout(2_100);
 
   await page.locator("#video-story-title").evaluate((element) => element.scrollIntoView({ block: "start" }));
@@ -116,7 +121,7 @@ async function recordViewport({ height, label, width }) {
   await page.locator("#hero").evaluate((element) => element.scrollIntoView({ block: "start" }));
   await page.waitForTimeout(1_000);
 
-  const videoPath = path.join(outputDir, `hero-${label}-${width}x${height}.webm`);
+  const videoPath = path.join(outputDir, `hero-${label}-motion.webm`);
   await context.close();
   await video.saveAs(videoPath);
 
@@ -130,6 +135,17 @@ async function recordViewport({ height, label, width }) {
     offscreenPaused: offscreenActAfter === offscreenActBefore,
     video: path.relative(process.cwd(), videoPath),
   };
+}
+
+if (process.env.QA_VIEWPORT === "desktop") {
+  const reportPath = path.join(outputDir, "hero-editorial-stage-results.json");
+  const previous = fs.existsSync(reportPath) ? JSON.parse(fs.readFileSync(reportPath, "utf8")) : {};
+  const desktopRecording = await recordViewport({ height: 900, label: "desktop", width: 1440 });
+  await browser.close();
+  const report = { ...previous, consoleErrors, desktopRecording, pageErrors };
+  fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  console.log(JSON.stringify({ consoleErrors, desktopRecording, pageErrors }, null, 2));
+  process.exit(consoleErrors.length || pageErrors.length ? 1 : 0);
 }
 
 const mobileRecording = await recordViewport({ height: 844, label: "mobile", width: 390 });
@@ -220,7 +236,7 @@ const report = {
   reducedResult,
   viewportResults,
 };
-fs.writeFileSync(path.join(outputDir, "hero-takeover-results.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+fs.writeFileSync(path.join(outputDir, "hero-editorial-stage-results.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
 console.log(JSON.stringify(report, null, 2));
 
 if (consoleErrors.length || pageErrors.length) process.exitCode = 1;

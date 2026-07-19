@@ -26,6 +26,12 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
       : item));
   }
 
+  function updateScale(id: string, device: "desktop" | "mobile", value: number) {
+    setOrdered((current) => current.map((item) => item.id === id
+      ? { ...item, [device === "desktop" ? "desktopScale" : "mobileScale"]: value }
+      : item));
+  }
+
   function move(id: string, offset: number) {
     setOrdered((current) => {
       const index = current.findIndex((item) => item.id === id);
@@ -54,7 +60,7 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
   return (
     <div className={styles.stack}>
       <p className={styles.notice}>Itens da mesma série devem permanecer contíguos e na ordem interna indicada. O servidor rejeita qualquer sequência que quebre silenciosamente essa regra.</p>
-      <GalleryPreviewEditor activeId={activeId} items={ordered} location={location} onActiveChange={setActiveId} onPositionChange={updatePosition} />
+      <GalleryPreviewEditor activeId={activeId} items={ordered} location={location} onActiveChange={setActiveId} onPositionChange={updatePosition} onScaleChange={updateScale} />
       <form action={reorderGalleryItemsAction} className={styles.formActions}>
         <input name="gallery_id" type="hidden" value={galleryId} />
         <input name="ordered_ids" type="hidden" value={JSON.stringify(ordered.map((item) => item.id))} />
@@ -95,7 +101,10 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
                   <label className={styles.field}><span>Ordem na série</span><input defaultValue={item.seriesOrder ?? ""} min="0" name="series_order" type="number" /></label>
                   <input name="mobile_object_position" type="hidden" value={item.mobileObjectPosition} />
                   <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
-                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>Mobile: {item.mobileObjectPosition}<br />Desktop: {item.desktopObjectPosition}</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
+                  <input name="mobile_scale" type="hidden" value={item.mobileScale} /><input name="desktop_scale" type="hidden" value={item.desktopScale} />
+                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>Mobile: {item.mobileObjectPosition} · {item.mobileScale.toFixed(2)}×<br />Desktop: {item.desktopObjectPosition} · {item.desktopScale.toFixed(2)}×</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
+                  <label className={styles.field}><span>Papel editorial</span><select defaultValue={item.editorialRole} name="editorial_role"><option value="primary">Principal</option><option value="secondary">Secundária</option><option value="detail">Detalhe</option></select></label>
+                  <label className={styles.field}><span>Cor de fundo</span><input defaultValue={item.backgroundColor ?? "#d7c3ad"} name="background_color" pattern="#[0-9A-Fa-f]{6}" /></label>
                   <label className={styles.checkboxField}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Publicado</span></label>
                 </div>
                 <AdminSubmitButton pendingLabel="Salvando item..." variant="secondary">Salvar item</AdminSubmitButton>

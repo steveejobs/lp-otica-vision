@@ -12,6 +12,8 @@ export type GalleryLocation = {
     mobileAspectRatio: string;
     surroundingItems: boolean;
   };
+  routeKey: string;
+  placementKey: string;
   route: "/" | "/instagram";
   sectionId: string;
   sectionLabel: string;
@@ -23,9 +25,11 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/#hero",
     key: "home.hero",
+    routeKey: "home",
+    placementKey: "hero",
     pageLabel: "Home",
     position: "No início da página, depois do cabeçalho e antes dos vídeos",
-    preview: { desktopAspectRatio: "3 / 4", mobileAspectRatio: "4 / 5", surroundingItems: false },
+    preview: { desktopAspectRatio: "1440 / 900", mobileAspectRatio: "390 / 844", surroundingItems: false },
     route: "/",
     sectionId: "hero",
     sectionLabel: "Hero",
@@ -35,6 +39,8 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/#colecao-em-destaque",
     key: "home.featured_collection",
+    routeKey: "home",
+    placementKey: "featured_collection",
     pageLabel: "Home",
     position: "Depois dos vídeos e antes das marcas em destaque",
     preview: { desktopAspectRatio: "3 / 4", mobileAspectRatio: "3 / 4", surroundingItems: true },
@@ -47,6 +53,8 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/#preview-catalogo",
     key: "home.catalog_preview",
+    routeKey: "home",
+    placementKey: "catalog_preview",
     pageLabel: "Home",
     position: "Depois das marcas em destaque e antes do LAB. DIGITAL; aparece quando a vitrine está ativa",
     preview: { desktopAspectRatio: "4 / 5", mobileAspectRatio: "4 / 5", surroundingItems: true },
@@ -59,6 +67,8 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/#lab-digital",
     key: "home.lab_digital",
+    routeKey: "home",
+    placementKey: "lab_digital",
     pageLabel: "Home",
     position: "Depois do preview do catálogo e antes das notícias",
     preview: { desktopAspectRatio: "4 / 5", mobileAspectRatio: "4 / 5", surroundingItems: true },
@@ -71,6 +81,8 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/instagram#hero-instagram",
     key: "instagram.hero",
+    routeKey: "instagram",
+    placementKey: "hero",
     pageLabel: "Instagram",
     position: "No início da página, depois da identidade e junto da bio",
     preview: { desktopAspectRatio: "9 / 16", mobileAspectRatio: "9 / 16", surroundingItems: true },
@@ -83,6 +95,8 @@ export const GALLERY_LOCATIONS = [
     device: "both",
     href: "/instagram#selecao-editorial",
     key: "instagram.editorial_selection",
+    routeKey: "instagram",
+    placementKey: "editorial_selection",
     pageLabel: "Instagram",
     position: "Depois do vídeo completo e antes das marcas",
     preview: { desktopAspectRatio: "3 / 4", mobileAspectRatio: "3 / 4", surroundingItems: true },
@@ -94,12 +108,18 @@ export const GALLERY_LOCATIONS = [
 
 export type GalleryLocationKey = (typeof GALLERY_LOCATIONS)[number]["key"];
 
-export function getGalleryLocation(routeKey: string) {
-  return GALLERY_LOCATIONS.find((location) => location.key === routeKey) ?? null;
+export function getGalleryLocation(routeKey: string, placementKey?: string) {
+  return GALLERY_LOCATIONS.find((location) => placementKey
+    ? location.routeKey === routeKey && location.placementKey === placementKey
+    : location.key === routeKey) ?? null;
 }
 
 export function isGalleryLocationKey(value: string): value is GalleryLocationKey {
   return GALLERY_LOCATIONS.some((location) => location.key === value);
+}
+
+export function getGalleryLocationByKey(value: string) {
+  return GALLERY_LOCATIONS.find((location) => location.key === value) ?? null;
 }
 
 export const galleryDeviceLabels: Record<GalleryDevice, string> = {

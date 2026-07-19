@@ -1,0 +1,19 @@
+{
+  "auditEventsWithActor": 30,
+  "consoleErrors": [
+    "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` wh"
+  ],
+  "finalRevision": {
+    "id": "8b291830-1ecb-4a72-9e0b-5aaa6fb35f20",
+    "revision": 5
+  },
+  "oneImageRevision": {
+    "id": "1899a6d4-3236-4cb5-a771-5f99b8645dad",
+    "revision": 4
+  },
+  "pageErrors": [],
+  "swappedRevision": {
+    "id": "f276a920-c111-48d7-ab6d-1f4b3f0f7198",
+    "revision": 3
+  }
+}
