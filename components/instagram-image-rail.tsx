@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
@@ -13,15 +12,20 @@ import {
   type PointerEvent,
 } from "react";
 
-import type { ImageAsset } from "@/lib/assets";
+import type { DisplayGalleryMedia } from "@/lib/gallery/display-media";
 
+import { GalleryMediaImage } from "./gallery-media-image";
 import styles from "./instagram-image-rail.module.css";
 
 type InstagramImageRailProps = {
-  images: readonly ImageAsset[];
+  images: readonly DisplayGalleryMedia[];
 };
 
 type CardStyle = CSSProperties & {
+  "--desktop-focus": string;
+  "--desktop-scale": number;
+  "--mobile-focus": string;
+  "--mobile-scale": number;
   "--placeholder-color": string;
 };
 
@@ -284,7 +288,13 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
       >
         {images.map((asset, index) => {
           const position = getPosition(index);
-          const cardStyle: CardStyle = { "--placeholder-color": asset.placeholderColor };
+          const cardStyle: CardStyle = {
+            "--desktop-focus": asset.desktopObjectPosition,
+            "--desktop-scale": asset.desktopScale,
+            "--mobile-focus": asset.mobileObjectPosition,
+            "--mobile-scale": asset.mobileScale,
+            "--placeholder-color": asset.placeholderColor,
+          };
           return (
             <figure
               className={`${styles.card} ${styles[position]} ${asset.seriesId !== images[activeIndex]?.seriesId ? styles.otherChapter : ""}`}
@@ -293,11 +303,11 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
               data-asset={asset.src}
               data-series={asset.seriesId}
               style={cardStyle}
-              key={asset.src}
+              key={asset.id}
             >
               {renderedIndexes.has(index) ? (
-                <Image
-                  src={asset.src}
+                <GalleryMediaImage
+                  media={asset}
                   width={asset.width}
                   height={asset.height}
                   sizes="(max-width: 720px) 64vw, 290px"
@@ -307,7 +317,6 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
                   blurDataURL={asset.blurDataURL}
                   draggable={false}
                   onLoad={() => markLoaded(index)}
-                  style={{ objectPosition: asset.objectPosition }}
                 />
               ) : null}
             </figure>
@@ -319,7 +328,7 @@ export function InstagramImageRail({ images }: InstagramImageRailProps) {
       <div className={styles.navigation}>
         <div className={styles.progress} aria-hidden="true">
           {images.map((asset, index) => (
-            <span className={index === activeIndex ? styles.current : ""} key={asset.src} />
+            <span className={index === activeIndex ? styles.current : ""} key={asset.id} />
           ))}
         </div>
         <div className={styles.controls} aria-label="Navegar pela seleção">

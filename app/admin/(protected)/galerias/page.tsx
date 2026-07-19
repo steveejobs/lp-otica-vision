@@ -32,7 +32,7 @@ export default async function AdminGalleriesPage({ searchParams }: { searchParam
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome</span><input maxLength={160} name="name" required /></label>
             <label className={styles.field}><span>Slug</span><input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
-            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue="" name="location_key" required><option disabled value="">Selecione a rota e a seção pública</option>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.pageLabel} › {location.sectionLabel} — {location.position}</option>)}</select></label>
+            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue="" name="location_key" required><option disabled value="">Selecione a rota e a seção pública</option>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.label} — {location.description}</option>)}</select></label>
             <label className={styles.field}><span>Ordem</span><input defaultValue="0" min="0" name="display_order" required type="number" /></label>
             <label className={styles.checkboxField}><input name="autoplay" type="checkbox" /><span>Autoplay</span></label>
           </div>

@@ -1,0 +1,140 @@
+.section {
+  background: var(--vision-paper);
+  container-type: inline-size;
+}
+
+.inner {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+}
+
+.copy {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+}
+
+.copy h2 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(2.55rem, 5vw, 4.75rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+.copy > p:last-of-type {
+  max-width: 39ch;
+  margin: 0;
+  color: var(--vision-muted);
+}
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.8rem;
+  min-height: 420px;
+}
+
+.cover,
+.product {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid rgba(143, 150, 157, 0.5);
+  border-radius: 3px;
+  background: var(--vision-steel);
+}
+
+.cover {
+  min-height: 420px;
+}
+
+.cover picture,
+.cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cover img {
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+  object-position: var(--cover-desktop-focus, 50% 50%);
+  transform: scale(var(--cover-desktop-scale, 1));
+  transform-origin: var(--cover-desktop-focus, 50% 50%);
+}
+
+.product {
+  display: grid;
+  gap: 0.65rem;
+  color: var(--vision-ink);
+  text-decoration: none;
+}
+
+.productMedia {
+  position: relative;
+  display: block;
+  min-height: 300px;
+  background: var(--vision-bg-soft);
+}
+
+.product > span:last-child {
+  padding: 0 0.8rem 0.8rem;
+  font-weight: 600;
+}
+
+.split-diptych {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.split-diptych .product {
+  margin-top: 2.25rem;
+  margin-bottom: 1.6rem;
+}
+
+.product-rail .cover {
+  display: none;
+}
+
+.cinematic-cover .product {
+  display: none;
+}
+
+.rail {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+}
+
+.rail a {
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--vision-steel-dark);
+  color: var(--vision-ink);
+  padding: 0.35rem 0;
+  text-decoration: none;
+}
+
+@container (min-width: 721px) {
+  .inner {
+    grid-template-columns: minmax(260px, 0.74fr) minmax(420px, 1.26fr);
+  }
+}
+
+@container (max-width: 720px) {
+  .cover {
+    min-height: min(120vw, 500px);
+  }
+
+  .stage {
+    min-height: 360px;
+  }
+
+  .cover img {
+    object-position: var(--cover-mobile-focus, 50% 50%);
+    transform: scale(var(--cover-mobile-scale, 1));
+    transform-origin: var(--cover-mobile-focus, 50% 50%);
+  }
+}

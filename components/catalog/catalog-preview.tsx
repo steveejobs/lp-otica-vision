@@ -1,10 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Glasses, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogProductCard } from "@/lib/catalog/types";
-import { LINKS } from "@/lib/links";
 
 import { CatalogPreviewRail } from "./catalog-preview-rail";
 import styles from "./catalog-preview.module.css";
@@ -24,6 +23,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
       id="preview-catalogo"
       className={styles.section}
       aria-labelledby="catalog-preview-title"
+      data-product-count={products.length}
       data-motion-reveal
       data-motion-variant="section"
     >
@@ -48,7 +48,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
         </header>
 
         {featuredProduct ? (
-          <div className={styles.showcase}>
+          <div className={styles.showcase} data-layout={products.length === 1 ? "protagonist" : products.length === 2 ? "diptych" : products.length === 3 ? "editorial" : "rail"}>
             <Link
               aria-label={`Ver ${featuredProduct.name}, código ${featuredProduct.sku}`}
               className={styles.feature}
@@ -88,42 +88,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
               </div>
             ) : null}
           </div>
-        ) : (
-          <div className={styles.emptyShowcase}>
-            <div className={styles.emptyStage} aria-hidden="true">
-              <div className={styles.emptyFrame}>
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className={styles.emptyPreviewRail}>
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className={styles.emptyMonogram}>
-                <Glasses aria-hidden="true" size={44} strokeWidth={1.35} />
-              </div>
-            </div>
-
-            <div className={styles.emptyCopy}>
-              <p className={styles.featureMeta}>Vitrine Vision</p>
-              <h3>A vitrine começa aqui.</h3>
-              <p>Acesse o catálogo geral ou fale com a equipe Vision pelo WhatsApp.</p>
-              <div className={styles.emptyActions}>
-                <Link className={styles.emptyAction} href="/catalogo">
-                  Ver catálogo geral
-                  <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
-                </Link>
-                <a className={styles.emptyActionSecondary} href={LINKS.whatsapp} rel="noopener noreferrer" target="_blank">
-                  <MessageCircle aria-hidden="true" size={16} strokeWidth={1.8} />
-                  WhatsApp
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
+        ) : null}
       </div>
     </section>
   );

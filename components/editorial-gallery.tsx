@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   useCallback,
@@ -13,20 +12,28 @@ import {
   type PointerEvent,
 } from "react";
 
-import type { ImageAsset } from "@/lib/assets";
-import type { FeaturedCollectionContent } from "@/lib/showcase-content";
+import type { DisplayGalleryMedia } from "@/lib/gallery/display-media";
 
 import { InstagramIcon } from "./instagram-icon";
+import { GalleryMediaImage } from "./gallery-media-image";
 import { SectionShell } from "./section-shell";
 import { VisionButton } from "./vision-button";
 import styles from "./editorial-gallery.module.css";
 
 type EditorialGalleryProps = {
-  collection: FeaturedCollectionContent;
+  collection: {
+    action: { ariaLabel: string; external: boolean; href: string; label: string };
+    description: string;
+    eyebrow: string;
+    galleryLabel: string;
+    images: readonly DisplayGalleryMedia[];
+    sectionId: string;
+    title: string;
+  };
 };
 
 type FocusSequenceProps = {
-  images: readonly ImageAsset[];
+  images: readonly DisplayGalleryMedia[];
   ariaLabel: string;
 };
 
@@ -42,6 +49,10 @@ type GalleryStyle = CSSProperties & {
 };
 
 type CardStyle = CSSProperties & {
+  "--desktop-focus": string;
+  "--desktop-scale": number;
+  "--mobile-focus": string;
+  "--mobile-scale": number;
   "--placeholder-color": string;
 };
 
@@ -304,7 +315,13 @@ function FocusSequence({ images, ariaLabel }: FocusSequenceProps) {
       >
         {images.map((asset, index) => {
           const position = getPosition(index);
-          const cardStyle: CardStyle = { "--placeholder-color": asset.placeholderColor };
+          const cardStyle: CardStyle = {
+            "--desktop-focus": asset.desktopObjectPosition,
+            "--desktop-scale": asset.desktopScale,
+            "--mobile-focus": asset.mobileObjectPosition,
+            "--mobile-scale": asset.mobileScale,
+            "--placeholder-color": asset.placeholderColor,
+          };
 
           return (
             <figure
@@ -313,11 +330,11 @@ function FocusSequence({ images, ariaLabel }: FocusSequenceProps) {
               data-asset={asset.src}
               data-series={asset.seriesId}
               style={cardStyle}
-              key={asset.src}
+              key={asset.id}
             >
               {renderedIndexes.has(index) ? (
-                <Image
-                  src={asset.src}
+                <GalleryMediaImage
+                  media={asset}
                   width={asset.width}
                   height={asset.height}
                   sizes="(max-width: 720px) 72vw, (max-width: 1100px) 38vw, 410px"
@@ -327,7 +344,6 @@ function FocusSequence({ images, ariaLabel }: FocusSequenceProps) {
                   placeholder="blur"
                   blurDataURL={asset.blurDataURL}
                   onLoad={() => markLoaded(index)}
-                  style={{ objectPosition: asset.objectPosition }}
                 />
               ) : null}
             </figure>
@@ -350,7 +366,7 @@ function FocusSequence({ images, ariaLabel }: FocusSequenceProps) {
           {images.map((asset, index) => (
             <span
               className={index === activeIndex ? styles.current : ""}
-              key={asset.src}
+              key={asset.id}
             />
           ))}
         </div>

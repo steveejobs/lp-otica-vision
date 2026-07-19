@@ -17,7 +17,7 @@ export function GalleryLocationCard({ location, published }: { location: Gallery
       <div className={styles.locationHeader}>
         <div>
           <span className={styles.eyebrow}>Aparece em</span>
-          <strong>{location.pageLabel} › {location.sectionLabel}</strong>
+          <strong>{location.label}</strong>
         </div>
         <span className={published ? styles.statusPositive : styles.statusNeutral}>
           {published ? "Publicada" : "Rascunho"}
@@ -25,11 +25,11 @@ export function GalleryLocationCard({ location, published }: { location: Gallery
       </div>
       <dl className={styles.locationDetails}>
         <div><dt>Rota</dt><dd>{location.route}</dd></div>
-        <div><dt>Posição</dt><dd>{location.position}</dd></div>
+        <div><dt>Posição</dt><dd>{location.description}</dd></div>
         <div><dt>Dispositivo</dt><dd>{galleryDeviceLabels[location.device]}</dd></div>
         <div><dt>Componente</dt><dd>{location.component}</dd></div>
       </dl>
-      <a className={styles.buttonLink} href={location.href} target="_blank" rel="noopener noreferrer">Ver no site</a>
+      <a className={styles.buttonLink} href={location.href} target="_blank" rel="noopener noreferrer">Ver na página</a>
     </aside>
   );
 }

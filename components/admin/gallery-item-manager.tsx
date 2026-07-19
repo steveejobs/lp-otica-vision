@@ -19,6 +19,7 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
   const [ordered, setOrdered] = useState(items);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
+  const isHomeHero = location?.key === "home.hero";
 
   function updatePosition(id: string, device: "desktop" | "mobile", value: string) {
     setOrdered((current) => current.map((item) => item.id === id
@@ -59,7 +60,7 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
 
   return (
     <div className={styles.stack}>
-      <p className={styles.notice}>Itens da mesma série devem permanecer contíguos e na ordem interna indicada. O servidor rejeita qualquer sequência que quebre silenciosamente essa regra.</p>
+      <p className={styles.notice}>{isHomeHero ? "Arraste ou use os comandos para definir a ordem real do ciclo público." : "Itens da mesma série devem permanecer contíguos e na ordem interna indicada. O servidor rejeita qualquer sequência que quebre silenciosamente essa regra."}</p>
       <GalleryPreviewEditor activeId={activeId} items={ordered} location={location} onActiveChange={setActiveId} onPositionChange={updatePosition} onScaleChange={updateScale} />
       <form action={reorderGalleryItemsAction} className={styles.formActions}>
         <input name="gallery_id" type="hidden" value={galleryId} />
@@ -81,12 +82,12 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
             onDrop={() => drop(item.id)}
           >
             <div>
-              {item.visualSeries ? <span className={styles.seriesBadge}>Série: {item.visualSeries} · posição {item.seriesOrder ?? "?"}</span> : <span className={styles.phaseBadge}>Item independente</span>}
+              {isHomeHero ? <span className={item.activeInPublication ? styles.statusPositive : styles.statusNeutral}>{item.activeInPublication ? "Ativo na versão pública" : "Fora da versão pública"}</span> : item.visualSeries ? <span className={styles.seriesBadge}>Série: {item.visualSeries} · posição {item.seriesOrder ?? "?"}</span> : <span className={styles.phaseBadge}>Item independente</span>}
               {item.signedUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element -- short-lived private Storage URL.
                 <img alt={item.altText} className={styles.imagePreview} src={item.signedUrl} style={{ objectPosition: item.desktopObjectPosition }} />
               ) : <div className={styles.imagePreview}>Prévia indisponível</div>}
-              <p className={styles.recordMeta}><span>{index + 1} de {ordered.length}</span><span>{item.width ?? "?"} × {item.height ?? "?"}</span><span>{item.published ? "Publicado" : "Rascunho"}</span></p>
+              <p className={styles.recordMeta}><span>{index + 1} de {ordered.length}</span><span>{item.width ?? "?"} × {item.height ?? "?"}</span><span>{item.published ? "Publicado" : "Rascunho"}</span><span>{item.assetStatus}</span>{item.updatedAt ? <span>Atualizado em {new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(item.updatedAt))}</span> : null}</p>
               <div className={styles.rowActions}>
                 <button className={styles.textButton} disabled={index === 0} onClick={() => move(item.id, -1)} type="button">Subir</button>
                 <button className={styles.textButton} disabled={index === ordered.length - 1} onClick={() => move(item.id, 1)} type="button">Descer</button>
@@ -102,8 +103,8 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
                   <input name="mobile_object_position" type="hidden" value={item.mobileObjectPosition} />
                   <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
                   <input name="mobile_scale" type="hidden" value={item.mobileScale} /><input name="desktop_scale" type="hidden" value={item.desktopScale} />
-                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>Mobile: {item.mobileObjectPosition} · {item.mobileScale.toFixed(2)}×<br />Desktop: {item.desktopObjectPosition} · {item.desktopScale.toFixed(2)}×</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
-                  <label className={styles.field}><span>Papel editorial</span><select defaultValue={item.editorialRole} name="editorial_role"><option value="primary">Principal</option><option value="secondary">Secundária</option><option value="detail">Detalhe</option></select></label>
+                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>{isHomeHero ? "Ajustado visualmente para desktop e mobile." : <>Mobile: {item.mobileObjectPosition} · {item.mobileScale.toFixed(2)}×<br />Desktop: {item.desktopObjectPosition} · {item.desktopScale.toFixed(2)}×</>}</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
+                  <label className={styles.field}><span>{isHomeHero ? "Função da imagem" : "Papel editorial"}</span><select defaultValue={item.editorialRole} name="editorial_role"><option value="primary">Imagem principal</option><option value="secondary">Complementar</option><option value="detail">Detalhe</option></select></label>
                   <label className={styles.field}><span>Cor de fundo</span><input defaultValue={item.backgroundColor ?? "#d7c3ad"} name="background_color" pattern="#[0-9A-Fa-f]{6}" /></label>
                   <label className={styles.checkboxField}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Publicado</span></label>
                 </div>

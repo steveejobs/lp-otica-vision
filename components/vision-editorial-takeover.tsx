@@ -1,7 +1,15 @@
 "use client";
 
 import { BookOpenText, MessageCircle } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+  type RefObject,
+} from "react";
 
 import type { HeroMedia } from "@/lib/gallery/hero";
 import { LINKS } from "@/lib/links";
@@ -12,23 +20,65 @@ import styles from "./vision-editorial-takeover.module.css";
 
 type Props = { media: HeroMedia[] };
 type StageStyle = CSSProperties & Record<`--${string}`, string | number>;
+type Direction = "next" | "previous";
+type TransitionIntent = { direction: Direction; targetIndex: number };
 
-const HOLD_MS = 2_550;
-const SETTLE_MS = 2_150;
+const HOLD_MS = 5_200;
+const MANUAL_RESUME_MS = 6_500;
+const TRANSITION_MS = 1_080;
+
+function atIndex(index: number, length: number) {
+  return (index + length) % length;
+}
+
+function imageUrl(item: HeroMedia, variant: "desktop" | "mobile") {
+  if (item.localSrc) return item.localSrc;
+  return `/api/galerias/imagem/${item.id}?variant=${variant}&v=${item.assetVersion}`;
+}
+
+function imageKey(item: HeroMedia) {
+  return `${item.id}:${item.assetVersion}`;
+}
 
 export function VisionEditorialTakeover({ media }: Props) {
-  const items = media.slice(0, 3);
-  const rootRef = useRef<HTMLElement>(null);
-  const firstImageRef = useRef<HTMLImageElement>(null);
-  const [act, setAct] = useState(0);
-  const [prepared, setPrepared] = useState(1);
-  const [visible, setVisible] = useState(true);
-  const [inViewport, setInViewport] = useState(true);
-  const [reduced, setReduced] = useState(false);
-  const [enhanced, setEnhanced] = useState(false);
-  const [firstReady, setFirstReady] = useState(false);
+  const mediaSignature = media.map((item) => `${item.id}:${item.assetVersion}`).join("|");
+  return <HeroStage key={mediaSignature} media={media} />;
+}
 
-  const markFirstReady = useCallback(() => setFirstReady(true), []);
+function HeroStage({ media }: Props) {
+  const rootRef = useRef<HTMLElement>(null);
+  const activeImageRef = useRef<HTMLImageElement>(null);
+  const targetImageRef = useRef<HTMLImageElement>(null);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const manualResumeTimerRef = useRef<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [enhanced, setEnhanced] = useState(false);
+  const [inViewport, setInViewport] = useState(true);
+  const [intent, setIntent] = useState<TransitionIntent | null>(null);
+  const [manualPause, setManualPause] = useState(false);
+  const [readyIds, setReadyIds] = useState<Set<string>>(() => new Set());
+  const [reduced, setReduced] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const [visible, setVisible] = useState(true);
+
+  const count = media.length;
+  const currentIndex = count ? atIndex(activeIndex, count) : 0;
+  const current = media[currentIndex];
+  const defaultTargetIndex = count > 1 ? atIndex(currentIndex + 1, count) : null;
+  const targetIndex = intent?.targetIndex ?? defaultTargetIndex;
+  const target = targetIndex === null ? null : media[targetIndex];
+  const firstReady = current ? readyIds.has(imageKey(current)) : false;
+  const targetReady = target ? readyIds.has(imageKey(target)) : false;
+
+  const markReady = useCallback((item: HeroMedia) => {
+    const key = imageKey(item);
+    setReadyIds((currentIds) => {
+      if (currentIds.has(key)) return currentIds;
+      const nextIds = new Set(currentIds);
+      nextIds.add(key);
+      return nextIds;
+    });
+  }, []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -36,11 +86,18 @@ export function VisionEditorialTakeover({ media }: Props) {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     const onVisibility = () => setVisible(document.visibilityState === "visible");
     const onMotion = () => setReduced(query.matches);
-    const observer = new IntersectionObserver(([entry]) => setInViewport(Boolean(entry?.isIntersecting)), { threshold: 0.08 });
+    const observer = new IntersectionObserver(
+      ([entry]) => setInViewport(Boolean(entry?.isIntersecting)),
+      { threshold: 0.08 },
+    );
+
     observer.observe(root);
-    onVisibility(); onMotion(); setEnhanced(true);
+    onVisibility();
+    onMotion();
+    setEnhanced(true);
     document.addEventListener("visibilitychange", onVisibility);
     query.addEventListener("change", onMotion);
+
     return () => {
       observer.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
@@ -48,109 +105,216 @@ export function VisionEditorialTakeover({ media }: Props) {
     };
   }, []);
 
+  useEffect(() => () => {
+    if (manualResumeTimerRef.current !== null) window.clearTimeout(manualResumeTimerRef.current);
+  }, []);
+
   useEffect(() => {
-    const image = firstImageRef.current;
-    if (!image) return;
-    const ready = () => {
+    const image = activeImageRef.current;
+    if (!image || !current) return;
+    const onImageReady = () => {
       if (!image.complete || image.naturalWidth < 1) return;
-      void image.decode?.().catch(() => undefined).finally(markFirstReady);
+      void image.decode?.().catch(() => undefined).finally(() => markReady(current));
     };
-    ready();
-    image.addEventListener("load", ready);
-    image.addEventListener("error", markFirstReady);
-    return () => {
-      image.removeEventListener("load", ready);
-      image.removeEventListener("error", markFirstReady);
-    };
-  }, [markFirstReady]);
+    onImageReady();
+    image.addEventListener("load", onImageReady);
+    return () => image.removeEventListener("load", onImageReady);
+  }, [current, markReady]);
 
   useEffect(() => {
-    if (!enhanced || !firstReady || reduced || items.length < 2) return;
-    const second = window.setTimeout(() => setPrepared(2), 260);
-    const third = window.setTimeout(() => setPrepared(3), 1_450);
-    return () => { window.clearTimeout(second); window.clearTimeout(third); };
-  }, [enhanced, firstReady, items.length, reduced]);
+    const image = targetImageRef.current;
+    if (!image || !target) return;
+    const onImageReady = () => {
+      if (!image.complete || image.naturalWidth < 1) return;
+      void image.decode?.().catch(() => undefined).finally(() => markReady(target));
+    };
+    onImageReady();
+    image.addEventListener("load", onImageReady);
+    return () => image.removeEventListener("load", onImageReady);
+  }, [markReady, target]);
+
+  const finishTransition = useCallback(() => {
+    if (!transitioning || !intent) return;
+    setActiveIndex(intent.targetIndex);
+    setIntent(null);
+    setTransitioning(false);
+  }, [intent, transitioning]);
 
   useEffect(() => {
-    if (!enhanced || !firstReady || reduced || !visible || !inViewport || items.length < 2 || act >= items.length) return;
-    const delay = act === items.length - 1 ? SETTLE_MS : HOLD_MS;
-    const timer = window.setTimeout(() => setAct((current) => Math.min(current + 1, items.length)), delay);
+    if (!transitioning) return;
+    const timer = window.setTimeout(finishTransition, TRANSITION_MS + 180);
     return () => window.clearTimeout(timer);
-  }, [act, enhanced, firstReady, inViewport, items.length, reduced, visible]);
+  }, [finishTransition, transitioning]);
 
-  const style = items.reduce<StageStyle>((values, item, index) => {
-    values[`--stage-bg-${index}`] = item.backgroundColor;
-    return values;
-  }, {});
+  useEffect(() => {
+    if (!intent || transitioning || !targetReady || !firstReady) return;
+    const timer = window.setTimeout(() => setTransitioning(true), 0);
+    return () => window.clearTimeout(timer);
+  }, [firstReady, intent, targetReady, transitioning]);
+
+  useEffect(() => {
+    if (
+      !enhanced || !firstReady || !targetReady || !visible || !inViewport || reduced
+      || manualPause || count < 2 || transitioning || intent || defaultTargetIndex === null
+    ) return;
+    const timer = window.setTimeout(() => {
+      setIntent({ direction: "next", targetIndex: defaultTargetIndex });
+    }, HOLD_MS);
+    return () => window.clearTimeout(timer);
+  }, [count, defaultTargetIndex, enhanced, firstReady, inViewport, intent, manualPause, reduced, targetReady, transitioning, visible]);
+
+  const pauseAutoplay = useCallback(() => {
+    setManualPause(true);
+    if (manualResumeTimerRef.current !== null) window.clearTimeout(manualResumeTimerRef.current);
+    manualResumeTimerRef.current = window.setTimeout(() => {
+      manualResumeTimerRef.current = null;
+      setManualPause(false);
+    }, MANUAL_RESUME_MS);
+  }, []);
+
+  const requestTransition = useCallback((direction: Direction) => {
+    if (count < 2 || transitioning || intent) return;
+    pauseAutoplay();
+    setIntent({
+      direction,
+      targetIndex: atIndex(currentIndex + (direction === "next" ? 1 : -1), count),
+    });
+  }, [count, currentIndex, intent, pauseAutoplay, transitioning]);
+
+  const onPointerDown = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+  }, []);
+
+  const onPointerUp = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    const start = pointerStartRef.current;
+    pointerStartRef.current = null;
+    if (!start) return;
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    if (Math.abs(deltaX) < 44 || Math.abs(deltaX) < Math.abs(deltaY) * 1.3) return;
+    requestTransition(deltaX < 0 ? "next" : "previous");
+  }, [requestTransition]);
+
+  const stageStyle: StageStyle = {
+    "--visual-background": current?.backgroundColor ?? "#d7c3ad",
+  };
+  const motionState = reduced ? "reduced" : visible && inViewport && !manualPause ? "playing" : "paused";
 
   return (
     <section
       aria-labelledby="hero-title"
       className={styles.stage}
-      data-act={reduced ? 0 : act}
-      data-count={items.length}
-      data-enhanced={enhanced}
-      data-ready={firstReady}
-      data-motion={reduced ? "reduced" : visible && inViewport ? "playing" : "paused"}
+      data-count={count}
+      data-motion={motionState}
       id="hero"
       ref={rootRef}
-      style={style}
     >
-      <div className={styles.identity}><BrandLogo size="hero" /></div>
-      <div aria-hidden="true" className={styles.folio}>VISION / CURADORIA / 01—03</div>
+      <div className={styles.inner}>
+        <div className={styles.copyField}>
+          <div className={styles.identity}><BrandLogo priority size="hero" /></div>
+          <div className={styles.copy}>
+            <h1 className={styles.title} id="hero-title">Armações que dão forma à sua presença.</h1>
+            <p>Armações nacionais e importadas, com lentes confeccionadas pela Vision em Araguaína.</p>
+            <div className={styles.actions}>
+              <VisionButton ariaLabel="Ver catálogo da Ótica Vision" href={LINKS.catalog} icon={BookOpenText}>Catálogo</VisionButton>
+              <VisionButton ariaLabel="Falar com a Ótica Vision pelo WhatsApp" external href={LINKS.whatsapp} icon={MessageCircle} variant="secondary">WhatsApp</VisionButton>
+            </div>
+          </div>
+        </div>
 
-      <div aria-hidden="true" className={styles.photoField}>
-        <span className={styles.registration}>01 / PROVA EDITORIAL</span>
-        <div className={styles.photoStage}>
-        {items.slice(0, prepared).map((item, index) => (
-          <figure
-            className={styles.page}
-            data-index={index}
-            key={item.id}
-            style={{
-              "--desktop-focus": item.desktopObjectPosition,
-              "--desktop-scale": item.desktopScale,
-              "--mobile-focus": item.mobileObjectPosition,
-              "--mobile-scale": item.mobileScale,
-              "--placeholder": item.backgroundColor,
-            } as StageStyle}
-          >
-            <picture>
-              <source media="(max-width: 720px)" sizes="78vw" srcSet={`/api/galerias/imagem/${item.id}?variant=mobile&v=${item.assetVersion} 800w`} />
-              <img
-                alt=""
-                className={styles.photo}
-                decoding={index === 0 ? "sync" : "async"}
-                fetchPriority={index === 0 ? "high" : "auto"}
-                height={item.height}
-                loading={index === 0 ? "eager" : "lazy"}
-                onError={index === 0 ? markFirstReady : undefined}
-                onLoad={index === 0 ? markFirstReady : undefined}
-                ref={index === 0 ? firstImageRef : undefined}
-                sizes="(max-width: 720px) 78vw, (max-width: 1100px) 44vw, 31rem"
-                src={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion}`}
-                srcSet={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion} 1200w`}
-                width={item.width}
-              />
-            </picture>
-          </figure>
-        ))}
-        <span className={styles.pageEdge} />
+        <div
+          aria-label="Imagens da Ótica Vision"
+          className={styles.visualField}
+          data-direction={intent?.direction ?? "next"}
+          data-transitioning={transitioning}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") requestTransition("previous");
+            if (event.key === "ArrowRight") requestTransition("next");
+          }}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          role="group"
+          style={stageStyle}
+          tabIndex={count > 1 ? 0 : -1}
+        >
+          <div className={styles.photoStage}>
+            {current ? [current, ...(target && target.id !== current.id ? [target] : [])].map((item) => {
+              const isCurrent = item.id === current.id;
+              return (
+                <figure
+                  aria-hidden={isCurrent || !target ? undefined : "true"}
+                  className={`${styles.page} ${isCurrent ? styles.current : styles.incoming}`}
+                  key={`${item.id}-${item.assetVersion}`}
+                  onTransitionEnd={isCurrent ? undefined : (event) => {
+                    if (event.propertyName === "clip-path") finishTransition();
+                  }}
+                >
+                  <HeroImage
+                    alt={isCurrent ? item.altText : ""}
+                    imageRef={isCurrent ? activeImageRef : targetImageRef}
+                    item={item}
+                    onLoad={() => markReady(item)}
+                    priority={isCurrent && currentIndex === 0 && !readyIds.size}
+                  />
+                </figure>
+              );
+            }) : <div className={styles.emptyVisual} aria-hidden="true" />}
+          </div>
+          {count > 1 ? (
+            <div className={styles.manualControls}>
+              <button aria-label="Imagem anterior" onClick={() => requestTransition("previous")} type="button">Anterior</button>
+              <button aria-label="Próxima imagem" onClick={() => requestTransition("next")} type="button">Próxima</button>
+            </div>
+          ) : null}
         </div>
       </div>
-
-      <div className={styles.copy}>
-        <h1 className={styles.title} id="hero-title">
-          <span>Seleção Vision.</span><span>Marcas com presença.</span>
-        </h1>
-        <div className={styles.actions}>
-          <VisionButton ariaLabel="Ver catálogo da Ótica Vision" href={LINKS.catalog} icon={BookOpenText}>Catálogo</VisionButton>
-          <VisionButton ariaLabel="Falar com a Ótica Vision pelo WhatsApp" external href={LINKS.whatsapp} icon={MessageCircle} variant="secondary">WhatsApp</VisionButton>
-        </div>
-      </div>
-
-      <span aria-hidden="true" className={styles.transitionRail} />
-      <p className={styles.visualDescription}>{items.map((item) => item.altText).join(". ") || "Curadoria Ótica Vision."}</p>
     </section>
+  );
+}
+
+function HeroImage({
+  alt,
+  imageRef,
+  item,
+  onLoad,
+  priority,
+}: {
+  alt: string;
+  imageRef?: RefObject<HTMLImageElement | null>;
+  item: HeroMedia;
+  onLoad?: () => void;
+  priority: boolean;
+}) {
+  const [failed, setFailed] = useState(false);
+  const style = {
+    "--desktop-focus": item.desktopObjectPosition,
+    "--desktop-scale": item.desktopScale,
+    "--mobile-focus": item.mobileObjectPosition,
+    "--mobile-scale": item.mobileScale,
+  } as StageStyle;
+  const source = failed && item.fallbackSrc ? item.fallbackSrc : imageUrl(item, "desktop");
+  const mobileSource = failed && item.fallbackSrc ? item.fallbackSrc : imageUrl(item, "mobile");
+  return (
+    <picture style={style}>
+      <source media="(max-width: 720px)" sizes="(max-width: 720px) 96vw" srcSet={`${mobileSource} 800w`} />
+      <img
+        alt={alt}
+        className={styles.photo}
+        decoding={priority ? "sync" : "async"}
+        fetchPriority={priority ? "high" : "auto"}
+        height={item.height}
+        loading="eager"
+        onError={() => {
+          if (!failed && item.fallbackSrc) setFailed(true);
+        }}
+        onLoad={onLoad}
+        ref={imageRef}
+        sizes="(max-width: 720px) 96vw, (max-width: 1100px) 58vw, 66vw"
+        src={source}
+        srcSet={`${source} 1200w`}
+        width={item.width}
+      />
+    </picture>
   );
 }

@@ -237,10 +237,168 @@ export type Database = {
           },
         ]
       }
+      collection_publication_products: {
+        Row: {
+          display_order: number
+          product_id: string
+          publication_id: string
+        }
+        Insert: {
+          display_order: number
+          product_id: string
+          publication_id: string
+        }
+        Update: {
+          display_order?: number
+          product_id?: string
+          publication_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_publication_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_publication_products_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "collection_publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_publications: {
+        Row: {
+          active: boolean
+          collection_id: string
+          cover_alt_text: string | null
+          cover_asset_version: string | null
+          cover_blur_data_url: string | null
+          cover_desktop_object_position: string
+          cover_desktop_scale: number
+          cover_height: number | null
+          cover_media_manifest: Json | null
+          cover_mobile_object_position: string
+          cover_mobile_scale: number
+          cover_path: string | null
+          cover_width: number | null
+          ends_at: string | null
+          home_cta_label: string | null
+          home_cta_target: string | null
+          home_description: string | null
+          home_enabled: boolean
+          home_gallery_id: string | null
+          home_placement_key: string | null
+          home_title: string | null
+          home_variant: string | null
+          id: string
+          name: string
+          published_at: string
+          published_by: string | null
+          revision: number
+          slug: string
+          starts_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          collection_id: string
+          cover_alt_text?: string | null
+          cover_asset_version?: string | null
+          cover_blur_data_url?: string | null
+          cover_desktop_object_position?: string
+          cover_desktop_scale?: number
+          cover_height?: number | null
+          cover_media_manifest?: Json | null
+          cover_mobile_object_position?: string
+          cover_mobile_scale?: number
+          cover_path?: string | null
+          cover_width?: number | null
+          ends_at?: string | null
+          home_cta_label?: string | null
+          home_cta_target?: string | null
+          home_description?: string | null
+          home_enabled: boolean
+          home_gallery_id?: string | null
+          home_placement_key?: string | null
+          home_title?: string | null
+          home_variant?: string | null
+          id?: string
+          name: string
+          published_at?: string
+          published_by?: string | null
+          revision: number
+          slug: string
+          starts_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          collection_id?: string
+          cover_alt_text?: string | null
+          cover_asset_version?: string | null
+          cover_blur_data_url?: string | null
+          cover_desktop_object_position?: string
+          cover_desktop_scale?: number
+          cover_height?: number | null
+          cover_media_manifest?: Json | null
+          cover_mobile_object_position?: string
+          cover_mobile_scale?: number
+          cover_path?: string | null
+          cover_width?: number | null
+          ends_at?: string | null
+          home_cta_label?: string | null
+          home_cta_target?: string | null
+          home_description?: string | null
+          home_enabled?: boolean
+          home_gallery_id?: string | null
+          home_placement_key?: string | null
+          home_title?: string | null
+          home_variant?: string | null
+          id?: string
+          name?: string
+          published_at?: string
+          published_by?: string | null
+          revision?: number
+          slug?: string
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_publications_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_publications_home_gallery_id_fkey"
+            columns: ["home_gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_publications_published_by_fkey"
+            columns: ["published_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collections: {
         Row: {
           cover_alt_text: string | null
+          cover_asset_version: string | null
+          cover_blur_data_url: string | null
+          cover_desktop_object_position: string
+          cover_desktop_scale: number
           cover_height: number | null
+          cover_media_manifest: Json | null
+          cover_mobile_object_position: string
+          cover_mobile_scale: number
           cover_object_position: string
           cover_path: string | null
           cover_width: number | null
@@ -249,6 +407,14 @@ export type Database = {
           display_order: number
           ends_at: string | null
           featured: boolean
+          home_cta_label: string | null
+          home_cta_target: string | null
+          home_description: string | null
+          home_enabled: boolean
+          home_gallery_id: string | null
+          home_placement_key: string | null
+          home_title: string | null
+          home_variant: string | null
           id: string
           name: string
           published: boolean
@@ -258,7 +424,14 @@ export type Database = {
         }
         Insert: {
           cover_alt_text?: string | null
+          cover_asset_version?: string | null
+          cover_blur_data_url?: string | null
+          cover_desktop_object_position?: string
+          cover_desktop_scale?: number
           cover_height?: number | null
+          cover_media_manifest?: Json | null
+          cover_mobile_object_position?: string
+          cover_mobile_scale?: number
           cover_object_position?: string
           cover_path?: string | null
           cover_width?: number | null
@@ -267,6 +440,14 @@ export type Database = {
           display_order?: number
           ends_at?: string | null
           featured?: boolean
+          home_cta_label?: string | null
+          home_cta_target?: string | null
+          home_description?: string | null
+          home_enabled?: boolean
+          home_gallery_id?: string | null
+          home_placement_key?: string | null
+          home_title?: string | null
+          home_variant?: string | null
           id?: string
           name: string
           published?: boolean
@@ -276,7 +457,14 @@ export type Database = {
         }
         Update: {
           cover_alt_text?: string | null
+          cover_asset_version?: string | null
+          cover_blur_data_url?: string | null
+          cover_desktop_object_position?: string
+          cover_desktop_scale?: number
           cover_height?: number | null
+          cover_media_manifest?: Json | null
+          cover_mobile_object_position?: string
+          cover_mobile_scale?: number
           cover_object_position?: string
           cover_path?: string | null
           cover_width?: number | null
@@ -285,6 +473,14 @@ export type Database = {
           display_order?: number
           ends_at?: string | null
           featured?: boolean
+          home_cta_label?: string | null
+          home_cta_target?: string | null
+          home_description?: string | null
+          home_enabled?: boolean
+          home_gallery_id?: string | null
+          home_placement_key?: string | null
+          home_title?: string | null
+          home_variant?: string | null
           id?: string
           name?: string
           published?: boolean
@@ -292,7 +488,15 @@ export type Database = {
           starts_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "collections_home_gallery_id_fkey"
+            columns: ["home_gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       galleries: {
         Row: {
@@ -432,6 +636,7 @@ export type Database = {
           published_at: string
           source_item_id: string | null
           storage_path: string
+          visual_series: string | null
           width: number
         }
         Insert: {
@@ -452,6 +657,7 @@ export type Database = {
           published_at?: string
           source_item_id?: string | null
           storage_path: string
+          visual_series?: string | null
           width: number
         }
         Update: {
@@ -472,6 +678,7 @@ export type Database = {
           published_at?: string
           source_item_id?: string | null
           storage_path?: string
+          visual_series?: string | null
           width?: number
         }
         Relationships: [
@@ -970,6 +1177,10 @@ export type Database = {
         }[]
       }
       normalize_catalog_search: { Args: { value: string }; Returns: string }
+      publish_collection_revision: {
+        Args: { target_collection_id: string }
+        Returns: string
+      }
       publish_gallery_revision: {
         Args: { target_gallery_id: string }
         Returns: string
@@ -995,6 +1206,14 @@ export type Database = {
       reorder_product_images: {
         Args: { ordered_ids: string[]; target_product_id: string }
         Returns: undefined
+      }
+      rollback_collection_revision: {
+        Args: { target_collection_id: string; target_publication_id: string }
+        Returns: string
+      }
+      rollback_gallery_revision: {
+        Args: { target_gallery_id: string; target_publication_id: string }
+        Returns: string
       }
       search_catalog_products: {
         Args: {

@@ -1,24 +1,32 @@
-import Image from "next/image";
 import { MessageCircle } from "lucide-react";
 import type { CSSProperties } from "react";
 
-import type { ImageAsset } from "@/lib/assets";
+import type { DisplayGalleryMedia } from "@/lib/gallery/display-media";
 import { LINKS } from "@/lib/links";
 
 import { SectionShell } from "./section-shell";
+import { GalleryMediaImage } from "./gallery-media-image";
 import { VisionButton } from "./vision-button";
 import styles from "./lab-section.module.css";
 
 type LabSectionProps = {
-  media: readonly [ImageAsset, ImageAsset];
+  media: readonly [DisplayGalleryMedia, DisplayGalleryMedia];
 };
 
 export function LabSection({ media }: LabSectionProps) {
   const [primaryMedia, secondaryMedia] = media;
   const primaryStyle = {
+    "--desktop-focus": primaryMedia.desktopObjectPosition,
+    "--desktop-scale": primaryMedia.desktopScale,
+    "--mobile-focus": primaryMedia.mobileObjectPosition,
+    "--mobile-scale": primaryMedia.mobileScale,
     "--placeholder-color": primaryMedia.placeholderColor,
   } as CSSProperties;
   const secondaryStyle = {
+    "--desktop-focus": secondaryMedia.desktopObjectPosition,
+    "--desktop-scale": secondaryMedia.desktopScale,
+    "--mobile-focus": secondaryMedia.mobileObjectPosition,
+    "--mobile-scale": secondaryMedia.mobileScale,
     "--placeholder-color": secondaryMedia.placeholderColor,
   } as CSSProperties;
 
@@ -47,8 +55,8 @@ export function LabSection({ media }: LabSectionProps) {
 
       <div className={styles.chapter} data-focus-reveal>
         <figure className={`${styles.media} ${styles.primaryMedia}`} style={primaryStyle}>
-          <Image
-            src={primaryMedia.src}
+          <GalleryMediaImage
+            media={primaryMedia}
             width={primaryMedia.width}
             height={primaryMedia.height}
             sizes="(max-width: 720px) 62vw, 330px"
@@ -56,12 +64,11 @@ export function LabSection({ media }: LabSectionProps) {
             loading="lazy"
             placeholder="blur"
             blurDataURL={primaryMedia.blurDataURL}
-            style={{ objectPosition: primaryMedia.objectPosition }}
           />
         </figure>
         <figure className={`${styles.media} ${styles.secondaryMedia}`} style={secondaryStyle}>
-          <Image
-            src={secondaryMedia.src}
+          <GalleryMediaImage
+            media={secondaryMedia}
             width={secondaryMedia.width}
             height={secondaryMedia.height}
             sizes="(max-width: 720px) 48vw, 230px"
@@ -69,7 +76,6 @@ export function LabSection({ media }: LabSectionProps) {
             loading="lazy"
             placeholder="blur"
             blurDataURL={secondaryMedia.blurDataURL}
-            style={{ objectPosition: secondaryMedia.objectPosition }}
           />
         </figure>
       </div>

@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { BrandGrid } from "@/components/brand-grid";
 import { CatalogPreview } from "@/components/catalog/catalog-preview";
 import { EditorialGallery } from "@/components/editorial-gallery";
+import { HomeCollectionSection } from "@/components/home-collection-section";
 import { HomeHero } from "@/components/home-hero";
 import { LabSection } from "@/components/lab-section";
 import { LocationSection } from "@/components/location-section";
@@ -10,14 +11,17 @@ import { NewsSection } from "@/components/news-section";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { VideoStory } from "@/components/video-story";
-import { homeVideos, labMedia } from "@/lib/assets";
+import { editorialGalleryImages, homeVideos, labMedia } from "@/lib/assets";
 import { getFeaturedCatalogProducts } from "@/lib/catalog/data";
 import { getHomeCatalogPreviewSettings } from "@/lib/catalog/home-preview-settings";
 import { getExameNews } from "@/lib/exame-news";
-import { featuredBrands, featuredCollection } from "@/lib/showcase-content";
+import { getPublishedHomeCollection } from "@/lib/collections/home";
+import { displayMediaFromLocalList, displayMediaFromPublished } from "@/lib/gallery/display-media";
+import { getPublishedGalleryMedia } from "@/lib/gallery/public";
+import { LINKS } from "@/lib/links";
+import { featuredBrands } from "@/lib/brand-content";
 
 export const revalidate = 28_800;
-const HOME_CATALOG_PREVIEW_MIN_PRODUCTS = 4;
 
 async function ExameNewsSection() {
   const newsItems = await getExameNews();
@@ -30,9 +34,47 @@ async function CatalogPreviewSection() {
   if (!settings.enabled) return null;
 
   const products = await getFeaturedCatalogProducts();
-  if (products.length < HOME_CATALOG_PREVIEW_MIN_PRODUCTS) return null;
+  if (!products.length) return null;
 
   return <CatalogPreview products={products} />;
+}
+
+async function HomeLabSection() {
+  const published = await getPublishedGalleryMedia("home", "lab_digital");
+  const media = published.length === 2
+    ? published.map((item, index) => displayMediaFromPublished(item, labMedia[index]))
+    : displayMediaFromLocalList(labMedia);
+
+  return <LabSection media={media as [typeof media[number], typeof media[number]]} />;
+}
+
+async function HomeFeaturedGallerySection() {
+  const collection = await getPublishedHomeCollection("featured_collection");
+  if (collection && collection.variant !== "editorial-protagonist") {
+    return <HomeCollectionSection collection={collection} />;
+  }
+  const published = await getPublishedGalleryMedia("home", "featured_collection");
+  const images = published.length
+    ? published.map((item, index) => displayMediaFromPublished(item, editorialGalleryImages[index]))
+    : displayMediaFromLocalList(editorialGalleryImages);
+  return (
+    <EditorialGallery collection={{
+      action: collection
+        ? {
+          ariaLabel: collection.cta.label,
+          external: collection.cta.target === "instagram" || collection.cta.target === "whatsapp",
+          href: collection.cta.target === "instagram" ? LINKS.instagram : collection.cta.target === "whatsapp" ? LINKS.whatsapp : collection.cta.target === "catalog" ? "/catalogo" : `/catalogo?colecao=${encodeURIComponent(collection.slug)}`,
+          label: collection.cta.label,
+        }
+        : { ariaLabel: "Ver Instagram da Ótica Vision", external: true, href: LINKS.instagram, label: "Ver Instagram" },
+      description: collection?.description ?? "Linhas, proporções e acabamentos reunidos pela Vision.",
+      eyebrow: "Seleção Vision",
+      galleryLabel: "Galeria editorial da Ótica Vision",
+      images,
+      sectionId: "colecao-em-destaque",
+      title: collection?.title ?? "A escolha ganha contorno.",
+    }} />
+  );
 }
 
 export default function HomePage() {
@@ -42,12 +84,12 @@ export default function HomePage() {
       <main id="main-content">
         <HomeHero />
         <VideoStory videos={homeVideos} />
-        <EditorialGallery collection={featuredCollection} />
+        <HomeFeaturedGallerySection />
         <BrandGrid content={featuredBrands} />
         <Suspense fallback={null}>
           <CatalogPreviewSection />
         </Suspense>
-        <LabSection media={labMedia} />
+        <HomeLabSection />
         <Suspense fallback={<NewsSection items={[]} loading />}>
           <ExameNewsSection />
         </Suspense>

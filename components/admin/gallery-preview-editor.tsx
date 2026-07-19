@@ -6,10 +6,14 @@ import { useState } from "react";
 
 import type { GalleryLocation } from "@/lib/admin/gallery-locations";
 
+import { BrandLogo } from "@/components/brand-logo";
+
 import styles from "./admin.module.css";
 
 export type GalleryPreviewItem = {
   altText: string;
+  activeInPublication: boolean;
+  assetStatus: string;
   backgroundColor: string | null;
   desktopObjectPosition: string;
   desktopScale: number;
@@ -21,6 +25,7 @@ export type GalleryPreviewItem = {
   published: boolean;
   seriesOrder: number | null;
   signedUrl: string | null;
+  updatedAt: string | null;
   visualSeries: string | null;
   width: number | null;
 };
@@ -113,7 +118,7 @@ export function GalleryPreviewEditor({
       <div className={styles.panelHeading}>
         <div>
           <h3 id="gallery-preview-title">Prévia real do enquadramento</h3>
-          <p>{location ? `${location.pageLabel} › ${location.sectionLabel} · ${location.component}` : "Defina a localização para carregar a proporção pública."}</p>
+          <p>{location ? `${location.label} · ${location.component}` : "Defina a localização para carregar a proporção pública."}</p>
         </div>
         <div className={styles.previewDeviceSwitch} role="group" aria-label="Dispositivo da prévia">
           <button aria-pressed={device === "mobile"} onClick={() => setDevice("mobile")} type="button">Mobile 390×844</button>
@@ -132,7 +137,7 @@ export function GalleryPreviewEditor({
           <label><span>Posição horizontal <output>{horizontal}%</output></span><input aria-label="Posição horizontal" max="100" min="0" onChange={(event) => changePosition("horizontal", Number(event.target.value))} type="range" value={horizontal} /></label>
           <label><span>Posição vertical <output>{vertical}%</output></span><input aria-label="Posição vertical" max="100" min="0" onChange={(event) => changePosition("vertical", Number(event.target.value))} type="range" value={vertical} /></label>
           <label><span>Escala <output>{scale.toFixed(2)}×</output></span><input aria-label="Escala" max="1.4" min="0.8" onChange={(event) => onScaleChange(active.id, device, Number(event.target.value))} step="0.01" type="range" value={scale} /></label>
-          <p className={styles.fieldHint}>Valor salvo para {device === "desktop" ? "desktop" : "mobile"}: {position}</p>
+          <p className={styles.fieldHint}>{location?.key === "home.hero" ? `Ajuste visual salvo para ${device === "desktop" ? "desktop" : "mobile"}.` : `Valor salvo para ${device === "desktop" ? "desktop" : "mobile"}: ${position}`}</p>
           {warnings.length ? <ul className={styles.previewWarnings}>{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul> : <p className={styles.previewReady}>Enquadramento sem alertas automáticos.</p>}
         </div>
       </div>
@@ -147,10 +152,13 @@ export function GalleryPreviewEditor({
 function HeroPreviewFrame({ item, position, ratio, scale, device }: { item: GalleryPreviewItem; position: string; ratio: string; scale: number; device: PreviewDevice }) {
   return (
     <figure className={styles.heroPreview} data-device={device} style={{ aspectRatio: ratio, background: item.backgroundColor ?? "#d7c3ad" }}>
-      <span className={styles.heroPreviewBrand}>VISION</span>
+      <span className={styles.heroPreviewCopy}>
+        <BrandLogo size="header" />
+        <strong>Armações que dão forma à sua presença.</strong>
+        <em>Armações nacionais e importadas, com lentes confeccionadas pela Vision em Araguaína.</em>
+        <span className={styles.heroPreviewActions}><span>Catálogo</span><span>WhatsApp</span></span>
+      </span>
       <span className={styles.heroPreviewPhoto}>{item.signedUrl ? <img alt={item.altText} src={item.signedUrl} style={{ objectPosition: position, transform: `scale(${scale})`, transformOrigin: position }} /> : null}<span className={styles.safeArea} aria-hidden="true" /></span>
-      <strong><span>Seleção Vision.</span><span>Marcas com presença.</span></strong>
-      <span className={styles.heroPreviewActions}>CATÁLOGO&nbsp;&nbsp;&nbsp; WHATSAPP</span>
     </figure>
   );
 }

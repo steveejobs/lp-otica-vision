@@ -20,6 +20,7 @@ import type {
 
 export const CATALOG_PAGE_SIZE = 24;
 export const HOME_CATALOG_PREVIEW_SIZE = 6;
+const HOME_CATALOG_PREVIEW_CANDIDATE_SIZE = 60;
 
 type SearchRow = Database["public"]["Functions"]["search_catalog_products"]["Returns"][number];
 
@@ -241,13 +242,16 @@ const getCachedFeaturedProducts = unstable_cache(
       .order("featured", { ascending: false })
       .order("display_order", { ascending: true })
       .order("updated_at", { ascending: false })
-      .limit(HOME_CATALOG_PREVIEW_SIZE);
+      .limit(HOME_CATALOG_PREVIEW_CANDIDATE_SIZE);
 
     if (error || !data) return [];
-    return (data as unknown as EmbeddedCardRow[])
+    const eligible = (data as unknown as EmbeddedCardRow[])
       .map(cardFromEmbedded)
-      .filter((item): item is CatalogProductCard => Boolean(item))
-      .slice(0, HOME_CATALOG_PREVIEW_SIZE);
+      .filter((item): item is CatalogProductCard => Boolean(item));
+    if (eligible.length > HOME_CATALOG_PREVIEW_SIZE) {
+      return eligible.filter((item) => item.featured).slice(0, HOME_CATALOG_PREVIEW_SIZE);
+    }
+    return eligible;
   },
   ["home-catalog-preview-v2"],
   { revalidate: 300, tags: [CATALOG_CACHE_TAG] },
@@ -255,6 +259,31 @@ const getCachedFeaturedProducts = unstable_cache(
 
 export async function getFeaturedCatalogProducts() {
   return getCachedFeaturedProducts();
+}
+
+export async function getPublishedCatalogProductsByIds(ids: readonly string[]) {
+  const uniqueIds = [...new Set(ids)].slice(0, 8);
+  if (!uniqueIds.length) return [];
+  const supabase = createOptionalSupabasePublicClient();
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("products")
+    .select(embeddedCardSelect)
+    .in("id", uniqueIds)
+    .eq("published", true)
+    .is("archived_at", null)
+    .eq("cover.is_cover", true);
+  if (error || !data) return [];
+  const byId = new Map(
+    (data as unknown as EmbeddedCardRow[])
+      .map(cardFromEmbedded)
+      .filter((item): item is CatalogProductCard => Boolean(item))
+      .map((item) => [item.id, item]),
+  );
+  return uniqueIds.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
 }
 
 const getCachedPublishedProduct = unstable_cache(

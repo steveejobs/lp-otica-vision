@@ -634,6 +634,8 @@
 .heroPreview {
   position: relative;
   width: min(100%, 44rem);
+  display: grid;
+  grid-template-columns: 0.38fr 0.62fr;
   overflow: hidden;
   margin: 0;
   border: 1px solid rgba(27, 24, 22, 0.2);
@@ -642,38 +644,75 @@
   color: #1b1816;
 }
 
-.heroPreviewBrand {
-  position: absolute;
-  z-index: 3;
-  top: 4%;
-  left: 4%;
+.heroPreviewCopy {
+  display: grid;
+  align-content: space-between;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 7% 8%;
+  background: #fbf8f3;
+}
+
+.heroPreviewCopy > span:first-child {
+  width: min(100%, 7.5rem);
+}
+
+.heroPreviewCopy strong {
   font-family: var(--font-display);
-  font-size: clamp(.65rem, 1.6vw, 1.1rem);
-  letter-spacing: .18em;
+  font-size: clamp(0.8rem, 2.05vw, 1.85rem);
+  font-weight: 500;
+  line-height: 0.92;
+}
+
+.heroPreviewCopy em {
+  color: var(--admin-muted);
+  font-size: clamp(0.38rem, 0.8vw, 0.66rem);
+  font-style: normal;
+  line-height: 1.4;
 }
 
 .heroPreviewPhoto {
-  position: absolute;
-  z-index: 1;
-  top: 5%;
-  left: 39%;
-  width: 35%;
-  height: 74%;
+  position: relative;
+  min-width: 0;
   overflow: hidden;
   background: #d5cabe;
 }
 
 .heroPreviewPhoto img { width: 100%; height: 100%; object-fit: cover; }
-.heroPreview strong { position: absolute; z-index: 4; right: 4%; bottom: 12%; left: 5%; font-family: var(--font-display); font-size: clamp(1rem, 4vw, 3rem); font-weight: 400; line-height: .82; letter-spacing: -.03em; }
-.heroPreview strong span { display: block; }
-.heroPreview strong span:last-child { margin-left: 10%; }
-.heroPreviewActions { position: absolute; z-index: 4; bottom: 4%; left: 5%; font-size: clamp(.35rem, .8vw, .65rem); font-weight: 700; letter-spacing: .1em; }
+.heroPreviewActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
 
-.heroPreview[data-device="mobile"] { width: min(70%, 19rem); }
-.heroPreview[data-device="mobile"] .heroPreviewPhoto { top: 6%; left: 10%; width: 78%; height: 56%; }
-.heroPreview[data-device="mobile"] strong { right: 5%; bottom: 12%; left: 5%; font-size: clamp(1.25rem, 8vw, 2.1rem); }
-.heroPreview[data-device="mobile"] strong span:last-child { margin-left: 0; }
-.heroPreview[data-device="mobile"] .heroPreviewActions { bottom: 5%; }
+.heroPreviewActions span {
+  min-height: 1.25rem;
+  padding: 0.3rem 0.42rem;
+  border: 1px solid rgba(27, 24, 22, 0.2);
+  color: var(--admin-ink);
+  font-size: clamp(0.34rem, 0.7vw, 0.54rem);
+  font-weight: 650;
+  line-height: 1;
+}
+
+.heroPreview[data-device="mobile"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(70%, 19rem);
+}
+
+.heroPreview[data-device="mobile"] .heroPreviewCopy {
+  gap: 0.65rem;
+  padding: 7% 8%;
+}
+
+.heroPreview[data-device="mobile"] .heroPreviewCopy strong {
+  font-size: clamp(1rem, 5.2vw, 1.45rem);
+}
+
+.heroPreview[data-device="mobile"] .heroPreviewCopy em {
+  font-size: 0.53rem;
+}
 
 .safeArea {
   position: absolute;
@@ -1786,6 +1825,69 @@
   .orderList .rowActions {
     grid-column: 1 / -1;
   }
+}
+
+.collectionPreview {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(143, 150, 157, 0.34);
+  background: var(--vision-paper);
+}
+
+.previewHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.previewHeader h2,
+.previewHeader p {
+  margin: 0;
+}
+
+.previewHeader p {
+  max-width: 46rem;
+  margin-top: 0.35rem;
+  color: var(--vision-muted);
+}
+
+.previewSwitch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.previewSwitch button {
+  min-height: 36px;
+  border: 1px solid var(--vision-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vision-ink);
+  cursor: pointer;
+}
+
+.previewSwitch button[aria-pressed="true"] {
+  border-color: var(--vision-steel-dark);
+  background: rgba(199, 173, 142, 0.22);
+}
+
+.collectionPreviewViewport {
+  overflow: auto;
+  border: 1px solid rgba(143, 150, 157, 0.42);
+  background: var(--vision-bg-soft);
+}
+
+.collectionPreviewViewport[data-device="mobile"] {
+  width: min(100%, 390px);
+  max-height: 844px;
+  margin-inline: auto;
+}
+
+.collectionPreviewViewport[data-device="desktop"] {
+  width: 100%;
+  min-height: 640px;
 }
 
 @media (max-width: 430px) {

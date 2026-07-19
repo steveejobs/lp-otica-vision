@@ -1,0 +1,24 @@
+{
+  "baseUrl": "http://127.0.0.1:3000",
+  "desktop": {
+    "errors": [],
+    "state": {
+      "catalogPreviewVisible": false,
+      "collectionImageSource": "http://127.0.0.1:3000/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014",
+      "heroImageSource": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+      "overflow": false
+    }
+  },
+  "failures": [],
+  "instagramErrors": [],
+  "mobile": {
+    "errors": [],
+    "state": {
+      "catalogPreviewVisible": false,
+      "collectionImageSource": "http://127.0.0.1:3000/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014",
+      "heroImageSource": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+      "overflow": false
+    }
+  },
+  "generatedAt": "2026-07-19T05:08:58.140Z"
+}

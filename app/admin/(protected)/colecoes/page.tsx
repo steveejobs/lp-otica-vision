@@ -10,7 +10,7 @@ export default async function AdminCollectionsPage({ searchParams }: { searchPar
   const supabase = await createSupabaseServerClient();
   const { data: collections, error } = await supabase
     .from("collections")
-    .select("id, name, slug, published, featured, starts_at, ends_at, display_order, updated_at")
+    .select("id, name, slug, published, featured, home_enabled, home_placement_key, home_variant, starts_at, ends_at, display_order, updated_at")
     .order("display_order")
     .order("name")
     .limit(100);

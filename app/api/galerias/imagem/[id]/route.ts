@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 
+import { isPublishedGalleryPlacement } from "@/lib/content-placements";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -33,8 +34,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .select("gallery_id, active").eq("id", item.publication_id).eq("active", true).maybeSingle();
   if (!publication) return notFound();
   const { data: gallery } = await supabase.from("galleries").select("published, route_key, placement_key")
-    .eq("id", publication.gallery_id).eq("published", true).eq("route_key", "home").eq("placement_key", "hero").maybeSingle();
-  if (!gallery) return notFound();
+    .eq("id", publication.gallery_id).eq("published", true).maybeSingle();
+  if (!gallery || !isPublishedGalleryPlacement(gallery.route_key, gallery.placement_key)) return notFound();
 
   const manifest = item.media_manifest as Record<string, ManifestFile> | null;
   const file = manifest?.[requested];

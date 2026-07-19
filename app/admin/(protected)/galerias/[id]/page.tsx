@@ -12,26 +12,36 @@ import { requireAdminRole } from "@/lib/auth/admin-access";
 import { createAdminImageUrls } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { deleteGalleryAction, publishGalleryAction, updateGalleryAction, uploadGalleryItemsAction } from "../actions";
+import { deleteGalleryAction, publishGalleryAction, rollbackGalleryRevisionAction, updateGalleryAction, uploadGalleryItemsAction } from "../actions";
 
 export default async function EditGalleryPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string; status?: string }> }) {
   await requireAdminRole(["admin", "editor"]);
   const { id } = await params;
   const supabase = await createSupabaseServerClient();
-  const [galleryResult, itemResult] = await Promise.all([
+  const [galleryResult, itemResult, publicationResult, publicationHistoryResult] = await Promise.all([
     supabase.from("galleries").select("*").eq("id", id).maybeSingle(),
     supabase.from("gallery_items").select("*").eq("gallery_id", id).order("display_order"),
+    supabase.from("gallery_publications").select("id, published_at").eq("gallery_id", id).eq("active", true).maybeSingle(),
+    supabase.from("gallery_publications").select("id, revision, active, published_at").eq("gallery_id", id).order("revision", { ascending: false }),
   ]);
   if (galleryResult.error || !galleryResult.data) notFound();
-  if (itemResult.error || !itemResult.data) throw new Error("Não foi possível carregar os itens da galeria.");
+  if (itemResult.error || !itemResult.data || publicationHistoryResult.error) throw new Error("Não foi possível carregar os itens ou revisões da galeria.");
   const gallery = galleryResult.data;
+  const isHomeHero = gallery.route_key === "home" && gallery.placement_key === "hero";
   const query = await searchParams;
+  const activeItemResult = publicationResult.data
+    ? await supabase.from("gallery_publication_items").select("source_item_id").eq("publication_id", publicationResult.data.id)
+    : { data: [], error: null };
+  if (activeItemResult.error) throw new Error("Nao foi possivel carregar a versao publica da galeria.");
+  const activeSourceIds = new Set((activeItemResult.data ?? []).flatMap((item) => item.source_item_id ? [item.source_item_id] : []));
   const signed = await createAdminImageUrls("site-galleries", itemResult.data.map((item) => {
     const manifest = item.media_manifest as { thumbnail?: { path?: string } } | null;
     return manifest?.thumbnail?.path ?? item.storage_path;
   }));
   const items = itemResult.data.map((item) => ({
     altText: item.alt_text,
+    activeInPublication: activeSourceIds.has(item.id),
+    assetStatus: signed.get(((item.media_manifest as { thumbnail?: { path?: string } } | null)?.thumbnail?.path ?? item.storage_path)) ? "Derivados disponiveis" : "Verificar Storage",
     desktopObjectPosition: item.desktop_object_position,
     height: item.height,
     id: item.id,
@@ -45,14 +55,15 @@ export default async function EditGalleryPage({ params, searchParams }: { params
     signedUrl: signed.get(((item.media_manifest as { thumbnail?: { path?: string } } | null)?.thumbnail?.path ?? item.storage_path)) ?? null,
     visualSeries: item.visual_series,
     width: item.width,
+    updatedAt: item.updated_at ?? item.created_at,
   }));
   return (
     <>
-      <AdminPageHeader eyebrow="Galerias" description={gallery.route_key === "home" && gallery.placement_key === "hero" ? "Primeira seção da página inicial" : "Ordem, enquadramento e publicação editorial."} title={gallery.route_key === "home" && gallery.placement_key === "hero" ? "Home › Hero principal" : gallery.name} />
+      <AdminPageHeader eyebrow="Galerias" description={isHomeHero ? "Primeira seção da página inicial" : "Ordem, enquadramento e publicação editorial."} title={isHomeHero ? "Home › Hero principal" : gallery.name} />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/galerias" prefetch={false}>Voltar para galerias</Link><AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" /></div>
       <GalleryLocationCard location={getGalleryLocation(gallery.route_key, gallery.placement_key)} published={gallery.published} />
-      <section className={styles.formPanel} aria-labelledby="gallery-publication-title"><div className={styles.panelHeading}><div><h2 id="gallery-publication-title">Publicação segura</h2><p>Cria uma revisão validada. Alterações incompletas permanecem em rascunho e a última revisão válida continua na página.</p></div><AdminStatus active={gallery.published} trueLabel="Revisão pública ativa" falseLabel="Sem revisão pública" /></div><form action={publishGalleryAction}><input name="gallery_id" type="hidden" value={gallery.id} /><AdminSubmitButton pendingLabel="Validando mídia e Storage...">Publicar hero</AdminSubmitButton></form></section>
+      <section className={styles.formPanel} aria-labelledby="gallery-publication-title"><div className={styles.panelHeading}><div><h2 id="gallery-publication-title">Publicação segura</h2><p>Cria uma revisão validada. Alterações incompletas permanecem em rascunho e a última revisão válida continua na página.</p></div><AdminStatus active={gallery.published} trueLabel="Revisão pública ativa" falseLabel="Sem revisão pública" /></div><div className={styles.formActions}><form action={publishGalleryAction}><input name="gallery_id" type="hidden" value={gallery.id} /><AdminSubmitButton pendingLabel="Validando mídia e Storage...">Publicar revisão</AdminSubmitButton></form>{(publicationHistoryResult.data ?? []).filter((publication) => !publication.active).slice(0, 3).map((publication) => <form action={rollbackGalleryRevisionAction} key={publication.id}><input name="gallery_id" type="hidden" value={gallery.id} /><input name="publication_id" type="hidden" value={publication.id} /><AdminSubmitButton pendingLabel="Restaurando..." variant="secondary">Restaurar revisão #{publication.revision}</AdminSubmitButton></form>)}</div></section>
       <section className={styles.formPanel} aria-labelledby="gallery-data-title">
         <div className={styles.panelHeading}><h2 id="gallery-data-title">Configuração da galeria</h2><p>Rota e slug são únicos.</p></div>
         <form action={updateGalleryAction} className={styles.adminForm}>
@@ -60,7 +71,7 @@ export default async function EditGalleryPage({ params, searchParams }: { params
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome</span><input defaultValue={gallery.name} maxLength={160} name="name" required /></label>
             <label className={styles.field}><span>Slug</span><input defaultValue={gallery.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
-            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue={`${gallery.route_key}.${gallery.placement_key}`} name="location_key" required>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.pageLabel} › {location.sectionLabel} — {location.position}</option>)}</select></label>
+            <label className={`${styles.field} ${styles.fieldWide}`}><span>Aparece em</span><select defaultValue={`${gallery.route_key}.${gallery.placement_key}`} name="location_key" required>{GALLERY_LOCATIONS.map((location) => <option key={location.key} value={location.key}>{location.label} — {location.description}</option>)}</select></label>
             <label className={styles.field}><span>Ordem</span><input defaultValue={gallery.display_order} min="0" name="display_order" required type="number" /></label>
             <label className={styles.checkboxField}><input defaultChecked={gallery.autoplay} name="autoplay" type="checkbox" /><span>Autoplay</span></label>
           </div>
@@ -75,11 +86,8 @@ export default async function EditGalleryPage({ params, searchParams }: { params
             <label className={styles.field}><span>Texto alternativo base</span><input maxLength={170} name="alt_base" required /></label>
             <label className={styles.field}><span>Série visual opcional</span><input maxLength={80} name="visual_series" /></label>
             <label className={styles.field}><span>Ordem inicial na série</span><input defaultValue="0" min="0" name="series_order" type="number" /></label>
-            <label className={styles.field}><span>Enquadramento mobile</span><input defaultValue="50% 50%" name="mobile_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
-            <label className={styles.field}><span>Enquadramento desktop</span><input defaultValue="50% 50%" name="desktop_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
-            <label className={styles.field}><span>Escala mobile</span><input defaultValue="1.00" max="1.40" min="0.80" name="mobile_scale" required step="0.01" type="number" /></label>
-            <label className={styles.field}><span>Escala desktop</span><input defaultValue="1.00" max="1.40" min="0.80" name="desktop_scale" required step="0.01" type="number" /></label>
-            <label className={styles.field}><span>Papel editorial</span><select defaultValue={items.length ? "secondary" : "primary"} name="editorial_role"><option value="primary">Principal</option><option value="secondary">Secundária</option><option value="detail">Detalhe</option></select></label>
+            {isHomeHero ? <><input name="mobile_object_position" type="hidden" value="50% 50%" /><input name="desktop_object_position" type="hidden" value="50% 50%" /><input name="mobile_scale" type="hidden" value="1.00" /><input name="desktop_scale" type="hidden" value="1.00" /><p className={`${styles.fieldHint} ${styles.fieldWide}`}>Depois do envio, ajuste cada recorte diretamente na prévia de desktop e mobile.</p></> : <><label className={styles.field}><span>Enquadramento mobile</span><input defaultValue="50% 50%" name="mobile_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label><label className={styles.field}><span>Enquadramento desktop</span><input defaultValue="50% 50%" name="desktop_object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label><label className={styles.field}><span>Escala mobile</span><input defaultValue="1.00" max="1.40" min="0.80" name="mobile_scale" required step="0.01" type="number" /></label><label className={styles.field}><span>Escala desktop</span><input defaultValue="1.00" max="1.40" min="0.80" name="desktop_scale" required step="0.01" type="number" /></label></>}
+            <label className={styles.field}><span>{isHomeHero ? "Função da imagem" : "Papel editorial"}</span><select defaultValue={items.length ? "secondary" : "primary"} name="editorial_role"><option value="primary">Imagem principal</option><option value="secondary">Complementar</option><option value="detail">Detalhe</option></select></label>
             <label className={styles.field}><span>Cor de fundo opcional</span><input defaultValue="#d7c3ad" name="background_color" pattern="#[0-9A-Fa-f]{6}" type="text" /></label>
             <label className={styles.checkboxField}><input name="published" type="checkbox" /><span>Publicar itens</span></label>
             <div className={styles.fieldWide}><FilePreviewInput id="gallery-files" multiple name="files" required /></div>
@@ -88,7 +96,7 @@ export default async function EditGalleryPage({ params, searchParams }: { params
         </form>
       </section>
       <section className={styles.formPanel} aria-labelledby="gallery-items-title">
-        <div className={styles.panelHeading}><div><h2 id="gallery-items-title">Itens e séries</h2><p>Os limites visuais marcam o início de cada série.</p></div><span className={styles.phaseBadge}>{items.length} itens</span></div>
+        <div className={styles.panelHeading}><div><h2 id="gallery-items-title">{isHomeHero ? "Imagens da hero" : "Itens e séries"}</h2><p>{isHomeHero ? "A ordem abaixo é a ordem do ciclo público." : "Os limites visuais marcam o início de cada série."}</p></div><span className={styles.phaseBadge}>{items.length} itens</span></div>
         <GalleryItemManager galleryId={gallery.id} items={items} location={getGalleryLocation(gallery.route_key, gallery.placement_key)} />
       </section>
       <section className={styles.dangerZone} aria-labelledby="delete-gallery-title">

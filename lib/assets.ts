@@ -249,8 +249,8 @@ const visualSeries = {
 } as const;
 
 export const visionTakeoverMedia = [
-  visualSeries.series7[1],
   visualSeries.series6[0],
+  visualSeries.series6[1],
   visualSeries.series6[2],
 ] as const;
 

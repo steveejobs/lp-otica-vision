@@ -9,6 +9,9 @@ type CollectionRecord = {
   display_order: number;
   ends_at: string | null;
   featured: boolean;
+  home_enabled: boolean;
+  home_placement_key: string | null;
+  home_variant: string | null;
   id: string;
   name: string;
   published: boolean;
@@ -33,6 +36,7 @@ export function CollectionRecordsTable({ collections }: { collections: Collectio
               <th>Slug</th>
               <th>Ordem</th>
               <th>Publicação</th>
+              <th>Home</th>
               <th>Início</th>
               <th>Fim</th>
               <th>Ações</th>
@@ -51,6 +55,7 @@ export function CollectionRecordsTable({ collections }: { collections: Collectio
                     falseLabel="Rascunho"
                   />
                 </td>
+                <td>{collection.home_enabled ? `${collection.home_placement_key ?? "posição pendente"} · ${collection.home_variant ?? "variante pendente"}` : "Não exibida"}</td>
                 <td>{formatAdminDate(collection.starts_at)}</td>
                 <td>{formatAdminDate(collection.ends_at)}</td>
                 <td>

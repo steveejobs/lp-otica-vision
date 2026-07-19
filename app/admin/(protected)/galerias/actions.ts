@@ -10,9 +10,9 @@ import {
   mutationErrorCode, objectPositionValue, optionalIntegerValue, optionalTextValue,
   orderedUuidList, slugValue, textValue, uuidValue,
 } from "@/lib/admin/validation";
-import { getGalleryLocationByKey } from "@/lib/admin/gallery-locations";
+import { getGalleryLocation, getGalleryLocationByKey } from "@/lib/admin/gallery-locations";
 import { requireAdminRole } from "@/lib/auth/admin-access";
-import { HERO_CACHE_TAG, HOME_ROUTE_CACHE_TAG } from "@/lib/gallery/cache";
+import { galleryPlacementCacheTag, HERO_CACHE_TAG, HOME_ROUTE_CACHE_TAG } from "@/lib/gallery/cache";
 import { removeManagedImages, uploadGalleryImageSet } from "@/lib/storage/images";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -102,10 +102,11 @@ export async function uploadGalleryItemsAction(formData: FormData) {
     const { data: gallery, error: galleryError } = await supabase.from("galleries").select("route_key, placement_key").eq("id", galleryId).single();
     if (galleryError) throw galleryError;
     const files = formData.getAll("files").filter((value): value is File => value instanceof File && value.size > 0);
-    const maxItems = gallery.route_key === "home" && gallery.placement_key === "hero" ? 3 : 10;
+    const placement = getGalleryLocation(gallery.route_key, gallery.placement_key);
+    if (!placement) throw new AdminValidationError("route");
     const { count, error: countError } = await supabase.from("gallery_items").select("id", { count: "exact", head: true }).eq("gallery_id", galleryId);
     if (countError) throw countError;
-    if (!files.length || files.length + (count ?? 0) > maxItems) throw new AdminValidationError("image");
+    if (!files.length || files.length + (count ?? 0) > (placement.maxItems ?? 10)) throw new AdminValidationError("image");
 
     const altBase = textValue(formData, "alt_base", { max: 170 });
     const mobilePosition = objectPositionValue(formData, "mobile_object_position");
@@ -251,13 +252,41 @@ export async function publishGalleryAction(formData: FormData) {
   const galleryId = uuidValue(formData, "gallery_id");
   const target = destination(galleryId);
   const supabase = await createSupabaseServerClient();
+  const { data: gallery } = await supabase.from("galleries").select("route_key, placement_key").eq("id", galleryId).maybeSingle();
   const { error } = await supabase.rpc("publish_gallery_revision", { target_gallery_id: galleryId });
   if (error) redirect(appendFeedback(target, "error", mutationErrorCode(error)));
-  revalidateTag(HERO_CACHE_TAG, "max");
-  revalidateTag(HOME_ROUTE_CACHE_TAG, "max");
-  revalidatePath("/");
+  if (gallery) revalidateTag(galleryPlacementCacheTag(gallery.route_key, gallery.placement_key), "max");
+  if (gallery?.route_key === "home") {
+    revalidateTag(HOME_ROUTE_CACHE_TAG, "max");
+    revalidatePath("/");
+  }
+  const location = gallery ? getGalleryLocation(gallery.route_key, gallery.placement_key) : null;
+  if (location && location.route !== "/") revalidatePath(location.route);
+  if (gallery?.route_key === "home" && gallery.placement_key === "hero") revalidateTag(HERO_CACHE_TAG, "max");
   revalidatePath(target);
   redirect(appendFeedback(target, "status", "published"));
+}
+
+export async function rollbackGalleryRevisionAction(formData: FormData) {
+  await requireAdminRole(["admin", "editor"]);
+  const galleryId = uuidValue(formData, "gallery_id");
+  const publicationId = uuidValue(formData, "publication_id");
+  const target = destination(galleryId);
+  const supabase = await createSupabaseServerClient();
+  const { data: gallery } = await supabase.from("galleries").select("route_key, placement_key").eq("id", galleryId).maybeSingle();
+  const { error } = await supabase.rpc("rollback_gallery_revision", {
+    target_gallery_id: galleryId,
+    target_publication_id: publicationId,
+  });
+  if (error) redirect(appendFeedback(target, "error", mutationErrorCode(error)));
+  if (gallery) {
+    revalidateTag(galleryPlacementCacheTag(gallery.route_key, gallery.placement_key), "max");
+    const location = getGalleryLocation(gallery.route_key, gallery.placement_key);
+    if (location) revalidatePath(location.route);
+    if (gallery.route_key === "home") revalidateTag(HOME_ROUTE_CACHE_TAG, "max");
+  }
+  revalidatePath(target);
+  redirect(appendFeedback(target, "status", "rolledback"));
 }
 
 export async function deleteGalleryAction(formData: FormData) {

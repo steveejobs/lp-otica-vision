@@ -1,0 +1,341 @@
+{
+  "checks": {
+    "desktopCycle": {
+      "closesAtFirst": true,
+      "noRepeatBeforeSeam": true,
+      "sequence": [
+        "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+        "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+        "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+      ]
+    },
+    "desktopFieldsSeparated": true,
+    "mobileCycle": {
+      "closesAtFirst": true,
+      "noRepeatBeforeSeam": true,
+      "sequence": [
+        "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+        "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+        "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+      ]
+    },
+    "noDecorativeHeroText": true,
+    "noDuplicateImageRequests": true,
+    "noImageCloneAccessibilityViolation": true,
+    "noViewportOverflow": true,
+    "noZeroSizedImages": true,
+    "reducedMotion": {
+      "manualNavigationWorks": true,
+      "autoplayDisabled": true
+    },
+    "swipeChangedImage": true,
+    "swipeResumedAutoplay": true,
+    "visibility": {
+      "offscreenPaused": true,
+      "restoredMotion": "playing",
+      "tabHiddenPaused": true,
+      "tabVisibleMotion": "playing"
+    }
+  },
+  "consoleErrors": [],
+  "imageRequestCounts": {
+    "http://localhost:3000/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2": 1,
+    "http://localhost:3000/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6": 1,
+    "http://localhost:3000/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014": 1,
+    "http://localhost:3000/api/galerias/imagem/7e88f48f-c2ea-47d5-b165-fd5be0ae7617?variant=desktop&v=6f2e4c52-69d1-46c9-863a-524d11e44945": 1,
+    "http://localhost:3000/api/galerias/imagem/7cfe3689-c19d-4b19-9add-36d8dda86ff6?variant=desktop&v=032a173f-f9a8-4ff2-8f4c-b0c1ef55d6ea": 1,
+    "http://localhost:3000/api/galerias/imagem/7c4977ab-1432-4180-9e06-fd04c15f1f81?variant=desktop&v=16f2d691-89a0-418d-a2ab-d330a1ada61f": 1,
+    "http://localhost:3000/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb": 1
+  },
+  "pageErrors": [],
+  "publishedImageCount": 3,
+  "recordings": {
+    "desktop": "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\docs\\qa\\hero-loop-refinement\\hero-desktop-1440x900-cycle.webm",
+    "mobile": "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\docs\\qa\\hero-loop-refinement\\hero-mobile-390x844-cycle.webm",
+    "swipe": "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\docs\\qa\\hero-loop-refinement\\hero-mobile-swipe-resume.webm"
+  },
+  "snapshots": {
+    "desktop": {
+      "cycle": {
+        "closesAtFirst": true,
+        "noRepeatBeforeSeam": true,
+        "sequence": [
+          "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+          "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+        ]
+      },
+      "end": {
+        "activeAlt": "Retrato editorial com óculos de lente marrom e trench coat",
+        "activeSrc": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "copy": {
+          "height": 320,
+          "left": 86,
+          "top": 527,
+          "width": 454
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 812,
+          "left": 0,
+          "top": 89,
+          "width": 1440
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 812,
+          "left": 613,
+          "top": 89,
+          "width": 741
+        }
+      },
+      "middle": {
+        "activeAlt": "Close editorial com armação marrom e acabamento metálico",
+        "activeSrc": "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+        "copy": {
+          "height": 320,
+          "left": 86,
+          "top": 527,
+          "width": 454
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 812,
+          "left": 0,
+          "top": 89,
+          "width": 1440
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 812,
+          "left": 613,
+          "top": 89,
+          "width": 741
+        }
+      },
+      "start": {
+        "activeAlt": "Retrato editorial com óculos de lente marrom e trench coat",
+        "activeSrc": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "copy": {
+          "height": 320,
+          "left": 86,
+          "top": 527,
+          "width": 454
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 812,
+          "left": 0,
+          "top": 89,
+          "width": 1440
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 812,
+          "left": 613,
+          "top": 89,
+          "width": 741
+        }
+      },
+      "video": "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\docs\\qa\\hero-loop-refinement\\hero-desktop-1440x900-cycle.webm"
+    },
+    "mobile": {
+      "cycle": {
+        "closesAtFirst": true,
+        "noRepeatBeforeSeam": true,
+        "sequence": [
+          "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+          "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+        ]
+      },
+      "end": {
+        "activeAlt": "Retrato editorial com óculos de lente marrom e trench coat",
+        "activeSrc": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "copy": {
+          "height": 246,
+          "left": 16,
+          "top": 271,
+          "width": 359
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 909,
+          "left": 0,
+          "top": 79,
+          "width": 390
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 447,
+          "left": 16,
+          "top": 541,
+          "width": 374
+        }
+      },
+      "middle": {
+        "activeAlt": "Close editorial com armação marrom e acabamento metálico",
+        "activeSrc": "/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+        "copy": {
+          "height": 246,
+          "left": 16,
+          "top": 271,
+          "width": 359
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 909,
+          "left": 0,
+          "top": 79,
+          "width": 390
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 447,
+          "left": 16,
+          "top": 541,
+          "width": 374
+        }
+      },
+      "start": {
+        "activeAlt": "Retrato editorial com óculos de lente marrom e trench coat",
+        "activeSrc": "/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+        "copy": {
+          "height": 246,
+          "left": 16,
+          "top": 271,
+          "width": 359
+        },
+        "decorativeTextPresent": false,
+        "hero": {
+          "height": 909,
+          "left": 0,
+          "top": 79,
+          "width": 390
+        },
+        "hiddenImagesHaveEmptyAlt": true,
+        "imageCount": 3,
+        "motion": "playing",
+        "publishedCount": 3,
+        "visual": {
+          "height": 447,
+          "left": 16,
+          "top": 541,
+          "width": 374
+        }
+      },
+      "video": "C:\\Users\\jarde\\Documents\\GitHub\\lp-otica-vision\\docs\\qa\\hero-loop-refinement\\hero-mobile-390x844-cycle.webm"
+    }
+  },
+  "viewports": [
+    {
+      "height": 728,
+      "overflow": false,
+      "viewport": {
+        "height": 800,
+        "width": 360
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 887,
+      "overflow": false,
+      "viewport": {
+        "height": 812,
+        "width": 375
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 909,
+      "overflow": false,
+      "viewport": {
+        "height": 844,
+        "width": 390
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 914,
+      "overflow": false,
+      "viewport": {
+        "height": 852,
+        "width": 393
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 953,
+      "overflow": false,
+      "viewport": {
+        "height": 915,
+        "width": 412
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 968,
+      "overflow": false,
+      "viewport": {
+        "height": 932,
+        "width": 430
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 680,
+      "overflow": false,
+      "viewport": {
+        "height": 768,
+        "width": 1366
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 812,
+      "overflow": false,
+      "viewport": {
+        "height": 900,
+        "width": 1440
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 812,
+      "overflow": false,
+      "viewport": {
+        "height": 900,
+        "width": 1600
+      },
+      "zeroSizedImages": false
+    },
+    {
+      "height": 928,
+      "overflow": false,
+      "viewport": {
+        "height": 1080,
+        "width": 1920
+      },
+      "zeroSizedImages": false
+    }
+  ]
+}

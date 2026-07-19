@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 
-import type { FeaturedBrandsContent } from "@/lib/showcase-content";
+import type { FeaturedBrandsContent } from "@/lib/brand-content";
 
 import { HomeBrandRail } from "./home-brand-rail";
 import { SectionShell } from "./section-shell";
