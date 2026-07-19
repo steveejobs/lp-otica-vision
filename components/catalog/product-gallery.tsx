@@ -12,7 +12,7 @@ import styles from "./product-gallery.module.css";
 const blurDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZBfq3UUnYALVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
 
-export function ProductGallery({ images, productName }: { images: CatalogImage[]; productName: string }) {
+export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
   const railRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
@@ -86,7 +86,12 @@ export function ProductGallery({ images, productName }: { images: CatalogImage[]
         tabIndex={0}
       >
         {images.map((image, index) => (
-          <figure className={styles.slide} key={image.id}>
+          <figure
+            className={styles.slide}
+            data-catalog-product-hero={index === initialIndex ? productId : undefined}
+            data-catalog-transition-media={index === initialIndex ? "" : undefined}
+            key={image.id}
+          >
             {loadedIndexes.has(index) ? (
               <Image
                 alt={image.altText}

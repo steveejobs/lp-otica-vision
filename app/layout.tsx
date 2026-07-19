@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 
+import { CatalogTransitionManager } from "@/components/catalog/catalog-transition-manager";
 import { VisionMotion } from "@/components/motion";
 import { heroMedia, identityAssets } from "@/lib/assets";
 import { getMetadataBase } from "@/lib/metadata";
@@ -61,6 +63,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Pular para o conteúdo
         </a>
         <VisionMotion />
+        <Suspense fallback={null}>
+          <CatalogTransitionManager />
+        </Suspense>
         {children}
       </body>
     </html>

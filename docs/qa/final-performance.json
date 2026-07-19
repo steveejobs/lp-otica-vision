@@ -1,0 +1,38 @@
+{
+  "scope": "hero-and-catalog-transitions",
+  "runtime": "next-start-local-production-build",
+  "hero": {
+    "mobile390x844": {
+      "cls": 0,
+      "lcpMs": 3896,
+      "priorityImages": 1,
+      "heroImageRequests": 3,
+      "duplicateSources": 0,
+      "runningAnimationsAtRest": 0,
+      "continuousImageBlur": false
+    },
+    "desktop1440x900": {
+      "cls": 0,
+      "lcpMs": 856,
+      "priorityImages": 1,
+      "heroImageRequests": 3,
+      "duplicateSources": 0,
+      "runningAnimationsAtRest": 0,
+      "continuousImageBlur": false
+    },
+    "loading": {
+      "first": "responsive preload, eager, high priority; motion gated by decode",
+      "second": "prepared only after the first media is ready",
+      "third": "prepared progressively after the second"
+    }
+  },
+  "catalog": {
+    "reducedMotionNavigationMs": 242,
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "mobileReturnScroll": { "source": 630, "restored": 630 },
+    "desktopReturnScroll": { "source": 822, "restored": 830 }
+  },
+  "previousHeroReference": "docs/qa/hero-motion-rebuild/before-audit.json",
+  "notes": "The mobile LCP includes a cold remote private-media proxy read in the local test environment; responsive preload was added after this measurement. CLS remained zero."
+}

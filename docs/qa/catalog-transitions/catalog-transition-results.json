@@ -1,0 +1,46 @@
+{
+  "consoleErrors": [],
+  "pageErrors": [],
+  "runs": [
+    {
+      "label": "mobile",
+      "checks": {
+        "homeOverlay": true,
+        "brandFilter": true,
+        "categoryFilter": true,
+        "productOverlay": true,
+        "productTarget": true,
+        "requestedSourceScroll": 240,
+        "sourceScroll": 630,
+        "restoredScroll": 630,
+        "returnPreservesScroll": true,
+        "returnTarget": true
+      },
+      "video": "docs\\qa\\catalog-transitions\\catalog-mobile-transitions.webm"
+    },
+    {
+      "label": "desktop",
+      "checks": {
+        "homeOverlay": true,
+        "brandFilter": true,
+        "categoryFilter": true,
+        "productOverlay": true,
+        "productTarget": true,
+        "requestedSourceScroll": 258,
+        "sourceScroll": 822,
+        "restoredScroll": 830,
+        "returnPreservesScroll": true,
+        "returnTarget": true
+      },
+      "video": "docs\\qa\\catalog-transitions\\catalog-desktop-transitions.webm"
+    },
+    {
+      "label": "mobile",
+      "checks": {
+        "navigationMs": 242,
+        "overlayDisabled": true
+      },
+      "video": "docs\\qa\\catalog-transitions\\catalog-mobile-reduced.webm"
+    }
+  ]
+}

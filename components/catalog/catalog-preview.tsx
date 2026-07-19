@@ -35,7 +35,12 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
           </div>
           <div className={styles.headerAside}>
             <p>Modelos publicados no catálogo, com caminho direto para consultar pelo WhatsApp.</p>
-            <Link className={styles.cta} href="/catalogo">
+            <Link
+              className={styles.cta}
+              data-catalog-collection-link
+              data-catalog-transition-link
+              href="/catalogo"
+            >
               Ver catálogo geral
               <ArrowRight aria-hidden="true" size={17} />
             </Link>
@@ -47,9 +52,11 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
             <Link
               aria-label={`Ver ${featuredProduct.name}, código ${featuredProduct.sku}`}
               className={styles.feature}
+              data-catalog-product-id={featuredProduct.id}
+              data-catalog-transition-link
               href={`/catalogo/${featuredProduct.slug}`}
             >
-              <span className={styles.featureMedia}>
+              <span className={styles.featureMedia} data-catalog-feature-media data-catalog-transition-media>
                 <Image
                   alt={featuredProduct.cover.altText}
                   blurDataURL={featuredProduct.cover.blurDataUrl ?? undefined}

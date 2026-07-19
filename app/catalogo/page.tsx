@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, MessageCircle } from "lucide-react";
-import { Suspense } from "react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
@@ -18,10 +17,8 @@ import {
   parseCatalogQuery,
   type CatalogSearchParams,
 } from "@/lib/catalog/query";
-import { getCatalogProductUrl } from "@/lib/catalog/site-url";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
 import { LINKS } from "@/lib/links";
-import { buildProductWhatsappUrl } from "@/lib/whatsapp/product-link";
 
 import styles from "./catalog.module.css";
 
@@ -61,24 +58,6 @@ function groupByBrand(products: CatalogProductCardData[]) {
   return [...groups.values()];
 }
 
-async function buildProductConsultationLinks(products: CatalogProductCardData[]) {
-  const entries = await Promise.all(
-    products.map(async (product) => [
-      product.id,
-      await buildProductWhatsappUrl({
-        brand: product.brand?.name,
-        color: product.color,
-        model: product.model,
-        productName: product.name,
-        productUrl: getCatalogProductUrl(product.slug),
-        sku: product.sku,
-      }),
-    ] as const),
-  );
-
-  return new Map(entries);
-}
-
 async function CatalogContent({
   searchParams,
 }: {
@@ -95,7 +74,6 @@ async function CatalogContent({
     ? [{ name: activeBrand?.name ?? "Produtos", products: catalog.products, slug: query.brand }]
     : groupByBrand(catalog.products);
   const hasFilters = hasActiveCatalogFilters(query);
-  const productConsultationLinks = await buildProductConsultationLinks(catalog.products);
 
   return (
     <div className={styles.page}>
@@ -103,8 +81,6 @@ async function CatalogContent({
       <main id="main-content">
         <section
           className={styles.hero}
-          data-motion-reveal
-          data-motion-variant="hero"
           aria-labelledby="catalog-title"
         >
           <div className={styles.heroInner}>
@@ -119,8 +95,6 @@ async function CatalogContent({
 
         <section
           className={styles.filters}
-          data-motion-reveal
-          data-motion-variant="section"
           aria-label="Filtros do catálogo"
         >
           <div className={styles.filterInner}>
@@ -129,6 +103,7 @@ async function CatalogContent({
               <nav className={styles.brandRail} aria-label="Selecionar marca">
                 <Link
                   aria-current={!query.brand ? "page" : undefined}
+                  data-catalog-filter-link
                   href={catalogHref(query, { brand: null, page: 1 })}
                   scroll={false}
                 >
@@ -138,6 +113,7 @@ async function CatalogContent({
                 {filters.brands.map((brand) => (
                   <Link
                     aria-current={query.brand === brand.key ? "page" : undefined}
+                    data-catalog-filter-link
                     href={catalogHref(query, { brand: brand.key, page: 1 })}
                     key={brand.key}
                     scroll={false}
@@ -149,7 +125,7 @@ async function CatalogContent({
               </nav>
             </div>
 
-            <form className={styles.filterForm} method="get" role="search">
+            <form className={styles.filterForm} data-catalog-filter-form method="get" role="search">
               {query.brand ? <input name="marca" type="hidden" value={query.brand} /> : null}
               <label className={styles.field}>
                 <span>Buscar por nome, modelo, SKU, cor ou marca</span>
@@ -202,7 +178,7 @@ async function CatalogContent({
               ) : null}
               <div className={styles.formActions}>
                 <button className={styles.submit} type="submit">Aplicar filtros</button>
-                {hasFilters ? <Link className={styles.clear} href="/catalogo">Limpar seleção</Link> : null}
+                {hasFilters ? <Link className={styles.clear} data-catalog-filter-link href="/catalogo" scroll={false}>Limpar seleção</Link> : null}
               </div>
             </form>
           </div>
@@ -210,8 +186,6 @@ async function CatalogContent({
 
         <section
           className={styles.results}
-          data-motion-reveal
-          data-motion-variant="section"
           aria-labelledby="catalog-results-title"
         >
           <div className={styles.resultsInner}>
@@ -233,7 +207,7 @@ async function CatalogContent({
                     : "Enquanto novos produtos são publicados, fale diretamente com a equipe Vision."}
                 </p>
                 <div className={styles.emptyActions}>
-                  {hasFilters ? <Link href="/catalogo">Limpar filtros</Link> : null}
+                  {hasFilters ? <Link data-catalog-filter-link href="/catalogo" scroll={false}>Limpar filtros</Link> : null}
                   <a href={LINKS.whatsapp} rel="noopener noreferrer" target="_blank">
                     <MessageCircle aria-hidden="true" size={17} />
                     Falar no WhatsApp
@@ -241,12 +215,10 @@ async function CatalogContent({
                 </div>
               </div>
             ) : (
-              <div className={styles.chapters} data-motion-stagger>
+              <div className={styles.chapters} data-catalog-results-grid>
                 {groups.map((group) => (
                   <section
                     className={styles.chapter}
-                    data-motion-reveal
-                    data-motion-variant="section"
                     key={group.slug ?? "vision"}
                   >
                     <div className={styles.chapterHeader}>
@@ -255,26 +227,16 @@ async function CatalogContent({
                         <span>{group.products.length}</span>
                       </div>
                       {!query.brand && group.slug ? (
-                        <Link href={catalogHref(query, { brand: group.slug, page: 1 })} scroll={false}>
+                        <Link data-catalog-filter-link href={catalogHref(query, { brand: group.slug, page: 1 })} scroll={false}>
                           Ver toda a marca
                           <ArrowUpRight aria-hidden="true" size={16} />
                         </Link>
                       ) : null}
                     </div>
-                    <div className={styles.grid} data-motion-stagger>
-                      {group.products.map((product) => {
-                        const whatsappUrl = productConsultationLinks.get(product.id);
-
-                        return (
-                          <CatalogProductCard
-                            actionLabel={whatsappUrl ? "Consultar no WhatsApp" : undefined}
-                            external={Boolean(whatsappUrl)}
-                            href={whatsappUrl}
-                            key={product.id}
-                            product={product}
-                          />
-                        );
-                      })}
+                    <div className={styles.grid}>
+                      {group.products.map((product) => (
+                        <CatalogProductCard key={product.id} product={product} />
+                      ))}
                     </div>
                   </section>
                 ))}
@@ -284,14 +246,14 @@ async function CatalogContent({
             {catalog.totalPages > 1 ? (
               <nav className={styles.pagination} aria-label="Paginação do catálogo">
                 {catalog.page > 1 ? (
-                  <Link href={catalogHref(query, { page: catalog.page - 1 })} scroll={false}>
+                  <Link data-catalog-filter-link href={catalogHref(query, { page: catalog.page - 1 })} scroll={false}>
                     <ArrowLeft aria-hidden="true" size={16} />
                     Anterior
                   </Link>
                 ) : <span />}
                 <span>Página {catalog.page} de {catalog.totalPages}</span>
                 {catalog.page < catalog.totalPages ? (
-                  <Link href={catalogHref(query, { page: catalog.page + 1 })} scroll={false}>
+                  <Link data-catalog-filter-link href={catalogHref(query, { page: catalog.page + 1 })} scroll={false}>
                     Próxima
                     <ArrowRight aria-hidden="true" size={16} />
                   </Link>
@@ -307,42 +269,6 @@ async function CatalogContent({
   );
 }
 
-function CatalogLoading() {
-  return (
-    <div className={styles.page}>
-      <SiteHeader />
-      <main id="main-content">
-        <section className={styles.hero} data-motion-reveal data-motion-variant="hero">
-          <div className={styles.heroInner}>
-            <p className="eyebrow">Catálogo geral</p>
-            <h1>Vitrine Vision</h1>
-            <p className={styles.intro}>Preparando a vitrine publicada.</p>
-          </div>
-        </section>
-        <section
-          className={styles.results}
-          data-motion-reveal
-          data-motion-variant="section"
-          aria-busy="true"
-          aria-label="Carregando catálogo"
-        >
-          <div className={styles.resultsInner}>
-            <div className={styles.loadingGrid}>
-              {Array.from({ length: 8 }, (_, index) => (
-                <span className={styles.loadingItem} key={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
-
-export default function CatalogPage(props: { searchParams: Promise<CatalogSearchParams> }) {
-  return (
-    <Suspense fallback={<CatalogLoading />}>
-      <CatalogContent {...props} />
-    </Suspense>
-  );
+export default async function CatalogPage(props: { searchParams: Promise<CatalogSearchParams> }) {
+  return <CatalogContent {...props} />;
 }

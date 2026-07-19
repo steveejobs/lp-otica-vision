@@ -36,19 +36,19 @@
     {
       "actions": [
         {
-          "bottom": 779.40625,
+          "bottom": 781,
           "height": 44,
           "left": 14.390625,
           "right": 121.1875,
-          "top": 735.40625,
+          "top": 737,
           "width": 106.796875
         },
         {
-          "bottom": 779.40625,
+          "bottom": 781,
           "height": 44,
           "left": 128.375,
           "right": 243.328125,
-          "top": 735.40625,
+          "top": 737,
           "width": 114.953125
         }
       ],
@@ -65,11 +65,11 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 360,
       "title": {
-        "bottom": 721.015625,
-        "height": 103.546875,
+        "bottom": 726.609375,
+        "height": 63.625,
         "left": 14.390625,
         "right": 345.609375,
-        "top": 617.46875,
+        "top": 662.984375,
         "width": 331.21875
       },
       "viewport": {
@@ -80,19 +80,19 @@
     {
       "actions": [
         {
-          "bottom": 791.40625,
+          "bottom": 793,
           "height": 44,
           "left": 15,
           "right": 121.796875,
-          "top": 747.40625,
+          "top": 749,
           "width": 106.796875
         },
         {
-          "bottom": 791.40625,
+          "bottom": 793,
           "height": 44,
           "left": 128.984375,
           "right": 243.9375,
-          "top": 747.40625,
+          "top": 749,
           "width": 114.953125
         }
       ],
@@ -109,11 +109,11 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 375,
       "title": {
-        "bottom": 733.015625,
-        "height": 112.546875,
+        "bottom": 736.203125,
+        "height": 103.921875,
         "left": 15,
         "right": 360,
-        "top": 620.46875,
+        "top": 632.28125,
         "width": 345
       },
       "viewport": {
@@ -124,19 +124,19 @@
     {
       "actions": [
         {
-          "bottom": 823.40625,
+          "bottom": 825,
           "height": 44,
           "left": 15.59375,
           "right": 122.390625,
-          "top": 779.40625,
+          "top": 781,
           "width": 106.796875
         },
         {
-          "bottom": 823.40625,
+          "bottom": 825,
           "height": 44,
           "left": 129.578125,
           "right": 244.53125,
-          "top": 779.40625,
+          "top": 781,
           "width": 114.953125
         }
       ],
@@ -153,11 +153,11 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 390,
       "title": {
-        "bottom": 765.015625,
-        "height": 117,
+        "bottom": 768.203125,
+        "height": 108.09375,
         "left": 15.59375,
         "right": 374.40625,
-        "top": 648.015625,
+        "top": 660.109375,
         "width": 358.8125
       },
       "viewport": {
@@ -168,19 +168,19 @@
     {
       "actions": [
         {
-          "bottom": 894.40625,
+          "bottom": 896,
           "height": 44,
           "left": 16.46875,
           "right": 123.265625,
-          "top": 850.40625,
+          "top": 852,
           "width": 106.796875
         },
         {
-          "bottom": 894.40625,
+          "bottom": 896,
           "height": 44,
           "left": 130.453125,
           "right": 245.40625,
-          "top": 850.40625,
+          "top": 852,
           "width": 114.953125
         }
       ],
@@ -197,12 +197,12 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 412,
       "title": {
-        "bottom": 836.015625,
-        "height": 123.609375,
+        "bottom": 839.203125,
+        "height": 114.1875,
         "left": 16.46875,
-        "right": 395.53125,
-        "top": 712.40625,
-        "width": 379.0625
+        "right": 384.46875,
+        "top": 725.015625,
+        "width": 368
       },
       "viewport": {
         "height": 915,
@@ -212,19 +212,19 @@
     {
       "actions": [
         {
-          "bottom": 911.40625,
+          "bottom": 913,
           "height": 44,
           "left": 17.1875,
           "right": 123.984375,
-          "top": 867.40625,
+          "top": 869,
           "width": 106.796875
         },
         {
-          "bottom": 911.40625,
+          "bottom": 913,
           "height": 44,
           "left": 131.171875,
           "right": 246.125,
-          "top": 867.40625,
+          "top": 869,
           "width": 114.953125
         }
       ],
@@ -241,12 +241,12 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 430,
       "title": {
-        "bottom": 853.015625,
-        "height": 129.046875,
+        "bottom": 856.203125,
+        "height": 119.203125,
         "left": 17.1875,
-        "right": 412.8125,
-        "top": 723.96875,
-        "width": 395.625
+        "right": 385.1875,
+        "top": 737,
+        "width": 368
       },
       "viewport": {
         "height": 932,
@@ -256,19 +256,19 @@
     {
       "actions": [
         {
-          "bottom": 730.609375,
+          "bottom": 743.421875,
           "height": 44,
-          "left": 75.125,
-          "right": 181.921875,
-          "top": 686.609375,
+          "left": 1082.4375,
+          "right": 1189.234375,
+          "top": 699.421875,
           "width": 106.796875
         },
         {
-          "bottom": 730.609375,
+          "bottom": 743.421875,
           "height": 44,
-          "left": 189.109375,
-          "right": 304.0625,
-          "top": 686.609375,
+          "left": 1196.421875,
+          "right": 1311.375,
+          "top": 699.421875,
           "width": 114.953125
         }
       ],
@@ -281,16 +281,16 @@
         "top": 89,
         "width": 1366
       },
-      "heroPhotoCountAt500ms": 3,
+      "heroPhotoCountAt500ms": 1,
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 1366,
       "title": {
-        "bottom": 668.21875,
-        "height": 241.921875,
-        "left": 75.125,
-        "right": 1058.640625,
-        "top": 426.296875,
-        "width": 983.515625
+        "bottom": 746.609375,
+        "height": 120.96875,
+        "left": 54.625,
+        "right": 1014.625,
+        "top": 625.640625,
+        "width": 960
       },
       "viewport": {
         "height": 768,
@@ -300,19 +300,19 @@
     {
       "actions": [
         {
-          "bottom": 856,
+          "bottom": 875.421875,
           "height": 44,
-          "left": 79.1875,
-          "right": 185.984375,
-          "top": 812,
+          "left": 1151.0625,
+          "right": 1257.859375,
+          "top": 831.421875,
           "width": 106.796875
         },
         {
-          "bottom": 856,
+          "bottom": 875.421875,
           "height": 44,
-          "left": 193.171875,
-          "right": 308.125,
-          "top": 812,
+          "left": 1265.046875,
+          "right": 1380,
+          "top": 831.421875,
           "width": 114.953125
         }
       ],
@@ -329,12 +329,12 @@
       "heroPriorityPhotoCount": 1,
       "maxScrollWidth": 1440,
       "title": {
-        "bottom": 793.609375,
-        "height": 255.046875,
-        "left": 79.1875,
-        "right": 1115.984375,
-        "top": 538.5625,
-        "width": 1036.796875
+        "bottom": 878.609375,
+        "height": 127.53125,
+        "left": 60,
+        "right": 1020,
+        "top": 751.078125,
+        "width": 960
       },
       "viewport": {
         "height": 900,

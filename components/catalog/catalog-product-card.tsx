@@ -40,7 +40,7 @@ export function CatalogProductCard({
     : `Ver ${product.name}, código ${product.sku}`;
   const content = (
     <>
-      <div className={styles.media}>
+      <div className={styles.media} data-catalog-transition-media>
         <Image
           alt={product.cover.altText}
           blurDataURL={product.cover.blurDataUrl ?? blurDataUrl}
@@ -76,9 +76,8 @@ export function CatalogProductCard({
     <article
       aria-hidden={clone || undefined}
       className={styles.card}
+      data-catalog-product-id={clone ? undefined : product.id}
       data-availability={product.availability}
-      data-motion-reveal={clone ? undefined : ""}
-      data-motion-variant={clone ? undefined : "catalog-card"}
       data-presentation={presentation}
     >
       {external ? (
@@ -96,6 +95,8 @@ export function CatalogProductCard({
         <Link
           aria-label={linkLabel}
           className={styles.link}
+          data-catalog-product-id={product.id}
+          data-catalog-transition-link
           href={productHref}
           tabIndex={clone ? -1 : undefined}
         >

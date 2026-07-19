@@ -108,13 +108,13 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
     <div className={styles.page}>
       <SiteHeader />
       <main className={styles.main} id="main-content">
-        <Link className={styles.back} href="/catalogo">
+        <Link className={styles.back} data-catalog-return-link href="/catalogo" scroll={false}>
           <ArrowLeft aria-hidden="true" size={16} />
           Voltar ao catálogo
         </Link>
 
         <article className={styles.product}>
-          <ProductGallery images={product.images} productName={product.name} />
+          <ProductGallery images={product.images} productId={product.id} productName={product.name} />
           <div className={styles.details}>
             <header className={styles.detailsHeader}>
               <p className={styles.brand}>{product.brand?.name ?? "Seleção Vision"}</p>

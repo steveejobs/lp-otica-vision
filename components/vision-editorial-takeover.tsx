@@ -1,7 +1,7 @@
 "use client";
 
 import { BookOpenText, MessageCircle } from "lucide-react";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 
 import type { HeroMedia } from "@/lib/gallery/hero";
 import { LINKS } from "@/lib/links";
@@ -13,18 +13,22 @@ import styles from "./vision-editorial-takeover.module.css";
 type Props = { media: HeroMedia[] };
 type StageStyle = CSSProperties & Record<`--${string}`, string | number>;
 
-const HOLD_MS = 2_650;
-const SETTLE_MS = 2_350;
+const HOLD_MS = 2_550;
+const SETTLE_MS = 2_150;
 
 export function VisionEditorialTakeover({ media }: Props) {
   const items = media.slice(0, 3);
   const rootRef = useRef<HTMLElement>(null);
+  const firstImageRef = useRef<HTMLImageElement>(null);
   const [act, setAct] = useState(0);
   const [prepared, setPrepared] = useState(1);
   const [visible, setVisible] = useState(true);
   const [inViewport, setInViewport] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [enhanced, setEnhanced] = useState(false);
+  const [firstReady, setFirstReady] = useState(false);
+
+  const markFirstReady = useCallback(() => setFirstReady(true), []);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -45,18 +49,34 @@ export function VisionEditorialTakeover({ media }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!enhanced || reduced || items.length < 2) return;
+    const image = firstImageRef.current;
+    if (!image) return;
+    const ready = () => {
+      if (!image.complete || image.naturalWidth < 1) return;
+      void image.decode?.().catch(() => undefined).finally(markFirstReady);
+    };
+    ready();
+    image.addEventListener("load", ready);
+    image.addEventListener("error", markFirstReady);
+    return () => {
+      image.removeEventListener("load", ready);
+      image.removeEventListener("error", markFirstReady);
+    };
+  }, [markFirstReady]);
+
+  useEffect(() => {
+    if (!enhanced || !firstReady || reduced || items.length < 2) return;
     const second = window.setTimeout(() => setPrepared(2), 260);
     const third = window.setTimeout(() => setPrepared(3), 1_450);
     return () => { window.clearTimeout(second); window.clearTimeout(third); };
-  }, [enhanced, items.length, reduced]);
+  }, [enhanced, firstReady, items.length, reduced]);
 
   useEffect(() => {
-    if (!enhanced || reduced || !visible || !inViewport || items.length < 2 || act >= items.length) return;
+    if (!enhanced || !firstReady || reduced || !visible || !inViewport || items.length < 2 || act >= items.length) return;
     const delay = act === items.length - 1 ? SETTLE_MS : HOLD_MS;
     const timer = window.setTimeout(() => setAct((current) => Math.min(current + 1, items.length)), delay);
     return () => window.clearTimeout(timer);
-  }, [act, enhanced, inViewport, items.length, reduced, visible]);
+  }, [act, enhanced, firstReady, inViewport, items.length, reduced, visible]);
 
   const style = items.reduce<StageStyle>((values, item, index) => {
     values[`--stage-bg-${index}`] = item.backgroundColor;
@@ -70,6 +90,7 @@ export function VisionEditorialTakeover({ media }: Props) {
       data-act={reduced ? 0 : act}
       data-count={items.length}
       data-enhanced={enhanced}
+      data-ready={firstReady}
       data-motion={reduced ? "reduced" : visible && inViewport ? "playing" : "paused"}
       id="hero"
       ref={rootRef}
@@ -78,7 +99,9 @@ export function VisionEditorialTakeover({ media }: Props) {
       <div className={styles.identity}><BrandLogo size="hero" /></div>
       <div aria-hidden="true" className={styles.folio}>VISION / CURADORIA / 01—03</div>
 
-      <div aria-hidden="true" className={styles.photoStage}>
+      <div aria-hidden="true" className={styles.photoField}>
+        <span className={styles.registration}>01 / PROVA EDITORIAL</span>
+        <div className={styles.photoStage}>
         {items.slice(0, prepared).map((item, index) => (
           <figure
             className={styles.page}
@@ -90,16 +113,30 @@ export function VisionEditorialTakeover({ media }: Props) {
               "--mobile-focus": item.mobileObjectPosition,
               "--mobile-scale": item.mobileScale,
               "--placeholder": item.backgroundColor,
-              "--placeholder-image": item.blurDataUrl ? `url("${item.blurDataUrl}")` : "none",
             } as StageStyle}
           >
             <picture>
               <source media="(max-width: 720px)" sizes="78vw" srcSet={`/api/galerias/imagem/${item.id}?variant=mobile&v=${item.assetVersion} 800w`} />
-              <img alt="" className={styles.photo} decoding="async" fetchPriority={index === 0 ? "high" : "auto"} height={item.height} loading={index === 0 ? "eager" : "lazy"} sizes="(max-width: 1100px) 52vw, 36vw" src={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion}`} srcSet={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion} 1200w`} width={item.width} />
+              <img
+                alt=""
+                className={styles.photo}
+                decoding={index === 0 ? "sync" : "async"}
+                fetchPriority={index === 0 ? "high" : "auto"}
+                height={item.height}
+                loading={index === 0 ? "eager" : "lazy"}
+                onError={index === 0 ? markFirstReady : undefined}
+                onLoad={index === 0 ? markFirstReady : undefined}
+                ref={index === 0 ? firstImageRef : undefined}
+                sizes="(max-width: 720px) 78vw, (max-width: 1100px) 44vw, 31rem"
+                src={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion}`}
+                srcSet={`/api/galerias/imagem/${item.id}?variant=desktop&v=${item.assetVersion} 1200w`}
+                width={item.width}
+              />
             </picture>
           </figure>
         ))}
         <span className={styles.pageEdge} />
+        </div>
       </div>
 
       <div className={styles.copy}>
