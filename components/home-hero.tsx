@@ -8,6 +8,7 @@ type HeroDisplayMedia = {
   alt: string;
   desktopScale: number;
   desktopObjectPosition: string;
+  fallbackSrc?: string;
   height: number;
   id: string;
   mobileObjectPosition: string;
@@ -32,10 +33,11 @@ function localHeroMedia(): HeroDisplayMedia[] {
 }
 
 function publishedHeroMedia(items: Awaited<ReturnType<typeof getHomeHeroMedia>>): HeroDisplayMedia[] {
-  return items.map((item) => ({
+  return items.map((item, index) => ({
     alt: item.altText,
     desktopScale: item.desktopScale,
     desktopObjectPosition: item.desktopObjectPosition,
+    fallbackSrc: visionTakeoverMedia[index % visionTakeoverMedia.length]?.src,
     height: item.height,
     id: item.id,
     mobileObjectPosition: item.mobileObjectPosition,

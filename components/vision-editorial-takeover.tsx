@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpenText, MessageCircle } from "lucide-react";
+import { Glasses, MessageCircle } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -20,6 +20,7 @@ type WallMedia = {
   alt: string;
   desktopScale: number;
   desktopObjectPosition: string;
+  fallbackSrc?: string;
   height: number;
   id: string;
   mobileObjectPosition: string;
@@ -76,6 +77,18 @@ function loadAndDecode(src: string) {
   });
 }
 
+async function loadHeroMedia(item: WallMedia, compactViewport: boolean) {
+  const primarySource = sourceForViewport(item, compactViewport);
+  try {
+    await loadAndDecode(primarySource);
+    return { source: primarySource, usesFallback: false };
+  } catch {
+    if (!item.fallbackSrc || item.fallbackSrc === primarySource) throw new Error(`Falha ao carregar a imagem da hero: ${primarySource}`);
+    await loadAndDecode(item.fallbackSrc);
+    return { source: item.fallbackSrc, usesFallback: true };
+  }
+}
+
 function cutPath(position: number, compactViewport: boolean) {
   return compactViewport
     ? `inset(${position}% 0 0 0)`
@@ -97,8 +110,9 @@ export function VisionEditorialTakeover({ media }: Props) {
   const previousCompactViewportRef = useRef<boolean | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [incomingIndex, setIncomingIndex] = useState<number | null>(null);
-  const [nextReadySrc, setNextReadySrc] = useState<string | null>(null);
+  const [nextReady, setNextReady] = useState<{ id: string; source: string } | null>(null);
   const [failedMediaIds, setFailedMediaIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [fallbackMediaIds, setFallbackMediaIds] = useState<ReadonlySet<string>>(() => new Set());
   const [inViewport, setInViewport] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -114,6 +128,7 @@ export function VisionEditorialTakeover({ media }: Props) {
   const next = nextIndex === null ? null : media[nextIndex];
   const nextSource = next ? sourceForViewport(next, compactViewport) : null;
   const incoming = incomingIndex === null ? null : media[incomingIndex];
+  const isNextReady = nextReady?.id === next?.id;
   const motionEnabled = Boolean(next) && inViewport && isVisible && !reducedMotion;
   const layout = layouts[activeIndex % layouts.length];
   const nextLayout = nextIndex === null ? layout : layouts[nextIndex % layouts.length];
@@ -178,36 +193,70 @@ export function VisionEditorialTakeover({ media }: Props) {
   }, [phase, reducedMotion]);
 
   useEffect(() => {
+    if (!active.fallbackSrc || fallbackMediaIds.has(active.id)) return;
+    const image = outgoingRef.current?.querySelector<HTMLImageElement>("img");
+    if (!image) return;
+
+    let cancelled = false;
+    const fallbackToLocalMedia = () => {
+      if (cancelled) return;
+      setFallbackMediaIds((current) => new Set(current).add(active.id));
+    };
+    const verifyLoadedImage = () => {
+      if (!image.naturalWidth) {
+        fallbackToLocalMedia();
+        return;
+      }
+      void image.decode?.().catch(fallbackToLocalMedia);
+    };
+
+    if (image.complete) {
+      verifyLoadedImage();
+      return () => { cancelled = true; };
+    }
+
+    image.addEventListener("load", verifyLoadedImage, { once: true });
+    image.addEventListener("error", fallbackToLocalMedia, { once: true });
+    return () => {
+      cancelled = true;
+      image.removeEventListener("load", verifyLoadedImage);
+      image.removeEventListener("error", fallbackToLocalMedia);
+    };
+  }, [active.fallbackSrc, active.id, compactViewport, fallbackMediaIds]);
+
+  useEffect(() => {
     if (!next || !nextSource || !inViewport || !isVisible) return;
 
-    if (decodedSourcesRef.current.has(nextSource)) {
-      setNextReadySrc(nextSource);
+    const knownSource = fallbackMediaIds.has(next.id) ? next.fallbackSrc : nextSource;
+    if (knownSource && decodedSourcesRef.current.has(knownSource)) {
+      setNextReady({ id: next.id, source: knownSource });
       return;
     }
 
     let cancelled = false;
-    setNextReadySrc((readySource) => readySource === nextSource ? readySource : null);
-    void loadAndDecode(nextSource)
-      .then(() => {
+    setNextReady((ready) => ready?.id === next.id ? ready : null);
+    void loadHeroMedia(next, compactViewport)
+      .then(({ source, usesFallback }) => {
         if (cancelled) return;
-        decodedSourcesRef.current.add(nextSource);
-        setNextReadySrc(nextSource);
+        decodedSourcesRef.current.add(source);
+        if (usesFallback) setFallbackMediaIds((current) => new Set(current).add(next.id));
+        setNextReady({ id: next.id, source });
       })
       .catch(() => {
         if (cancelled) return;
         pendingManualAdvanceRef.current = false;
-        setNextReadySrc(null);
+        setNextReady(null);
         setFailedMediaIds((current) => new Set(current).add(next.id));
       });
 
     return () => {
       cancelled = true;
     };
-  }, [inViewport, isVisible, next, nextSource]);
+  }, [compactViewport, fallbackMediaIds, inViewport, isVisible, next, nextSource]);
 
   const requestAdvance = useCallback((manual = false) => {
     if (!next || nextIndex === null || phase !== "idle") return;
-    if (nextReadySrc !== nextSource) {
+    if (!isNextReady) {
       pendingManualAdvanceRef.current = manual;
       return;
     }
@@ -215,18 +264,18 @@ export function VisionEditorialTakeover({ media }: Props) {
     pendingManualAdvanceRef.current = false;
     setIncomingIndex(nextIndex);
     setPhase("preparing");
-  }, [next, nextIndex, nextReadySrc, nextSource, phase]);
+  }, [isNextReady, next, nextIndex, phase]);
 
   useEffect(() => {
-    if (!pendingManualAdvanceRef.current || nextReadySrc !== nextSource || phase !== "idle") return;
+    if (!pendingManualAdvanceRef.current || !isNextReady || phase !== "idle") return;
     requestAdvance(true);
-  }, [nextReadySrc, nextSource, phase, requestAdvance]);
+  }, [isNextReady, phase, requestAdvance]);
 
   useEffect(() => {
-    if (!motionEnabled || phase !== "idle" || nextReadySrc !== nextSource) return;
+    if (!motionEnabled || phase !== "idle" || !isNextReady) return;
     const dwellTimer = window.setTimeout(() => requestAdvance(), HOLD_MS);
     return () => window.clearTimeout(dwellTimer);
-  }, [motionEnabled, nextReadySrc, nextSource, phase, requestAdvance]);
+  }, [isNextReady, motionEnabled, phase, requestAdvance]);
 
   useEffect(() => {
     if (phase !== "preparing" || incomingIndex === null) return;
@@ -351,7 +400,7 @@ export function VisionEditorialTakeover({ media }: Props) {
           <h1 id="hero-title">{"Arma\u00e7\u00f5es que d\u00e3o forma \u00e0 sua presen\u00e7a."}</h1>
           <p>{"Arma\u00e7\u00f5es nacionais e importadas, com lentes confeccionadas pela Vision em Aragua\u00edna."}</p>
           <div className={styles.actions}>
-            <VisionButton ariaLabel={"Ver cat\u00e1logo da \u00d3tica Vision"} href={LINKS.catalog} icon={BookOpenText}>{"Cat\u00e1logo"}</VisionButton>
+            <VisionButton ariaLabel={"Ver cat\u00e1logo da \u00d3tica Vision"} href={LINKS.catalog} icon={Glasses}>{"Cat\u00e1logo"}</VisionButton>
             <VisionButton ariaLabel={"Falar com a \u00d3tica Vision pelo WhatsApp"} external href={LINKS.whatsapp} icon={MessageCircle} variant="secondary">WhatsApp</VisionButton>
           </div>
         </div>
@@ -367,14 +416,16 @@ export function VisionEditorialTakeover({ media }: Props) {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         role="group"
-      >
+    >
         <div className={styles.mediaField} data-vision-media-field>
           {incoming ? (
             <HeroMedia
               ariaHidden
               className={styles.incoming}
+              onUseFallback={() => setFallbackMediaIds((current) => new Set(current).add(incoming.id))}
               item={incoming}
               key={`media-${incoming.id}`}
+              useFallback={fallbackMediaIds.has(incoming.id)}
             />
           ) : null}
           <HeroMedia
@@ -382,7 +433,9 @@ export function VisionEditorialTakeover({ media }: Props) {
             elementRef={outgoingRef}
             item={active}
             key={`media-${active.id}`}
+            onUseFallback={() => setFallbackMediaIds((current) => new Set(current).add(active.id))}
             priority={activeIndex === 0}
+            useFallback={fallbackMediaIds.has(active.id)}
           />
           <span className={styles.paperPlane} ref={paperPlaneRef} aria-hidden="true">
             <span className={styles.restLine} />
@@ -401,14 +454,19 @@ function HeroMedia({
   className,
   elementRef,
   item,
+  onUseFallback,
   priority = false,
+  useFallback = false,
 }: {
   ariaHidden?: boolean;
   className: string;
   elementRef?: Ref<HTMLElement>;
   item: WallMedia;
+  onUseFallback: () => void;
   priority?: boolean;
+  useFallback?: boolean;
 }) {
+  const src = useFallback && item.fallbackSrc ? item.fallbackSrc : item.src;
   return (
     <figure
       aria-hidden={ariaHidden || undefined}
@@ -418,19 +476,23 @@ function HeroMedia({
       style={{
         "--desktop-object-position": item.desktopObjectPosition,
         "--desktop-media-scale": Math.max(1, item.desktopScale),
+        "--hero-fallback-image": item.fallbackSrc ? `url("${item.fallbackSrc}")` : "none",
         "--mobile-object-position": item.mobileObjectPosition,
         "--mobile-media-scale": Math.max(1, item.mobileScale),
       } as CSSProperties}
-    >
+      >
       <picture>
-        {item.mobileSrc ? <source media="(max-width: 720px)" srcSet={item.mobileSrc} /> : null}
+        {!useFallback && item.mobileSrc ? <source media="(max-width: 720px)" srcSet={item.mobileSrc} /> : null}
         <img
           alt={ariaHidden ? "" : item.alt}
           decoding={priority ? "sync" : "async"}
           fetchPriority={priority ? "high" : "auto"}
           height={item.height}
           loading={priority ? "eager" : "lazy"}
-          src={item.src}
+          onError={() => {
+            if (!useFallback && item.fallbackSrc) onUseFallback();
+          }}
+          src={src}
           width={item.width}
         />
       </picture>

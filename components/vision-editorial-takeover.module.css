@@ -116,7 +116,11 @@
   inset: 0;
   overflow: hidden;
   border-radius: 0;
-  background: var(--vision-paper);
+  background-color: var(--vision-paper);
+  background-image: var(--hero-fallback-image, none);
+  background-position: var(--mobile-object-position, 50% 50%);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .active {
@@ -233,6 +237,11 @@
     object-position: var(--desktop-object-position, 50% 50%);
     transform: scale(var(--desktop-media-scale, 1));
     transform-origin: var(--desktop-object-position, 50% 50%);
+  }
+
+  .active,
+  .incoming {
+    background-position: var(--desktop-object-position, 50% 50%);
   }
 
   .paperPlane {

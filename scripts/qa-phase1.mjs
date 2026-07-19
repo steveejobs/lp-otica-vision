@@ -127,6 +127,7 @@ try {
   record("editor_create_products", !publishedError && !draftError);
 
   const imagePath = `${publishedId}/${randomUUID()}.png`;
+  const assetVersion = randomUUID();
   cleanup.storagePaths.push(imagePath);
   const png = Uint8Array.from(
     Buffer.from(
@@ -139,19 +140,45 @@ try {
     .upload(imagePath, png, { contentType: "image/png", upsert: false });
   const { error: imageRecordError } = await editor.client.from("product_images").insert({
     alt_text: "Imagem de QA da Fase 1",
+    asset_version: assetVersion,
+    blur_data_url: "data:image/webp;base64,AAAA",
     height: 1,
     is_cover: true,
+    mime_type: "image/png",
     product_id: publishedId,
+    size_bytes: png.byteLength,
     storage_path: imagePath,
     width: 1,
   });
+  const { data: imageRecord } = await editor.client
+    .from("product_images")
+    .select("id")
+    .eq("product_id", publishedId)
+    .eq("asset_version", assetVersion)
+    .maybeSingle();
+  const variantKinds = ["admin_thumbnail", "catalog_card", "home_preview", "product_detail", "open_graph"];
+  const { error: variantsError } = imageRecord
+    ? await editor.client.from("product_image_variants").insert(
+      variantKinds.map((kind) => ({
+        asset_version: assetVersion,
+        etag: `"${"a".repeat(43)}"`,
+        height: 1,
+        kind,
+        mime_type: kind === "open_graph" ? "image/jpeg" : "image/webp",
+        product_image_id: imageRecord.id,
+        size_bytes: 1,
+        storage_path: `${publishedId}/${randomUUID()}.${kind === "open_graph" ? "jpg" : "webp"}`,
+        width: 1,
+      })),
+    )
+    : { error: new Error("Imagem de QA nao foi registrada.") };
   const { error: publishError } = await editor.client
     .from("products")
     .update({ published: true })
     .eq("id", publishedId);
   record(
     "editor_uploads_allowed_image",
-    !uploadError && !imageRecordError && !publishError,
+    !uploadError && !imageRecordError && !variantsError && !publishError,
   );
 
   const anonymous = publicClient();

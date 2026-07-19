@@ -395,5 +395,5 @@ assertUnique(
     ...instagramImages.map((item) => item.src),
     ...brandLogos.map((item) => item.src),
   ],
-  "/instagram",
+  "/bio",
 );

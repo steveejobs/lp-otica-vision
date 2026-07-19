@@ -50,7 +50,7 @@ async function capture({ label, width, height, record = false }) {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto(`${baseUrl}/`, { timeout: 90_000, waitUntil: "domcontentloaded" });
   await page.locator("#hero").waitFor({ state: "visible" });
-  await waitForImage(page.locator("#hero img[class*='photo']").first());
+  await waitForImage(page.locator("#hero [data-vision-media] img").first());
   await page.waitForTimeout(900);
   await page.screenshot({ path: path.join(outputDirectory, `home-${label}-start.png`), fullPage: false });
   const collectionImage = page.locator("#colecao-em-destaque img").first();
@@ -61,10 +61,12 @@ async function capture({ label, width, height, record = false }) {
   const state = await page.evaluate(() => ({
     catalogPreviewVisible: Boolean(document.querySelector("#preview-catalogo")),
     collectionImageSource: document.querySelector("#colecao-em-destaque img")?.getAttribute("src") ?? null,
-    heroImageSource: document.querySelector("#hero img[class*='photo']")?.getAttribute("src") ?? null,
+    heroImageSource: document.querySelector("#hero [data-vision-media] img")?.getAttribute("src") ?? null,
     overflow: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) > window.innerWidth,
   }));
-  if (!state.collectionImageSource?.includes("/api/galerias/imagem/")) failures.push(`${label}: coleção não usa o proxy de galeria.`);
+  if (!state.collectionImageSource?.includes("/api/colecoes/imagem/") && !state.collectionImageSource?.includes("/api/galerias/imagem/")) {
+    failures.push(`${label}: coleção não usa um proxy oficial de mídia.`);
+  }
   if (!state.heroImageSource?.includes("/api/galerias/imagem/")) failures.push(`${label}: hero não usa o proxy de galeria.`);
   if (state.catalogPreviewVisible) failures.push(`${label}: catálogo vazio não foi ocultado.`);
   if (state.overflow) failures.push(`${label}: overflow horizontal detectado.`);
@@ -95,7 +97,7 @@ if (!requestedViewport) {
   const instagram = await instagramContext.newPage();
   instagram.on("console", (message) => { if (message.type() === "error") instagramErrors.push(message.text()); });
   instagram.on("pageerror", (error) => instagramErrors.push(error.message));
-  await instagram.goto(`${baseUrl}/instagram`, { timeout: 90_000, waitUntil: "domcontentloaded" });
+  await instagram.goto(`${baseUrl}/bio`, { timeout: 90_000, waitUntil: "domcontentloaded" });
   const instagramImage = instagram.locator("#selecao-editorial img").first();
   await instagramImage.scrollIntoViewIfNeeded();
   await waitForImage(instagramImage);
