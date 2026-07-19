@@ -89,14 +89,16 @@ async function setPublished(page, role, published) {
 
 async function publish(page) {
   const section = page.getByRole("heading", { name: "Publicação segura" }).locator("xpath=ancestor::section[1]");
-  await waitNavigation(page, () => section.getByRole("button", { name: "Publicar hero" }).click());
+  await waitNavigation(page, () => section.getByRole("button", { name: "Publicar revisão" }).click());
   if (new URL(page.url()).searchParams.get("status") !== "published") throw new Error("Publicacao da hero falhou.");
 }
 
 async function waitHero(page) {
-  await page.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
-  const image = page.locator("#hero img").first();
-  await image.waitFor();
+  await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+  const field = page.locator("[data-vision-media-field]");
+  await field.waitFor({ state: "visible", timeout: 90_000 });
+  const image = field.locator("img").first();
+  await image.waitFor({ state: "attached", timeout: 90_000 });
   await image.evaluate(async (element) => { if (!element.complete) await new Promise((resolve) => element.addEventListener("load", resolve, { once: true })); await element.decode?.(); });
 }
 

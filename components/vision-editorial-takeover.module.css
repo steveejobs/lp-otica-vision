@@ -1,43 +1,63 @@
 .stage {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100svh - 72px - env(safe-area-inset-top, 0px));
-  overflow: clip;
   background: var(--vision-paper);
   color: var(--vision-ink);
 }
 
 .copyField {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   align-content: start;
-  padding: clamp(1.65rem, 5vw, 3.8rem) 4vw 1.4rem;
+  padding: clamp(1.65rem, 5vw, 3.8rem) 4vw 1.45rem;
 }
 
 .copy {
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   align-content: start;
   gap: 1rem;
   max-width: 31rem;
 }
 
+.copy > * {
+  min-width: 0;
+}
+
 .copy h1 {
+  max-width: 100%;
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.45rem, 10.8vw, 4.05rem);
   font-weight: 500;
   line-height: 0.92;
   text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .copy p {
+  width: 100%;
+  max-width: 100%;
   max-width: 28rem;
   margin: 0;
   color: var(--vision-muted);
   font-size: 0.92rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .actions {
   display: flex;
+  width: 100%;
+  max-width: 100%;
   flex-wrap: wrap;
   gap: 0.55rem;
   margin-top: 0.2rem;
@@ -45,77 +65,141 @@
 
 .actions a {
   min-height: 44px;
+  max-width: 100%;
   padding: 0.7rem 0.9rem;
 }
 
-.wall {
+.visual {
+  --line-x: 14%;
   position: relative;
-  min-height: min(56svh, 38rem);
-  overflow: hidden;
-  background: #766f6d;
+  min-width: 0;
+  min-height: min(52svh, 31rem);
   touch-action: pan-y;
 }
 
-.wall figure,
-.wall img {
+.visual[data-layout="narrow"] {
+  --line-x: 25%;
+}
+
+.visual[data-layout="open"] {
+  --line-x: 7%;
+}
+
+.visual[data-state="transitioning"][data-next-layout="offset"] {
+  --line-x: 14%;
+}
+
+.visual[data-state="transitioning"][data-next-layout="narrow"] {
+  --line-x: 25%;
+}
+
+.visual[data-state="transitioning"][data-next-layout="open"] {
+  --line-x: 7%;
+}
+
+.mediaField {
   position: absolute;
   inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 6px;
+  contain: layout paint style;
+}
+
+.mediaField figure,
+.mediaField picture,
+.mediaField img {
+  position: absolute;
   display: block;
   width: 100%;
   height: 100%;
   margin: 0;
 }
 
-.wall figure {
-  overflow: hidden;
+.mediaField img {
+  object-fit: cover;
+  object-position: var(--desktop-object-position, 50% 50%);
+  transform: scale(var(--desktop-media-scale, 1));
+  transform-origin: var(--desktop-object-position, 50% 50%);
 }
 
-.wall img {
-  object-fit: cover;
+@media (max-width: 720px) {
+  .mediaField img {
+    object-position: var(--mobile-object-position, 50% 50%);
+    transform: scale(var(--mobile-media-scale, 1));
+    transform-origin: var(--mobile-object-position, 50% 50%);
+  }
+}
+
+.active,
+.incoming {
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.active,
+.incoming {
+  --desktop-object-position: 50% 50%;
+  --desktop-media-scale: 1;
+  --mobile-object-position: 50% 50%;
+  --mobile-media-scale: 1;
 }
 
 .active {
-  z-index: 1;
-}
-
-.blade {
   z-index: 2;
-  pointer-events: none;
-  filter: saturate(0.94);
-}
-
-.previousBlade {
-  clip-path: inset(0 87% 0 0);
-}
-
-.nextBlade {
-  clip-path: inset(0 0 0 87%);
+  inset: 0;
+  transition: top 860ms cubic-bezier(0.62, 0, 0.2, 1), right 860ms cubic-bezier(0.62, 0, 0.2, 1), bottom 860ms cubic-bezier(0.62, 0, 0.2, 1), left 860ms cubic-bezier(0.62, 0, 0.2, 1);
 }
 
 .incoming {
+  z-index: 1;
+  inset: -2px;
+}
+
+.visual[data-state="transitioning"] .active {
+  top: 6%;
+  right: 8%;
+  bottom: 6%;
+  left: calc(var(--line-x) + 5%);
+}
+
+.paperPlane {
+  position: absolute;
   z-index: 3;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--line-x);
+  background: var(--vision-paper);
   pointer-events: none;
-  clip-path: inset(0 0 0 100%);
+  transition: width 860ms cubic-bezier(0.62, 0, 0.2, 1);
 }
 
-.wall[data-transitioning] .incoming {
-  animation: blade-open 1080ms cubic-bezier(0.78, 0, 0.22, 1) both;
+.line {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 1px;
+  background: var(--vision-steel-dark);
 }
 
-@keyframes blade-open {
-  from {
-    clip-path: inset(0 0 0 100%);
-  }
-
-  to {
-    clip-path: inset(0);
-  }
+.continuation {
+  position: absolute;
+  z-index: 4;
+  bottom: -15px;
+  left: var(--line-x);
+  width: 1px;
+  height: 30px;
+  background: var(--vision-steel-dark);
+  pointer-events: none;
+  transition: left 860ms cubic-bezier(0.62, 0, 0.2, 1);
 }
 
 @media (min-width: 721px) {
   .stage {
-    grid-template-columns: minmax(19rem, 0.3fr) minmax(0, 0.7fr);
-    min-height: clamp(42rem, calc(100svh - 88px), 58rem);
+    grid-template-columns: minmax(19rem, 0.31fr) minmax(0, 0.69fr);
+    min-height: clamp(44rem, calc(100svh - 88px), 60rem);
   }
 
   .copyField {
@@ -132,22 +216,43 @@
     font-size: 0.97rem;
   }
 
-  .wall {
+  .visual {
     min-height: 100%;
   }
 
-  .previousBlade {
-    clip-path: inset(0 88% 0 0);
+  .visual {
+    --line-x: 12%;
   }
 
-  .nextBlade {
-    clip-path: inset(0 0 0 88%);
+  .visual[data-layout="narrow"] {
+    --line-x: 23%;
+  }
+
+  .visual[data-layout="open"] {
+    --line-x: 5%;
+  }
+
+  .visual[data-state="transitioning"][data-next-layout="offset"] {
+    --line-x: 12%;
+  }
+
+  .visual[data-state="transitioning"][data-next-layout="narrow"] {
+    --line-x: 23%;
+  }
+
+  .visual[data-state="transitioning"][data-next-layout="open"] {
+    --line-x: 5%;
+  }
+
+  .mediaField {
+    border-radius: 8px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .incoming,
-  .wall[data-transitioning] .incoming {
-    animation: none;
+  .active,
+  .paperPlane,
+  .continuation {
+    transition: none;
   }
 }
