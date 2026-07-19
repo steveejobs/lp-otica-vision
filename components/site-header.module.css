@@ -70,7 +70,7 @@
   bottom: 0.52rem;
   left: 0.35rem;
   height: 1px;
-  background: var(--vision-bronze);
+  background: var(--vision-champagne);
   transform: scaleX(0.24);
   transform-origin: left;
   transition: transform 180ms var(--ease-vision);
@@ -81,7 +81,7 @@
 }
 
 .instagram:hover {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
 }
 
 @media (max-width: 370px) {

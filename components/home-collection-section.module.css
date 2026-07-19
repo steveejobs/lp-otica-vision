@@ -41,7 +41,7 @@
   position: relative;
   overflow: hidden;
   margin: 0;
-  border: 1px solid rgba(143, 150, 157, 0.5);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.5);
   border-radius: 3px;
   background: var(--vision-steel);
 }

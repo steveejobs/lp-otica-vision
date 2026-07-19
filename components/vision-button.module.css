@@ -7,12 +7,11 @@
   justify-content: center;
   gap: 0.6rem;
   padding: 0.72rem 1.05rem;
-  border: 1px solid rgba(143, 150, 157, 0.68);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.7);
   border-radius: var(--radius-sm);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    inset 0 -1px 0 rgba(122, 96, 73, 0.08),
-    0 8px 20px rgba(25, 22, 20, 0.07);
+    inset 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.42),
+    0 1px 0 rgb(var(--vision-graphite-rgb) / 0.06);
   font-size: 0.86rem;
   font-weight: 600;
   line-height: 1;
@@ -21,7 +20,6 @@
   transition:
     background-color 180ms var(--ease-vision),
     border-color 180ms var(--ease-vision),
-    box-shadow 180ms var(--ease-vision),
     color 180ms var(--ease-vision);
 }
 
@@ -33,44 +31,49 @@
   right: 4px;
   left: 4px;
   height: 1px;
-  background: rgba(255, 255, 255, 0.58);
+  background: var(--vision-metal-gradient);
+  opacity: 0.34;
   pointer-events: none;
 }
 
 .button:hover {
   border-color: var(--vision-steel-dark);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1px 0 rgba(122, 96, 73, 0.1),
-    0 10px 24px rgba(25, 22, 20, 0.1);
+  box-shadow: inset 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.5);
+}
+
+.button:active {
+  border-color: rgb(var(--vision-steel-rgb) / 0.86);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.58;
 }
 
 .primary {
-  background-color: rgba(199, 173, 142, 0.36);
+  background-color: var(--vision-champagne);
   color: var(--vision-ink);
-  backdrop-filter: blur(14px);
 }
 
 .primary:hover {
-  background-color: rgba(199, 173, 142, 0.5);
+  background-color: color-mix(in srgb, var(--vision-champagne) 88%, var(--vision-graphite));
 }
 
 .secondary {
-  background-color: rgba(251, 248, 243, 0.58);
+  background-color: rgb(var(--vision-warm-white-rgb) / 0.76);
   color: var(--vision-ink);
-  backdrop-filter: blur(10px);
 }
 
 .secondary:hover {
-  background-color: rgba(217, 221, 225, 0.34);
+  background-color: rgb(var(--vision-ivory-rgb) / 0.96);
 }
 
 .compact {
   min-height: 44px;
   padding: 0.66rem 0.88rem;
-  background-color: rgba(199, 173, 142, 0.3);
+  background-color: rgb(var(--vision-champagne-rgb) / 0.78);
   font-size: 0.82rem;
-  backdrop-filter: blur(10px);
 }
 
 @media (prefers-reduced-motion: reduce) {

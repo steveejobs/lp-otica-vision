@@ -48,12 +48,12 @@
   color: var(--vision-ink);
   font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: rgba(122, 96, 73, 0.38);
+  text-decoration-color: rgb(var(--vision-muted-text-rgb) / 0.38);
   text-underline-offset: 0.3rem;
 }
 
 .links a:hover {
-  text-decoration-color: var(--vision-bronze);
+  text-decoration-color: var(--vision-champagne);
 }
 
 @media (min-width: 721px) {

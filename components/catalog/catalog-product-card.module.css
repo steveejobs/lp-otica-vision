@@ -12,10 +12,10 @@
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border: 1px solid rgba(25, 22, 20, 0.1);
+  border: 1px solid rgb(var(--vision-graphite-rgb) / 0.1);
   border-radius: var(--radius-md);
   background: var(--vision-bg-soft);
-  box-shadow: 0 14px 32px rgba(25, 22, 20, 0.08);
+  box-shadow: 0 14px 32px rgb(var(--vision-graphite-rgb) / 0.08);
   transform: translateY(0);
   transition:
     border-color var(--duration-fast) var(--ease-vision),
@@ -33,10 +33,10 @@
   width: 30%;
   background: linear-gradient(
     90deg,
-    rgba(251, 248, 243, 0),
-    rgba(251, 248, 243, 0.3),
-    rgba(217, 221, 225, 0.14),
-    rgba(251, 248, 243, 0)
+    rgb(var(--vision-warm-white-rgb) / 0),
+    rgb(var(--vision-warm-white-rgb) / 0.3),
+    rgb(var(--vision-silver-light-rgb) / 0.14),
+    rgb(var(--vision-warm-white-rgb) / 0)
   );
   opacity: 0;
   pointer-events: none;
@@ -51,7 +51,7 @@
   position: absolute;
   z-index: 2;
   inset: 0;
-  border: 1px solid rgba(255, 255, 255, 0.38);
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / 0.38);
   border-radius: inherit;
   pointer-events: none;
 }
@@ -70,7 +70,7 @@
 }
 
 .brand {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
   font-size: 0.69rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -125,7 +125,7 @@
 }
 
 .card[data-availability="last_unit"] .availability {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
 }
 
 .card[data-availability="unavailable"] .availability {
@@ -152,7 +152,7 @@
 
 .card[data-presentation="preview"] .media {
   aspect-ratio: 3 / 4;
-  border-color: rgba(143, 150, 157, 0.36);
+  border-color: rgb(var(--vision-steel-rgb) / 0.36);
   box-shadow: none;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .card[data-presentation="preview"] .brand {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
   font-size: 0.65rem;
 }
 
@@ -182,8 +182,8 @@
 
 @media (hover: hover) and (pointer: fine) {
   .link:hover .media {
-    border-color: rgba(143, 150, 157, 0.56);
-    box-shadow: 0 20px 42px rgba(25, 22, 20, 0.12);
+    border-color: rgb(var(--vision-steel-rgb) / 0.56);
+    box-shadow: 0 20px 42px rgb(var(--vision-graphite-rgb) / 0.12);
     transform: translateY(-3px);
   }
 

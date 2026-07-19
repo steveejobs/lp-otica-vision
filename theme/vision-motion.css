@@ -194,15 +194,15 @@ body::before {
       90deg,
       var(--vision-paper) 0%,
       var(--vision-paper) 62%,
-      rgba(244, 238, 230, 0.92) 76%,
-      rgba(251, 248, 243, 0) 100%
+      rgb(var(--vision-ivory-rgb) / 0.92) 76%,
+      rgb(var(--vision-warm-white-rgb) / 0) 100%
     ),
     linear-gradient(
       90deg,
-      rgba(199, 173, 142, 0.2),
-      rgba(199, 173, 142, 0)
+      rgb(var(--vision-champagne-rgb) / 0.2),
+      rgb(var(--vision-champagne-rgb) / 0)
     );
-  box-shadow: -20px 0 54px rgba(25, 22, 20, 0.11);
+  box-shadow: -20px 0 54px rgb(var(--vision-graphite-rgb) / 0.11);
   opacity: 0;
   pointer-events: none;
   transform: translateX(-108%) skewX(-2deg);
@@ -221,14 +221,14 @@ body::after {
   background:
     linear-gradient(
       180deg,
-      rgba(217, 221, 225, 0),
-      rgba(143, 150, 157, 0.75) 18%,
-      rgba(122, 96, 73, 0.55) 52%,
-      rgba(217, 221, 225, 0)
+      rgb(var(--vision-silver-light-rgb) / 0),
+      rgb(var(--vision-steel-rgb) / 0.75) 18%,
+      rgb(var(--vision-muted-text-rgb) / 0.55) 52%,
+      rgb(var(--vision-silver-light-rgb) / 0)
     );
   box-shadow:
-    0 0 22px rgba(217, 221, 225, 0.42),
-    22px 0 72px rgba(199, 173, 142, 0.24);
+    0 0 22px rgb(var(--vision-silver-light-rgb) / 0.42),
+    22px 0 72px rgb(var(--vision-champagne-rgb) / 0.24);
   opacity: 0;
   pointer-events: none;
   transform: translateX(-12vw);

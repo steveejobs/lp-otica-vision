@@ -10,7 +10,7 @@
   right: 0;
   bottom: 12%;
   width: clamp(150px, 25vw, 380px);
-  background: rgba(199, 173, 142, 0.18);
+  background: rgb(var(--vision-sand-rgb) / 0.52);
   pointer-events: none;
 }
 
@@ -34,7 +34,7 @@
   left: 8.2rem;
   width: min(28vw, 190px);
   height: 1px;
-  background: rgba(143, 150, 157, 0.48);
+  background: var(--vision-metal-gradient);
 }
 
 .eyebrow {
@@ -74,7 +74,7 @@
   right: 2%;
   width: 86%;
   height: 58%;
-  border: 1px solid rgba(143, 150, 157, 0.34);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.34);
   border-radius: 50%;
   transform: rotate(-8deg);
 }
@@ -84,10 +84,10 @@
   aspect-ratio: 4 / 5;
   overflow: hidden;
   margin: 0;
-  border: 1px solid rgba(143, 150, 157, 0.5);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.5);
   border-radius: 3px;
   background: var(--placeholder-color, var(--vision-steel));
-  box-shadow: 0 18px 36px rgba(25, 22, 20, 0.1);
+  box-shadow: 0 18px 36px rgb(var(--vision-graphite-rgb) / 0.1);
 }
 
 .primaryMedia {
@@ -102,14 +102,14 @@
   right: 0;
   bottom: 0;
   width: min(51%, 230px);
-  box-shadow: 0 20px 42px rgba(25, 22, 20, 0.14);
+  box-shadow: 0 20px 42px rgb(var(--vision-graphite-rgb) / 0.14);
 }
 
 .media::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(251, 248, 243, 0.2);
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / 0.2);
   border-radius: inherit;
   pointer-events: none;
 }

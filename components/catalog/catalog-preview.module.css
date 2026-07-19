@@ -17,7 +17,7 @@
 
 .section::before {
   inset: 1.1rem clamp(1rem, 4vw, 4rem);
-  border: 1px solid rgba(143, 150, 157, 0.14);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.14);
 }
 
 .section::after {
@@ -25,7 +25,7 @@
   bottom: 0;
   left: clamp(8rem, 18vw, 24rem);
   width: 1px;
-  background: rgba(199, 173, 142, 0.28);
+  background: rgb(var(--vision-champagne-rgb) / 0.28);
 }
 
 .inner {
@@ -41,7 +41,7 @@
   align-items: end;
   gap: 2.5rem;
   padding-bottom: 1.75rem;
-  border-bottom: 1px solid rgba(143, 150, 157, 0.3);
+  border-bottom: 1px solid rgb(var(--vision-steel-rgb) / 0.3);
 }
 
 .header > div:first-child {
@@ -82,8 +82,8 @@
   padding: 0.72rem 0.92rem;
   border: 1px solid var(--vision-steel-dark);
   border-radius: var(--radius-sm);
-  background: rgba(199, 173, 142, 0.18);
-  box-shadow: inset 0 1px 0 rgba(251, 248, 243, 0.76);
+  background: rgb(var(--vision-champagne-rgb) / 0.18);
+  box-shadow: inset 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.76);
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -124,17 +124,17 @@
   aspect-ratio: 4 / 5;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid rgba(143, 150, 157, 0.38);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.38);
   border-radius: var(--radius-md);
   background: var(--vision-bg-soft);
-  box-shadow: 0 18px 42px rgba(25, 22, 20, 0.08);
+  box-shadow: 0 18px 42px rgb(var(--vision-graphite-rgb) / 0.08);
 }
 
 .featureMedia::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(251, 248, 243, 0.5);
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / 0.5);
   border-radius: inherit;
   pointer-events: none;
 }
@@ -153,7 +153,7 @@
 .featureMeta,
 .railHeader p,
 .railHeader span {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
   font-size: 0.7rem;
   font-weight: 700;
   line-height: 1.25;
@@ -201,7 +201,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(143, 150, 157, 0.28);
+  border-bottom: 1px solid rgb(var(--vision-steel-rgb) / 0.28);
 }
 
 .railHeader span {
@@ -258,7 +258,7 @@
   place-items: center;
   border: 1px solid var(--vision-line);
   border-radius: var(--radius-sm);
-  background: rgba(251, 248, 243, 0.62);
+  background: rgb(var(--vision-warm-white-rgb) / 0.62);
   color: var(--vision-muted);
   cursor: pointer;
 }

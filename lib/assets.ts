@@ -63,7 +63,7 @@ const image = (
     alt,
     objectPosition,
     blurDataURL: placeholder?.blurDataURL ?? "",
-    placeholderColor: placeholder?.color ?? "#d9dde1",
+    placeholderColor: placeholder?.color ?? "var(--vision-silver-light)",
     seriesId,
   };
 };

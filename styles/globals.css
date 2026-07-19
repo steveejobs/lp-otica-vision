@@ -62,8 +62,9 @@ figure {
 }
 
 :focus-visible {
-  outline: 2px solid var(--vision-bronze);
+  outline: 2px solid var(--vision-steel);
   outline-offset: 4px;
+  box-shadow: 0 0 0 3px rgb(var(--vision-champagne-rgb) / 0.32);
 }
 
 .skip-link {
@@ -74,7 +75,7 @@ figure {
   padding: 0.7rem 0.9rem;
   border: 1px solid var(--vision-steel-dark);
   border-radius: var(--radius-sm);
-  background: var(--vision-paper);
+  background: var(--vision-warm-white);
   color: var(--vision-ink);
   font-size: 0.82rem;
   font-weight: 600;
@@ -89,7 +90,7 @@ figure {
 }
 
 .eyebrow {
-  color: var(--vision-bronze);
+  color: var(--vision-muted);
   font-size: 0.76rem;
   font-weight: 600;
   line-height: 1.35;

@@ -108,6 +108,7 @@
   object-position: var(--mobile-object-position, 50% 50%);
   transform: scale(var(--mobile-media-scale, 1));
   transform-origin: var(--mobile-object-position, 50% 50%);
+  transition: none;
 }
 
 .active,
@@ -126,6 +127,7 @@
   z-index: 1;
 }
 
+.active picture,
 .incoming picture {
   inset: -2px;
   width: auto;
@@ -147,7 +149,7 @@
   right: 0;
   left: 0;
   height: 1px;
-  background: var(--vision-steel-dark);
+  background: var(--vision-metal-gradient);
   opacity: 0.82;
   transition: opacity 100ms linear;
 }
@@ -161,37 +163,16 @@
   visibility: hidden;
 }
 
-.cutUpper,
-.cutLower,
-.cutStep {
+.cutLine {
   position: absolute;
   display: block;
-  background: var(--vision-steel-dark);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-.cutUpper {
-  top: var(--line-y);
-  right: 42%;
-  left: 0;
-  height: 1px;
-}
-
-.cutLower {
   top: var(--line-y);
   right: 0;
-  left: 58%;
+  left: 0;
   height: 1px;
-}
-
-.cutStep {
-  top: var(--line-y);
-  left: calc(58% - 1px);
-  width: 1px;
-  height: 9%;
-  transform: scaleY(0);
-  transform-origin: center top;
+  background: var(--vision-metal-gradient);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .visual[data-state="preparing"] .cutGuide,
@@ -206,23 +187,23 @@
 
 @media (min-width: 721px) {
   .stage {
-    grid-template-columns: minmax(0, 0.38fr) minmax(0, 0.62fr);
+    grid-template-columns: minmax(0, 0.3fr) minmax(0, 0.7fr);
     grid-template-rows: minmax(0, 1fr);
     min-height: max(42rem, calc(100svh - 88px - env(safe-area-inset-top, 0px)));
   }
 
   .copyField {
     align-content: center;
-    padding: clamp(3.5rem, 6.8vh, 5rem) clamp(3.5rem, 4.2vw, 5rem);
+    padding: clamp(3.5rem, 6.8vh, 5rem) clamp(2.75rem, 3.2vw, 4rem);
   }
 
   .copy {
-    max-width: 34rem;
+    max-width: 31rem;
   }
 
   .copy h1 {
-    font-size: clamp(3.625rem, 4.35vw, 5.15rem);
-    line-height: 0.97;
+    font-size: clamp(3.25rem, 3.7vw, 4.5rem);
+    line-height: 0.99;
   }
 
   .copy p {
@@ -267,31 +248,13 @@
     height: auto;
   }
 
-  .cutUpper {
+  .cutLine {
     top: 0;
-    right: auto;
-    bottom: 46%;
-    left: var(--line-x);
-    width: 1px;
-    height: auto;
-  }
-
-  .cutLower {
-    top: 54%;
     right: auto;
     bottom: 0;
     left: var(--line-x);
     width: 1px;
     height: auto;
-  }
-
-  .cutStep {
-    top: calc(54% - 1px);
-    left: var(--line-x);
-    width: 9%;
-    height: 1px;
-    transform: scaleX(0);
-    transform-origin: left center;
   }
 }
 

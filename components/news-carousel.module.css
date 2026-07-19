@@ -22,7 +22,7 @@
   right: -5%;
   width: 70%;
   height: 78%;
-  background: rgba(199, 173, 142, 0.13);
+  background: rgb(var(--vision-sand-rgb) / 0.38);
   pointer-events: none;
 }
 
@@ -38,10 +38,10 @@
   width: min(82vw, 305px);
   height: 356px;
   overflow: hidden;
-  border: 1px solid rgba(143, 150, 157, 0.44);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.44);
   border-radius: var(--radius-md);
-  background: rgba(244, 238, 230, 0.96);
-  box-shadow: 0 15px 31px rgba(25, 22, 20, 0.085);
+  background: rgb(var(--vision-ivory-rgb) / 0.96);
+  box-shadow: 0 15px 31px rgb(var(--vision-graphite-rgb) / 0.085);
   opacity: 0;
   filter: saturate(0.78) contrast(0.97);
   transform: translate3d(var(--drag-offset), 0.8rem, 0) scale(0.9);
@@ -67,7 +67,7 @@
   z-index: 4;
   opacity: 1;
   filter: saturate(1) contrast(1);
-  box-shadow: 0 20px 40px rgba(25, 22, 20, 0.13);
+  box-shadow: 0 20px 40px rgb(var(--vision-graphite-rgb) / 0.13);
   transform: translate3d(var(--drag-offset), 0, 0) scale(1);
   pointer-events: auto;
 }
@@ -111,14 +111,14 @@
   flex: none;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  background: rgba(199, 173, 142, 0.3);
+  background: rgb(var(--vision-sand-rgb) / 0.62);
 }
 
 .media::before {
   content: "";
   position: absolute;
   inset: 12% 10%;
-  border: 1px solid rgba(143, 150, 157, 0.26);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.26);
   border-radius: var(--radius-sm);
 }
 
@@ -173,7 +173,7 @@
   gap: 0.35rem;
   margin-top: auto;
   padding-top: 0.72rem;
-  color: var(--vision-bronze);
+  color: var(--vision-ink);
   font-size: 0.74rem;
   font-weight: 600;
 }
@@ -208,8 +208,8 @@
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 0.65rem;
-  border-top: 1px solid rgba(143, 150, 157, 0.36);
-  border-bottom: 1px solid rgba(143, 150, 157, 0.3);
+  border-top: 1px solid rgb(var(--vision-steel-rgb) / 0.36);
+  border-bottom: 1px solid rgb(var(--vision-steel-rgb) / 0.3);
 }
 
 .progress {
@@ -231,11 +231,11 @@
   right: 3px;
   left: 3px;
   height: 1px;
-  background: rgba(143, 150, 157, 0.4);
+  background: rgb(var(--vision-steel-rgb) / 0.4);
 }
 
 .progress .current::before {
-  background: var(--vision-bronze);
+  background: var(--vision-champagne);
   transform: scaleY(2);
 }
 

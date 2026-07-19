@@ -1,17 +1,17 @@
 .frame {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(143, 150, 157, 0.52);
+  border: 1px solid rgb(var(--vision-steel-rgb) / 0.52);
   border-radius: var(--radius-md);
   background: var(--vision-steel);
-  box-shadow: 0 16px 34px rgba(25, 22, 20, 0.1);
+  box-shadow: 0 16px 34px rgb(var(--vision-graphite-rgb) / 0.1);
 }
 
 .frame::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid rgba(251, 248, 243, 0.2);
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / 0.2);
   border-radius: inherit;
   pointer-events: none;
 }

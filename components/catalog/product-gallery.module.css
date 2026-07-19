@@ -6,10 +6,10 @@
   display: flex;
   width: 100%;
   overflow-x: auto;
-  border: 1px solid rgba(25, 22, 20, 0.11);
+  border: 1px solid rgb(var(--vision-graphite-rgb) / 0.11);
   border-radius: var(--radius-md);
   background: var(--vision-bg-soft);
-  box-shadow: 0 22px 50px rgba(25, 22, 20, 0.1);
+  box-shadow: 0 22px 50px rgb(var(--vision-graphite-rgb) / 0.1);
   overscroll-behavior-x: contain;
   scrollbar-width: none;
   scroll-snap-type: x mandatory;
@@ -99,7 +99,7 @@
 }
 
 .indicators button[aria-pressed="true"]::after {
-  background: var(--vision-bronze);
+  background: var(--vision-champagne);
   opacity: 1;
 }
 

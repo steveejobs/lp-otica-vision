@@ -17,8 +17,8 @@
   border-radius: 999px;
   background: radial-gradient(
     ellipse at center,
-    rgba(25, 22, 20, 0.17),
-    rgba(25, 22, 20, 0.055) 48%,
+    rgb(var(--vision-graphite-rgb) / 0.17),
+    rgb(var(--vision-graphite-rgb) / 0.055) 48%,
     transparent 80%
   );
   filter: blur(14px);
@@ -29,7 +29,7 @@
 .image {
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 1px 1.5px rgba(25, 22, 20, 0.09));
+  filter: drop-shadow(0 1px 1.5px rgb(var(--vision-graphite-rgb) / 0.09));
   object-fit: contain;
 }
 
@@ -44,8 +44,8 @@
   height: 32%;
   background: radial-gradient(
     ellipse at center,
-    rgba(25, 22, 20, 0.24),
-    rgba(25, 22, 20, 0.075) 50%,
+    rgb(var(--vision-graphite-rgb) / 0.24),
+    rgb(var(--vision-graphite-rgb) / 0.075) 50%,
     transparent 82%
   );
   filter: blur(12px);

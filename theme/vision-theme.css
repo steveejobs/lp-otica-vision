@@ -1,15 +1,44 @@
 :root {
-  --vision-bg: #b19475;
-  --vision-bg-soft: #f4eee6;
-  --vision-paper: #fbf8f3;
-  --vision-ink: #191614;
-  --vision-muted: #74675d;
-  --vision-steel: #d9dde1;
-  --vision-steel-dark: #8f969d;
-  --vision-champagne: #c7ad8e;
-  --vision-bronze: #7a6049;
-  --vision-line: rgba(25, 22, 20, 0.12);
-  --vision-shadow: rgba(25, 22, 20, 0.14);
+  --vision-ivory: #F4F0E9;
+  --vision-sand: #DDD3C5;
+  --vision-champagne: #C7AD86;
+  --vision-silver-light: #C6C8C7;
+  --vision-steel: #8F9494;
+  --vision-graphite: #1D1D1B;
+  --vision-warm-white: #FAF8F3;
+  --vision-muted-text: #756D63;
+
+  --vision-ivory-rgb: 244 240 233;
+  --vision-sand-rgb: 221 211 197;
+  --vision-champagne-rgb: 199 173 134;
+  --vision-silver-light-rgb: 198 200 199;
+  --vision-steel-rgb: 143 148 148;
+  --vision-graphite-rgb: 29 29 27;
+  --vision-warm-white-rgb: 250 248 243;
+  --vision-muted-text-rgb: 117 109 99;
+
+  --vision-metal-gradient: linear-gradient(
+    115deg,
+    #8F9494 0%,
+    #E5E6E3 32%,
+    #A8ACAB 56%,
+    #F0EFEA 76%,
+    #8F9494 100%
+  );
+
+  --vision-bg: var(--vision-sand);
+  --vision-bg-soft: var(--vision-sand);
+  --vision-paper: var(--vision-ivory);
+  --vision-ink: var(--vision-graphite);
+  --vision-muted: var(--vision-muted-text);
+  --vision-paper-rgb: var(--vision-ivory-rgb);
+  --vision-bg-soft-rgb: var(--vision-sand-rgb);
+  --vision-ink-rgb: var(--vision-graphite-rgb);
+  --vision-muted-rgb: var(--vision-muted-text-rgb);
+  --vision-steel-dark: var(--vision-steel);
+  --vision-steel-dark-rgb: var(--vision-steel-rgb);
+  --vision-line: rgb(var(--vision-graphite-rgb) / 0.12);
+  --vision-shadow: rgb(var(--vision-graphite-rgb) / 0.14);
   --vision-red: #8e1f28;
   --vision-positive: #49624e;
 

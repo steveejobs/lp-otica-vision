@@ -36,9 +36,9 @@
     linear-gradient(
       90deg,
       var(--rail-fade-surface) 0%,
-      rgba(244, 238, 230, 0.96) 34%,
-      rgba(244, 238, 230, 0.52) 68%,
-      rgba(244, 238, 230, 0) 100%
+      rgb(var(--vision-ivory-rgb) / 0.96) 34%,
+      rgb(var(--vision-ivory-rgb) / 0.52) 68%,
+      rgb(var(--vision-ivory-rgb) / 0) 100%
     );
 }
 

@@ -9,6 +9,7 @@
 
 .soft {
   background: var(--vision-bg-soft);
+  --vision-muted: color-mix(in srgb, var(--vision-muted-text) 70%, var(--vision-graphite));
 }
 
 .container {

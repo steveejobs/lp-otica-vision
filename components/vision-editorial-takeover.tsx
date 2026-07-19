@@ -76,12 +76,10 @@ function loadAndDecode(src: string) {
   });
 }
 
-function desktopCutPath(upper: number, lower: number) {
-  return `polygon(${upper}% 0, 100.5% 0, 100.5% 100%, ${lower}% 100%, ${lower}% 54%, ${upper}% 54%)`;
-}
-
-function mobileCutPath(upper: number, lower: number) {
-  return `polygon(0 ${upper}%, 58% ${upper}%, 58% ${lower}%, 100% ${lower}%, 100% 100.5%, 0 100.5%)`;
+function cutPath(position: number, compactViewport: boolean) {
+  return compactViewport
+    ? `inset(${position}% 0 0 0)`
+    : `inset(0 0 0 ${position}%)`;
 }
 
 /** One current medium at rest; one decoded incoming medium joins only for the cut. */
@@ -89,9 +87,7 @@ export function VisionEditorialTakeover({ media }: Props) {
   const rootRef = useRef<HTMLElement>(null);
   const outgoingRef = useRef<HTMLElement>(null);
   const paperPlaneRef = useRef<HTMLSpanElement>(null);
-  const cutUpperRef = useRef<HTMLSpanElement>(null);
-  const cutStepRef = useRef<HTMLSpanElement>(null);
-  const cutLowerRef = useRef<HTMLSpanElement>(null);
+  const cutLineRef = useRef<HTMLSpanElement>(null);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const preparationFrame = useRef<number | null>(null);
   const animationsRef = useRef<Animation[]>([]);
@@ -217,14 +213,9 @@ export function VisionEditorialTakeover({ media }: Props) {
     }
 
     pendingManualAdvanceRef.current = false;
-    if (reducedMotion) {
-      setActiveIndex(nextIndex);
-      return;
-    }
-
     setIncomingIndex(nextIndex);
     setPhase("preparing");
-  }, [next, nextIndex, nextReadySrc, nextSource, phase, reducedMotion]);
+  }, [next, nextIndex, nextReadySrc, nextSource, phase]);
 
   useEffect(() => {
     if (!pendingManualAdvanceRef.current || nextReadySrc !== nextSource || phase !== "idle") return;
@@ -241,12 +232,17 @@ export function VisionEditorialTakeover({ media }: Props) {
     if (phase !== "preparing" || incomingIndex === null) return;
 
     preparationFrame.current = window.requestAnimationFrame(() => {
+      if (reducedMotion) {
+        setPhase("committing");
+        setActiveIndex(incomingIndex);
+        setIncomingIndex(null);
+        return;
+      }
+
       const outgoing = outgoingRef.current;
       const paperPlane = paperPlaneRef.current;
-      const upper = cutUpperRef.current;
-      const step = cutStepRef.current;
-      const lower = cutLowerRef.current;
-      if (!outgoing || !paperPlane || !upper || !step || !lower || !outgoing.animate) {
+      const cutLine = cutLineRef.current;
+      if (!outgoing || !paperPlane || !cutLine || !outgoing.animate) {
         setPhase("committing");
         setActiveIndex(incomingIndex);
         setIncomingIndex(null);
@@ -260,44 +256,29 @@ export function VisionEditorialTakeover({ media }: Props) {
       const fieldRect = outgoing.getBoundingClientRect();
       const easing = "cubic-bezier(0.72, 0, 0.18, 1)";
       const timing: KeyframeAnimationOptions = { duration: CUT_DURATION_MS, easing, fill: "forwards" };
-      const activeKeyframes: Keyframe[] = compactViewport
-        ? [
-          { clipPath: mobileCutPath(start, start), offset: 0 },
-          { clipPath: mobileCutPath(start + 3, start), offset: 0.14 },
-          { clipPath: mobileCutPath(56, 47), offset: 0.56 },
-          { clipPath: mobileCutPath(96, 90), offset: 0.9 },
-          { clipPath: mobileCutPath(100.5, 100.5), offset: 1 },
-        ]
-        : [
-          { clipPath: desktopCutPath(start, start), offset: 0 },
-          { clipPath: desktopCutPath(start + 3, start), offset: 0.14 },
-          { clipPath: desktopCutPath(57, 48), offset: 0.56 },
-          { clipPath: desktopCutPath(96, 90), offset: 0.9 },
-          { clipPath: desktopCutPath(100.5, 100.5), offset: 1 },
-        ];
-      const upperPercentages = compactViewport
-        ? [start, start + 3, 56, 96, 100.5]
-        : [start, start + 3, 57, 96, 100.5];
-      const lowerPercentages = compactViewport
-        ? [start, start, 47, 90, 100.5]
-        : [start, start, 48, 90, 100.5];
-      const stepSizes = [0, 3, 9, 6, 0];
-      const offsets = [0, 0.14, 0.56, 0.9, 1];
-      const lineOpacity = [1, 1, 1, 1, 0];
-      const positionFrames = (percentages: number[]) => percentages.map((percentage, index) => ({
-        offset: offsets[index],
-        opacity: lineOpacity[index],
-        transform: compactViewport
-          ? `translate3d(0, ${((percentage - start) / 100) * fieldRect.height}px, 0)`
-          : `translate3d(${((percentage - start) / 100) * fieldRect.width}px, 0, 0)`,
-      }));
-      const stepFrames = lowerPercentages.map((percentage, index) => ({
-        offset: offsets[index],
-        opacity: lineOpacity[index],
-        transform: compactViewport
-          ? `translate3d(0, ${((percentage - start) / 100) * fieldRect.height}px, 0) scaleY(${stepSizes[index] / 9})`
-          : `translate3d(${((percentage - start) / 100) * fieldRect.width}px, 0, 0) scaleX(${stepSizes[index] / 9})`,
-      }));
+      const activeKeyframes: Keyframe[] = [
+        { clipPath: cutPath(start, compactViewport) },
+        { clipPath: cutPath(100.5, compactViewport) },
+      ];
+      const lineDistance = compactViewport
+        ? ((100.5 - start) / 100) * fieldRect.height
+        : ((100.5 - start) / 100) * fieldRect.width;
+      const lineFrames: Keyframe[] = [
+        { opacity: 1, transform: "translate3d(0, 0, 0)" },
+        {
+          offset: 0.94,
+          opacity: 1,
+          transform: compactViewport
+            ? `translate3d(0, ${lineDistance * 0.94}px, 0)`
+            : `translate3d(${lineDistance * 0.94}px, 0, 0)`,
+        },
+        {
+          opacity: 0,
+          transform: compactViewport
+            ? `translate3d(0, ${lineDistance}px, 0)`
+            : `translate3d(${lineDistance}px, 0, 0)`,
+        },
+      ];
       const planeFrames = compactViewport
         ? [
           { clipPath: `inset(0 0 ${100 - start}% 0)` },
@@ -312,17 +293,13 @@ export function VisionEditorialTakeover({ media }: Props) {
       const animations = [
         outgoing.animate(activeKeyframes, timing),
         paperPlane.animate(planeFrames, { duration: 430, easing: "cubic-bezier(0.45, 0, 0.2, 1)", fill: "forwards" }),
-        upper.animate(positionFrames(upperPercentages), timing),
-        lower.animate(positionFrames(lowerPercentages), timing),
-        step.animate(stepFrames, timing),
+        cutLine.animate(lineFrames, timing),
       ];
       animationsRef.current = animations;
 
       void Promise.all(animations.map((animation) => animation.finished))
         .then(() => {
           if (transitionRunRef.current !== runId) return;
-          animationsRef.current = [];
-          animations.forEach((animation) => animation.cancel());
           setPhase("committing");
           setActiveIndex(incomingIndex);
           setIncomingIndex(null);
@@ -336,11 +313,15 @@ export function VisionEditorialTakeover({ media }: Props) {
       if (preparationFrame.current !== null) window.cancelAnimationFrame(preparationFrame.current);
       preparationFrame.current = null;
     };
-  }, [compactViewport, incomingIndex, layout, nextLayout, phase]);
+  }, [compactViewport, incomingIndex, layout, nextLayout, phase, reducedMotion]);
 
   useEffect(() => {
     if (phase !== "committing") return;
-    preparationFrame.current = window.requestAnimationFrame(() => setPhase("idle"));
+    preparationFrame.current = window.requestAnimationFrame(() => {
+      animationsRef.current.forEach((animation) => animation.cancel());
+      animationsRef.current = [];
+      setPhase("idle");
+    });
     return () => {
       if (preparationFrame.current !== null) window.cancelAnimationFrame(preparationFrame.current);
       preparationFrame.current = null;
@@ -388,21 +369,26 @@ export function VisionEditorialTakeover({ media }: Props) {
         role="group"
       >
         <div className={styles.mediaField} data-vision-media-field>
-          {incoming ? <HeroMedia ariaHidden className={styles.incoming} item={incoming} /> : null}
+          {incoming ? (
+            <HeroMedia
+              ariaHidden
+              className={styles.incoming}
+              item={incoming}
+              key={`media-${incoming.id}`}
+            />
+          ) : null}
           <HeroMedia
             className={styles.active}
             elementRef={outgoingRef}
             item={active}
-            key={`active-${active.id}`}
+            key={`media-${active.id}`}
             priority={activeIndex === 0}
           />
           <span className={styles.paperPlane} ref={paperPlaneRef} aria-hidden="true">
             <span className={styles.restLine} />
           </span>
           <span className={styles.cutGuide} aria-hidden="true">
-            <span className={styles.cutUpper} ref={cutUpperRef} />
-            <span className={styles.cutStep} ref={cutStepRef} />
-            <span className={styles.cutLower} ref={cutLowerRef} />
+            <span className={styles.cutLine} ref={cutLineRef} />
           </span>
         </div>
       </div>

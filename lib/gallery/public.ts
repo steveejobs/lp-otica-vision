@@ -81,7 +81,7 @@ function createCachedPublishedGallery(routeKey: string, placementKey: string) {
       return data.map((item) => ({
         altText: item.alt_text,
         assetVersion: item.asset_version,
-        backgroundColor: item.background_color ?? "#d7c3ad",
+        backgroundColor: item.background_color ?? "var(--vision-sand)",
         blurDataUrl: item.blur_data_url,
         desktopObjectPosition: item.desktop_object_position,
         desktopScale: Number(item.desktop_scale),

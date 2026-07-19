@@ -1,5 +1,5 @@
 .section {
-  border-bottom: 1px solid rgba(25, 22, 20, 0.16);
+  border-bottom: 1px solid rgb(var(--vision-graphite-rgb) / 0.16);
   background: var(--vision-bg);
 }
 
@@ -10,7 +10,7 @@
   bottom: 0;
   left: clamp(1rem, 7vw, 7rem);
   width: 1px;
-  background: rgba(251, 248, 243, 0.38);
+  background: rgb(var(--vision-warm-white-rgb) / 0.38);
   pointer-events: none;
 }
 
@@ -49,8 +49,6 @@
 
 .actions a {
   width: 100%;
-  border-color: rgba(25, 22, 20, 0.26);
-  background: rgba(251, 248, 243, 0.68);
 }
 
 @media (min-width: 390px) {

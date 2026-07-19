@@ -24,7 +24,7 @@
   content: "";
   width: min(8vw, 88px);
   height: 1px;
-  background: rgba(143, 150, 157, 0.58);
+  background: rgb(var(--vision-steel-rgb) / 0.58);
 }
 
 .intro h2 {

@@ -15,7 +15,7 @@
   position: absolute;
   inset: 0 0 0 auto;
   width: min(36vw, 420px);
-  background: rgba(177, 148, 117, 0.11);
+  background: rgb(var(--vision-sand-rgb) / 0.11);
   pointer-events: none;
 }
 
@@ -26,7 +26,7 @@
   right: min(14vw, 180px);
   bottom: 18%;
   width: 1px;
-  background: rgba(143, 150, 157, 0.22);
+  background: rgb(var(--vision-steel-rgb) / 0.22);
   pointer-events: none;
 }
 
@@ -126,14 +126,14 @@
 }
 
 .brandRail a[aria-current="page"] {
-  border-color: rgba(122, 96, 73, 0.72);
-  background: rgba(199, 173, 142, 0.28);
+  border-color: rgb(var(--vision-muted-text-rgb) / 0.72);
+  background: rgb(var(--vision-champagne-rgb) / 0.28);
 }
 
 .brandRail a:hover {
-  border-color: rgba(143, 150, 157, 0.72);
-  background: rgba(217, 221, 225, 0.22);
-  box-shadow: 0 8px 18px rgba(25, 22, 20, 0.06);
+  border-color: rgb(var(--vision-steel-rgb) / 0.72);
+  background: rgb(var(--vision-silver-light-rgb) / 0.22);
+  box-shadow: 0 8px 18px rgb(var(--vision-graphite-rgb) / 0.06);
   transform: translateY(-1px);
 }
 
@@ -161,9 +161,9 @@
   width: 100%;
   min-height: 46px;
   padding: 0.68rem 0.78rem;
-  border: 1px solid rgba(25, 22, 20, 0.18);
+  border: 1px solid rgb(var(--vision-graphite-rgb) / 0.18);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.44);
+  background: rgb(var(--vision-warm-white-rgb) / 0.44);
   color: var(--vision-ink);
   font: inherit;
   font-size: 0.84rem;
@@ -177,9 +177,9 @@
 .field select:hover,
 .field input:focus,
 .field select:focus {
-  border-color: rgba(143, 150, 157, 0.72);
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: 0 8px 20px rgba(25, 22, 20, 0.05);
+  border-color: rgb(var(--vision-steel-rgb) / 0.72);
+  background: rgb(var(--vision-warm-white-rgb) / 0.62);
+  box-shadow: 0 8px 20px rgb(var(--vision-graphite-rgb) / 0.05);
 }
 
 .formActions {
@@ -208,13 +208,14 @@
 .submit {
   padding: 0.7rem 1rem;
   border: 1px solid var(--vision-steel-dark);
-  background: rgba(199, 173, 142, 0.34);
+  background: var(--vision-champagne);
+  color: var(--vision-ink);
   cursor: pointer;
 }
 
 .submit:hover {
-  border-color: var(--vision-bronze);
-  background: rgba(199, 173, 142, 0.48);
+  border-color: var(--vision-steel);
+  background: color-mix(in srgb, var(--vision-champagne) 88%, var(--vision-graphite));
   transform: translateY(-1px);
 }
 

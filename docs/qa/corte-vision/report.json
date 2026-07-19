@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://127.0.0.1:5183",
+  "baseUrl": "http://127.0.0.1:5184",
   "checks": {
     "contrastUsesAtMostTwoMedia": true,
     "desktopCycleReturnsWithoutEarlyRepeat": true,
@@ -52,7 +52,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -127,7 +127,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -140,7 +140,7 @@
           }
         },
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -190,24 +190,24 @@
     },
     "final": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -222,38 +222,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -265,24 +265,24 @@
     },
     "initial": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -297,38 +297,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -340,24 +340,24 @@
     },
     "middle": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -372,51 +372,51 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         },
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "transitioning",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -427,19 +427,19 @@
       "visibleMedia": 2
     },
     "requests": {
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/7e88f48f-c2ea-47d5-b165-fd5be0ae7617?variant=desktop&v=6f2e4c52-69d1-46c9-863a-524d11e44945": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/7cfe3689-c19d-4b19-9add-36d8dda86ff6?variant=desktop&v=032a173f-f9a8-4ff2-8f4c-b0c1ef55d6ea": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/7c4977ab-1432-4180-9e06-fd04c15f1f81?variant=desktop&v=16f2d691-89a0-418d-a2ab-d330a1ada61f": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb": 1
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/7e88f48f-c2ea-47d5-b165-fd5be0ae7617?variant=desktop&v=6f2e4c52-69d1-46c9-863a-524d11e44945": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/7cfe3689-c19d-4b19-9add-36d8dda86ff6?variant=desktop&v=032a173f-f9a8-4ff2-8f4c-b0c1ef55d6ea": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/7c4977ab-1432-4180-9e06-fd04c15f1f81?variant=desktop&v=16f2d691-89a0-418d-a2ab-d330a1ada61f": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb": 1
     },
     "sequence": [
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
-      "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
-      "http://127.0.0.1:5183/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+      "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+      "http://127.0.0.1:5184/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=desktop&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
     ]
   },
   "mobile": {
@@ -482,7 +482,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -557,7 +557,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -632,7 +632,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -645,7 +645,7 @@
           }
         },
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -687,18 +687,17 @@
       "visibleMedia": 2
     },
     "requests": {
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/7e88f48f-c2ea-47d5-b165-fd5be0ae7617?variant=desktop&v=6f2e4c52-69d1-46c9-863a-524d11e44945": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/7c4977ab-1432-4180-9e06-fd04c15f1f81?variant=desktop&v=16f2d691-89a0-418d-a2ab-d330a1ada61f": 1,
-      "http://127.0.0.1:5183/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb": 1
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/4c7449ac-7516-4f9f-8277-9c6ac8aaf2e6?variant=desktop&v=4c5fbad6-eeca-42ad-b27b-91583edb3014": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/7e88f48f-c2ea-47d5-b165-fd5be0ae7617?variant=desktop&v=6f2e4c52-69d1-46c9-863a-524d11e44945": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6": 1,
+      "http://127.0.0.1:5184/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb": 1
     },
     "sequence": [
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
-      "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
-      "http://127.0.0.1:5183/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
-      "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+      "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+      "http://127.0.0.1:5184/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+      "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2"
     ]
   },
   "reducedMotion": {
@@ -736,7 +735,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -811,7 +810,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -886,7 +885,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -1006,24 +1005,24 @@
     },
     "restored": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -1038,38 +1037,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -1115,7 +1114,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/af60852a-d49b-4028-af7c-ce55afca49a9?variant=mobile&v=71d7a294-df79-4b7d-8331-8b40cf0ac5eb",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -1190,7 +1189,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=mobile&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -1265,7 +1264,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -1342,7 +1341,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 380.28125,
@@ -1417,7 +1416,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 385.390625,
@@ -1492,7 +1491,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 391.796875,
@@ -1567,7 +1566,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 402.015625,
@@ -1642,7 +1641,7 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=mobile&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
             "x": 0,
             "y": 406.1875,
@@ -1685,24 +1684,24 @@
     },
     {
       "actionsRect": {
-        "x": 57.359375,
-        "y": 544.546875,
-        "width": 404.359375,
+        "x": 44,
+        "y": 561.046875,
+        "width": 321.796875,
         "height": 44,
-        "top": 544.546875,
-        "right": 461.71875,
-        "bottom": 588.546875,
-        "left": 57.359375
+        "top": 561.046875,
+        "right": 365.796875,
+        "bottom": 605.046875,
+        "left": 44
       },
       "fieldRect": {
-        "x": 519.078125,
+        "x": 409.796875,
         "y": 89,
-        "width": 846.921875,
+        "width": 956.203125,
         "height": 680,
         "top": 89,
         "right": 1366,
         "bottom": 769,
-        "left": 519.078125
+        "left": 409.796875
       },
       "heroRect": {
         "x": 0,
@@ -1717,38 +1716,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 519.078125,
+            "x": 409.796875,
             "y": 89,
-            "width": 846.921875,
+            "width": 956.203125,
             "height": 680,
             "top": 89,
             "right": 1366,
             "bottom": 769,
-            "left": 519.078125
+            "left": 409.796875
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 57.359375,
+        "divider": 44,
         "titleToParagraph": 27.3125,
         "paragraphToActions": 27.3125
       },
       "title": {
-        "fontSize": 59.421,
-        "lineHeight": 57.6384,
-        "lines": 3,
+        "fontSize": 52,
+        "lineHeight": 51.48,
+        "lines": 4,
         "rect": {
-          "x": 57.359375,
-          "y": 269.453125,
-          "width": 404.359375,
-          "height": 172.875,
-          "top": 269.453125,
-          "right": 461.71875,
-          "bottom": 442.328125,
-          "left": 57.359375
+          "x": 44,
+          "y": 252.953125,
+          "width": 321.796875,
+          "height": 205.875,
+          "top": 252.953125,
+          "right": 365.796875,
+          "bottom": 458.828125,
+          "left": 44
         }
       },
       "viewport": {
@@ -1760,24 +1759,24 @@
     },
     {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -1792,38 +1791,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -1835,24 +1834,24 @@
     },
     {
       "actionsRect": {
-        "x": 80,
-        "y": 740.65625,
-        "width": 544,
+        "x": 61.4375,
+        "y": 726.265625,
+        "width": 453.125,
         "height": 44,
-        "top": 740.65625,
-        "right": 624,
-        "bottom": 784.65625,
-        "left": 80
+        "top": 726.265625,
+        "right": 514.5625,
+        "bottom": 770.265625,
+        "left": 61.4375
       },
       "fieldRect": {
-        "x": 729.59375,
+        "x": 576,
         "y": 89,
-        "width": 1190.40625,
+        "width": 1344,
         "height": 992,
         "top": 89,
         "right": 1920,
         "bottom": 1081,
-        "left": 729.59375
+        "left": 576
       },
       "heroRect": {
         "x": 0,
@@ -1867,38 +1866,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 729.59375,
+            "x": 576,
             "y": 89,
-            "width": 1190.40625,
+            "width": 1344,
             "height": 992,
             "top": 89,
             "right": 1920,
             "bottom": 1081,
-            "left": 729.59375
+            "left": 576
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 105.59375,
+        "divider": 61.4375,
         "titleToParagraph": 32,
         "paragraphToActions": 32
       },
       "title": {
-        "fontSize": 82.4,
-        "lineHeight": 79.928,
+        "fontSize": 71.04,
+        "lineHeight": 70.3296,
         "lines": 3,
         "rect": {
-          "x": 80,
-          "y": 385.328125,
-          "width": 544,
-          "height": 239.765625,
-          "top": 385.328125,
-          "right": 624,
-          "bottom": 625.09375,
-          "left": 80
+          "x": 61.4375,
+          "y": 399.71875,
+          "width": 453.125,
+          "height": 210.984375,
+          "top": 399.71875,
+          "right": 514.5625,
+          "bottom": 610.703125,
+          "left": 61.4375
         }
       },
       "viewport": {
@@ -1912,24 +1911,24 @@
   "visibility": {
     "before": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -1944,38 +1943,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -1987,24 +1986,24 @@
     },
     "hidden": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -2019,38 +2018,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/4efc08dc-15c2-46f0-b28d-5beb89a8e893?variant=desktop&v=041abb8f-c96f-4283-b438-4cce5d0b9eb2",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
@@ -2062,24 +2061,24 @@
     },
     "resumed": {
       "actionsRect": {
-        "x": 60.46875,
-        "y": 616.71875,
-        "width": 426.25,
+        "x": 46.078125,
+        "y": 604.6875,
+        "width": 339.84375,
         "height": 44,
-        "top": 616.71875,
-        "right": 486.71875,
-        "bottom": 660.71875,
-        "left": 60.46875
+        "top": 604.6875,
+        "right": 385.921875,
+        "bottom": 648.6875,
+        "left": 46.078125
       },
       "fieldRect": {
-        "x": 547.1875,
+        "x": 432,
         "y": 89,
-        "width": 892.8125,
+        "width": 1008,
         "height": 812,
         "top": 89,
         "right": 1440,
         "bottom": 901,
-        "left": 547.1875
+        "left": 432
       },
       "heroRect": {
         "x": 0,
@@ -2094,38 +2093,38 @@
       "lineEndsInsideHero": true,
       "media": [
         {
-          "id": "http://127.0.0.1:5183/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
+          "id": "http://127.0.0.1:5184/api/galerias/imagem/cab80012-41b4-4383-b38b-2926a3512400?variant=desktop&v=8467a54c-0983-4bbb-83e7-9fb590e675b6",
           "rect": {
-            "x": 547.1875,
+            "x": 432,
             "y": 89,
-            "width": 892.8125,
+            "width": 1008,
             "height": 812,
             "top": 89,
             "right": 1440,
             "bottom": 901,
-            "left": 547.1875
+            "left": 432
           }
         }
       ],
       "phase": "idle",
       "spacing": {
-        "divider": 60.46875,
+        "divider": 46.078125,
         "titleToParagraph": 28.796875,
         "paragraphToActions": 28.796875
       },
       "title": {
-        "fontSize": 62.64,
-        "lineHeight": 60.7608,
+        "fontSize": 53.28,
+        "lineHeight": 52.7472,
         "lines": 3,
         "rect": {
-          "x": 60.46875,
-          "y": 329.28125,
-          "width": 426.25,
-          "height": 182.25,
-          "top": 329.28125,
-          "right": 486.71875,
-          "bottom": 511.53125,
-          "left": 60.46875
+          "x": 46.078125,
+          "y": 341.296875,
+          "width": 339.84375,
+          "height": 158.203125,
+          "top": 341.296875,
+          "right": 385.921875,
+          "bottom": 499.5,
+          "left": 46.078125
         }
       },
       "viewport": {
