@@ -1,0 +1,22 @@
+{
+  "cycleDurationMs": 11190,
+  "desktop": {
+    "errors": [],
+    "sequence": [
+      "/media/photos/6%20(1).jpg",
+      "/media/photos/6%20(2).jpg",
+      "/media/photos/6%20(3).jpg",
+      "/media/photos/6%20(1).jpg"
+    ]
+  },
+  "mobile": {
+    "errors": [],
+    "sequence": [
+      "/media/photos/6%20(1).jpg",
+      "/media/photos/6%20(2).jpg",
+      "/media/photos/6%20(3).jpg",
+      "/media/photos/6%20(1).jpg"
+    ]
+  },
+  "passed": true
+}

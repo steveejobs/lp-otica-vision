@@ -1,52 +1,38 @@
 .stage {
+  display: grid;
   min-height: calc(100svh - 72px - env(safe-area-inset-top, 0px));
   overflow: clip;
   background: var(--vision-paper);
   color: var(--vision-ink);
 }
 
-.inner {
-  display: grid;
-  width: min(92vw, 100%);
-  min-height: inherit;
-  margin: 0 auto;
-}
-
 .copyField {
   display: grid;
   align-content: start;
-  gap: clamp(2.2rem, 7vw, 4rem);
-  padding: 2.1rem 0 1.5rem;
-}
-
-.identity {
-  display: flex;
-  align-items: flex-start;
-  min-height: 2.7rem;
+  padding: clamp(1.65rem, 5vw, 3.8rem) 4vw 1.4rem;
 }
 
 .copy {
   display: grid;
   align-content: start;
-  gap: 1.1rem;
+  gap: 1rem;
   max-width: 31rem;
 }
 
-.title {
+.copy h1 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 11vw, 4.1rem);
+  font-size: clamp(2.45rem, 10.8vw, 4.05rem);
   font-weight: 500;
   line-height: 0.92;
-  letter-spacing: 0;
   text-wrap: balance;
 }
 
-.copy > p {
-  max-width: 27rem;
+.copy p {
+  max-width: 28rem;
   margin: 0;
   color: var(--vision-muted);
-  font-size: 0.91rem;
+  font-size: 0.92rem;
   line-height: 1.55;
 }
 
@@ -59,177 +45,109 @@
 
 .actions a {
   min-height: 44px;
-  padding: 0.7rem 0.88rem;
+  padding: 0.7rem 0.9rem;
 }
 
-.visualField {
+.wall {
   position: relative;
-  min-height: clamp(20rem, 53svh, 36rem);
-  margin-right: -4vw;
+  min-height: min(56svh, 38rem);
   overflow: hidden;
-  border-top: 1px solid var(--vision-line);
-  border-left: 1px solid var(--vision-line);
-  background: var(--visual-background);
-  outline: none;
+  background: #766f6d;
   touch-action: pan-y;
 }
 
-.visualField:focus-visible {
-  outline: 2px solid var(--vision-bronze);
-  outline-offset: -5px;
-}
-
-.photoStage,
-.page,
-.page picture,
-.photo,
-.emptyVisual {
+.wall figure,
+.wall img {
   position: absolute;
   inset: 0;
-}
-
-.page {
-  z-index: 1;
-  margin: 0;
-  overflow: hidden;
-  background: var(--visual-background);
-}
-
-.page picture {
   display: block;
-}
-
-.photo {
   width: 100%;
   height: 100%;
+  margin: 0;
+}
+
+.wall figure {
+  overflow: hidden;
+}
+
+.wall img {
   object-fit: cover;
-  object-position: var(--mobile-focus);
-  transform: scale(var(--mobile-scale));
-  transform-origin: var(--mobile-focus);
+}
+
+.active {
+  z-index: 1;
+}
+
+.blade {
+  z-index: 2;
+  pointer-events: none;
+  filter: saturate(0.94);
+}
+
+.previousBlade {
+  clip-path: inset(0 87% 0 0);
+}
+
+.nextBlade {
+  clip-path: inset(0 0 0 87%);
 }
 
 .incoming {
-  z-index: 2;
-  clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
-  transform: translate3d(-4%, 0, 0);
-  transition:
-    clip-path 1080ms cubic-bezier(0.76, 0, 0.24, 1),
-    transform 1080ms cubic-bezier(0.76, 0, 0.24, 1);
+  z-index: 3;
+  pointer-events: none;
+  clip-path: inset(0 0 0 100%);
 }
 
-.visualField[data-direction="previous"] .incoming {
-  clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-  transform: translate3d(4%, 0, 0);
+.wall[data-transitioning] .incoming {
+  animation: blade-open 1080ms cubic-bezier(0.78, 0, 0.22, 1) both;
 }
 
-.visualField[data-transitioning="true"] .incoming {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  transform: translate3d(0, 0, 0);
-}
+@keyframes blade-open {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
 
-.emptyVisual {
-  background: var(--vision-bg-soft);
-}
-
-.manualControls {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-}
-
-.stage[data-count="1"][data-motion="playing"] .current .photo {
-  animation: single-image-drift 14s ease-in-out infinite alternate;
-}
-
-@keyframes single-image-drift {
-  from { transform: scale(var(--mobile-scale)) translate3d(0, 0, 0); }
-  to { transform: scale(var(--mobile-scale)) translate3d(-0.7%, -0.4%, 0); }
+  to {
+    clip-path: inset(0);
+  }
 }
 
 @media (min-width: 721px) {
   .stage {
+    grid-template-columns: minmax(19rem, 0.3fr) minmax(0, 0.7fr);
     min-height: clamp(42rem, calc(100svh - 88px), 58rem);
   }
 
-  .inner {
-    grid-template-columns: minmax(0, 0.38fr) minmax(0, 0.62fr);
-    column-gap: clamp(2.5rem, 5vw, 5.8rem);
-    width: min(88vw, 1320px);
-  }
-
   .copyField {
-    align-content: space-between;
-    gap: 3rem;
-    padding: clamp(2.4rem, 5.2vh, 4.8rem) 0 clamp(2.8rem, 6vh, 5.5rem);
+    align-content: end;
+    padding: clamp(2.8rem, 7vh, 5.4rem) clamp(2rem, 3.4vw, 4rem);
   }
 
-  .identity {
-    min-height: 3rem;
-  }
-
-  .copy {
-    gap: 1.3rem;
-  }
-
-  .title {
-    font-size: clamp(3.3rem, 4.7vw, 5.45rem);
+  .copy h1 {
+    font-size: clamp(3.1rem, 4.6vw, 5.2rem);
     line-height: 0.9;
   }
 
-  .copy > p {
-    font-size: 0.98rem;
+  .copy p {
+    font-size: 0.97rem;
   }
 
-  .visualField {
-    min-height: 0;
-    margin: 0;
-    border-top: 0;
+  .wall {
+    min-height: 100%;
   }
 
-  .photo {
-    object-position: var(--desktop-focus);
-    transform: scale(var(--desktop-scale));
-    transform-origin: var(--desktop-focus);
+  .previousBlade {
+    clip-path: inset(0 88% 0 0);
   }
 
-  .stage[data-count="1"][data-motion="playing"] .current .photo {
-    animation-name: single-image-drift-desktop;
-  }
-}
-
-@keyframes single-image-drift-desktop {
-  from { transform: scale(var(--desktop-scale)) translate3d(0, 0, 0); }
-  to { transform: scale(var(--desktop-scale)) translate3d(-0.5%, -0.35%, 0); }
-}
-
-@media (max-width: 370px) {
-  .copyField {
-    gap: 1.55rem;
-    padding-top: 1.35rem;
-  }
-
-  .title {
-    font-size: 2.28rem;
-  }
-
-  .copy > p {
-    font-size: 0.84rem;
-  }
-
-  .visualField {
-    min-height: 19rem;
+  .nextBlade {
+    clip-path: inset(0 0 0 88%);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .incoming {
-    transition: none;
-  }
-
-  .stage[data-count="1"] .current .photo {
+  .incoming,
+  .wall[data-transitioning] .incoming {
     animation: none;
   }
 }
