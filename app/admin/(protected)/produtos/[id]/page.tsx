@@ -24,7 +24,7 @@ export default async function EditProductPage({
   await requireAdminRole(["admin", "editor"]);
   const { id } = await params;
   const supabase = await createSupabaseServerClient();
-  const [productResult, brandResult, categoryResult, imageResult] = await Promise.all([
+  const [productResult, brandResult, categoryResult, imageResult, styleResult, productStyleResult] = await Promise.all([
     supabase.from("products").select("*").eq("id", id).maybeSingle(),
     supabase.from("brands").select("id, name, active").order("name"),
     supabase.from("categories").select("id, name, active").order("name"),
@@ -33,6 +33,8 @@ export default async function EditProductPage({
       .select("id, alt_text, object_position, is_cover, storage_path, width, height, mime_type, size_bytes, asset_version, display_order, variants:product_image_variants(kind, storage_path, width, height, mime_type, size_bytes, asset_version)")
       .eq("product_id", id)
       .order("display_order"),
+    supabase.from("styles").select("id, label, description, active").order("display_order"),
+    supabase.from("product_styles").select("style_id, is_primary, is_featured, display_order").eq("product_id", id).order("display_order"),
   ]);
   if (productResult.error || !productResult.data) notFound();
   if (brandResult.error || categoryResult.error || imageResult.error || !brandResult.data || !categoryResult.data || !imageResult.data) {
@@ -91,6 +93,23 @@ export default async function EditProductPage({
     ...(!product.brand_id ? ["sem marca vinculada"] : []),
     ...(!product.category_id ? ["sem categoria vinculada"] : []),
   ];
+  const styleSchemaAvailable = !styleResult.error && !productStyleResult.error;
+  const styleOptions = styleSchemaAvailable ? styleResult.data ?? [] : [];
+  const styleAssignments = styleSchemaAvailable
+    ? (productStyleResult.data ?? []).map((assignment) => ({
+        displayOrder: assignment.display_order,
+        isFeatured: assignment.is_featured,
+        isPrimary: assignment.is_primary,
+        styleId: assignment.style_id,
+      }))
+    : [];
+  const hasActiveStyle = styleAssignments.some((assignment) => styleOptions.some((style) => style.id === assignment.styleId && style.active));
+  const styleEligibilityReasons = [
+    ...(!hasActiveStyle ? ["sem estilo ativo"] : []),
+    ...(!hasCover ? ["sem capa publicada"] : []),
+    ...(product.archived_at ? ["produto arquivado"] : []),
+    ...(!product.published ? ["produto não publicado"] : []),
+  ];
 
   return (
     <>
@@ -111,7 +130,7 @@ export default async function EditProductPage({
       ) : null}
       <section className={styles.formPanel} aria-labelledby="product-data-title">
         <div className={styles.panelHeading}><h2 id="product-data-title">Dados do produto</h2><p>SKU e slug são únicos.</p></div>
-        <ProductForm action={updateProductAction} archived={Boolean(product.archived_at)} brands={brandResult.data} categories={categoryResult.data} defaults={product} editing />
+        <ProductForm action={updateProductAction} archived={Boolean(product.archived_at)} brands={brandResult.data} categories={categoryResult.data} defaults={product} editing styleAssignments={styleAssignments} styleEligibilityReasons={styleEligibilityReasons} styleOptions={styleOptions} />
       </section>
 
       {!product.archived_at ? (

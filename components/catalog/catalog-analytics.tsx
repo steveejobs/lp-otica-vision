@@ -31,12 +31,17 @@ export function CatalogAnalytics({
       ["categoria", query.category],
       ["disponibilidade", query.availability],
       ["colecao", query.collection],
+      ["estilo", query.style],
     ] as const;
 
     for (const [filter, value] of filters) {
       if (!value) continue;
       void trackCatalogEvent({
         eventName: "catalog_filter",
+        metadata: { filter, value },
+      });
+      void trackCatalogEvent({
+        eventName: "catalog_filter_changed",
         metadata: { filter, value },
       });
     }

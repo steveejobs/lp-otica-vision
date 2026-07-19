@@ -1,5 +1,5 @@
 export type PlacementRoute = "/" | "/bio";
-export type PlacementSource = "catalog" | "collection" | "gallery" | "static";
+export type PlacementSource = "catalog" | "collection" | "gallery" | "products" | "static";
 export type PlacementStatus = "implemented" | "unavailable";
 export type PlacementDevice = "both" | "desktop" | "mobile";
 
@@ -87,23 +87,23 @@ export const PUBLIC_PLACEMENTS = [
     variants: COLLECTION_HOME_VARIANT_VALUES,
   },
   {
-    component: "CatalogPreview",
-    description: "Vitrine pública derivada apenas de produtos publicados; não aceita uma galeria própria.",
+    component: "VisionCuration",
+    description: "Seleção editorial conectada aos produtos publicados, filtrada por estilo e categoria.",
     device: "both",
     galleryMedia: false,
-    href: "/#preview-catalogo",
-    key: "home.catalog_preview",
-    label: "Home › Preview do catálogo",
-    maxItems: 6,
+    href: "/#curadoria",
+    key: "home.style_curator",
+    label: "Home › Curadoria guiada › Seleção de estilo e preview do catálogo",
+    maxItems: 8,
     minItems: 0,
-    placementKey: "catalog_preview",
+    placementKey: "style_curator",
     preview: { desktopAspectRatio: "1440 / 900", mobileAspectRatio: "390 / 844", surroundingItems: true },
     route: "/",
     routeKey: "home",
-    sectionId: "preview-catalogo",
-    source: "catalog",
+    sectionId: "curadoria",
+    source: "products",
     status: "implemented",
-    variants: ["protagonist", "diptych", "editorial-composition", "rail"],
+    variants: ["style", "category"],
   },
   {
     component: "LabSection",

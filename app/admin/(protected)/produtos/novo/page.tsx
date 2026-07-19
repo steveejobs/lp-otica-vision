@@ -11,9 +11,10 @@ import { createProductAction } from "../actions";
 export default async function NewProductPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();
-  const [{ data: brands, error: brandError }, { data: categories, error: categoryError }] = await Promise.all([
+  const [{ data: brands, error: brandError }, { data: categories, error: categoryError }, styleResult] = await Promise.all([
     supabase.from("brands").select("id, name, active").order("name"),
     supabase.from("categories").select("id, name, active").order("name"),
+    supabase.from("styles").select("id, label, description, active").order("display_order"),
   ]);
   if (brandError || categoryError || !brands || !categories) throw new Error("Não foi possível preparar o cadastro de produto.");
   const query = await searchParams;
@@ -22,7 +23,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
       <AdminPageHeader eyebrow="Produtos" description="O produto nasce como rascunho e com disponibilidade sob consulta. Adicione uma capa validada antes de publicar." title="Novo produto" />
       <AdminFeedback error={query.error} />
       <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link></div>
-      <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Dados do rascunho</h2><ProductForm action={createProductAction} brands={brands} categories={categories} /></section>
+      <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Dados do rascunho</h2><ProductForm action={createProductAction} brands={brands} categories={categories} styleEligibilityReasons={["produto ainda não publicado", "sem capa publicada", "sem estilo ativo"]} styleOptions={styleResult.error ? [] : styleResult.data ?? []} /></section>
     </>
   );
 }

@@ -11,6 +11,7 @@ import styles from "./admin.module.css";
 const navigation = [
   { href: "/admin", label: "Visão geral", roles: ["admin", "editor", "attendant"] },
   { href: "/admin/produtos", label: "Produtos", roles: ["admin", "editor"] },
+  { href: "/admin/estilos", label: "Estilos", roles: ["admin", "editor"] },
   { href: "/admin/disponibilidade", label: "Disponibilidade", roles: ["admin", "editor", "attendant"] },
   { href: "/admin/colecoes", label: "Coleções", roles: ["admin", "editor"] },
   { href: "/admin/galerias", label: "Galerias", roles: ["admin", "editor"] },

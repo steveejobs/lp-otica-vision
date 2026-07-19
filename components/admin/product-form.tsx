@@ -11,6 +11,7 @@ import { brandSlugFromName } from "@/lib/admin/brand-identity";
 import { AdminSubmitButton } from "./admin-form-controls";
 import { FilePreviewInput } from "./file-preview-input";
 import { ProductSkuField } from "./product-sku-field";
+import { ProductStyleSelector, type ProductStyleAssignment } from "./product-style-selector";
 import styles from "./admin.module.css";
 
 type ProductDefaults = {
@@ -41,6 +42,9 @@ export function ProductForm({
   categories,
   defaults = {},
   editing = false,
+  styleAssignments = [],
+  styleEligibilityReasons = [],
+  styleOptions = [],
 }: {
   action: (formData: FormData) => Promise<void>;
   archived?: boolean;
@@ -48,6 +52,9 @@ export function ProductForm({
   categories: { active: boolean; id: string; name: string }[];
   defaults?: ProductDefaults;
   editing?: boolean;
+  styleAssignments?: ProductStyleAssignment[];
+  styleEligibilityReasons?: string[];
+  styleOptions?: { active: boolean; description: string; id: string; label: string }[];
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [brandOptions, setBrandOptions] = useState(brands);
@@ -173,6 +180,13 @@ export function ProductForm({
             <textarea defaultValue={defaults.whatsapp_message_override ?? ""} maxLength={1200} name="whatsapp_message_override" />
             <small className={styles.fieldHint}>Opcional. Não inclua prazo, estoque ou condição comercial não confirmada.</small>
           </label>
+          {styleOptions.length ? (
+            <ProductStyleSelector
+              assignments={styleAssignments}
+              eligibilityReasons={styleEligibilityReasons}
+              options={styleOptions}
+            />
+          ) : null}
         </div>
         <div className={styles.formActions}>
           <AdminSubmitButton pendingLabel={editing ? "Salvando produto..." : "Criando rascunho..."}>

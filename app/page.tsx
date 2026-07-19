@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { BrandGrid } from "@/components/brand-grid";
-import { CatalogPreview } from "@/components/catalog/catalog-preview";
+import { HomeCuration } from "@/components/curation/home-curation";
 import { EditorialGallery } from "@/components/editorial-gallery";
 import { HomeCollectionSection } from "@/components/home-collection-section";
 import { HomeHero } from "@/components/home-hero";
@@ -12,8 +12,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { VideoStory } from "@/components/video-story";
 import { editorialGalleryImages, homeVideos, labMedia } from "@/lib/assets";
-import { getFeaturedCatalogProducts } from "@/lib/catalog/data";
-import { getHomeCatalogPreviewSettings } from "@/lib/catalog/home-preview-settings";
 import { getExameNews } from "@/lib/exame-news";
 import { getPublishedHomeCollection } from "@/lib/collections/home";
 import { displayMediaFromLocalList, displayMediaFromPublished } from "@/lib/gallery/display-media";
@@ -27,16 +25,6 @@ async function ExameNewsSection() {
   const newsItems = await getExameNews();
 
   return <NewsSection items={newsItems} />;
-}
-
-async function CatalogPreviewSection() {
-  const settings = await getHomeCatalogPreviewSettings();
-  if (!settings.enabled) return null;
-
-  const products = await getFeaturedCatalogProducts();
-  if (!products.length) return null;
-
-  return <CatalogPreview products={products} />;
 }
 
 async function HomeLabSection() {
@@ -77,7 +65,15 @@ async function HomeFeaturedGallerySection() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const categorySlug = typeof params.categoria === "string" ? params.categoria : undefined;
+  const styleSlug = typeof params.estilo === "string" ? params.estilo : undefined;
+
   return (
     <>
       <SiteHeader />
@@ -85,10 +81,10 @@ export default function HomePage() {
         <HomeHero />
         <VideoStory videos={homeVideos} />
         <HomeFeaturedGallerySection />
-        <BrandGrid content={featuredBrands} />
         <Suspense fallback={null}>
-          <CatalogPreviewSection />
+          <HomeCuration categorySlug={categorySlug} styleSlug={styleSlug} />
         </Suspense>
+        <BrandGrid content={featuredBrands} />
         <HomeLabSection />
         <Suspense fallback={<NewsSection items={[]} loading />}>
           <ExameNewsSection />

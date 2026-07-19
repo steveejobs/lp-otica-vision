@@ -1123,6 +1123,84 @@ export type Database = {
         }
         Relationships: []
       }
+      product_styles: {
+        Row: {
+          created_at: string
+          display_order: number
+          is_featured: boolean
+          is_primary: boolean
+          product_id: string
+          style_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          is_featured?: boolean
+          is_primary?: boolean
+          product_id: string
+          style_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          is_featured?: boolean
+          is_primary?: boolean
+          product_id?: string
+          style_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_styles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_styles_style_id_fkey"
+            columns: ["style_id"]
+            isOneToOne: false
+            referencedRelation: "styles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      styles: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          label: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description: string
+          display_order?: number
+          id?: string
+          label: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          label?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string
@@ -1174,6 +1252,27 @@ export type Database = {
         Returns: {
           slug: string
           updated_at: string
+        }[]
+      }
+      curation_category_options: {
+        Args: { p_style_slug: string }
+        Returns: {
+          display_order: number
+          id: string
+          name: string
+          product_count: number
+          slug: string
+        }[]
+      }
+      curation_style_options: {
+        Args: { p_category_slug?: string }
+        Returns: {
+          description: string
+          display_order: number
+          id: string
+          label: string
+          product_count: number
+          slug: string
         }[]
       }
       normalize_catalog_search: { Args: { value: string }; Returns: string }
@@ -1255,12 +1354,66 @@ export type Database = {
           updated_at: string
         }[]
       }
+      search_curated_catalog_products: {
+        Args: {
+          p_availability?: Database["public"]["Enums"]["availability_status"]
+          p_brand_slug?: string
+          p_category_slug?: string
+          p_collection_slug?: string
+          p_page_offset?: number
+          p_page_size?: number
+          p_search_term?: string
+          p_style_slug: string
+        }
+        Returns: {
+          availability_status: Database["public"]["Enums"]["availability_status"]
+          brand_id: string
+          brand_name: string
+          brand_slug: string
+          category_id: string
+          category_name: string
+          category_slug: string
+          color: string
+          cover_alt_text: string
+          cover_blur_data_url: string
+          cover_height: number
+          cover_image_id: string
+          cover_object_position: string
+          cover_updated_at: string
+          cover_width: number
+          display_order: number
+          featured: boolean
+          model: string
+          price: number
+          price_visibility: Database["public"]["Enums"]["price_visibility"]
+          product_id: string
+          product_name: string
+          short_description: string
+          sku: string
+          slug: string
+          style_display_order: number
+          style_featured: boolean
+          style_id: string
+          style_label: string
+          style_slug: string
+          total_count: number
+          updated_at: string
+        }[]
+      }
       set_product_cover: {
         Args: { target_image_id: string; target_product_id: string }
         Returns: undefined
       }
       sync_collection_products: {
         Args: { ordered_product_ids: string[]; target_collection_id: string }
+        Returns: undefined
+      }
+      sync_product_styles: {
+        Args: { assignments: Json; target_product_id: string }
+        Returns: undefined
+      }
+      reorder_style_products: {
+        Args: { ordered_product_ids: string[]; target_style_id: string }
         Returns: undefined
       }
       sync_promotion_products: {
@@ -1280,6 +1433,13 @@ export type Database = {
         | "gallery_interaction"
         | "catalog_search"
         | "catalog_filter"
+        | "style_selected"
+        | "category_selected"
+        | "curation_product_opened"
+        | "curation_view_more"
+        | "catalog_filter_changed"
+        | "catalog_product_opened"
+        | "curation_whatsapp_clicked"
       availability_status:
         | "available"
         | "last_unit"
@@ -1434,6 +1594,13 @@ export const Constants = {
         "gallery_interaction",
         "catalog_search",
         "catalog_filter",
+        "style_selected",
+        "category_selected",
+        "curation_product_opened",
+        "curation_view_more",
+        "catalog_filter_changed",
+        "catalog_product_opened",
+        "curation_whatsapp_clicked",
       ],
       availability_status: [
         "available",

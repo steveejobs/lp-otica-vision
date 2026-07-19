@@ -6,11 +6,13 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type ProductWhatsappInput = {
   brand?: string | null;
+  category?: string | null;
   color?: string | null;
   model?: string | null;
   productName: string;
   productUrl: string;
   sku: string;
+  style?: string | null;
 };
 
 function cleanLine(value: string, field: string, maxLength: number) {
@@ -73,6 +75,12 @@ export function buildProductWhatsappUrlWithPhone(phone: string, input: ProductWh
   const color = input.color?.trim()
     ? cleanLine(input.color, "Cor", 100)
     : null;
+  const style = input.style?.trim()
+    ? cleanLine(input.style, "Estilo", 100)
+    : null;
+  const category = input.category?.trim()
+    ? cleanLine(input.category, "Categoria", 100)
+    : null;
   const productUrl = validateProductUrl(input.productUrl);
   const message = [
     "Olá! Tenho interesse neste produto:",
@@ -82,6 +90,8 @@ export function buildProductWhatsappUrlWithPhone(phone: string, input: ProductWh
     ...(brand ? [`Marca: ${brand}`] : []),
     ...(model ? [`Modelo: ${model}`] : []),
     ...(color ? [`Cor: ${color}`] : []),
+    ...(style ? [`Estilo selecionado: ${style}`] : []),
+    ...(category ? [`Categoria selecionada: ${category}`] : []),
     "",
     "Link:",
     productUrl,

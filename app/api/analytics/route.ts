@@ -21,6 +21,13 @@ const eventNames = new Set<EventName>([
   "gallery_interaction",
   "catalog_search",
   "catalog_filter",
+  "style_selected",
+  "category_selected",
+  "curation_product_opened",
+  "curation_view_more",
+  "catalog_filter_changed",
+  "catalog_product_opened",
+  "curation_whatsapp_clicked",
 ]);
 const metadataKeys = new Set([
   "filter",
@@ -34,7 +41,7 @@ const metadataKeys = new Set([
   "viewport",
 ]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const FILTER_NAMES = new Set(["categoria", "colecao", "disponibilidade", "marca"]);
+const FILTER_NAMES = new Set(["categoria", "colecao", "disponibilidade", "estilo", "marca"]);
 const FILTER_VALUE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function jsonResponse(body: object, status: number) {

@@ -207,6 +207,31 @@ function productPayload(formData: FormData) {
   } satisfies Database["public"]["Tables"]["products"]["Update"];
 }
 
+function productStyleAssignments(formData: FormData) {
+  if (formData.get("styles_contract") !== "1") return null;
+  const styleIds = formData.getAll("style_ids").filter((value): value is string => typeof value === "string");
+  if (styleIds.length > 3 || new Set(styleIds).size !== styleIds.length || styleIds.some((id) => !isUuidString(id))) {
+    throw new AdminValidationError("constraint");
+  }
+  const primary = formData.get("style_primary");
+  if (styleIds.length && (typeof primary !== "string" || !styleIds.includes(primary))) {
+    throw new AdminValidationError("constraint");
+  }
+  const featured = new Set(formData.getAll("style_featured_ids").filter((value): value is string => typeof value === "string"));
+  if ([...featured].some((id) => !styleIds.includes(id))) throw new AdminValidationError("constraint");
+
+  return styleIds.map((styleId) => {
+    const value = Number.parseInt(String(formData.get(`style_order_${styleId}`) ?? "0"), 10);
+    if (!Number.isSafeInteger(value) || value < 0 || value > 100_000) throw new AdminValidationError("constraint");
+    return {
+      display_order: value,
+      is_featured: featured.has(styleId),
+      is_primary: styleId === primary,
+      style_id: styleId,
+    };
+  });
+}
+
 export async function generateProductSkuAction(): Promise<
   { ok: true; sku: string } | { ok: false; error: string }
 > {
@@ -233,6 +258,17 @@ export async function createProductAction(formData: FormData) {
       .single();
     if (error) throw error;
     id = data.id;
+    const assignments = productStyleAssignments(formData);
+    if (assignments) {
+      const { error: styleError } = await supabase.rpc("sync_product_styles", {
+        assignments,
+        target_product_id: id,
+      });
+      if (styleError) {
+        await supabase.from("products").delete().eq("id", id);
+        throw styleError;
+      }
+    }
   } catch (error) {
     errorCode = mutationErrorCode(error);
   }
@@ -253,10 +289,18 @@ export async function updateProductAction(formData: FormData) {
     if (readError) throw readError;
     if (product.archived_at) throw new AdminValidationError("constraint");
     const payload = productPayload(formData);
+    const assignments = productStyleAssignments(formData);
     productSlug = payload.slug;
     if (payload.featured && !payload.published) throw new AdminValidationError("constraint");
     const { error } = await supabase.from("products").update(payload).eq("id", id);
     if (error) throw error;
+    if (assignments) {
+      const { error: styleError } = await supabase.rpc("sync_product_styles", {
+        assignments,
+        target_product_id: id,
+      });
+      if (styleError) throw styleError;
+    }
   } catch (error) {
     errorCode = mutationErrorCode(error);
   }

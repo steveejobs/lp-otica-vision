@@ -12,12 +12,13 @@ import { SiteHeader } from "@/components/site-header";
 import { getPublishedCatalogProduct, getRelatedCatalogProducts } from "@/lib/catalog/data";
 import { availabilityLabels, formatCatalogPrice } from "@/lib/catalog/format";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
+import { catalogHref, catalogProductHref, parseCatalogQuery, type CatalogSearchParams } from "@/lib/catalog/query";
 import { getCatalogProductUrl, getCatalogSiteBase } from "@/lib/catalog/site-url";
+import { getCurationStyleOptions } from "@/lib/curation/data";
 import { buildProductWhatsappUrl } from "@/lib/whatsapp/product-link";
 
 import styles from "./product.module.css";
 
-export const dynamic = "force-static";
 export const dynamicParams = true;
 export const revalidate = 300;
 
@@ -57,22 +58,34 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function CatalogProductPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CatalogProductPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<CatalogSearchParams>;
+}) {
   const { slug } = await params;
+  const originQuery = parseCatalogQuery(await searchParams);
   const product = await getPublishedCatalogProduct(slug);
   if (!product) notFound();
 
-  const [related, whatsappUrl] = await Promise.all([
+  const [related, curationStyles] = await Promise.all([
     getRelatedCatalogProducts(product),
-    buildProductWhatsappUrl({
+    originQuery.style ? getCurationStyleOptions(originQuery.category) : Promise.resolve([]),
+  ]);
+  const selectedStyle = curationStyles.find((style) => style.slug === originQuery.style)?.label ?? originQuery.style;
+  const whatsappUrl = await buildProductWhatsappUrl({
       brand: product.brand?.name,
+      category: originQuery.category,
       color: product.color,
       model: product.model,
       productName: product.name,
       productUrl: getCatalogProductUrl(product.slug),
       sku: product.sku,
-    }),
-  ]);
+      style: selectedStyle,
+    });
+  const backHref = catalogHref(originQuery, {});
   const price = formatCatalogPrice(product.price, product.priceVisibility);
   const canonicalUrl = getCatalogProductUrl(product.slug);
   const imageUrl = new URL(catalogImageUrl(product.cover, "open_graph"), getCatalogSiteBase()).toString();
@@ -108,7 +121,7 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
     <div className={styles.page}>
       <SiteHeader />
       <main className={styles.main} id="main-content">
-        <Link className={styles.back} data-catalog-return-link href="/catalogo" scroll={false}>
+        <Link className={styles.back} data-catalog-return-link href={backHref} scroll={false}>
           <ArrowLeft aria-hidden="true" size={16} />
           Voltar ao catálogo
         </Link>
@@ -136,6 +149,7 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
               href={whatsappUrl}
               label={product.availability === "unavailable" ? "Consultar modelo" : "Consultar no WhatsApp"}
               productId={product.id}
+              curated={Boolean(originQuery.style)}
             />
             <p className={styles.consultationNote}>
               A consulta confirma a disponibilidade comercial do modelo. Nenhuma reserva é feita automaticamente.
@@ -150,13 +164,19 @@ export default async function CatalogProductPage({ params }: { params: Promise<{
                 <p className="eyebrow">Na mesma curadoria</p>
                 <h2 id="related-title">Outros modelos</h2>
               </div>
-              <Link href="/catalogo">
+              <Link href={backHref}>
                 Ver catálogo
                 <ArrowRight aria-hidden="true" size={16} />
               </Link>
             </div>
             <div className={styles.relatedGrid}>
-              {related.map((item) => <CatalogProductCard key={item.id} product={item} />)}
+              {related.map((item) => (
+                <CatalogProductCard
+                  href={catalogProductHref(item.slug, originQuery)}
+                  key={item.id}
+                  product={item}
+                />
+              ))}
             </div>
           </section>
         ) : null}

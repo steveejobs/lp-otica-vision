@@ -45,6 +45,7 @@ export function parseCatalogQuery(params: CatalogSearchParams): CatalogQuery {
         ? Math.min(requestedPage, 1000)
         : 1,
     search: safeSearch(params.busca),
+    style: safeSlug(params.estilo),
   };
 }
 
@@ -60,6 +61,7 @@ export function catalogHref(
   if (next.category) query.set("categoria", next.category);
   if (next.availability) query.set("disponibilidade", next.availability);
   if (next.collection) query.set("colecao", next.collection);
+  if (next.style) query.set("estilo", next.style);
   if (next.page > 1) query.set("pagina", String(next.page));
 
   const value = query.toString();
@@ -72,6 +74,15 @@ export function hasActiveCatalogFilters(query: CatalogQuery) {
       query.brand ||
       query.category ||
       query.availability ||
-      query.collection,
+      query.collection ||
+      query.style,
   );
+}
+
+export function catalogProductHref(slug: string, query: CatalogQuery) {
+  const params = new URLSearchParams();
+  if (query.style) params.set("estilo", query.style);
+  if (query.category) params.set("categoria", query.category);
+  const suffix = params.toString();
+  return suffix ? `/catalogo/${slug}?${suffix}` : `/catalogo/${slug}`;
 }

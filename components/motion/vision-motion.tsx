@@ -30,6 +30,11 @@ function getInternalNavigationUrl(target: EventTarget | null) {
   if (anchor.target && anchor.target !== "_self") return null;
   if (anchor.hasAttribute("download")) return null;
   if (anchor.dataset.noPageTransition === "true") return null;
+  if (
+    anchor.hasAttribute("data-catalog-transition-link") ||
+    anchor.hasAttribute("data-catalog-filter-link") ||
+    anchor.hasAttribute("data-catalog-return-link")
+  ) return null;
 
   const url = new URL(anchor.href, window.location.href);
   if (url.origin !== window.location.origin) return null;

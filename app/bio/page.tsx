@@ -3,6 +3,7 @@ import { Home, MapPin, MessageCircle } from "lucide-react";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { BrandRail } from "@/components/brand-rail";
+import { BioCurationLink } from "@/components/curation/bio-curation-link";
 import { InstagramIcon } from "@/components/instagram-icon";
 import { InstagramImageRail } from "@/components/instagram-image-rail";
 import { ObservedVideo } from "@/components/observed-video";
@@ -82,7 +83,8 @@ export default async function BioPage() {
           </p>
 
           <nav className={styles.actions} aria-label="Links da Ótica Vision">
-            <a className={styles.primaryLink} href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
+            <BioCurationLink className={styles.primaryLink} />
+            <a href={LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
               <MessageCircle aria-hidden="true" size={21} strokeWidth={1.55} />
               <span>WhatsApp</span>
             </a>

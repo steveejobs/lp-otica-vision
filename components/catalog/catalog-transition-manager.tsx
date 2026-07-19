@@ -3,6 +3,8 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { trackCatalogEvent } from "@/lib/analytics/client";
+
 import styles from "./catalog-transition-manager.module.css";
 
 type Rect = { height: number; left: number; top: number; width: number };
@@ -76,6 +78,9 @@ export function CatalogTransitionManager() {
   const filterSnapshotRef = useRef<FilterSnapshot | null>(null);
   const markerRef = useRef<HTMLSpanElement>(null);
   const routeKey = `${pathname}?${searchParams.toString()}`;
+  const selectedStyle = searchParams.get("estilo");
+  const analyticsEnabled = !pathname.startsWith("/preview/curadoria");
+  const currentHref = `${pathname}${searchParams.size ? `?${searchParams.toString()}` : ""}`;
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -105,11 +110,19 @@ export function CatalogTransitionManager() {
       if (filterLink) filterSnapshotRef.current = captureCards();
 
       const link = target?.closest<HTMLElement>("[data-catalog-transition-link]");
-      if (!link || reducedMotion()) {
+      if (!link) {
         return;
       }
       const card = link.closest<HTMLElement>("[data-catalog-product-id]");
       const productId = card?.dataset.catalogProductId ?? link.dataset.catalogProductId ?? null;
+      if (analyticsEnabled && pathname.endsWith("/catalogo") && productId) {
+        void trackCatalogEvent({
+          eventName: "catalog_product_opened",
+          metadata: { source: selectedStyle ? "style_filter" : "catalog" },
+          productId,
+        });
+      }
+      if (reducedMotion()) return;
       const collection = link.hasAttribute("data-catalog-collection-link");
       const sourceElement = collection
         ? document.querySelector("[data-catalog-feature-media]")
@@ -126,7 +139,7 @@ export function CatalogTransitionManager() {
         { duration: 140, easing: "cubic-bezier(.22,.61,.36,1)", fill: "forwards" },
       );
 
-      if (pathname === "/catalogo" && productId) {
+      if (pathname.endsWith("/catalogo") && productId) {
         sessionStorage.setItem(RETURN_KEY, JSON.stringify({
           href: `${pathname}${window.location.search}`,
           productId,
@@ -157,7 +170,7 @@ export function CatalogTransitionManager() {
       document.removeEventListener("submit", onSubmit, true);
       if (marker) delete marker.dataset.ready;
     };
-  }, [pathname, router]);
+  }, [analyticsEnabled, pathname, router, selectedStyle]);
 
   useEffect(() => {
     if (reducedMotion()) {
@@ -210,12 +223,24 @@ export function CatalogTransitionManager() {
     };
     firstFrame = requestAnimationFrame(() => {
       secondFrame = requestAnimationFrame(() => {
+        if (pathname.endsWith("/catalogo")) {
+          try {
+            const state = JSON.parse(sessionStorage.getItem(RETURN_KEY) ?? "null") as { href?: string; scrollY?: number } | null;
+            if (state?.href === currentHref && typeof state.scrollY === "number") {
+              window.scrollTo({ behavior: "auto", top: state.scrollY });
+              sessionStorage.removeItem(RETURN_KEY);
+            }
+          } catch {
+            sessionStorage.removeItem(RETURN_KEY);
+          }
+        }
         const pending = pendingMediaRef.current;
         if (pending) resolvePending(pending);
 
         const snapshot = filterSnapshotRef.current;
         const grid = document.querySelector<HTMLElement>("[data-catalog-results-grid]");
         if (snapshot && grid) {
+          const layoutAnimations: Animation[] = [];
           const nextCards = new Map(
             [...grid.querySelectorAll<HTMLElement>("[data-catalog-product-id]")]
               .map((card) => [card.dataset.catalogProductId ?? "", card] as const),
@@ -227,13 +252,13 @@ export function CatalogTransitionManager() {
             const next = nextCards.get(previous.id);
             if (next) {
               const destination = next.getBoundingClientRect();
-              next.animate(
+              layoutAnimations.push(next.animate(
                 [
                   { transform: `translate3d(${previous.left - destination.left}px,${previous.top - destination.top}px,0)`, clipPath: "inset(0)" },
                   { transform: "translate3d(0,0,0)", clipPath: "inset(0)" },
                 ],
                 { duration: 360, easing: "cubic-bezier(.22,.61,.36,1)" },
-              );
+              ));
             } else {
               const ghost = document.createElement("img");
               ghost.alt = "";
@@ -257,15 +282,17 @@ export function CatalogTransitionManager() {
 
           nextCards.forEach((card, id) => {
             if (previousIds.has(id)) return;
-            card.animate(
+            layoutAnimations.push(card.animate(
               [
                 { clipPath: "inset(100% 0 0 0)", transform: "translateY(12px)" },
                 { clipPath: "inset(0)", transform: "translateY(0)" },
               ],
               { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)" },
-            );
+            ));
           });
-          window.setTimeout(() => { grid.style.minHeight = ""; }, 380);
+          void Promise.allSettled(layoutAnimations.map((animation) => animation.finished)).then(() => {
+            grid.style.minHeight = "";
+          });
           filterSnapshotRef.current = null;
         }
 
@@ -276,7 +303,7 @@ export function CatalogTransitionManager() {
       cancelAnimationFrame(secondFrame);
       cancelAnimationFrame(pendingFrame);
     };
-  }, [routeKey]);
+  }, [currentHref, pathname, routeKey]);
 
   return <span aria-hidden="true" data-catalog-transition-manager hidden ref={markerRef} />;
 }

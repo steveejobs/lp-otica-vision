@@ -13,11 +13,13 @@ import {
 } from "@/lib/catalog/data";
 import {
   catalogHref,
+  catalogProductHref,
   hasActiveCatalogFilters,
   parseCatalogQuery,
   type CatalogSearchParams,
 } from "@/lib/catalog/query";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
+import { getCurationStyleOptions } from "@/lib/curation/data";
 import { LINKS } from "@/lib/links";
 
 import styles from "./catalog.module.css";
@@ -64,13 +66,17 @@ async function CatalogContent({
   searchParams: Promise<CatalogSearchParams>;
 }) {
   const query = parseCatalogQuery(await searchParams);
-  const [catalog, filters, collectionId] = await Promise.all([
+  const [catalog, filters, collectionId, styleOptions] = await Promise.all([
     getCatalogPage(query),
     getCatalogFilterOptions(),
     query.collection ? getPublishedCollectionId(query.collection) : Promise.resolve(null),
+    getCurationStyleOptions(query.category),
   ]);
   const activeBrand = filters.brands.find((brand) => brand.key === query.brand);
-  const groups = query.brand
+  const activeStyle = styleOptions.find((style) => style.slug === query.style);
+  const groups = query.style
+    ? [{ name: activeStyle?.label ?? "Seleção por estilo", products: catalog.products, slug: null }]
+    : query.brand
     ? [{ name: activeBrand?.name ?? "Produtos", products: catalog.products, slug: query.brand }]
     : groupByBrand(catalog.products);
   const hasFilters = hasActiveCatalogFilters(query);
@@ -98,6 +104,33 @@ async function CatalogContent({
           aria-label="Filtros do catálogo"
         >
           <div className={styles.filterInner}>
+            {styleOptions.length ? (
+              <div className={styles.brandBlock}>
+                <span className={styles.filterLabel}>Direção de estilo</span>
+                <nav className={styles.brandRail} aria-label="Selecionar estilo">
+                  <Link
+                    aria-current={!query.style ? "page" : undefined}
+                    data-catalog-filter-link
+                    href={catalogHref(query, { page: 1, style: null })}
+                    scroll={false}
+                  >
+                    Todos
+                  </Link>
+                  {styleOptions.map((style) => (
+                    <Link
+                      aria-current={query.style === style.slug ? "page" : undefined}
+                      data-catalog-filter-link
+                      href={catalogHref(query, { page: 1, style: style.slug })}
+                      key={style.id}
+                      scroll={false}
+                    >
+                      {style.label}
+                      <span>{style.productCount}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            ) : null}
             <div className={styles.brandBlock}>
               <span className={styles.filterLabel}>Navegar por marca</span>
               <nav className={styles.brandRail} aria-label="Selecionar marca">
@@ -127,6 +160,7 @@ async function CatalogContent({
 
             <form className={styles.filterForm} data-catalog-filter-form method="get" role="search">
               {query.brand ? <input name="marca" type="hidden" value={query.brand} /> : null}
+              {query.style ? <input name="estilo" type="hidden" value={query.style} /> : null}
               <label className={styles.field}>
                 <span>Buscar por nome, modelo, SKU, cor ou marca</span>
                 <input
@@ -191,7 +225,7 @@ async function CatalogContent({
           <div className={styles.resultsInner}>
             <div className={styles.resultSummary}>
               <h2 id="catalog-results-title">
-                {query.brand && activeBrand ? activeBrand.name : "Seleção publicada"}
+                {activeStyle?.label ?? (query.brand && activeBrand ? activeBrand.name : "Seleção publicada")}
               </h2>
               <p aria-live="polite">
                 {catalog.total} {catalog.total === 1 ? "produto" : "produtos"}
@@ -226,7 +260,7 @@ async function CatalogContent({
                         <h2>{group.name}</h2>
                         <span>{group.products.length}</span>
                       </div>
-                      {!query.brand && group.slug ? (
+                      {!query.style && !query.brand && group.slug ? (
                         <Link data-catalog-filter-link href={catalogHref(query, { brand: group.slug, page: 1 })} scroll={false}>
                           Ver toda a marca
                           <ArrowUpRight aria-hidden="true" size={16} />
@@ -235,7 +269,11 @@ async function CatalogContent({
                     </div>
                     <div className={styles.grid}>
                       {group.products.map((product) => (
-                        <CatalogProductCard key={product.id} product={product} />
+                        <CatalogProductCard
+                          href={catalogProductHref(product.slug, query)}
+                          key={product.id}
+                          product={product}
+                        />
                       ))}
                     </div>
                   </section>

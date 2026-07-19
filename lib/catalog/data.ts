@@ -23,12 +23,14 @@ export const HOME_CATALOG_PREVIEW_SIZE = 6;
 const HOME_CATALOG_PREVIEW_CANDIDATE_SIZE = 60;
 
 type SearchRow = Database["public"]["Functions"]["search_catalog_products"]["Returns"][number];
+type CuratedSearchRow = Database["public"]["Functions"]["search_curated_catalog_products"]["Returns"][number];
+type CatalogSearchRow = SearchRow | CuratedSearchRow;
 
 function taxonomy(id: string | null, name: string | null, slug: string | null): CatalogTaxonomy | null {
   return id && name && slug ? { id, name, slug } : null;
 }
 
-function coverFromSearch(row: SearchRow): CatalogImage {
+function coverFromSearch(row: CatalogSearchRow): CatalogImage {
   return {
     altText: row.cover_alt_text,
     blurDataUrl: row.cover_blur_data_url,
@@ -41,7 +43,7 @@ function coverFromSearch(row: SearchRow): CatalogImage {
   };
 }
 
-function cardFromSearch(row: SearchRow): CatalogProductCard {
+function cardFromSearch(row: CatalogSearchRow): CatalogProductCard {
   return {
     availability: row.availability_status,
     brand: taxonomy(row.brand_id, row.brand_name, row.brand_slug),
@@ -76,18 +78,26 @@ function createOptionalSupabasePublicClient() {
 
 export async function getCatalogPage(query: CatalogQuery): Promise<CatalogPageResult> {
   const supabase = createSupabasePublicClient();
-  const args: Database["public"]["Functions"]["search_catalog_products"]["Args"] = {
+  const commonArgs = {
     p_page_offset: (query.page - 1) * CATALOG_PAGE_SIZE,
     p_page_size: CATALOG_PAGE_SIZE,
   };
 
-  if (query.search) args.p_search_term = query.search;
-  if (query.brand) args.p_brand_slug = query.brand;
-  if (query.category) args.p_category_slug = query.category;
-  if (query.availability) args.p_availability = query.availability;
-  if (query.collection) args.p_collection_slug = query.collection;
+  const optionalArgs = {
+    ...(query.search ? { p_search_term: query.search } : {}),
+    ...(query.brand ? { p_brand_slug: query.brand } : {}),
+    ...(query.category ? { p_category_slug: query.category } : {}),
+    ...(query.availability ? { p_availability: query.availability } : {}),
+    ...(query.collection ? { p_collection_slug: query.collection } : {}),
+  };
 
-  const { data, error } = await supabase.rpc("search_catalog_products", args);
+  const { data, error } = query.style
+    ? await supabase.rpc("search_curated_catalog_products", {
+        ...commonArgs,
+        ...optionalArgs,
+        p_style_slug: query.style,
+      })
+    : await supabase.rpc("search_catalog_products", { ...commonArgs, ...optionalArgs });
   if (error || !data) throw genericCatalogError();
 
   const total = data[0]?.total_count ?? 0;

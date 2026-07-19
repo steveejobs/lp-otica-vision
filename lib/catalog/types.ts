@@ -65,6 +65,7 @@ export type CatalogQuery = {
   collection: string | null;
   page: number;
   search: string;
+  style: string | null;
 };
 
 export type CatalogPageResult = {
