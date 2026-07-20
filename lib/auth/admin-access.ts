@@ -1,7 +1,6 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
-import { cache } from "react";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/supabase";
@@ -17,7 +16,7 @@ export type AdminSession = {
   };
 };
 
-const getAdminSessionCached = cache(async (): Promise<AdminSession | null> => {
+export async function getAdminSession(): Promise<AdminSession | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getClaims();
   const subject = !error && typeof data?.claims?.sub === "string" ? data.claims.sub : null;
@@ -44,10 +43,6 @@ const getAdminSessionCached = cache(async (): Promise<AdminSession | null> => {
       role: profile.role,
     },
   };
-});
-
-export function getAdminSession() {
-  return getAdminSessionCached();
 }
 
 export async function requireAdminSession() {

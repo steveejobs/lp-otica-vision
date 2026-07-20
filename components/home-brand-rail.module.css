@@ -110,22 +110,39 @@
 
 @media (max-width: 720px) {
   .viewport {
-    --rail-slot-width: 84px;
-    --rail-slot-height: 84px;
-    --rail-gap: 6px;
-    --rail-half-gap: 3px;
-    --rail-padding: calc((100vw - 264px) / 2);
-    --rail-edge-fade: 6px;
-    --rail-duration: 30s;
+    --rail-slot-width: clamp(132px, 42vw, 174px);
+    --rail-slot-height: clamp(112px, 32vw, 138px);
+    --rail-gap: clamp(0.65rem, 3vw, 0.95rem);
+    --rail-half-gap: calc(var(--rail-gap) / 2);
+    --rail-padding: 0px;
+    --rail-edge-fade: 18px;
+    --rail-duration: 52s;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 var(--rail-edge-fade),
+      #000 calc(100% - var(--rail-edge-fade)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0,
+      #000 var(--rail-edge-fade),
+      #000 calc(100% - var(--rail-edge-fade)),
+      transparent 100%
+    );
   }
 
   .logo {
-    max-width: min(var(--brand-max-width), calc(var(--rail-slot-width) * 0.88));
-    max-height: min(
-      var(--brand-max-height),
-      calc(var(--rail-slot-height) * 0.52)
+    max-width: min(
+      calc(var(--brand-max-width) * 1.28),
+      calc(var(--rail-slot-width) * 0.84)
     );
-    opacity: 0.92;
+    max-height: min(
+      calc(var(--brand-max-height) * 1.2),
+      calc(var(--rail-slot-height) * 0.58)
+    );
+    opacity: 0.94;
   }
 }
 

@@ -59,6 +59,7 @@
   --radius-sm: 6px;
   --radius-md: 8px;
 
-  --container-mobile: min(92vw, 100%);
+  --page-gutter-mobile: clamp(1rem, 4vw, 1.25rem);
+  --container-mobile: calc(100% - (2 * var(--page-gutter-mobile)));
   --container-desktop: min(88vw, 1320px);
 }

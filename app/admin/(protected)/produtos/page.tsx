@@ -87,7 +87,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
           <label className={styles.field}><span>Arquivo</span><select defaultValue={params.archive ?? "active"} name="archive"><option value="active">Ativos</option><option value="archived">Arquivados</option><option value="all">Todos</option></select></label>
         </form>
         <div className={styles.toolbarActions}>
-          <Link className={styles.buttonLink} href="/admin/produtos/novo" prefetch={false}>Novo produto</Link>
+          <Link className={styles.buttonLink} href="/admin/produtos/novo-produto" prefetch={false}>Novo produto</Link>
           <Link className={styles.buttonLink} href="/admin/disponibilidade" prefetch={false}>Disponibilidade rápida</Link>
         </div>
       </div>

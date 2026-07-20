@@ -90,53 +90,36 @@
   color: var(--vision-muted);
 }
 
-@media (max-width: 370px) {
-  .inner {
-    width: min(92vw, 100%);
-    min-height: 76px;
-    gap: 0.65rem;
-  }
-
-  .actions {
-    gap: 0.55rem;
-  }
-
-  .instagram {
-    width: 44px;
-    justify-content: center;
-  }
-
-  .instagram span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-}
-
 @media (max-width: 720px) {
   .inner {
-    width: min(92vw, 100%);
-    min-height: 78px;
-    gap: 0.65rem;
+    display: grid;
+    width: 100%;
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+    padding: 0.35rem var(--page-gutter-mobile) 0.45rem;
   }
 
   .actions {
-    gap: 0.45rem;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.3rem;
+    padding-top: 0.2rem;
+    border-top: 1px solid rgb(var(--vision-steel-rgb) / 0.3);
   }
 
   .brand {
-    max-width: 106px;
+    width: 114px;
+    max-width: 114px;
+    justify-self: start;
   }
 
   .catalog {
-    padding-inline: 0.2rem;
-    font-size: 0.78rem;
+    width: 100%;
+    justify-content: center;
+    padding-inline: 0.25rem;
+    font-size: 0.74rem;
   }
 
   .catalog::after {
@@ -145,38 +128,40 @@
   }
 
   .instagram {
-    width: 44px;
+    width: 100%;
     justify-content: center;
-    padding-inline: 0;
+    gap: 0.32rem;
+    padding-inline: 0.2rem;
+    font-size: 0.74rem;
   }
 
   .instagram span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
+    position: static;
+    width: auto;
+    height: auto;
     padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    margin: 0;
+    overflow: visible;
+    clip: auto;
     white-space: nowrap;
-    border: 0;
   }
 
   .whatsapp {
-    width: 44px;
-    padding-inline: 0;
+    width: 100%;
+    gap: 0.3rem;
+    padding-inline: 0.25rem;
+    font-size: 0.72rem;
   }
 
   .whatsapp span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
+    position: static;
+    width: auto;
+    height: auto;
     padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
+    margin: 0;
+    overflow: visible;
+    clip: auto;
     white-space: nowrap;
-    border: 0;
   }
 }
 

@@ -17,7 +17,8 @@
   display: grid;
   min-width: 0;
   align-content: start;
-  padding: clamp(1.35rem, 5vw, 1.8rem) 4vw clamp(1.3rem, 4.8vw, 1.7rem);
+  padding: clamp(1.35rem, 5vw, 1.8rem) var(--page-gutter-mobile)
+    clamp(1.3rem, 4.8vw, 1.7rem);
 }
 
 .copyField::after {
@@ -259,7 +260,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.8rem;
-  padding-inline: 4vw;
+  padding-inline: var(--page-gutter-mobile);
   border-top: 1px solid var(--vision-line);
   background: var(--vision-paper);
 }

@@ -84,8 +84,8 @@
 
 @media (max-width: 720px) {
   .inner {
-    gap: 2rem;
-    padding-block: 3.2rem 3rem;
+    gap: 2.4rem;
+    padding-block: 3.4rem 3.2rem;
   }
 
   .intro h2 {

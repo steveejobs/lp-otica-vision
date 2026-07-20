@@ -281,7 +281,7 @@
     padding: 3.5rem 0 4.25rem;
   }
 
-  .inner { width: min(92vw, 100%); }
+  .inner { width: var(--container-mobile); }
 
   .header {
     grid-template-columns: 1fr;

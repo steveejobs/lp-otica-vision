@@ -56,7 +56,7 @@ function BrandGroup({
                 decoding="async"
                 height={brand.height}
                 loading="lazy"
-                sizes="(max-width: 720px) 84px, 146px"
+                sizes="(max-width: 720px) 164px, 146px"
                 src={brand.src}
                 style={logoStyle}
                 width={brand.width}

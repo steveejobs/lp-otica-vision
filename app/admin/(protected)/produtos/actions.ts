@@ -316,7 +316,7 @@ export async function createProductAction(formData: FormData) {
   } catch (error) {
     errorCode = mutationErrorCode(error);
   }
-  if (errorCode || !id) redirect(appendFeedback("/admin/produtos/novo", "error", errorCode ?? "failed"));
+  if (errorCode || !id) redirect(appendFeedback("/admin/produtos/novo-produto", "error", errorCode ?? "failed"));
   revalidatePath("/admin/produtos");
   redirect(appendFeedback(`/admin/produtos/${id}`, "status", "created"));
 }

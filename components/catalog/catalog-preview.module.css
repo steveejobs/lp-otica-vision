@@ -304,7 +304,7 @@
   }
 
   .inner {
-    width: min(92vw, 100%);
+    width: var(--container-mobile);
     gap: 1.8rem;
   }
 
