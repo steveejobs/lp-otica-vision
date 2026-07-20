@@ -82,7 +82,6 @@ export default async function EditProductPage({
   const linkedBrand = brandResult.data.find((brand) => brand.id === product.brand_id);
   const linkedCategory = categoryResult.data.find((category) => category.id === product.category_id);
   const blockingIssues = [
-    ...(!product.sku.trim() ? ["SKU ausente"] : []),
     ...(!product.name.trim() ? ["nome ausente"] : []),
     ...(!hasCover ? ["capa completa ausente"] : []),
     ...(linkedBrand && !linkedBrand.active ? ["marca vinculada inativa"] : []),

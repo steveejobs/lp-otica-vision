@@ -8,9 +8,11 @@ import type { HeroWallMedia } from "./hero-types";
 /** Keeps loading recovery local to the image so the hero composition stays static. */
 export function HeroMedia({
   item,
+  onReady,
   priority = false,
 }: {
   item: HeroWallMedia;
+  onReady?: (id: string) => void;
   priority?: boolean;
 }) {
   const imageRef = useRef<HTMLImageElement>(null);
@@ -33,6 +35,10 @@ export function HeroMedia({
 
     return () => window.cancelAnimationFrame(frame);
   }, [item.fallbackSrc, src, useFallback]);
+
+  useEffect(() => {
+    if (ready) onReady?.(item.id);
+  }, [item.id, onReady, ready]);
 
   return (
     <figure
@@ -57,6 +63,7 @@ export function HeroMedia({
         <img
           alt={item.alt}
           decoding={priority ? "sync" : "async"}
+          draggable={false}
           fetchPriority={priority ? "high" : "auto"}
           height={item.height}
           loading={priority ? "eager" : "lazy"}

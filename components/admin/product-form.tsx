@@ -128,7 +128,7 @@ export function ProductForm({
             <section aria-labelledby="product-main-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
                 <span>1</span>
-                <div><h3 id="product-main-title">Informações principais</h3><p>O essencial para identificar o produto na vitrine.</p></div>
+                <div><h3 id="product-main-title">Informações</h3><p>O essencial para apresentar o produto na vitrine.</p></div>
               </div>
               <div className={styles.formGrid}>
                 <label className={`${styles.field} ${styles.fieldWide}`}>
@@ -160,10 +160,6 @@ export function ProductForm({
                     {categories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? "" : " · inativa"}</option>)}
                   </select>
                 </label>
-                <label className={styles.field}>
-                  <span>Cor (opcional)</span>
-                  <input defaultValue={defaults.color ?? ""} maxLength={120} name="color" />
-                </label>
               </div>
               {styleOptions.length ? (
                 <ProductStyleSelector
@@ -172,12 +168,18 @@ export function ProductForm({
                   options={styleOptions}
                 />
               ) : null}
+              <div className={styles.formGrid}>
+                <label className={styles.field}>
+                  <span>Cor (opcional)</span>
+                  <input defaultValue={defaults.color ?? ""} maxLength={120} name="color" />
+                </label>
+              </div>
             </section>
 
             <section aria-labelledby="product-presentation-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
                 <span>2</span>
-                <div><h3 id="product-presentation-title">Apresentação</h3><p>{editing ? "Adicione as imagens e escolha a capa logo abaixo deste formulário." : "Depois de salvar o rascunho, você poderá adicionar as imagens e escolher a capa."}</p></div>
+                <div><h3 id="product-presentation-title">Apresentação</h3><p>{editing ? "Imagens e capa podem ser ajustadas logo abaixo. Depois, complete a descrição curta." : "Salve o rascunho para adicionar imagens e escolher a capa."}</p></div>
               </div>
               <div className={styles.formGrid}>
                 <label className={`${styles.field} ${styles.fieldWide}`}>
@@ -190,14 +192,14 @@ export function ProductForm({
             <section aria-labelledby="product-sale-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
                 <span>3</span>
-                <div><h3 id="product-sale-title">Venda e contato</h3><p>Preço e estado comercial, sem controle de quantidade.</p></div>
+                <div><h3 id="product-sale-title">Contato</h3><p>Defina como o produto aparece para quem consulta a Vision.</p></div>
               </div>
               <div className={styles.commercialFields}>
                 <fieldset className={styles.choiceGroup}>
                   <legend>Preço</legend>
                   <div className={styles.segmentedControl}>
-                    <label><input checked={priceMode === "defined"} name="price_mode" onChange={() => setPriceMode("defined")} type="radio" value="defined" /><span>Preço definido</span></label>
                     <label><input checked={priceMode === "consult"} name="price_mode" onChange={() => { setPriceMode("consult"); setPriceCents(""); }} type="radio" value="consult" /><span>Sob consulta</span></label>
+                    <label><input checked={priceMode === "defined"} name="price_mode" onChange={() => setPriceMode("defined")} type="radio" value="defined" /><span>Preço definido</span></label>
                   </div>
                   <input name="price_cents" type="hidden" value={priceMode === "defined" ? priceCents : ""} />
                   {priceMode === "defined" ? (
