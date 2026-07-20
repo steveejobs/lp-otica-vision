@@ -57,6 +57,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() ?? "";
+
   return (
     <html lang="pt-BR" data-scroll-behavior="smooth">
       <body>
@@ -65,7 +67,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <VisionMotion />
         <Suspense fallback={null}>
-          <AnalyticsRuntime measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()} />
+          <AnalyticsRuntime measurementId={measurementId} />
         </Suspense>
         <Suspense fallback={null}>
           <CatalogTransitionManager />

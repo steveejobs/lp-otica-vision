@@ -80,7 +80,7 @@ function sendInternal(payload: object, transport: AnalyticsEventInput["transport
 }
 
 function sendGoogle(eventName: string, properties: AnalyticsProperties, productId?: string | null) {
-  if (readAnalyticsConsent() !== "accepted" || !window.__visionGaReady || typeof window.gtag !== "function") return;
+  if (readAnalyticsConsent() !== "accepted" || typeof window.gtag !== "function") return;
   const debugMode = (() => { try { return window.sessionStorage.getItem("vision.ga.debug") === "1"; } catch { return false; } })();
   window.gtag("event", eventName, {
     ...properties,

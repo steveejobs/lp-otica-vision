@@ -1,6 +1,5 @@
 "use client";
 
-import Script from "next/script";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -23,13 +22,17 @@ function filteredSearch(pathname: string, search: URLSearchParams) {
   return value ? `?${value}` : "";
 }
 
-export function AnalyticsRuntime({ measurementId }: { measurementId?: string }) {
+function isMeasurementId(value: string) {
+  return /^G-[A-Z0-9]+$/i.test(value);
+}
+
+export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [consent, setConsent] = useState<AnalyticsConsentChoice>("unknown");
   const [initialized, setInitialized] = useState(false);
-  const [scriptReady, setScriptReady] = useState(false);
   const previousLocation = useRef("");
+  const initializedMeasurementId = useRef<string | null>(null);
   const publicRoute = !pathname.startsWith("/admin") && !pathname.startsWith("/preview");
   const location = useMemo(() => `${pathname}${filteredSearch(pathname, searchParams)}`, [pathname, searchParams]);
 
@@ -39,6 +42,29 @@ export function AnalyticsRuntime({ measurementId }: { measurementId?: string }) 
     window.addEventListener(ANALYTICS_CONSENT_CHANGE_EVENT, update);
     return () => { window.clearTimeout(timer); window.removeEventListener(ANALYTICS_CONSENT_CHANGE_EVENT, update); };
   }, []);
+
+  useEffect(() => {
+    if (!publicRoute || consent !== "accepted" || !isMeasurementId(measurementId)) return;
+    if (initializedMeasurementId.current === measurementId) return;
+
+    window.dataLayer = window.dataLayer ?? [];
+    window.gtag = window.gtag ?? ((...args: unknown[]) => { window.dataLayer?.push(args); });
+    window.gtag("js", new Date());
+    window.gtag("consent", "default", {
+      ad_personalization: "denied",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      analytics_storage: "granted",
+    });
+    window.gtag("config", measurementId, { anonymize_ip: true });
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.id = "vision-google-analytics";
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+    document.head.append(script);
+    initializedMeasurementId.current = measurementId;
+  }, [consent, measurementId, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute) return;
@@ -101,40 +127,8 @@ export function AnalyticsRuntime({ measurementId }: { measurementId?: string }) 
     return () => document.removeEventListener("click", handleClick, { capture: true });
   }, [pathname, publicRoute]);
 
-  const enableGoogle = initialized && publicRoute && consent === "accepted" && Boolean(measurementId);
-
   return (
     <>
-      {enableGoogle && !scriptReady ? (
-        <Script id="vision-google-consent" strategy="afterInteractive">
-          {`window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments)};window.gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',wait_for_update:500});window.gtag('consent','update',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});`}
-        </Script>
-      ) : null}
-      {enableGoogle ? (
-        <Script
-          id="vision-google-analytics"
-          onReady={() => {
-            if (!measurementId || typeof window.gtag !== "function") return;
-            window.gtag("js", new Date());
-            window.gtag("config", measurementId, {
-              allow_ad_personalization_signals: false,
-              allow_google_signals: false,
-              send_page_view: false,
-            });
-            const debugMode = (() => { try { return window.sessionStorage.getItem("vision.ga.debug") === "1"; } catch { return false; } })();
-            window.gtag("event", "page_view", {
-              ...(debugMode ? { debug_mode: true } : {}),
-              page_location: `${window.location.origin}${location}`,
-              page_title: document.title,
-            });
-            window.__visionGaReady = true;
-            setScriptReady(true);
-            window.dispatchEvent(new Event("vision:ga-ready"));
-          }}
-          src={`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId ?? "")}`}
-          strategy="afterInteractive"
-        />
-      ) : null}
       {initialized && publicRoute ? <PrivacyConsent initialChoice={consent} key={consent} /> : null}
       {initialized ? <span data-analytics-runtime-ready hidden /> : null}
     </>
