@@ -55,6 +55,8 @@ export function VisionCuration({
   const previousRects = useRef(new Map<string, DOMRect>());
   const requestRef = useRef<AbortController | null>(null);
   const manualPrimaryPauseUntil = useRef(0);
+  const hoverDebounceRef = useRef<number | null>(null);
+  const activeAnimations = useRef<Animation[]>([]);
   const [selection, setSelection] = useState(initialSelection);
   const [requestedStyle, setRequestedStyle] = useState(initialSelection.styleSlug);
   const [focusId, setFocusId] = useState(initialSelection.products[0]?.id ?? null);
@@ -75,7 +77,10 @@ export function VisionCuration({
   const activeProduct = products[0];
   const activeWhatsappUrl = activeProduct ? whatsappUrls[activeProduct.id] : undefined;
 
-  useEffect(() => () => requestRef.current?.abort(), []);
+  useEffect(() => () => {
+    requestRef.current?.abort();
+    if (hoverDebounceRef.current) window.clearTimeout(hoverDebounceRef.current);
+  }, []);
 
   useEffect(() => {
     const element = rootRef.current;
@@ -120,13 +125,14 @@ export function VisionCuration({
         const scaleX = previous.width / Math.max(next.width, 1);
         const scaleY = previous.height / Math.max(next.height, 1);
         if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1 && Math.abs(scaleX - 1) < 0.01 && Math.abs(scaleY - 1) < 0.01) continue;
-        element.animate(
+        const anim = element.animate(
           [
             { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${scaleX}, ${scaleY})` },
             { transform: "translate3d(0, 0, 0) scale(1)" },
           ],
-          { duration: 520, easing: "cubic-bezier(.22,.72,.18,1)" },
+          { duration: 420, easing: "cubic-bezier(.22,.72,.18,1)" },
         );
+        activeAnimations.current.push(anim);
       }
       currentRects.current = nextRects;
     });
@@ -224,9 +230,17 @@ export function VisionCuration({
   const changeFocus = useCallback((id: string) => {
     if (id === focusId) return;
     if (typeof window !== "undefined" && !window.matchMedia("(min-width: 721px)").matches) return;
-    manualPrimaryPauseUntil.current = Date.now() + PRIMARY_MANUAL_HOLD_MS;
-    captureRects();
-    setFocusId(id);
+    if (hoverDebounceRef.current) window.clearTimeout(hoverDebounceRef.current);
+    hoverDebounceRef.current = window.setTimeout(() => {
+      // Cancel any in-flight FLIP animations
+      for (const anim of activeAnimations.current) {
+        try { anim.cancel(); } catch { /* already finished */ }
+      }
+      activeAnimations.current = [];
+      manualPrimaryPauseUntil.current = Date.now() + PRIMARY_MANUAL_HOLD_MS;
+      captureRects();
+      setFocusId(id);
+    }, 120);
   }, [captureRects, focusId]);
 
   function moveChoice(event: KeyboardEvent<HTMLButtonElement>) {

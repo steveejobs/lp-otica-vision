@@ -187,7 +187,7 @@
 
   .link:hover .media img {
     filter: saturate(1.02) contrast(1.01);
-    transform: scale(1.025);
+    transform: scale(1.008);
   }
 
   .link:hover .action svg {

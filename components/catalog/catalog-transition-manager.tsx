@@ -196,7 +196,7 @@ export function CatalogTransitionManager() {
             { borderRadius: "var(--radius-md)", clipPath: "inset(1.5%)", transform: "translate3d(0,0,0) scale(1)" },
             { borderRadius: "var(--radius-md)", clipPath: "inset(0)", transform: `translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})` },
           ],
-          { duration: 440, easing: "cubic-bezier(.76,0,.24,1)", fill: "forwards" },
+          { duration: 360, easing: "cubic-bezier(.76,0,.24,1)", fill: "forwards" },
         );
         transition.finished.finally(() => {
           pending.node.remove();
@@ -247,7 +247,7 @@ export function CatalogTransitionManager() {
                   { transform: `translate3d(${previous.left - destination.left}px,${previous.top - destination.top}px,0)`, clipPath: "inset(0)" },
                   { transform: "translate3d(0,0,0)", clipPath: "inset(0)" },
                 ],
-                { duration: 360, easing: "cubic-bezier(.22,.61,.36,1)" },
+                { duration: 300, easing: "cubic-bezier(.22,.61,.36,1)" },
               ));
             } else {
               const ghost = document.createElement("img");

@@ -20,6 +20,7 @@ export const analyticsEventNames = [
   "bio_link_clicked",
   "lab_cta_clicked",
   "external_link_clicked",
+  "scroll_depth",
 ] as const;
 
 export type AnalyticsEventName = (typeof analyticsEventNames)[number];
@@ -45,6 +46,7 @@ export const analyticsPropertyNames = [
   "page_title",
   "page_location",
   "page_referrer",
+  "scroll_percent",
 ] as const;
 
 export type AnalyticsPropertyName = (typeof analyticsPropertyNames)[number];

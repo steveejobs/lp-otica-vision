@@ -44,7 +44,7 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
   }, []);
 
   useEffect(() => {
-    if (!publicRoute || consent !== "accepted" || !isMeasurementId(measurementId)) return;
+    if (!publicRoute || !isMeasurementId(measurementId)) return;
     if (initializedMeasurementId.current === measurementId) return;
 
     window.dataLayer = window.dataLayer ?? [];
@@ -54,17 +54,46 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
       ad_personalization: "denied",
       ad_storage: "denied",
       ad_user_data: "denied",
-      analytics_storage: "granted",
+      analytics_storage: "denied",
     });
     window.gtag("config", measurementId, { anonymize_ip: true });
 
-    const script = document.createElement("script");
-    script.async = true;
-    script.id = "vision-google-analytics";
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
-    document.head.append(script);
+    const existing = document.getElementById("vision-google-analytics");
+    if (!existing) {
+      const script = document.createElement("script");
+      script.async = true;
+      script.id = "vision-google-analytics";
+      script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
+      document.head.append(script);
+    }
     initializedMeasurementId.current = measurementId;
-  }, [consent, measurementId, publicRoute]);
+  }, [measurementId, publicRoute]);
+
+  useEffect(() => {
+    if (!publicRoute || consent === "unknown") return;
+    window.gtag?.("consent", "update", {
+      analytics_storage: consent === "accepted" ? "granted" : "denied",
+    });
+  }, [consent, publicRoute]);
+
+  useEffect(() => {
+    if (!publicRoute) return;
+    const milestones = [25, 50, 75, 100];
+    const sent = new Set<number>();
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (scrollHeight <= 0) return;
+      const percent = Math.round((window.scrollY / scrollHeight) * 100);
+      for (const milestone of milestones) {
+        if (percent >= milestone && !sent.has(milestone)) {
+          sent.add(milestone);
+          trackEvent({ eventName: "scroll_depth" as Parameters<typeof trackEvent>[0]["eventName"], properties: { scroll_percent: String(milestone), source_route: pathname } });
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute) return;

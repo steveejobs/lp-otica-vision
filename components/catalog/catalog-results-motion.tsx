@@ -18,12 +18,12 @@ export function CatalogResultsMotion({ children, motionKey }: CatalogResultsMoti
     const cards = [...root.querySelectorAll<HTMLElement>("[data-catalog-product-id]")];
     const animations = cards.map((card, index) => card.animate(
       [
-        { clipPath: "inset(12% 0 0 0)", opacity: 0, transform: "translate3d(0, 24px, 0) scale(.988)" },
+        { clipPath: "inset(6% 0 0 0)", opacity: 0, transform: "translate3d(0, 16px, 0) scale(.994)" },
         { clipPath: "inset(0)", opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
       ],
       {
-        delay: Math.min(index, 7) * 58,
-        duration: 620,
+        delay: Math.min(index, 7) * 42,
+        duration: 440,
         easing: "cubic-bezier(.22,.72,.18,1)",
         fill: "both",
       },

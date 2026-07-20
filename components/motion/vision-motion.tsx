@@ -5,12 +5,12 @@ import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
-const ROUTE_EXIT_MS = 760;
-const ROUTE_ENTER_MS = 1_080;
+const ROUTE_EXIT_MS = 480;
+const ROUTE_ENTER_MS = 680;
 const CATALOG_ROUTE_EXIT_MS = 520;
 const CATALOG_ROUTE_ENTER_MS = 760;
 const HYDRATION_SETTLE_MS = 420;
-const STAGGER_STEP_MS = 118;
+const STAGGER_STEP_MS = 72;
 const STAGGER_LIMIT = 9;
 const CATALOG_STAGGER_STEP_MS = 64;
 const CATALOG_STAGGER_LIMIT = 5;
