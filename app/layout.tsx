@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 
+import { AnalyticsRuntime } from "@/components/analytics/analytics-runtime";
 import { CatalogTransitionManager } from "@/components/catalog/catalog-transition-manager";
 import { VisionMotion } from "@/components/motion";
 import { heroMedia, identityAssets } from "@/lib/assets";
@@ -63,6 +64,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Pular para o conteúdo
         </a>
         <VisionMotion />
+        <Suspense fallback={null}>
+          <AnalyticsRuntime measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()} />
+        </Suspense>
         <Suspense fallback={null}>
           <CatalogTransitionManager />
         </Suspense>

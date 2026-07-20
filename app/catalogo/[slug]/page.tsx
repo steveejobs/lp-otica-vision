@@ -171,7 +171,7 @@ export default async function CatalogProductPage({
           </section>
         ) : null}
 
-        <ProductViewAnalytics productId={product.id} />
+        <ProductViewAnalytics productId={product.id} productSlug={product.slug} />
         <script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
           type="application/ld+json"

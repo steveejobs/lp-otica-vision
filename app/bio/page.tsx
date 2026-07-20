@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Home, MapPin, MessageCircle } from "lucide-react";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { PrivacyPreferencesButton } from "@/components/analytics/privacy-preferences-button";
 import { BrandRail } from "@/components/brand-rail";
 import { BioCurationLink } from "@/components/curation/bio-curation-link";
 import { InstagramIcon } from "@/components/instagram-icon";
@@ -129,6 +130,7 @@ export default async function BioPage() {
           <span>Ver rota</span>
         </a>
       </section>
+      <footer className={styles.privacyFooter}><PrivacyPreferencesButton /></footer>
     </main>
   );
 }

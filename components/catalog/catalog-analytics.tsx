@@ -8,9 +8,11 @@ import type { CatalogQuery } from "@/lib/catalog/types";
 export function CatalogAnalytics({
   collectionId,
   query,
+  resultCount,
 }: {
   collectionId: string | null;
   query: CatalogQuery;
+  resultCount: number;
 }) {
   const lastSignature = useRef("");
 
@@ -21,9 +23,10 @@ export function CatalogAnalytics({
 
     if (query.search) {
       void trackCatalogEvent({
-        eventName: "catalog_search",
-        metadata: { query: query.search },
+        eventName: "search_performed",
+        metadata: { search_result_count: resultCount },
       });
+      if (resultCount === 0) void trackCatalogEvent({ eventName: "search_zero_results", metadata: { search_result_count: 0 } });
     }
 
     const filters = [
@@ -37,35 +40,58 @@ export function CatalogAnalytics({
     for (const [filter, value] of filters) {
       if (!value) continue;
       void trackCatalogEvent({
-        eventName: "catalog_filter",
-        metadata: { filter, value },
-      });
-      void trackCatalogEvent({
         eventName: "catalog_filter_changed",
-        metadata: { filter, value },
+        metadata: { filter_name: filter, filter_value: value },
       });
+      if (filter === "marca") void trackCatalogEvent({ eventName: "brand_selected", metadata: { brand_slug: value } });
+      if (filter === "categoria") void trackCatalogEvent({ eventName: "category_selected", metadata: { category_slug: value } });
+      if (filter === "estilo") void trackCatalogEvent({ eventName: "style_selected", metadata: { style_slug: value } });
     }
 
     if (query.collection && collectionId) {
       void trackCatalogEvent({
         collectionId,
-        eventName: "collection_view",
-        metadata: { source: "catalog_filter" },
+        eventName: "collection_opened",
+        metadata: { collection_slug: query.collection, source_route: "/catalogo" },
       });
     }
-  }, [collectionId, query]);
+  }, [collectionId, query, resultCount]);
+
+  useEffect(() => {
+    const observed = new Set<string>();
+    const timers = new Map<string, number>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        const card = entry.target as HTMLElement;
+        const id = card.dataset.catalogProductId;
+        if (!id || observed.has(id)) continue;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
+          const timer = window.setTimeout(() => {
+            observed.add(id);
+            void trackCatalogEvent({ eventName: "product_focused", productId: id });
+          }, 1100);
+          timers.set(id, timer);
+        } else if (timers.has(id)) {
+          window.clearTimeout(timers.get(id));
+          timers.delete(id);
+        }
+      }
+    }, { threshold: [0.65] });
+    document.querySelectorAll<HTMLElement>("article[data-catalog-product-id]").forEach((card) => observer.observe(card));
+    return () => { observer.disconnect(); timers.forEach((timer) => window.clearTimeout(timer)); };
+  }, [query]);
 
   return null;
 }
 
-export function ProductViewAnalytics({ productId }: { productId: string }) {
+export function ProductViewAnalytics({ productId, productSlug }: { productId: string; productSlug: string }) {
   const sent = useRef(false);
 
   useEffect(() => {
     if (sent.current) return;
     sent.current = true;
-    void trackCatalogEvent({ eventName: "product_view", productId });
-  }, [productId]);
+    void trackCatalogEvent({ eventName: "product_opened", metadata: { product_slug: productSlug }, productId });
+  }, [productId, productSlug]);
 
   return null;
 }

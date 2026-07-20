@@ -21,6 +21,8 @@ export function LocationSection() {
 
       <div className={styles.actions}>
         <VisionButton
+          analyticsEvent="general_whatsapp_clicked"
+          analyticsLocation="location_section"
           href={LINKS.whatsapp}
           icon={MessageCircle}
           external
@@ -29,6 +31,8 @@ export function LocationSection() {
           Falar no WhatsApp
         </VisionButton>
         <VisionButton
+          analyticsEvent="map_clicked"
+          analyticsLocation="location_section"
           href={LINKS.maps}
           icon={MapPin}
           variant="secondary"

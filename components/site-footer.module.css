@@ -41,6 +41,20 @@
   white-space: nowrap;
 }
 
+.privacy {
+  min-height: 44px;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vision-muted);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--vision-muted-text-rgb) / 0.38);
+  text-underline-offset: 0.3rem;
+  cursor: pointer;
+}
+
 .links a {
   min-height: 44px;
   display: inline-flex;
@@ -79,4 +93,6 @@
     grid-column: auto;
     justify-self: end;
   }
+
+  .privacy { grid-column: 2 / -1; justify-self: end; }
 }

@@ -4,45 +4,35 @@ import { createHmac } from "node:crypto";
 
 import { NextResponse } from "next/server";
 
+import { analyticsEventNames, type AnalyticsEventName } from "@/lib/analytics/events";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Database, Json } from "@/types/supabase";
 
 export const runtime = "nodejs";
 
 type EventName = Database["public"]["Enums"]["analytics_event_name"];
-
-const eventNames = new Set<EventName>([
-  "page_view",
-  "product_view",
-  "product_whatsapp_click",
-  "collection_view",
-  "promotion_view",
-  "promotion_click",
-  "gallery_interaction",
-  "catalog_search",
-  "catalog_filter",
-  "style_selected",
-  "category_selected",
-  "curation_product_opened",
-  "curation_view_more",
-  "catalog_filter_changed",
-  "catalog_product_opened",
-  "curation_whatsapp_clicked",
-]);
+const eventNames = new Set<AnalyticsEventName>(analyticsEventNames);
 const metadataKeys = new Set([
-  "filter",
-  "item_index",
-  "position",
-  "query",
-  "source",
-  "surface",
-  "test",
-  "value",
-  "viewport",
+  "availability",
+  "brand_slug",
+  "category_slug",
+  "click_location",
+  "collection_slug",
+  "filter_name",
+  "filter_value",
+  "product_slug",
+  "search_result_count",
+  "source_route",
+  "style_slug",
+  "utm_campaign",
+  "utm_content",
+  "utm_medium",
+  "utm_source",
+  "utm_term",
 ]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const FILTER_NAMES = new Set(["categoria", "colecao", "disponibilidade", "estilo", "marca"]);
 const FILTER_VALUE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ROUTE_PATTERN = /^\/[a-z0-9/_-]*$/i;
 
 function jsonResponse(body: object, status: number) {
   return NextResponse.json(body, {
@@ -70,21 +60,12 @@ function sanitizeMetadata(value: unknown): Json {
     } else if (typeof item === "string") {
       const normalized = item.normalize("NFKC").replace(/\s+/g, " ").trim();
       if (!normalized || normalized.length > 100) continue;
-      if (key === "query") {
-        if (
-          normalized.length > 60 ||
-          normalized.includes("@") ||
-          /https?:\/\//i.test(normalized) ||
-          /\d{6,}/.test(normalized)
-        ) continue;
-        clean[key] = normalized.toLocaleLowerCase("pt-BR");
-      } else if (key === "filter") {
-        if (FILTER_NAMES.has(normalized)) clean[key] = normalized;
-      } else if (key === "value") {
+      if (normalized.includes("@") || /https?:\/\//i.test(normalized) || /\d{6,}/.test(normalized)) continue;
+      if (key === "source_route") {
+        if (ROUTE_PATTERN.test(normalized)) clean[key] = normalized;
+      } else if (["brand_slug", "category_slug", "collection_slug", "filter_name", "filter_value", "product_slug", "style_slug", "availability"].includes(key)) {
         if (FILTER_VALUE_PATTERN.test(normalized)) clean[key] = normalized;
-      } else {
-        clean[key] = normalized;
-      }
+      } else clean[key] = normalized;
     }
   }
 
@@ -155,7 +136,7 @@ export async function POST(request: Request) {
 
   if (
     typeof eventName !== "string" ||
-    !eventNames.has(eventName as EventName) ||
+    !eventNames.has(eventName as AnalyticsEventName) ||
     typeof route !== "string" ||
     !route.startsWith("/") ||
     route.startsWith("//") ||

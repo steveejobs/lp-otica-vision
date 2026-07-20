@@ -2,8 +2,6 @@
 
 import { MessageCircle } from "lucide-react";
 
-import { trackCatalogEvent } from "@/lib/analytics/client";
-
 import styles from "./product-whatsapp-button.module.css";
 
 export function ProductWhatsappButton({
@@ -20,14 +18,10 @@ export function ProductWhatsappButton({
   return (
     <a
       className={styles.button}
+      data-analytics-event="product_whatsapp_clicked"
+      data-analytics-location={curated ? "curated_product_detail" : "product_detail"}
+      data-analytics-product-id={productId}
       href={href}
-      onClick={() => {
-        void trackCatalogEvent({
-          eventName: curated ? "curation_whatsapp_clicked" : "product_whatsapp_click",
-          metadata: { surface: "product_detail" },
-          productId,
-        });
-      }}
       rel="noopener noreferrer"
       target="_blank"
     >

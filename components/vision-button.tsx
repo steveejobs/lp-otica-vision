@@ -12,6 +12,8 @@ type VisionButtonProps = {
   external?: boolean;
   className?: string;
   onClick?: () => void;
+  analyticsEvent?: string;
+  analyticsLocation?: string;
 };
 
 export function VisionButton({
@@ -23,6 +25,8 @@ export function VisionButton({
   external = false,
   className = "",
   onClick,
+  analyticsEvent,
+  analyticsLocation,
 }: VisionButtonProps) {
   const content = (
     <>
@@ -37,6 +41,8 @@ export function VisionButton({
         className={`${styles.button} ${styles[variant]} ${className}`}
         href={href}
         aria-label={ariaLabel}
+        data-analytics-event={analyticsEvent}
+        data-analytics-location={analyticsLocation}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
       >

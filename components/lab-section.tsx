@@ -44,6 +44,8 @@ export function LabSection({ media }: LabSectionProps) {
           Confecção própria em Araguaína - TO, com cuidado no acabamento.
         </p>
         <VisionButton
+          analyticsEvent="lab_cta_clicked"
+          analyticsLocation="lab_section"
           href={LINKS.whatsapp}
           icon={MessageCircle}
           external

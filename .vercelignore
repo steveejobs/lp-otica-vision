@@ -24,7 +24,7 @@ playwright-report/
 test-results/
 artifacts/
 tests/
-test/
+/test/
 __tests__/
 e2e/
 *.log

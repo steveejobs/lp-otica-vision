@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-import { trackCatalogEvent } from "@/lib/analytics/client";
 
 import styles from "./catalog-transition-manager.module.css";
 
@@ -78,8 +77,6 @@ export function CatalogTransitionManager() {
   const filterSnapshotRef = useRef<FilterSnapshot | null>(null);
   const markerRef = useRef<HTMLSpanElement>(null);
   const routeKey = `${pathname}?${searchParams.toString()}`;
-  const selectedStyle = searchParams.get("estilo");
-  const analyticsEnabled = !pathname.startsWith("/preview/curadoria");
   const currentHref = `${pathname}${searchParams.size ? `?${searchParams.toString()}` : ""}`;
 
   useEffect(() => {
@@ -115,13 +112,6 @@ export function CatalogTransitionManager() {
       }
       const card = link.closest<HTMLElement>("[data-catalog-product-id]");
       const productId = card?.dataset.catalogProductId ?? link.dataset.catalogProductId ?? null;
-      if (analyticsEnabled && pathname.endsWith("/catalogo") && productId) {
-        void trackCatalogEvent({
-          eventName: "catalog_product_opened",
-          metadata: { source: selectedStyle ? "style_filter" : "catalog" },
-          productId,
-        });
-      }
       if (reducedMotion()) return;
       const collection = link.hasAttribute("data-catalog-collection-link");
       const sourceElement = collection
@@ -170,7 +160,7 @@ export function CatalogTransitionManager() {
       document.removeEventListener("submit", onSubmit, true);
       if (marker) delete marker.dataset.ready;
     };
-  }, [analyticsEnabled, pathname, router, selectedStyle]);
+  }, [pathname, router]);
 
   useEffect(() => {
     if (reducedMotion()) {

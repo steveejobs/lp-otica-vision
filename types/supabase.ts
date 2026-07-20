@@ -1236,6 +1236,7 @@ export type Database = {
     }
     Functions: {
       admin_catalog_analytics: { Args: { p_days?: number }; Returns: Json }
+      admin_analytics_report: { Args: { p_days?: number }; Returns: Json }
       allocate_product_sku: { Args: never; Returns: string }
       catalog_filter_options: {
         Args: never
@@ -1440,6 +1441,23 @@ export type Database = {
         | "catalog_filter_changed"
         | "catalog_product_opened"
         | "curation_whatsapp_clicked"
+        | "hero_interaction"
+        | "curation_viewed"
+        | "brand_selected"
+        | "collection_opened"
+        | "catalog_opened"
+        | "catalog_view_more"
+        | "search_performed"
+        | "search_zero_results"
+        | "product_focused"
+        | "product_opened"
+        | "product_whatsapp_clicked"
+        | "general_whatsapp_clicked"
+        | "map_clicked"
+        | "instagram_clicked"
+        | "bio_link_clicked"
+        | "lab_cta_clicked"
+        | "external_link_clicked"
       availability_status:
         | "available"
         | "last_unit"
@@ -1601,6 +1619,23 @@ export const Constants = {
         "catalog_filter_changed",
         "catalog_product_opened",
         "curation_whatsapp_clicked",
+        "hero_interaction",
+        "curation_viewed",
+        "brand_selected",
+        "collection_opened",
+        "catalog_opened",
+        "catalog_view_more",
+        "search_performed",
+        "search_zero_results",
+        "product_focused",
+        "product_opened",
+        "product_whatsapp_clicked",
+        "general_whatsapp_clicked",
+        "map_clicked",
+        "instagram_clicked",
+        "bio_link_clicked",
+        "lab_cta_clicked",
+        "external_link_clicked",
       ],
       availability_status: [
         "available",

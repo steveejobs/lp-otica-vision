@@ -22,6 +22,8 @@ export function HeroCopy() {
         <p className={styles.support}>{heroContent.support}</p>
         <div className={styles.actions}>
           <VisionButton
+            analyticsEvent="hero_interaction"
+            analyticsLocation="hero_whatsapp"
             ariaLabel={heroContent.actions.primary.ariaLabel}
             external
             href={LINKS.whatsapp}
@@ -30,6 +32,8 @@ export function HeroCopy() {
             {heroContent.actions.primary.label}
           </VisionButton>
           <VisionButton
+            analyticsEvent="hero_interaction"
+            analyticsLocation="hero_instagram"
             ariaLabel={heroContent.actions.secondary.ariaLabel}
             external
             href={LINKS.instagram}

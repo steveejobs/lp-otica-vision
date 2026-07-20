@@ -1,0 +1,17 @@
+alter type public.analytics_event_name add value if not exists 'hero_interaction';
+alter type public.analytics_event_name add value if not exists 'curation_viewed';
+alter type public.analytics_event_name add value if not exists 'brand_selected';
+alter type public.analytics_event_name add value if not exists 'collection_opened';
+alter type public.analytics_event_name add value if not exists 'catalog_opened';
+alter type public.analytics_event_name add value if not exists 'catalog_view_more';
+alter type public.analytics_event_name add value if not exists 'search_performed';
+alter type public.analytics_event_name add value if not exists 'search_zero_results';
+alter type public.analytics_event_name add value if not exists 'product_focused';
+alter type public.analytics_event_name add value if not exists 'product_opened';
+alter type public.analytics_event_name add value if not exists 'product_whatsapp_clicked';
+alter type public.analytics_event_name add value if not exists 'general_whatsapp_clicked';
+alter type public.analytics_event_name add value if not exists 'map_clicked';
+alter type public.analytics_event_name add value if not exists 'instagram_clicked';
+alter type public.analytics_event_name add value if not exists 'bio_link_clicked';
+alter type public.analytics_event_name add value if not exists 'lab_cta_clicked';
+alter type public.analytics_event_name add value if not exists 'external_link_clicked';

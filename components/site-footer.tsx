@@ -1,4 +1,5 @@
 import { LINKS } from "@/lib/links";
+import { PrivacyPreferencesButton } from "@/components/analytics/privacy-preferences-button";
 
 import styles from "./site-footer.module.css";
 
@@ -23,6 +24,7 @@ export function SiteFooter() {
         </nav>
 
         <p className={styles.copyright}>© {currentYear} Ótica Vision</p>
+        <PrivacyPreferencesButton className={styles.privacy} />
       </div>
     </footer>
   );

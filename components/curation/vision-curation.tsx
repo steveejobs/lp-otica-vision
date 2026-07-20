@@ -144,7 +144,7 @@ export function VisionCuration({
       if (analytics) {
         void trackCatalogEvent({
           eventName,
-          metadata: { value: eventName === "style_selected" ? next.styleSlug : next.categorySlug ?? "todos" },
+          metadata: eventName === "style_selected" ? { style_slug: next.styleSlug } : { category_slug: next.categorySlug ?? "todos" },
         });
       }
     } catch {
@@ -180,6 +180,7 @@ export function VisionCuration({
       aria-labelledby="curation-title"
       aria-busy={busy}
       className={styles.section}
+      data-analytics-section={analytics ? "curation_viewed" : undefined}
       data-style={requestedStyle}
       id="curadoria"
       ref={rootRef}
@@ -264,7 +265,6 @@ export function VisionCuration({
                     data-catalog-transition-link
                     href={productHref}
                     onClick={(event) => {
-                      if (analytics) void trackCatalogEvent({ eventName: "curation_product_opened", productId: product.id, metadata: { value: selection.styleSlug } });
                       if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
                         event.preventDefault();
                         window.location.assign(productHref);
@@ -307,7 +307,7 @@ export function VisionCuration({
             data-catalog-transition-link
             href={catalogHref}
             onClick={(event) => {
-              if (analytics) void trackCatalogEvent({ eventName: "curation_view_more", metadata: { value: selection.styleSlug } });
+              if (analytics) void trackCatalogEvent({ eventName: "catalog_opened", metadata: { source_route: "/", style_slug: selection.styleSlug } });
               if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
                 event.preventDefault();
                 window.location.assign(catalogHref);

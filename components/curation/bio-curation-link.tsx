@@ -28,7 +28,7 @@ export function BioCurationLink({ className }: { className?: string }) {
       className={className}
       href="/#curadoria"
       onClick={(event) => {
-        void trackCatalogEvent({ eventName: "curation_view_more", metadata: { source: "bio" } });
+        void trackCatalogEvent({ eventName: "bio_link_clicked", metadata: { click_location: "curation", source_route: "/bio" } });
         const destination = persistedHref();
         if (!destination) return;
         event.preventDefault();

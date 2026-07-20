@@ -439,7 +439,7 @@ async function CatalogContent({
             ) : null}
           </div>
         </section>
-        <CatalogAnalytics collectionId={collectionId} query={query} />
+        <CatalogAnalytics collectionId={collectionId} query={query} resultCount={catalog.total} />
       </main>
       <SiteFooter />
     </div>

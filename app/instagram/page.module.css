@@ -327,6 +327,9 @@
   font-weight: 600;
 }
 
+.privacyFooter { display: flex; justify-content: center; padding-top: 1.25rem; }
+.privacyFooter button { min-height: 44px; border: 0; background: transparent; color: var(--vision-muted); font: inherit; font-size: .76rem; text-decoration: underline; text-underline-offset: .25rem; cursor: pointer; }
+
 @media (min-width: 721px) {
   .page {
     width: min(88vw, 1120px);
