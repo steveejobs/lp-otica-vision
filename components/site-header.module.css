@@ -37,6 +37,12 @@
   min-width: 0;
 }
 
+.heroEntrance .actions {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: header-actions-arrival 760ms 540ms var(--ease-vision-out) forwards;
+}
+
 .actions a {
   min-width: 0;
 }
@@ -178,5 +184,23 @@
   .catalog::after,
   .instagram {
     transition: none;
+  }
+
+  .heroEntrance .actions {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+@keyframes header-actions-arrival {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

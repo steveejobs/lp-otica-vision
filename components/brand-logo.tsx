@@ -5,18 +5,22 @@ import { identityAssets } from "@/lib/assets";
 import styles from "./brand-logo.module.css";
 
 type BrandLogoProps = {
+  animated?: boolean;
   className?: string;
   priority?: boolean;
   size?: "header" | "hero" | "instagram";
 };
 
 export function BrandLogo({
+  animated = false,
   className = "",
   priority = false,
   size = "header",
 }: BrandLogoProps) {
   return (
-    <span className={`${styles.wrap} ${styles[size]} ${className}`}>
+    <span
+      className={`${styles.wrap} ${styles[size]} ${animated ? styles.animated : ""} ${className}`}
+    >
       <Image
         className={styles.image}
         src={identityAssets.logo}

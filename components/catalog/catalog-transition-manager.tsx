@@ -280,14 +280,18 @@ export function CatalogTransitionManager() {
             }
           }
 
+          let newCardIndex = 0;
           nextCards.forEach((card, id) => {
             if (previousIds.has(id)) return;
+            card.classList.add("is-motion-visible");
+            const delay = Math.min(newCardIndex, 5) * 56;
+            newCardIndex += 1;
             layoutAnimations.push(card.animate(
               [
-                { clipPath: "inset(100% 0 0 0)", transform: "translateY(12px)" },
-                { clipPath: "inset(0)", transform: "translateY(0)" },
+                { clipPath: "inset(18% 0 0 0)", opacity: 0, transform: "translateY(22px) scale(.985)" },
+                { clipPath: "inset(0)", opacity: 1, transform: "translateY(0) scale(1)" },
               ],
-              { duration: 320, easing: "cubic-bezier(.22,.61,.36,1)" },
+              { delay, duration: 480, easing: "cubic-bezier(.22,.61,.36,1)", fill: "both" },
             ));
           });
           void Promise.allSettled(layoutAnimations.map((animation) => animation.finished)).then(() => {

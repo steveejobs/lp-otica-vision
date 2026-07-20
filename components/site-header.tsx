@@ -8,12 +8,22 @@ import { InstagramIcon } from "./instagram-icon";
 import { VisionButton } from "./vision-button";
 import styles from "./site-header.module.css";
 
-export function SiteHeader() {
+export function SiteHeader({
+  heroEntrance = false,
+}: {
+  heroEntrance?: boolean;
+}) {
   return (
-    <header className={styles.header}>
+    <header
+      className={`${styles.header} ${heroEntrance ? styles.heroEntrance : ""}`}
+    >
       <div className={styles.inner}>
-        <Link className={styles.brand} href={LINKS.home} aria-label="Ótica Vision - início">
-          <BrandLogo priority />
+        <Link
+          className={styles.brand}
+          href={LINKS.home}
+          aria-label="Ótica Vision - início"
+        >
+          <BrandLogo animated={heroEntrance} priority />
         </Link>
 
         <nav className={styles.actions} aria-label="Navegação principal">

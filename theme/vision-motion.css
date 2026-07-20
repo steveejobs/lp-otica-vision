@@ -56,10 +56,10 @@
 }
 
 [data-motion-variant="catalog-card"] {
-  --motion-distance: 46px;
-  --motion-duration: 1.14s;
-  --motion-entry-scale: 0.948;
-  --motion-media-scale: 1.07;
+  --motion-distance: 34px;
+  --motion-duration: 680ms;
+  --motion-entry-scale: 0.982;
+  --motion-media-scale: 1.045;
   transform-origin: 50% 18%;
 }
 
@@ -121,12 +121,18 @@ html[data-motion-ready="true"] [data-motion-variant="hero"]:not(.is-motion-visib
 }
 
 html[data-motion-ready="true"] [data-motion-variant="catalog-card"]:not(.is-motion-visible) {
-  filter: blur(12px) saturate(0.78);
-  transform:
-    translate3d(var(--motion-entry-x), var(--motion-entry-y), 0)
-    rotateX(8deg)
-    rotate(var(--motion-entry-rotate))
-    scale(var(--motion-entry-scale));
+  filter: none;
+  transform: translate3d(0, var(--motion-distance), 0) scale(var(--motion-entry-scale));
+}
+
+html[data-motion-ready="true"] [data-motion-variant="catalog-card"]:not(.is-motion-visible) :where(h3, p, a) {
+  filter: none;
+  transform: translate3d(0, 14px, 0);
+}
+
+html[data-motion-ready="true"] [data-motion-variant="catalog-card"]:not(.is-motion-visible) :where(img) {
+  clip-path: inset(0 0 12% 0);
+  filter: saturate(0.9);
 }
 
 html[data-motion-ready="true"] [data-motion-reveal][data-motion-exit="up"]:not(.is-motion-visible),
@@ -275,6 +281,45 @@ html[data-route-state="entering"] main {
   animation: visionPageEnter var(--route-enter-duration) var(--ease-vision-out) both;
 }
 
+html[data-route-state="entering"][data-route-target="catalog"] body::before {
+  animation: visionCatalogEnter 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  background: var(--vision-paper);
+  box-shadow: -18px 0 42px rgb(var(--vision-graphite-rgb) / 0.08);
+  backdrop-filter: none;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] body::after {
+  animation: visionCatalogLineEnter 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] main {
+  animation: none;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > * {
+  animation: visionCatalogContentEnter 560ms var(--ease-vision-out) both;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > :nth-child(1) {
+  animation-delay: 40ms;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > :nth-child(2) {
+  animation-delay: 80ms;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > :nth-child(3) {
+  animation-delay: 130ms;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="filters"] {
+  animation: visionCatalogContentEnter 500ms var(--ease-vision-out) 150ms both;
+}
+
+html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="summary"] {
+  animation: visionCatalogContentEnter 480ms var(--ease-vision-out) 220ms both;
+}
+
 @keyframes visionRouteLeave {
   from {
     opacity: 0;
@@ -395,6 +440,42 @@ html[data-route-state="entering"] main {
   }
 }
 
+@keyframes visionCatalogEnter {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(101%);
+  }
+}
+
+@keyframes visionCatalogLineEnter {
+  from {
+    opacity: 0.92;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(101vw);
+  }
+}
+
+@keyframes visionCatalogContentEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes visionPageEnter {
   from {
     opacity: 0.52;
@@ -415,11 +496,14 @@ html[data-route-state="entering"] main {
 
 @media (prefers-reduced-motion: reduce) {
   [data-motion-reveal],
-  [data-focus-reveal] {
+  [data-focus-reveal],
+  [data-catalog-enter],
+  [data-catalog-enter] > * {
     clip-path: none;
     filter: none;
     opacity: 1;
     transform: none;
+    animation: none;
     transition: none;
   }
 

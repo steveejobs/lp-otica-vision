@@ -33,6 +33,28 @@
   object-fit: contain;
 }
 
+.animated .image {
+  opacity: 0;
+  transform: translateY(7px) scale(0.985);
+  animation: vision-logo-arrival 1.12s 100ms var(--ease-vision-out) forwards;
+}
+
+.animated::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: -3%;
+  bottom: 7px;
+  left: -3%;
+  height: 1px;
+  background: var(--vision-metal-gradient);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: vision-logo-line 1.24s 180ms var(--ease-vision-out) forwards;
+  pointer-events: none;
+}
+
 .header {
   width: 132px;
   height: 64px;
@@ -59,6 +81,11 @@
   transform: translateY(-50%);
 }
 
+.header.animated .image {
+  transform: translateY(calc(-50% + 7px)) scale(0.985);
+  animation-name: vision-logo-arrival-header;
+}
+
 .hero {
   width: clamp(164px, 16vw, 214px);
 }
@@ -76,5 +103,82 @@
   .header::before {
     filter: blur(11px);
     opacity: 0.54;
+  }
+}
+
+@keyframes vision-logo-arrival {
+  from {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgb(var(--vision-graphite-rgb) / 0));
+    transform: translateY(7px) scale(0.985);
+  }
+
+  54% {
+    filter: drop-shadow(0 2px 8px rgb(var(--vision-silver-light-rgb) / 0.36));
+  }
+
+  to {
+    opacity: 1;
+    filter: drop-shadow(0 1px 1.5px rgb(var(--vision-graphite-rgb) / 0.09));
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes vision-logo-arrival-header {
+  from {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgb(var(--vision-graphite-rgb) / 0));
+    transform: translateY(calc(-50% + 7px)) scale(0.985);
+  }
+
+  54% {
+    filter: drop-shadow(0 2px 8px rgb(var(--vision-silver-light-rgb) / 0.36));
+  }
+
+  to {
+    opacity: 1;
+    filter: drop-shadow(0 1px 1.5px rgb(var(--vision-graphite-rgb) / 0.09));
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+@keyframes vision-logo-line {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  36% {
+    opacity: 0.9;
+  }
+
+  76% {
+    opacity: 0.7;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated .image,
+  .animated::after {
+    animation: none;
+  }
+
+  .animated .image {
+    opacity: 1;
+    transform: none;
+  }
+
+  .header.animated .image {
+    transform: translateY(-50%);
+  }
+
+  .animated::after {
+    display: none;
   }
 }

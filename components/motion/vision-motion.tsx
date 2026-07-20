@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
@@ -8,9 +8,12 @@ const STAGGER_SELECTOR = "[data-motion-stagger]";
 const ROUTE_EXIT_MS = 760;
 const ROUTE_ENTER_MS = 1_080;
 const CATALOG_ROUTE_EXIT_MS = 520;
+const CATALOG_ROUTE_ENTER_MS = 760;
 const HYDRATION_SETTLE_MS = 420;
 const STAGGER_STEP_MS = 118;
 const STAGGER_LIMIT = 9;
+const CATALOG_STAGGER_STEP_MS = 64;
+const CATALOG_STAGGER_LIMIT = 5;
 
 const STAGGER_MOTIONS = [
   { x: "-18px", y: "38px", rotate: "-0.7deg" },
@@ -59,6 +62,7 @@ function setRouteTarget(target?: "catalog" | "default") {
 
 export function VisionMotion() {
   const pathname = usePathname();
+  const router = useRouter();
   const exitTimerRef = useRef<number | null>(null);
   const enterTimerRef = useRef<number | null>(null);
 
@@ -67,17 +71,24 @@ export function VisionMotion() {
       window.clearTimeout(enterTimerRef.current);
     }
 
-    if (pathname === "/" || pathname === "/catalogo" || pathname.startsWith("/catalogo/")) {
+    const isCatalogPath = pathname === "/catalogo" || pathname.startsWith("/catalogo/");
+    const isCatalogArrival =
+      isCatalogPath &&
+      document.documentElement.dataset.routeTarget === "catalog" &&
+      document.documentElement.dataset.routeState === "leaving";
+
+    if (pathname === "/" || (isCatalogPath && !isCatalogArrival)) {
       setRouteTarget();
       setRouteState("idle");
       return;
     }
 
-    setRouteTarget("default");
+    setRouteTarget(isCatalogArrival ? "catalog" : "default");
     setRouteState("entering");
     enterTimerRef.current = window.setTimeout(() => {
       setRouteState("idle");
-    }, ROUTE_ENTER_MS);
+      setRouteTarget();
+    }, isCatalogArrival ? CATALOG_ROUTE_ENTER_MS : ROUTE_ENTER_MS);
 
     return () => {
       if (enterTimerRef.current) {
@@ -144,11 +155,15 @@ export function VisionMotion() {
         Array.from(container.children).forEach((child, index) => {
           if (!(child instanceof HTMLElement)) return;
 
+          const isCatalogCard = child.dataset.motionVariant === "catalog-card";
           const motion = STAGGER_MOTIONS[index % STAGGER_MOTIONS.length];
-          child.style.setProperty("--motion-delay", `${Math.min(index, STAGGER_LIMIT) * STAGGER_STEP_MS}ms`);
-          child.style.setProperty("--motion-entry-x", motion.x);
-          child.style.setProperty("--motion-entry-y", motion.y);
-          child.style.setProperty("--motion-entry-rotate", motion.rotate);
+          const delay = isCatalogCard
+            ? Math.min(index, CATALOG_STAGGER_LIMIT) * CATALOG_STAGGER_STEP_MS
+            : Math.min(index, STAGGER_LIMIT) * STAGGER_STEP_MS;
+          child.style.setProperty("--motion-delay", `${delay}ms`);
+          child.style.setProperty("--motion-entry-x", isCatalogCard ? "0px" : motion.x);
+          child.style.setProperty("--motion-entry-y", isCatalogCard ? "34px" : motion.y);
+          child.style.setProperty("--motion-entry-rotate", isCatalogCard ? "0deg" : motion.rotate);
         });
       });
     };
@@ -265,7 +280,7 @@ export function VisionMotion() {
       setRouteTarget(catalogDestination ? "catalog" : "default");
       setRouteState("leaving");
       exitTimerRef.current = window.setTimeout(() => {
-        window.location.assign(destination);
+        router.push(destination);
       }, catalogDestination ? CATALOG_ROUTE_EXIT_MS : ROUTE_EXIT_MS);
     };
 
@@ -281,7 +296,7 @@ export function VisionMotion() {
       }
       setRouteTarget();
     };
-  }, []);
+  }, [router]);
 
   return null;
 }

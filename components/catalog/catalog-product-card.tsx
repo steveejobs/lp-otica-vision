@@ -26,7 +26,10 @@ export function CatalogProductCard({
   clone?: boolean;
   external?: boolean;
   href?: string;
-  imageVariant?: Extract<ProductImageVariantKind, "catalog_card" | "home_preview">;
+  imageVariant?: Extract<
+    ProductImageVariantKind,
+    "catalog_card" | "home_preview"
+  >;
   presentation?: "catalog" | "preview";
   priority?: boolean;
   product: CatalogProductCardData;
@@ -34,7 +37,9 @@ export function CatalogProductCard({
   const descriptor = [product.model, product.color].filter(Boolean).join(" · ");
   const price = formatCatalogPrice(product.price, product.priceVisibility);
   const productHref = href ?? `/catalogo/${product.slug}`;
-  const label = actionLabel ?? (presentation === "preview" ? "Abrir modelo" : "Ver produto");
+  const label =
+    actionLabel ??
+    (presentation === "preview" ? "Abrir modelo" : "Ver detalhes");
   const linkLabel = external
     ? `Consultar ${product.name} pelo WhatsApp`
     : `Ver ${product.name}`;
@@ -47,7 +52,7 @@ export function CatalogProductCard({
           fill
           placeholder="blur"
           priority={priority}
-          sizes="(max-width: 380px) 92vw, (max-width: 720px) 45vw, (max-width: 1100px) 30vw, 22vw"
+          sizes="(max-width: 720px) 46vw, (max-width: 1100px) 30vw, 22vw"
           src={catalogImageUrl(product.cover, imageVariant)}
           style={{ objectPosition: product.cover.objectPosition }}
           unoptimized
@@ -55,12 +60,19 @@ export function CatalogProductCard({
       </div>
 
       <div className={styles.content}>
-        <p className={styles.brand}>{product.brand?.name ?? "Seleção Vision"}</p>
+        <div className={styles.meta}>
+          <p className={styles.brand}>
+            {product.brand?.name ?? "Seleção Vision"}
+          </p>
+          <span className={styles.reference}>Ref. {product.sku}</span>
+        </div>
         <h3>{product.name}</h3>
         {descriptor ? <p className={styles.descriptor}>{descriptor}</p> : null}
         {presentation === "catalog" ? (
           <div className={styles.commercialLine}>
-            <span className={styles.availability}>{availabilityLabels[product.availability]}</span>
+            <span className={styles.availability}>
+              {availabilityLabels[product.availability]}
+            </span>
             {price ? <strong>{price}</strong> : null}
           </div>
         ) : null}
@@ -76,6 +88,10 @@ export function CatalogProductCard({
     <article
       aria-hidden={clone || undefined}
       className={styles.card}
+      data-motion-reveal={presentation === "catalog" ? "" : undefined}
+      data-motion-variant={
+        presentation === "catalog" ? "catalog-card" : undefined
+      }
       data-catalog-product-id={clone ? undefined : product.id}
       data-availability={product.availability}
       data-presentation={presentation}
