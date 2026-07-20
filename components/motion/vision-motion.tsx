@@ -7,6 +7,7 @@ const REVEAL_SELECTOR = "[data-motion-reveal], [data-focus-reveal]";
 const STAGGER_SELECTOR = "[data-motion-stagger]";
 const ROUTE_EXIT_MS = 760;
 const ROUTE_ENTER_MS = 1_080;
+const CATALOG_ROUTE_EXIT_MS = 520;
 const HYDRATION_SETTLE_MS = 420;
 const STAGGER_STEP_MS = 118;
 const STAGGER_LIMIT = 9;
@@ -51,6 +52,11 @@ function setRouteState(state: "idle" | "leaving" | "entering") {
   document.documentElement.dataset.routeState = state;
 }
 
+function setRouteTarget(target?: "catalog" | "default") {
+  if (target) document.documentElement.dataset.routeTarget = target;
+  else delete document.documentElement.dataset.routeTarget;
+}
+
 export function VisionMotion() {
   const pathname = usePathname();
   const exitTimerRef = useRef<number | null>(null);
@@ -61,11 +67,13 @@ export function VisionMotion() {
       window.clearTimeout(enterTimerRef.current);
     }
 
-    if (pathname === "/") {
+    if (pathname === "/" || pathname === "/catalogo" || pathname.startsWith("/catalogo/")) {
+      setRouteTarget();
       setRouteState("idle");
       return;
     }
 
+    setRouteTarget("default");
     setRouteState("entering");
     enterTimerRef.current = window.setTimeout(() => {
       setRouteState("idle");
@@ -243,6 +251,7 @@ export function VisionMotion() {
       const url = getInternalNavigationUrl(event.target);
       if (!url) return;
       const destination = `${url.pathname}${url.search}${url.hash}`;
+      const catalogDestination = url.pathname === "/catalogo" || url.pathname.startsWith("/catalogo/");
 
       event.preventDefault();
 
@@ -253,10 +262,11 @@ export function VisionMotion() {
         window.clearTimeout(enterTimerRef.current);
       }
 
+      setRouteTarget(catalogDestination ? "catalog" : "default");
       setRouteState("leaving");
       exitTimerRef.current = window.setTimeout(() => {
         window.location.assign(destination);
-      }, ROUTE_EXIT_MS);
+      }, catalogDestination ? CATALOG_ROUTE_EXIT_MS : ROUTE_EXIT_MS);
     };
 
     document.addEventListener("click", handleClick, true);
@@ -269,6 +279,7 @@ export function VisionMotion() {
       if (enterTimerRef.current) {
         window.clearTimeout(enterTimerRef.current);
       }
+      setRouteTarget();
     };
   }, []);
 
