@@ -46,7 +46,9 @@ function overlayFrom(image: HTMLImageElement, rect: Rect, className: string) {
   node.style.top = `${rect.top}px`;
   node.style.width = `${rect.width}px`;
   node.style.height = `${rect.height}px`;
+  node.style.objectFit = getComputedStyle(image).objectFit;
   node.style.objectPosition = getComputedStyle(image).objectPosition;
+  node.style.padding = getComputedStyle(image).padding;
   document.body.append(node);
   return node;
 }
@@ -125,8 +127,8 @@ export function CatalogTransitionManager() {
       const node = overlayFrom(image, source, styles.sharedMedia);
       pendingMediaRef.current = { kind: collection ? "collection" : "product", node, productId, source };
       node.animate(
-        [{ clipPath: "inset(0)" }, { clipPath: "inset(1.5% 1.5% 1.5% 1.5%)" }],
-        { duration: 140, easing: "cubic-bezier(.22,.61,.36,1)", fill: "forwards" },
+        [{ opacity: 1 }, { opacity: .96 }],
+        { duration: 120, easing: "cubic-bezier(.22,.61,.36,1)", fill: "forwards" },
       );
 
       if (pathname.endsWith("/catalogo") && productId) {
@@ -193,10 +195,10 @@ export function CatalogTransitionManager() {
         const sy = destination.height / Math.max(1, pending.source.height);
         const transition = pending.node.animate(
           [
-            { borderRadius: "var(--radius-md)", clipPath: "inset(1.5%)", transform: "translate3d(0,0,0) scale(1)" },
-            { borderRadius: "var(--radius-md)", clipPath: "inset(0)", transform: `translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})` },
+            { borderRadius: "var(--radius-md)", opacity: .96, transform: "translate3d(0,0,0) scale(1)" },
+            { borderRadius: "var(--radius-md)", opacity: 1, transform: `translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})` },
           ],
-          { duration: 360, easing: "cubic-bezier(.76,0,.24,1)", fill: "forwards" },
+          { duration: 300, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" },
         );
         transition.finished.finally(() => {
           pending.node.remove();
@@ -244,10 +246,10 @@ export function CatalogTransitionManager() {
               const destination = next.getBoundingClientRect();
               layoutAnimations.push(next.animate(
                 [
-                  { transform: `translate3d(${previous.left - destination.left}px,${previous.top - destination.top}px,0)`, clipPath: "inset(0)" },
-                  { transform: "translate3d(0,0,0)", clipPath: "inset(0)" },
+                  { transform: `translate3d(${previous.left - destination.left}px,${previous.top - destination.top}px,0)`, opacity: .92 },
+                  { transform: "translate3d(0,0,0)", opacity: 1 },
                 ],
-                { duration: 300, easing: "cubic-bezier(.22,.61,.36,1)" },
+                { duration: 260, easing: "cubic-bezier(.22,.72,.18,1)" },
               ));
             } else {
               const ghost = document.createElement("img");
@@ -262,10 +264,10 @@ export function CatalogTransitionManager() {
               document.body.append(ghost);
               ghost.animate(
                 [
-                  { clipPath: "inset(0)", opacity: 1, transform: "translateY(0)" },
-                  { clipPath: "inset(0 0 100% 0)", opacity: .7, transform: "translateY(-8px)" },
+                  { opacity: 1, transform: "translateY(0) scale(1)" },
+                  { opacity: 0, transform: "translateY(-6px) scale(.99)" },
                 ],
-                { duration: 230, easing: "cubic-bezier(.76,0,.24,1)" },
+                { duration: 180, easing: "cubic-bezier(.4,0,1,1)" },
               ).finished.finally(() => ghost.remove());
             }
           }
@@ -274,14 +276,14 @@ export function CatalogTransitionManager() {
           nextCards.forEach((card, id) => {
             if (previousIds.has(id)) return;
             card.classList.add("is-motion-visible");
-            const delay = Math.min(newCardIndex, 5) * 56;
+            const delay = Math.min(newCardIndex, 4) * 32;
             newCardIndex += 1;
             layoutAnimations.push(card.animate(
               [
-                { clipPath: "inset(18% 0 0 0)", opacity: 0, transform: "translateY(22px) scale(.985)" },
-                { clipPath: "inset(0)", opacity: 1, transform: "translateY(0) scale(1)" },
+                { opacity: 0, transform: "translateY(12px)" },
+                { opacity: 1, transform: "translateY(0)" },
               ],
-              { delay, duration: 480, easing: "cubic-bezier(.22,.61,.36,1)", fill: "both" },
+              { delay, duration: 300, easing: "cubic-bezier(.22,.72,.18,1)", fill: "both" },
             ));
           });
           void Promise.allSettled(layoutAnimations.map((animation) => animation.finished)).then(() => {

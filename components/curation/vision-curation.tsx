@@ -3,13 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 import { trackCatalogEvent } from "@/lib/analytics/client";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import { ProductWhatsappButton } from "@/components/catalog/product-whatsapp-button";
 import { fixtureCurationSelection } from "@/lib/curation/fixtures";
-import type { CurationSelection, CuratedProduct } from "@/lib/curation/types";
+import type { CurationSelection } from "@/lib/curation/types";
 
 import styles from "./vision-curation.module.css";
 
@@ -31,12 +31,6 @@ function queryString(styleSlug: string, categorySlug: string | null) {
   return params.toString();
 }
 
-function orderedProducts(products: CuratedProduct[], focusId: string | null) {
-  if (!focusId) return products;
-  const focused = products.find((product) => product.id === focusId);
-  return focused ? [focused, ...products.filter((product) => product.id !== focusId)] : products;
-}
-
 function useFixtureMode(demoBasePath?: string) {
   return Boolean(demoBasePath);
 }
@@ -50,13 +44,11 @@ export function VisionCuration({
 }: Props) {
   const fixtureMode = useFixtureMode(demoBasePath);
   const rootRef = useRef<HTMLElement>(null);
-  const productRefs = useRef(new Map<string, HTMLElement>());
-  const currentRects = useRef(new Map<string, DOMRect>());
-  const previousRects = useRef(new Map<string, DOMRect>());
   const requestRef = useRef<AbortController | null>(null);
   const manualPrimaryPauseUntil = useRef(0);
-  const hoverDebounceRef = useRef<number | null>(null);
-  const activeAnimations = useRef<Animation[]>([]);
+  const focusTimerRef = useRef<number | null>(null);
+  const pendingFocusRef = useRef<string | null>(null);
+  const readyImagesRef = useRef(new Set<string>());
   const [selection, setSelection] = useState(initialSelection);
   const [requestedStyle, setRequestedStyle] = useState(initialSelection.styleSlug);
   const [focusId, setFocusId] = useState(initialSelection.products[0]?.id ?? null);
@@ -67,19 +59,16 @@ export function VisionCuration({
   const [reducedMotion, setReducedMotion] = useState(false);
   const [wideScreen, setWideScreen] = useState(false);
   const [whatsappUrls, setWhatsappUrls] = useState(productWhatsappUrls ?? {});
-  const products = useMemo(
-    () => orderedProducts(selection.products, focusId),
-    [focusId, selection.products],
-  );
+  const products = selection.products;
   const selectedStyle = selection.styles.find((style) => style.slug === requestedStyle)
     ?? selection.styles.find((style) => style.slug === selection.styleSlug)
     ?? selection.styles[0];
-  const activeProduct = products[0];
+  const activeProduct = products.find((product) => product.id === focusId) ?? products[0];
   const activeWhatsappUrl = activeProduct ? whatsappUrls[activeProduct.id] : undefined;
 
   useEffect(() => () => {
     requestRef.current?.abort();
-    if (hoverDebounceRef.current) window.clearTimeout(hoverDebounceRef.current);
+    if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
   }, []);
 
   useEffect(() => {
@@ -109,55 +98,21 @@ export function VisionCuration({
     };
   }, []);
 
-  useLayoutEffect(() => {
-    const previousRectsSnapshot = previousRects.current;
-    previousRects.current.clear();
-    const frame = requestAnimationFrame(() => {
-      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const nextRects = new Map<string, DOMRect>();
-      for (const [id, element] of productRefs.current) {
-        const next = element.getBoundingClientRect();
-        nextRects.set(id, next);
-        const previous = previousRectsSnapshot.get(id);
-        if (!previous || reduceMotion) continue;
-        const deltaX = previous.left - next.left;
-        const deltaY = previous.top - next.top;
-        const scaleX = previous.width / Math.max(next.width, 1);
-        const scaleY = previous.height / Math.max(next.height, 1);
-        if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1 && Math.abs(scaleX - 1) < 0.01 && Math.abs(scaleY - 1) < 0.01) continue;
-        const anim = element.animate(
-          [
-            { transform: `translate3d(${deltaX}px, ${deltaY}px, 0) scale(${scaleX}, ${scaleY})` },
-            { transform: "translate3d(0, 0, 0) scale(1)" },
-          ],
-          { duration: 420, easing: "cubic-bezier(.22,.72,.18,1)" },
-        );
-        activeAnimations.current.push(anim);
-      }
-      currentRects.current = nextRects;
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [products]);
-
-  const captureRects = useCallback(() => {
-    previousRects.current = new Map(currentRects.current);
-  }, []);
-
   useEffect(() => {
     if (selection.products.length < 2 || reducedMotion || !wideScreen || !inViewport || !pageVisible) return;
 
     const remainingManualHold = manualPrimaryPauseUntil.current - Date.now();
     const delay = Math.max(PRIMARY_AUTOPLAY_MS, remainingManualHold);
     const timeout = window.setTimeout(() => {
-      captureRects();
       setFocusId((currentId) => {
         const currentIndex = selection.products.findIndex((product) => product.id === currentId);
-        return selection.products[(currentIndex + 1) % selection.products.length]?.id ?? selection.products[0]?.id ?? null;
+        const nextId = selection.products[(currentIndex + 1) % selection.products.length]?.id ?? selection.products[0]?.id ?? null;
+        return nextId && readyImagesRef.current.has(nextId) ? nextId : currentId;
       });
     }, delay);
 
     return () => window.clearTimeout(timeout);
-  }, [captureRects, focusId, inViewport, pageVisible, reducedMotion, selection.products, wideScreen]);
+  }, [focusId, inViewport, pageVisible, reducedMotion, selection.products, wideScreen]);
 
   const persistSelection = useCallback((next: CurationSelection) => {
     try {
@@ -208,7 +163,6 @@ export function VisionCuration({
         });
       if (controller.signal.aborted) return;
       const nextSelection = payload.selection;
-      captureRects();
       setSelection(nextSelection);
       setWhatsappUrls(payload.productWhatsappUrls ?? {});
       setRequestedStyle(nextSelection.styleSlug);
@@ -225,23 +179,28 @@ export function VisionCuration({
     } finally {
       if (!controller.signal.aborted) setBusy(false);
     }
-  }, [analytics, captureRects, fixtureMode, persistSelection]);
+  }, [analytics, fixtureMode, persistSelection]);
 
   const changeFocus = useCallback((id: string) => {
     if (id === focusId) return;
-    if (typeof window !== "undefined" && !window.matchMedia("(min-width: 721px)").matches) return;
-    if (hoverDebounceRef.current) window.clearTimeout(hoverDebounceRef.current);
-    hoverDebounceRef.current = window.setTimeout(() => {
-      // Cancel any in-flight FLIP animations
-      for (const anim of activeAnimations.current) {
-        try { anim.cancel(); } catch { /* already finished */ }
+    if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
+    focusTimerRef.current = window.setTimeout(() => {
+      if (!readyImagesRef.current.has(id)) {
+        pendingFocusRef.current = id;
+        return;
       }
-      activeAnimations.current = [];
       manualPrimaryPauseUntil.current = Date.now() + PRIMARY_MANUAL_HOLD_MS;
-      captureRects();
       setFocusId(id);
-    }, 120);
-  }, [captureRects, focusId]);
+    }, 80);
+  }, [focusId]);
+
+  const markImageReady = useCallback((id: string) => {
+    readyImagesRef.current.add(id);
+    if (pendingFocusRef.current !== id) return;
+    pendingFocusRef.current = null;
+    manualPrimaryPauseUntil.current = Date.now() + PRIMARY_MANUAL_HOLD_MS;
+    setFocusId(id);
+  }, []);
 
   function moveChoice(event: KeyboardEvent<HTMLButtonElement>) {
     if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
@@ -321,59 +280,95 @@ export function VisionCuration({
 
         <div className={styles.composition} id="curation-products">
           <span aria-hidden="true" className={styles.visionLine} />
-          <div className={styles.productRail} data-count={products.length}>
-            {products.map((product, index) => {
-              const productHref = demoBasePath
-                ? `${demoBasePath}/produto/${product.slug}?${queryString(selection.styleSlug, selection.categorySlug)}`
-                : `/catalogo/${product.slug}?${queryString(selection.styleSlug, selection.categorySlug)}`;
+          {activeProduct ? (
+            <article className={styles.feature} data-catalog-product-id={activeProduct.id}>
+              <Link
+                aria-label={`Abrir ${activeProduct.name}`}
+                className={styles.featureLink}
+                data-catalog-product-id={activeProduct.id}
+                data-catalog-transition-link
+                href={demoBasePath
+                  ? `${demoBasePath}/produto/${activeProduct.slug}?${queryString(selection.styleSlug, selection.categorySlug)}`
+                  : `/catalogo/${activeProduct.slug}?${queryString(selection.styleSlug, selection.categorySlug)}`}
+              >
+                <span className={styles.featureMedia} data-catalog-feature-media>
+                  {products.map((product, index) => {
+                    const imageSrc = product.fixture && product.fixtureImageSrc
+                      ? product.fixtureImageSrc
+                      : catalogImageUrl(product.cover, "product_detail");
+                    const selected = product.id === activeProduct.id;
+                    return (
+                      <span
+                        aria-hidden={!selected}
+                        className={styles.featureLayer}
+                        data-active={selected || undefined}
+                        data-catalog-transition-media={selected ? "" : undefined}
+                        key={product.id}
+                      >
+                        <Image
+                          alt={selected ? product.cover.altText : ""}
+                          fill
+                          onLoad={() => markImageReady(product.id)}
+                          priority={index === 0}
+                          sizes="(max-width: 720px) 92vw, (max-width: 1120px) 56vw, 700px"
+                          src={imageSrc}
+                          style={{ objectPosition: product.cover.objectPosition }}
+                          unoptimized
+                        />
+                      </span>
+                    );
+                  })}
+                  <span aria-hidden="true" className={styles.featureIndex}>
+                    {String(products.findIndex((product) => product.id === activeProduct.id) + 1).padStart(2, "0")}
+                    <i />
+                    {String(products.length).padStart(2, "0")}
+                  </span>
+                </span>
+                <span className={styles.featureCopy}>
+                  <small>{activeProduct.fixture ? "Demonstração visual" : activeProduct.brand?.name ?? "Seleção Vision"}</small>
+                  <strong>{activeProduct.name}</strong>
+                  <span>{activeProduct.fixture ? `Identificador ${activeProduct.sku}` : [activeProduct.model, activeProduct.color].filter(Boolean).join(" · ")}</span>
+                  <b>Abrir modelo <ArrowUpRight aria-hidden="true" size={17} /></b>
+                </span>
+              </Link>
+            </article>
+          ) : null}
+
+          <div aria-label="Selecionar produto em destaque" className={styles.productRail}>
+            {products.map((product) => {
               const imageSrc = product.fixture && product.fixtureImageSrc
                 ? product.fixtureImageSrc
                 : catalogImageUrl(product.cover, "home_preview");
               return (
-                <article
+                <button
+                  aria-label={`Destacar ${product.name}`}
+                  aria-pressed={product.id === activeProduct?.id}
                   className={styles.product}
-                  data-protagonist={product.id === focusId || undefined}
                   key={product.id}
                   onFocus={() => changeFocus(product.id)}
-                  onPointerEnter={() => changeFocus(product.id)}
-                  ref={(element) => {
-                    if (element) productRefs.current.set(product.id, element);
-                    else productRefs.current.delete(product.id);
+                  onClick={() => changeFocus(product.id)}
+                  onPointerEnter={(event) => {
+                    if (event.pointerType === "mouse") changeFocus(product.id);
                   }}
+                  type="button"
                 >
-                  <Link
-                    aria-label={`Abrir ${product.name}`}
-                    data-catalog-product-id={product.id}
-                    data-catalog-transition-link
-                    href={productHref}
-                    onClick={(event) => {
-                      if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-                        event.preventDefault();
-                        window.location.assign(productHref);
-                      }
-                    }}
-                  >
-                    <span className={styles.media} data-catalog-transition-media>
-                      <Image
-                        alt={product.cover.altText}
-                        blurDataURL={product.cover.blurDataUrl ?? undefined}
-                        fill
-                        loading={index === 0 ? "eager" : "lazy"}
-                        placeholder={product.cover.blurDataUrl ? "blur" : "empty"}
-                        priority={index === 0}
-                        sizes={index === 0 ? "(max-width: 720px) 82vw, 50vw" : "(max-width: 720px) 82vw, 18vw"}
-                        src={imageSrc}
-                        style={{ objectPosition: product.cover.objectPosition }}
-                        unoptimized
-                      />
-                    </span>
-                    <span className={styles.productCopy}>
-                      <small>{product.fixture ? "Demonstração visual" : product.brand?.name ?? "Seleção Vision"}</small>
-                      <strong>{product.name}</strong>
-                      <span>{product.fixture ? `Identificador ${product.sku}` : [product.model, product.color].filter(Boolean).join(" · ")}</span>
-                    </span>
-                  </Link>
-                </article>
+                  <span className={styles.media}>
+                    <Image
+                      alt=""
+                      fill
+                      sizes="(max-width: 720px) 38vw, 170px"
+                      src={imageSrc}
+                      style={{ objectPosition: product.cover.objectPosition }}
+                      unoptimized
+                    />
+                  </span>
+                  <span className={styles.productCopy}>
+                    <small>{product.fixture ? "Demonstração visual" : product.brand?.name ?? "Seleção Vision"}</small>
+                    <strong>{product.name}</strong>
+                    <span>{product.fixture ? `Identificador ${product.sku}` : [product.model, product.color].filter(Boolean).join(" · ")}</span>
+                  </span>
+                  <span aria-hidden="true" className={styles.selectionMark} />
+                </button>
               );
             })}
           </div>
@@ -389,12 +384,8 @@ export function VisionCuration({
               data-catalog-collection-link
               data-catalog-transition-link
               href={catalogHref}
-              onClick={(event) => {
+              onClick={() => {
                 if (analytics) void trackCatalogEvent({ eventName: "catalog_opened", metadata: { source_route: "/", style_slug: selection.styleSlug } });
-                if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-                  event.preventDefault();
-                  window.location.assign(catalogHref);
-                }
               }}
             >
               Ver seleção completa

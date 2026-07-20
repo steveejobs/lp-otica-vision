@@ -4,17 +4,22 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { readAnalyticsConsent, ANALYTICS_CONSENT_CHANGE_EVENT, type AnalyticsConsentChoice } from "@/lib/analytics/consent";
-import { trackEvent, trackPageView } from "@/lib/analytics/client";
+import { trackEvent, trackGooglePageView, trackPageView } from "@/lib/analytics/client";
 
 import { PrivacyConsent } from "./privacy-consent";
 
 const CATALOG_PARAMS = new Set(["busca", "marca", "categoria", "estilo", "colecao", "disponibilidade", "pagina"]);
+const CAMPAIGN_PARAMS = new Set(["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]);
 
 function filteredSearch(pathname: string, search: URLSearchParams) {
-  if (pathname !== "/catalogo") return "";
   const filtered = new URLSearchParams();
   [...search.entries()].sort(([a], [b]) => a.localeCompare(b)).forEach(([key, value]) => {
-    if (!CATALOG_PARAMS.has(key) || !value) return;
+    if (!value) return;
+    if (CAMPAIGN_PARAMS.has(key)) {
+      filtered.append(key, value.normalize("NFKC").replace(/\s+/g, " ").trim().slice(0, 100));
+      return;
+    }
+    if (pathname !== "/catalogo" || !CATALOG_PARAMS.has(key)) return;
     if (key === "busca") filtered.append(key, "ativa");
     else if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/i.test(value)) filtered.append(key, value);
   });
@@ -44,19 +49,23 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
   }, []);
 
   useEffect(() => {
-    if (!publicRoute || !isMeasurementId(measurementId)) return;
+    if (!initialized || consent !== "accepted" || !publicRoute || !isMeasurementId(measurementId)) return;
     if (initializedMeasurementId.current === measurementId) return;
 
     window.dataLayer = window.dataLayer ?? [];
-    window.gtag = window.gtag ?? ((...args: unknown[]) => { window.dataLayer?.push(args); });
-    window.gtag("js", new Date());
+    window.gtag = window.gtag ?? function gtag() {
+      // gtag.js expects the native Arguments object used by Google's bootstrap contract.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer?.push(arguments);
+    };
     window.gtag("consent", "default", {
       ad_personalization: "denied",
       ad_storage: "denied",
       ad_user_data: "denied",
-      analytics_storage: "denied",
+      analytics_storage: "granted",
     });
-    window.gtag("config", measurementId, { anonymize_ip: true });
+    window.gtag("js", new Date());
+    window.gtag("config", measurementId, { anonymize_ip: true, send_page_view: false });
 
     const existing = document.getElementById("vision-google-analytics");
     if (!existing) {
@@ -67,7 +76,7 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
       document.head.append(script);
     }
     initializedMeasurementId.current = measurementId;
-  }, [measurementId, publicRoute]);
+  }, [consent, initialized, measurementId, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute || consent === "unknown") return;
@@ -75,6 +84,16 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
       analytics_storage: consent === "accepted" ? "granted" : "denied",
     });
   }, [consent, publicRoute]);
+
+  useEffect(() => {
+    if (!initialized || consent !== "accepted" || !publicRoute) return;
+    const url = new URL(location, window.location.origin);
+    trackGooglePageView({
+      page_location: url.href,
+      page_title: document.title.slice(0, 100),
+      source_route: pathname,
+    });
+  }, [consent, initialized, location, pathname, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute) return;

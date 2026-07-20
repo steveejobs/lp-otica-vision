@@ -10,17 +10,15 @@
 
 .media {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border: 1px solid rgb(var(--vision-steel-rgb) / 0.34);
   border-radius: var(--radius-sm);
-  background: var(--vision-bg-soft);
-  box-shadow: 0 8px 22px rgb(var(--vision-graphite-rgb) / 0.055);
-  transform: translateY(0);
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(var(--vision-graphite-rgb) / 0.045);
   transition:
     border-color var(--duration-fast) var(--ease-vision),
-    box-shadow var(--duration-medium) var(--ease-vision),
-    transform var(--duration-medium) var(--ease-vision-out);
+    box-shadow var(--duration-medium) var(--ease-vision);
 }
 
 .media::before {
@@ -38,9 +36,9 @@
 }
 
 .media img {
-  object-fit: cover;
+  object-fit: contain;
+  padding: clamp(0.45rem, 1vw, 0.9rem);
   transition:
-    transform 540ms var(--ease-vision-out),
     filter var(--duration-medium) var(--ease-vision);
 }
 
@@ -149,7 +147,7 @@
 }
 
 .card[data-presentation="preview"] .media {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 3;
   border-color: rgb(var(--vision-steel-rgb) / 0.36);
   box-shadow: none;
 }
@@ -181,13 +179,11 @@
 @media (hover: hover) and (pointer: fine) {
   .link:hover .media {
     border-color: rgb(var(--vision-steel-rgb) / 0.56);
-    box-shadow: 0 16px 34px rgb(var(--vision-graphite-rgb) / 0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgb(var(--vision-graphite-rgb) / 0.085);
   }
 
   .link:hover .media img {
     filter: saturate(1.02) contrast(1.01);
-    transform: scale(1.008);
   }
 
   .link:hover .action svg {
@@ -220,8 +216,4 @@
     transition: none;
   }
 
-  .link:hover .media,
-  .link:hover .media img {
-    transform: none;
-  }
 }

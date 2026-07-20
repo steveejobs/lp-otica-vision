@@ -18,6 +18,7 @@ declare global {
 
 const SESSION_KEY = "vision.analytics.session";
 const LAST_PAGE_KEY = "vision.analytics.last-page";
+const LAST_GOOGLE_PAGE_KEY = "vision.analytics.last-google-page";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const allowedProperties = new Set<string>(analyticsPropertyNames);
 const recentEvents = new Map<string, number>();
@@ -85,7 +86,14 @@ function sendGoogle(eventName: string, properties: AnalyticsProperties, productI
   window.gtag("event", eventName, {
     ...properties,
     ...(debugMode ? { debug_mode: true } : {}),
-    ...(eventName === "view_item" && productId ? { items: [{ item_id: productId, item_name: properties.product_slug ?? productId }] } : {}),
+    ...(eventName === "view_item" && productId ? {
+      items: [{
+        item_brand: properties.brand_slug,
+        item_category: properties.category_slug,
+        item_id: productId,
+        item_name: properties.product_name ?? properties.product_slug ?? productId,
+      }],
+    } : {}),
   });
 }
 
@@ -102,10 +110,22 @@ export function trackEvent(input: AnalyticsEventInput) {
     route: window.location.pathname.slice(0, 500),
   };
   if (input.internal !== false) sendInternal(payload, input.transport);
-  sendGoogle(googleRecommendedEventMap[input.eventName] ?? input.eventName, {
-    ...properties,
-    ...(input.productId ? { product_id: input.productId } : {}),
-  }, input.productId);
+  if (input.eventName !== "page_view") {
+    sendGoogle(googleRecommendedEventMap[input.eventName] ?? input.eventName, {
+      ...properties,
+      ...(input.productId ? { product_id: input.productId } : {}),
+    }, input.productId);
+  }
+}
+
+export function trackGooglePageView(properties: AnalyticsProperties) {
+  if (typeof window === "undefined" || readAnalyticsConsent() !== "accepted" || typeof window.gtag !== "function") return;
+  const signature = String(properties.page_location ?? window.location.href);
+  try {
+    if (window.sessionStorage.getItem(LAST_GOOGLE_PAGE_KEY) === signature) return;
+    window.sessionStorage.setItem(LAST_GOOGLE_PAGE_KEY, signature);
+  } catch {}
+  sendGoogle("page_view", properties);
 }
 
 export function trackPageView(input: { location: string; referrer?: string; title: string }) {
@@ -128,6 +148,7 @@ export function trackPageView(input: { location: string; referrer?: string; titl
     if (value) properties[key] = value;
   }
   trackEvent({ eventName: "page_view", properties });
+  trackGooglePageView(properties);
 }
 
 export function updateAnalyticsConsent(choice: Exclude<AnalyticsConsentChoice, "unknown">) {

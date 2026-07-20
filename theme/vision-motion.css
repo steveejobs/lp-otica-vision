@@ -254,19 +254,19 @@ html[data-route-state="leaving"] main {
 }
 
 html[data-route-state="leaving"][data-route-target="catalog"] body::before {
-  animation: visionCatalogLeave 520ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  animation: visionCatalogLeave 280ms cubic-bezier(0.72, 0, 0.18, 1) both;
   background: var(--vision-paper);
   box-shadow: none;
   backdrop-filter: none;
 }
 
 html[data-route-state="leaving"][data-route-target="catalog"] body::after {
-  animation: visionCatalogLineLeave 520ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  animation: visionCatalogLineLeave 280ms cubic-bezier(0.72, 0, 0.18, 1) both;
   box-shadow: 0 0 18px rgb(var(--vision-silver-light-rgb) / 0.34);
 }
 
 html[data-route-state="leaving"][data-route-target="catalog"] main {
-  animation: visionCatalogPageLeave 520ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  animation: visionCatalogPageLeave 280ms cubic-bezier(0.72, 0, 0.18, 1) both;
 }
 
 html[data-route-state="entering"] body::before {
@@ -282,14 +282,14 @@ html[data-route-state="entering"] main {
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] body::before {
-  animation: visionCatalogEnter 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: visionCatalogEnter 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
   background: var(--vision-paper);
   box-shadow: -18px 0 42px rgb(var(--vision-graphite-rgb) / 0.08);
   backdrop-filter: none;
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] body::after {
-  animation: visionCatalogLineEnter 760ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: visionCatalogLineEnter 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] main {
@@ -297,7 +297,7 @@ html[data-route-state="entering"][data-route-target="catalog"] main {
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > * {
-  animation: visionCatalogContentEnter 560ms var(--ease-vision-out) both;
+  animation: visionCatalogContentEnter 360ms var(--ease-vision-out) both;
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="hero"] > :nth-child(1) {
@@ -313,11 +313,11 @@ html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-ent
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="filters"] {
-  animation: visionCatalogContentEnter 500ms var(--ease-vision-out) 150ms both;
+  animation: visionCatalogContentEnter 340ms var(--ease-vision-out) 70ms both;
 }
 
 html[data-route-state="entering"][data-route-target="catalog"] [data-catalog-enter="summary"] {
-  animation: visionCatalogContentEnter 480ms var(--ease-vision-out) 220ms both;
+  animation: visionCatalogContentEnter 320ms var(--ease-vision-out) 110ms both;
 }
 
 @keyframes visionRouteLeave {

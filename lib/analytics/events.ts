@@ -29,6 +29,7 @@ export const analyticsPropertyNames = [
   "source_route",
   "click_location",
   "product_id",
+  "product_name",
   "product_slug",
   "brand_slug",
   "category_slug",
@@ -63,6 +64,7 @@ export type AnalyticsEventInput = {
 };
 
 export const googleRecommendedEventMap: Partial<Record<AnalyticsEventName, string>> = {
+  search_performed: "search",
   product_opened: "view_item",
 };
 

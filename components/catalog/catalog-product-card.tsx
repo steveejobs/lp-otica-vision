@@ -88,11 +88,10 @@ export function CatalogProductCard({
     <article
       aria-hidden={clone || undefined}
       className={styles.card}
-      data-motion-reveal={presentation === "catalog" ? "" : undefined}
-      data-motion-variant={
-        presentation === "catalog" ? "catalog-card" : undefined
-      }
       data-catalog-product-id={clone ? undefined : product.id}
+      data-catalog-product-name={clone ? undefined : product.name}
+      data-catalog-product-slug={clone ? undefined : product.slug}
+      data-catalog-product-brand={clone ? undefined : product.brand?.slug}
       data-availability={product.availability}
       data-presentation={presentation}
     >

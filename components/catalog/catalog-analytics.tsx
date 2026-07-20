@@ -68,7 +68,16 @@ export function CatalogAnalytics({
         if (entry.isIntersecting && entry.intersectionRatio >= 0.65) {
           const timer = window.setTimeout(() => {
             observed.add(id);
-            void trackCatalogEvent({ eventName: "product_focused", productId: id });
+            void trackCatalogEvent({
+              eventName: "product_focused",
+              metadata: {
+                brand_slug: card.dataset.catalogProductBrand,
+                product_name: card.dataset.catalogProductName,
+                product_slug: card.dataset.catalogProductSlug,
+                source_route: "/catalogo",
+              },
+              productId: id,
+            });
           }, 1100);
           timers.set(id, timer);
         } else if (timers.has(id)) {
@@ -84,14 +93,36 @@ export function CatalogAnalytics({
   return null;
 }
 
-export function ProductViewAnalytics({ productId, productSlug }: { productId: string; productSlug: string }) {
+export function ProductViewAnalytics({
+  brandSlug,
+  categorySlug,
+  productId,
+  productName,
+  productSlug,
+}: {
+  brandSlug?: string;
+  categorySlug?: string;
+  productId: string;
+  productName: string;
+  productSlug: string;
+}) {
   const sent = useRef(false);
 
   useEffect(() => {
     if (sent.current) return;
     sent.current = true;
-    void trackCatalogEvent({ eventName: "product_opened", metadata: { product_slug: productSlug }, productId });
-  }, [productId, productSlug]);
+    void trackCatalogEvent({
+      eventName: "product_opened",
+      metadata: {
+        brand_slug: brandSlug,
+        category_slug: categorySlug,
+        product_name: productName,
+        product_slug: productSlug,
+        source_route: `/catalogo/${productSlug}`,
+      },
+      productId,
+    });
+  }, [brandSlug, categorySlug, productId, productName, productSlug]);
 
   return null;
 }
