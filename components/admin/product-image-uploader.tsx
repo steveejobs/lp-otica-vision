@@ -3,21 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import {
-  createProductImageUploadTokensAction,
-  discardProductImageUploadsAction,
-  finalizeProductImageReplacementAction,
-  finalizeProductImageUploadsAction,
-} from "@/app/admin/(protected)/produtos/actions";
-import {
-  isProductImageUploadMime,
-  PRODUCT_IMAGE_UPLOAD_MAX_BYTES,
-  PRODUCT_IMAGE_UPLOAD_MAX_FILES,
-} from "@/lib/catalog/image-upload";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-
 import { FilePreviewInput } from "./file-preview-input";
 import styles from "./admin.module.css";
+import { productImageSelectionError, uploadProductImages } from "./product-image-upload-client";
 
 export function ProductImageUploader({
   imageId,
@@ -36,63 +24,18 @@ export function ProductImageUploader({
     event.preventDefault();
     const form = event.currentTarget;
     setMessage(null);
-    if (
-      !files.length ||
-      files.length > (replacing ? 1 : PRODUCT_IMAGE_UPLOAD_MAX_FILES) ||
-      files.some(
-        (file) =>
-          !isProductImageUploadMime(file.type) ||
-          file.size < 1 ||
-          file.size > PRODUCT_IMAGE_UPLOAD_MAX_BYTES,
-      )
-    ) {
-      setMessage("Selecione imagens JPEG, PNG, WebP ou AVIF de até 8 MB cada.");
-      return;
-    }
-
-    const formData = new FormData(form);
-    const objectPosition = String(formData.get("object_position") ?? "50% 50%");
-    let uploadIds: string[] = [];
+    const validationError = productImageSelectionError(files, replacing);
+    if (validationError) { setMessage(validationError); return; }
     setPending(true);
-    setMessage("Preparando envio seguro...");
-    try {
-      const tokenResult = await createProductImageUploadTokensAction({
-        files: files.map((file) => ({ mimeType: file.type, sizeBytes: file.size })),
-        productId,
-      });
-      if (!tokenResult.ok || !tokenResult.uploads || tokenResult.uploads.length !== files.length) {
-        throw new Error("token");
-      }
-      uploadIds = tokenResult.uploads.map((upload) => upload.id);
-      const supabase = createSupabaseBrowserClient();
-      for (const [index, upload] of tokenResult.uploads.entries()) {
-        setMessage(`Enviando imagem ${index + 1} de ${files.length}...`);
-        const { error } = await supabase.storage
-          .from("catalog-products")
-          .uploadToSignedUrl(upload.path, upload.token, files[index], {
-            cacheControl: "3600",
-            contentType: files[index].type,
-            upsert: false,
-          });
-        if (error) throw error;
-      }
-
-      setMessage(replacing ? "Gerando novamente os derivados..." : "Gerando derivados otimizados...");
-      const finalResult = replacing && imageId
-        ? await finalizeProductImageReplacementAction({ imageId, productId, uploadId: uploadIds[0] })
-        : await finalizeProductImageUploadsAction({ objectPosition, productId, uploadIds });
-      if (!finalResult.ok) throw new Error(finalResult.error);
-
+    const result = await uploadProductImages({ files, imageId, onProgress: setMessage, productId });
+    if (result.ok) {
       setMessage("Imagens processadas com sucesso.");
       setPending(false);
       setFiles([]);
       form.reset();
       router.refresh();
-    } catch {
-      if (uploadIds.length) {
-        await discardProductImageUploadsAction({ uploadIds });
-      }
-      setMessage("Não foi possível validar e processar as imagens. Revise os arquivos e tente novamente.");
+    } else {
+      setMessage(result.error);
       setPending(false);
     }
   }

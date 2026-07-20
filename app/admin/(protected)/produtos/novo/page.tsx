@@ -20,7 +20,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
   const query = await searchParams;
   return (
     <>
-      <AdminPageHeader eyebrow="Produtos" description="O produto nasce como rascunho, disponível e com preço sob consulta. Depois, adicione as imagens e publique quando estiver pronto." title="Novo produto" />
+      <AdminPageHeader eyebrow="Produtos" description="Cadastre as informações e selecione até 10 imagens. A primeira foto será usada como capa do rascunho." title="Novo produto" />
       <AdminFeedback error={query.error} />
       <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link></div>
       <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Cadastro do produto</h2><ProductForm action={createProductAction} brands={brands} categories={categories} styleEligibilityReasons={["produto ainda não publicado", "sem capa publicada", "sem estilo ativo"]} styleOptions={styleResult.error ? [] : styleResult.data ?? []} /></section>

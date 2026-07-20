@@ -283,39 +283,53 @@ export async function generateProductSkuAction(): Promise<
   }
 }
 
+async function insertProductDraft(formData: FormData) {
+  const supabase = await createSupabaseServerClient();
+  const payload = productPayload(formData);
+  const [displayOrder, sku, slug] = await Promise.all([
+    nextProductDisplayOrder(supabase),
+    allocateProductSku(),
+    allocateProductSlug(supabase, payload.name),
+  ]);
+  const { data, error } = await supabase
+    .from("products")
+    .insert({ ...payload, display_order: displayOrder, featured: false, published: false, sku, slug })
+    .select("id")
+    .single();
+  if (error) throw error;
+  const assignments = productStyleAssignments(formData);
+  if (assignments) {
+    const { error: styleError } = await supabase.rpc("sync_product_styles", {
+      assignments,
+      target_product_id: data.id,
+    });
+    if (styleError) {
+      await supabase.from("products").delete().eq("id", data.id);
+      throw styleError;
+    }
+  }
+  return data.id;
+}
+
+export async function createProductDraftAction(formData: FormData): Promise<
+  { ok: true; productId: string } | { error: string; ok: false }
+> {
+  await requireAdminRole(["admin", "editor"]);
+  try {
+    const productId = await insertProductDraft(formData);
+    revalidatePath("/admin/produtos");
+    return { ok: true, productId };
+  } catch (error) {
+    return { error: mutationErrorCode(error), ok: false };
+  }
+}
+
 export async function createProductAction(formData: FormData) {
   await requireAdminRole(["admin", "editor"]);
-  const supabase = await createSupabaseServerClient();
   let id: string | null = null;
   let errorCode: string | null = null;
-  try {
-    const payload = productPayload(formData);
-    const [displayOrder, sku, slug] = await Promise.all([
-      nextProductDisplayOrder(supabase),
-      allocateProductSku(),
-      allocateProductSlug(supabase, payload.name),
-    ]);
-    const { data, error } = await supabase
-      .from("products")
-      .insert({ ...payload, display_order: displayOrder, featured: false, published: false, sku, slug })
-      .select("id")
-      .single();
-    if (error) throw error;
-    id = data.id;
-    const assignments = productStyleAssignments(formData);
-    if (assignments) {
-      const { error: styleError } = await supabase.rpc("sync_product_styles", {
-        assignments,
-        target_product_id: id,
-      });
-      if (styleError) {
-        await supabase.from("products").delete().eq("id", id);
-        throw styleError;
-      }
-    }
-  } catch (error) {
-    errorCode = mutationErrorCode(error);
-  }
+  try { id = await insertProductDraft(formData); }
+  catch (error) { errorCode = mutationErrorCode(error); }
   if (errorCode || !id) redirect(appendFeedback("/admin/produtos/novo-produto", "error", errorCode ?? "failed"));
   revalidatePath("/admin/produtos");
   redirect(appendFeedback(`/admin/produtos/${id}`, "status", "created"));

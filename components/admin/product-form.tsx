@@ -1,13 +1,17 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useRef, useState, type FormEvent } from "react";
 
+import { createProductDraftAction } from "@/app/admin/(protected)/produtos/actions";
 import {
   createInlineBrandAction,
   type InlineBrandState,
 } from "@/app/admin/(protected)/marcas/actions";
 
 import { AdminSubmitButton } from "./admin-form-controls";
+import { FilePreviewInput } from "./file-preview-input";
+import { productImageSelectionError, uploadProductImages } from "./product-image-upload-client";
 import { ProductStyleSelector, type ProductStyleAssignment } from "./product-style-selector";
 import styles from "./admin.module.css";
 
@@ -61,6 +65,7 @@ export function ProductForm({
   styleOptions?: { active: boolean; description: string; id: string; label: string }[];
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const router = useRouter();
   const [brandOptions, setBrandOptions] = useState(brands);
   const [selectedBrandId, setSelectedBrandId] = useState(defaults.brand_id ?? "");
   const [brandName, setBrandName] = useState("");
@@ -74,6 +79,9 @@ export function ProductForm({
     defaults.published ? "published" : "draft",
   );
   const [featured, setFeatured] = useState(Boolean(defaults.featured));
+  const [newProductFiles, setNewProductFiles] = useState<File[]>([]);
+  const [createPending, setCreatePending] = useState(false);
+  const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [brandState, submitBrand, brandPending] = useActionState(
     async (previous: InlineBrandState, formData: FormData) => {
       const result = await createInlineBrandAction(previous, formData);
@@ -110,6 +118,35 @@ export function ProductForm({
     setSelectedBrandId(value);
   }
 
+  async function submitNewProduct(event: FormEvent<HTMLFormElement>) {
+    if (editing) return;
+    event.preventDefault();
+    const validationError = productImageSelectionError(newProductFiles);
+    if (validationError) { setCreateMessage(validationError); return; }
+
+    const formData = new FormData(event.currentTarget);
+    // Os arquivos seguem pelo upload assinado; nunca devem atravessar o limite da Server Action.
+    formData.delete("files");
+    setCreatePending(true);
+    setCreateMessage("Salvando as informações do produto...");
+    const productResult = await createProductDraftAction(formData);
+    if (!productResult.ok) {
+      setCreateMessage("Não foi possível criar o produto. Revise os campos e tente novamente.");
+      setCreatePending(false);
+      return;
+    }
+
+    const imageResult = await uploadProductImages({
+      files: newProductFiles,
+      onProgress: setCreateMessage,
+      productId: productResult.productId,
+    });
+    const params = new URLSearchParams({ status: "created" });
+    if (!imageResult.ok) params.set("error", "image");
+    router.push(`/admin/produtos/${productResult.productId}?${params.toString()}`);
+    router.refresh();
+  }
+
   const maskedPrice = priceCents ? brlFormatter.format(Number(priceCents) / 100) : "";
   const submitLabel = !editing
     ? "Salvar rascunho"
@@ -121,9 +158,9 @@ export function ProductForm({
 
   return (
     <>
-      <form action={action} className={styles.adminForm}>
+      <form action={action} className={styles.adminForm} onSubmit={editing ? undefined : submitNewProduct}>
         {defaults.id ? <input name="id" type="hidden" value={defaults.id} /> : null}
-        <fieldset className={styles.formFieldset} disabled={archived}>
+        <fieldset className={styles.formFieldset} disabled={archived || createPending}>
           <div className={styles.productFormSections}>
             <section aria-labelledby="product-main-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
@@ -176,10 +213,28 @@ export function ProductForm({
               </div>
             </section>
 
+            {!editing ? (
+              <section aria-labelledby="product-images-title" className={styles.productFormSection}>
+                <div className={styles.formSectionHeading}>
+                  <span>2</span>
+                  <div><h3 id="product-images-title">Imagens</h3><p>Selecione de 1 a 10 fotos. A primeira será usada como capa.</p></div>
+                </div>
+                <FilePreviewInput
+                  disabled={createPending}
+                  id="new-product-images"
+                  multiple
+                  name="files"
+                  onFilesChange={(files) => { setNewProductFiles(files); setCreateMessage(null); }}
+                  required
+                />
+                <p className={styles.choiceHint}>{newProductFiles.length ? `${newProductFiles.length} ${newProductFiles.length === 1 ? "imagem selecionada" : "imagens selecionadas"}. Você poderá alterar a capa e a ordem depois de salvar.` : "Escolha pelo menos uma imagem para cadastrar o produto."}</p>
+              </section>
+            ) : null}
+
             <section aria-labelledby="product-presentation-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
-                <span>2</span>
-                <div><h3 id="product-presentation-title">Apresentação</h3><p>{editing ? "Imagens e capa podem ser ajustadas logo abaixo. Depois, complete a descrição curta." : "Salve o rascunho para adicionar imagens e escolher a capa."}</p></div>
+                <span>{editing ? "2" : "3"}</span>
+                <div><h3 id="product-presentation-title">Apresentação</h3><p>{editing ? "Imagens e capa podem ser ajustadas logo abaixo. Depois, complete a descrição curta." : "Acrescente uma descrição curta somente se ela ajudar a identificar o produto."}</p></div>
               </div>
               <div className={styles.formGrid}>
                 <label className={`${styles.field} ${styles.fieldWide}`}>
@@ -191,7 +246,7 @@ export function ProductForm({
 
             <section aria-labelledby="product-sale-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
-                <span>3</span>
+                <span>{editing ? "3" : "4"}</span>
                 <div><h3 id="product-sale-title">Contato</h3><p>Defina como o produto aparece para quem consulta a Vision.</p></div>
               </div>
               <div className={styles.commercialFields}>
@@ -244,7 +299,7 @@ export function ProductForm({
 
             <section aria-labelledby="product-publication-title" className={styles.productFormSection}>
               <div className={styles.formSectionHeading}>
-                <span>4</span>
+                <span>{editing ? "4" : "5"}</span>
                 <div><h3 id="product-publication-title">Publicação</h3><p>Rascunhos ficam visíveis somente no painel administrativo.</p></div>
               </div>
               {editing ? (
@@ -270,8 +325,9 @@ export function ProductForm({
               )}
             </section>
           </div>
+          {!editing && createMessage ? <p className={createMessage.startsWith("Não foi possível") || createMessage.startsWith("Selecione") || createMessage.startsWith("Use imagens") ? styles.formError : styles.fieldHint} role="status">{createMessage}</p> : null}
           <div className={styles.formActions}>
-            <AdminSubmitButton pendingLabel="Salvando produto...">{submitLabel}</AdminSubmitButton>
+            {editing ? <AdminSubmitButton pendingLabel="Salvando produto...">{submitLabel}</AdminSubmitButton> : <button className={styles.primaryButton} disabled={createPending} type="submit">{createPending ? "Criando produto e enviando imagens..." : "Cadastrar produto e imagens"}</button>}
           </div>
         </fieldset>
       </form>
