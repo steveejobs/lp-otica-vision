@@ -11,6 +11,7 @@ import {
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
+import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -309,6 +310,7 @@ async function CatalogContent({
           className={styles.results}
           aria-labelledby="catalog-results-title"
         >
+          <CatalogResultsMotion motionKey={`${query.style ?? "all"}:${query.brand ?? "all"}:${query.category ?? "all"}:${query.availability ?? "all"}:${query.collection ?? "all"}:${query.search ?? "all"}:${catalog.page}`}>
           <div className={styles.resultsInner}>
             <div className={styles.resultSummary} data-catalog-enter="summary">
               <h2 id="catalog-results-title">
@@ -438,6 +440,7 @@ async function CatalogContent({
               </nav>
             ) : null}
           </div>
+          </CatalogResultsMotion>
         </section>
         <CatalogAnalytics collectionId={collectionId} query={query} resultCount={catalog.total} />
       </main>

@@ -7,18 +7,22 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 
 import { trackCatalogEvent } from "@/lib/analytics/client";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
+import { ProductWhatsappButton } from "@/components/catalog/product-whatsapp-button";
 import { fixtureCurationSelection } from "@/lib/curation/fixtures";
 import type { CurationSelection, CuratedProduct } from "@/lib/curation/types";
 
 import styles from "./vision-curation.module.css";
 
 const SELECTION_KEY = "vision:curation-selection";
+const PRIMARY_AUTOPLAY_MS = 5200;
+const PRIMARY_MANUAL_HOLD_MS = 7200;
 
 type Props = {
   analytics?: boolean;
   demoBasePath?: string;
   initialSelection: CurationSelection;
   previewLabel?: string;
+  productWhatsappUrls?: Readonly<Record<string, string>>;
 };
 
 function queryString(styleSlug: string, categorySlug: string | null) {
@@ -42,6 +46,7 @@ export function VisionCuration({
   demoBasePath,
   initialSelection,
   previewLabel,
+  productWhatsappUrls,
 }: Props) {
   const fixtureMode = useFixtureMode(demoBasePath);
   const rootRef = useRef<HTMLElement>(null);
@@ -49,11 +54,17 @@ export function VisionCuration({
   const currentRects = useRef(new Map<string, DOMRect>());
   const previousRects = useRef(new Map<string, DOMRect>());
   const requestRef = useRef<AbortController | null>(null);
+  const manualPrimaryPauseUntil = useRef(0);
   const [selection, setSelection] = useState(initialSelection);
   const [requestedStyle, setRequestedStyle] = useState(initialSelection.styleSlug);
   const [focusId, setFocusId] = useState(initialSelection.products[0]?.id ?? null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [inViewport, setInViewport] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [wideScreen, setWideScreen] = useState(false);
+  const [whatsappUrls, setWhatsappUrls] = useState(productWhatsappUrls ?? {});
   const products = useMemo(
     () => orderedProducts(selection.products, focusId),
     [focusId, selection.products],
@@ -61,8 +72,37 @@ export function VisionCuration({
   const selectedStyle = selection.styles.find((style) => style.slug === requestedStyle)
     ?? selection.styles.find((style) => style.slug === selection.styleSlug)
     ?? selection.styles[0];
+  const activeProduct = products[0];
+  const activeWhatsappUrl = activeProduct ? whatsappUrls[activeProduct.id] : undefined;
 
   useEffect(() => () => requestRef.current?.abort(), []);
+
+  useEffect(() => {
+    const element = rootRef.current;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const desktop = window.matchMedia("(min-width: 721px)");
+    const syncMotionPreference = () => setReducedMotion(media.matches);
+    const syncPageVisibility = () => setPageVisible(!document.hidden);
+    const syncViewport = () => setWideScreen(desktop.matches);
+    syncMotionPreference();
+    syncPageVisibility();
+    syncViewport();
+
+    const observer = element
+      ? new IntersectionObserver(([entry]) => setInViewport(entry?.isIntersecting ?? false), { threshold: 0.2 })
+      : null;
+    if (element) observer?.observe(element);
+    media.addEventListener("change", syncMotionPreference);
+    desktop.addEventListener("change", syncViewport);
+    document.addEventListener("visibilitychange", syncPageVisibility);
+
+    return () => {
+      observer?.disconnect();
+      media.removeEventListener("change", syncMotionPreference);
+      desktop.removeEventListener("change", syncViewport);
+      document.removeEventListener("visibilitychange", syncPageVisibility);
+    };
+  }, []);
 
   useLayoutEffect(() => {
     const previousRectsSnapshot = previousRects.current;
@@ -97,6 +137,22 @@ export function VisionCuration({
     previousRects.current = new Map(currentRects.current);
   }, []);
 
+  useEffect(() => {
+    if (selection.products.length < 2 || reducedMotion || !wideScreen || !inViewport || !pageVisible) return;
+
+    const remainingManualHold = manualPrimaryPauseUntil.current - Date.now();
+    const delay = Math.max(PRIMARY_AUTOPLAY_MS, remainingManualHold);
+    const timeout = window.setTimeout(() => {
+      captureRects();
+      setFocusId((currentId) => {
+        const currentIndex = selection.products.findIndex((product) => product.id === currentId);
+        return selection.products[(currentIndex + 1) % selection.products.length]?.id ?? selection.products[0]?.id ?? null;
+      });
+    }, delay);
+
+    return () => window.clearTimeout(timeout);
+  }, [captureRects, focusId, inViewport, pageVisible, reducedMotion, selection.products, wideScreen]);
+
   const persistSelection = useCallback((next: CurationSelection) => {
     try {
       sessionStorage.setItem(SELECTION_KEY, JSON.stringify({
@@ -124,27 +180,38 @@ export function VisionCuration({
     setMessage("");
 
     try {
-      const next = fixtureMode
-        ? fixtureCurationSelection(styleSlug, categorySlug)
+      const payload = fixtureMode
+        ? {
+          productWhatsappUrls: {},
+          selection: fixtureCurationSelection(styleSlug, categorySlug),
+        }
         : await fetch(`/api/curadoria?${queryString(styleSlug, categorySlug)}`, {
           cache: "no-store",
           signal: controller.signal,
         }).then(async (response) => {
           if (!response.ok) throw new Error("curation-request");
-          const payload = await response.json() as { selection: CurationSelection | null };
+          const payload = await response.json() as {
+            productWhatsappUrls?: Record<string, string>;
+            selection: CurationSelection | null;
+          };
           if (!payload.selection) throw new Error("curation-empty");
-          return payload.selection;
+          return {
+            productWhatsappUrls: payload.productWhatsappUrls ?? {},
+            selection: payload.selection,
+          };
         });
       if (controller.signal.aborted) return;
+      const nextSelection = payload.selection;
       captureRects();
-      setSelection(next);
-      setRequestedStyle(next.styleSlug);
-      setFocusId(next.products[0]?.id ?? null);
-      persistSelection(next);
+      setSelection(nextSelection);
+      setWhatsappUrls(payload.productWhatsappUrls ?? {});
+      setRequestedStyle(nextSelection.styleSlug);
+      setFocusId(nextSelection.products[0]?.id ?? null);
+      persistSelection(nextSelection);
       if (analytics) {
         void trackCatalogEvent({
           eventName,
-          metadata: eventName === "style_selected" ? { style_slug: next.styleSlug } : { category_slug: next.categorySlug ?? "todos" },
+          metadata: eventName === "style_selected" ? { style_slug: nextSelection.styleSlug } : { category_slug: nextSelection.categorySlug ?? "todos" },
         });
       }
     } catch {
@@ -157,6 +224,7 @@ export function VisionCuration({
   const changeFocus = useCallback((id: string) => {
     if (id === focusId) return;
     if (typeof window !== "undefined" && !window.matchMedia("(min-width: 721px)").matches) return;
+    manualPrimaryPauseUntil.current = Date.now() + PRIMARY_MANUAL_HOLD_MS;
     captureRects();
     setFocusId(id);
   }, [captureRects, focusId]);
@@ -250,7 +318,7 @@ export function VisionCuration({
               return (
                 <article
                   className={styles.product}
-                  data-protagonist={index === 0 || undefined}
+                  data-protagonist={product.id === focusId || undefined}
                   key={product.id}
                   onFocus={() => changeFocus(product.id)}
                   onPointerEnter={() => changeFocus(product.id)}
@@ -302,21 +370,33 @@ export function VisionCuration({
             <strong>{selection.total}</strong> {selection.total === 1 ? "produto compatível" : "produtos compatíveis"}
             {selectedStyle ? ` com a direção ${selectedStyle.label}` : ""}.
           </p>
-          <Link
-            data-catalog-collection-link
-            data-catalog-transition-link
-            href={catalogHref}
-            onClick={(event) => {
-              if (analytics) void trackCatalogEvent({ eventName: "catalog_opened", metadata: { source_route: "/", style_slug: selection.styleSlug } });
-              if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
-                event.preventDefault();
-                window.location.assign(catalogHref);
-              }
-            }}
-          >
-            Ver seleção completa
-            <ArrowUpRight aria-hidden="true" size={18} />
-          </Link>
+          <div className={styles.footerActions}>
+            <Link
+              data-catalog-collection-link
+              data-catalog-transition-link
+              href={catalogHref}
+              onClick={(event) => {
+                if (analytics) void trackCatalogEvent({ eventName: "catalog_opened", metadata: { source_route: "/", style_slug: selection.styleSlug } });
+                if (event.button === 0 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+                  event.preventDefault();
+                  window.location.assign(catalogHref);
+                }
+              }}
+            >
+              Ver seleção completa
+              <ArrowUpRight aria-hidden="true" size={18} />
+            </Link>
+            {activeProduct && activeWhatsappUrl ? (
+              <span className={styles.whatsappAction}>
+                <ProductWhatsappButton
+                  curated
+                  href={activeWhatsappUrl}
+                  label={`Falar sobre ${activeProduct.name}`}
+                  productId={activeProduct.id}
+                />
+              </span>
+            ) : null}
+          </div>
         </footer>
         {message ? <p className={styles.message} role="status">{message}</p> : null}
       </div>

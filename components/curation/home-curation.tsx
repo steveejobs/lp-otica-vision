@@ -1,6 +1,8 @@
 import { VisionCuration } from "@/components/curation/vision-curation";
 import { getCurationSelection } from "@/lib/curation/data";
+import { getCurationProductWhatsappUrls } from "@/lib/curation/product-whatsapp";
 import { getHomeCurationSettings } from "@/lib/curation/settings";
+import { getMetadataBase } from "@/lib/metadata";
 
 type HomeCurationProps = {
   categorySlug?: string;
@@ -17,5 +19,9 @@ export async function HomeCuration({ categorySlug, styleSlug }: HomeCurationProp
   });
 
   if (!selection || selection.products.length === 0) return null;
-  return <VisionCuration initialSelection={selection} />;
+
+  const siteUrl = getMetadataBase() ?? new URL("http://localhost:3000");
+  const productWhatsappUrls = await getCurationProductWhatsappUrls(selection.products, siteUrl);
+
+  return <VisionCuration initialSelection={selection} productWhatsappUrls={productWhatsappUrls} />;
 }

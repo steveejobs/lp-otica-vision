@@ -5,7 +5,7 @@
 .hero {
   position: relative;
   overflow: clip;
-  padding: clamp(3rem, 7vw, 6.5rem) 0 clamp(2.6rem, 5vw, 4.5rem);
+  padding: clamp(2rem, 4vw, 3.6rem) 0 clamp(1.8rem, 3vw, 2.75rem);
   border-bottom: 1px solid var(--vision-line);
   background: var(--vision-paper);
 }
@@ -70,7 +70,7 @@
   max-width: 13ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 7.4vw, 6.6rem);
+  font-size: clamp(2.8rem, 5.8vw, 5.25rem);
   font-weight: 400;
   letter-spacing: 0;
   line-height: 0.92;
@@ -113,8 +113,8 @@
 .filterInner {
   display: grid;
   max-width: 1320px;
-  gap: 1.15rem;
-  padding-block: 1.2rem 1.35rem;
+  gap: 0.9rem;
+  padding-block: 0.9rem 1rem;
 }
 
 .brandBlock {
@@ -328,7 +328,7 @@
 
 .results {
   min-height: 38rem;
-  padding: clamp(2.5rem, 5vw, 4.8rem) 0 clamp(5rem, 9vw, 8rem);
+  padding: clamp(1.85rem, 3.6vw, 3.4rem) 0 clamp(5rem, 9vw, 8rem);
 }
 
 .resultsInner {
@@ -491,7 +491,17 @@
   }
 
   .heroCopy h1 {
-    font-size: clamp(4.6rem, 6.4vw, 6.6rem);
+    font-size: clamp(3.8rem, 5.2vw, 5.25rem);
+  }
+
+  .filterInner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .refinePanel {
+    grid-column: 1 / -1;
   }
 
   .filters {
