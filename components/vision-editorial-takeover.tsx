@@ -440,6 +440,8 @@ export function VisionEditorialTakeover({ media }: Props) {
           <span className={styles.paperPlane} ref={paperPlaneRef} aria-hidden="true">
             <span className={styles.restLine} />
           </span>
+          <span className={styles.entryCurtain} aria-hidden="true" />
+          <span className={styles.entryLine} aria-hidden="true" />
           <span className={styles.cutGuide} aria-hidden="true">
             <span className={styles.cutLine} ref={cutLineRef} />
           </span>

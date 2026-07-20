@@ -25,6 +25,7 @@
   min-width: 0;
   max-width: 31rem;
   align-content: start;
+  animation: hero-copy-arrival 580ms 60ms var(--ease-vision-out) both;
 }
 
 .copy > * {
@@ -147,6 +148,31 @@
   pointer-events: none;
 }
 
+.entryCurtain {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  clip-path: inset(52% 0 0 0);
+  background: var(--vision-paper);
+  pointer-events: none;
+  animation: hero-curtain-mobile 760ms 80ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  will-change: clip-path;
+}
+
+.entryLine {
+  position: absolute;
+  z-index: 6;
+  top: 52%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--vision-metal-gradient);
+  box-shadow: 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.32);
+  pointer-events: none;
+  animation: hero-line-mobile 760ms 80ms cubic-bezier(0.72, 0, 0.18, 1) both;
+  will-change: top, opacity;
+}
+
 .restLine {
   position: absolute;
   top: var(--line-y);
@@ -187,6 +213,40 @@
 .visual[data-state="preparing"] .restLine,
 .visual[data-state="transitioning"] .restLine {
   opacity: 0;
+}
+
+@keyframes hero-copy-arrival {
+  from {
+    opacity: 0.88;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-curtain-mobile {
+  from {
+    clip-path: inset(52% 0 0 0);
+  }
+
+  to {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@keyframes hero-line-mobile {
+  from {
+    top: 52%;
+    opacity: 1;
+  }
+
+  to {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 @media (min-width: 721px) {
@@ -248,6 +308,22 @@
     clip-path: inset(0 calc(100% - var(--line-x)) 0 0);
   }
 
+  .entryCurtain {
+    clip-path: inset(0 0 0 52%);
+    animation-name: hero-curtain-desktop;
+  }
+
+  .entryLine {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 52%;
+    width: 1px;
+    height: auto;
+    animation-name: hero-line-desktop;
+    will-change: left, opacity;
+  }
+
   .restLine {
     top: 0;
     right: auto;
@@ -267,8 +343,59 @@
   }
 }
 
+@keyframes hero-curtain-desktop {
+  from {
+    clip-path: inset(0 0 0 52%);
+  }
+
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes hero-line-desktop {
+  from {
+    left: 52%;
+    opacity: 1;
+  }
+
+  to {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .copy,
+  .entryCurtain,
+  .entryLine,
   .restLine {
+    animation: none;
     transition: none;
+  }
+
+  .copy {
+    opacity: 1;
+    transform: none;
+  }
+
+  .entryCurtain {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  .entryLine {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@media (min-width: 721px) and (prefers-reduced-motion: reduce) {
+  .entryCurtain {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .entryLine {
+    top: 0;
+    left: 100%;
   }
 }
