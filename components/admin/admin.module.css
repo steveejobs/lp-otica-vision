@@ -37,6 +37,8 @@
   background: var(--admin-dark);
   color: #f8f4ee;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(211, 182, 148, 0.64) transparent;
 }
 
 .sidebarBrand {
@@ -179,6 +181,42 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 98, 71, 0.56) transparent;
+}
+
+/* A rolagem faz parte da interface do ADM, sem a barra nativa do sistema. */
+.sidebar::-webkit-scrollbar,
+.adminCanvas::-webkit-scrollbar {
+  width: 0.7rem;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.adminCanvas::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.adminCanvas::-webkit-scrollbar-thumb {
+  border: 0.22rem solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(211, 182, 148, 0.64);
+}
+
+.adminCanvas::-webkit-scrollbar-thumb {
+  background-color: rgba(128, 98, 71, 0.56);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(211, 182, 148, 0.9);
+}
+
+.adminCanvas::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128, 98, 71, 0.82);
 }
 
 .mobileHeader {
@@ -2198,16 +2236,56 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   min-height: 2.85rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--admin-line);
-  border-radius: 0.4rem;
-  background: rgba(255, 253, 249, 0.66);
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--admin-line);
+  background: transparent;
+  cursor: pointer;
 }
 
 .checkboxField input {
-  width: 1.1rem;
-  height: 1.1rem;
-  accent-color: var(--admin-bronze);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.checkboxField > span {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--admin-muted);
+  transition: color 160ms var(--ease-vision);
+}
+
+.checkboxField > span::after {
+  width: 1.8rem;
+  height: 0.62rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+  border-radius: 999px;
+  background: rgba(116, 105, 95, 0.28);
+  content: "";
+  transition: background 160ms var(--ease-vision), box-shadow 160ms var(--ease-vision);
+}
+
+.checkboxField input:checked + span {
+  color: var(--admin-ink);
+}
+
+.checkboxField input:checked + span::after {
+  background: var(--admin-bronze);
+  box-shadow: inset 1.18rem 0 0 #f8f4ee;
+}
+
+.checkboxField input:disabled + span {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.checkboxField:has(input:focus-visible) {
+  outline: 3px solid rgba(128, 98, 71, 0.2);
+  outline-offset: 3px;
 }
 
 .checkboxWithInfo {

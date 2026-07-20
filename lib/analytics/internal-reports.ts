@@ -20,6 +20,16 @@ export type InternalAnalyticsReport = {
   topStyles: Array<{ slug: string; uses: number }>;
 };
 
+export type AnalyticsProductCover = {
+  altText: string;
+  assetVersion: string;
+  height: number | null;
+  id: string;
+  objectPosition: string;
+  productId: string;
+  width: number | null;
+};
+
 function object(value: Json | undefined): Record<string, Json | undefined> { return value && typeof value === "object" && !Array.isArray(value) ? value : {}; }
 function array(value: Json | undefined) { return Array.isArray(value) ? value.map(object) : []; }
 function text(value: Json | undefined) { return typeof value === "string" ? value : ""; }
@@ -69,4 +79,24 @@ export async function getInternalAnalyticsReport(days: number) {
   const legacy = await supabase.rpc("admin_catalog_analytics", { p_days: days });
   if (!legacy.error && legacy.data) return { data: parseLegacy(legacy.data, days), error: "A migração analítica do preview ainda não foi aplicada; exibindo o relatório legado.", source: "Dados internos" as const };
   return { data: empty(days), error: "Dados internos temporariamente indisponíveis.", source: "Dados internos" as const };
+}
+
+export async function getAnalyticsProductCovers(productIds: string[]) {
+  if (!productIds.length) return {} as Record<string, AnalyticsProductCover>;
+  const supabase = await createSupabaseServerClient();
+  const result = await supabase
+    .from("product_images")
+    .select("id, alt_text, asset_version, height, object_position, product_id, width")
+    .in("product_id", productIds)
+    .eq("is_cover", true);
+  if (result.error || !result.data) return {} as Record<string, AnalyticsProductCover>;
+  return Object.fromEntries(result.data.map((cover) => [cover.product_id, {
+    altText: cover.alt_text,
+    assetVersion: cover.asset_version,
+    height: cover.height,
+    id: cover.id,
+    objectPosition: cover.object_position,
+    productId: cover.product_id,
+    width: cover.width,
+  }])) as Record<string, AnalyticsProductCover>;
 }
