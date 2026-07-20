@@ -11,7 +11,3 @@ export type HeroWallMedia = {
   src: string;
   width: number;
 };
-
-export type HeroTransitionPhase =
-  "idle" | "preparing" | "transitioning" | "committing";
-export type HeroFieldLayout = "open" | "offset" | "narrow";

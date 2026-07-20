@@ -1,12 +1,11 @@
 .stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(24rem, 1fr);
   position: relative;
+  display: grid;
   width: 100%;
   min-width: 0;
   max-width: 100%;
-  min-height: calc(100svh - 78px - env(safe-area-inset-top, 0px));
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto clamp(20rem, 42svh, 24rem);
   overflow: clip;
   background: var(--vision-paper);
   color: var(--vision-ink);
@@ -18,7 +17,7 @@
   display: grid;
   min-width: 0;
   align-content: start;
-  padding: clamp(1.25rem, 4.6vw, 1.75rem) 4vw clamp(1.15rem, 4vw, 1.5rem);
+  padding: clamp(1.35rem, 5vw, 1.8rem) 4vw clamp(1.3rem, 4.8vw, 1.7rem);
 }
 
 .copyField::after {
@@ -29,10 +28,11 @@
   left: 0;
   height: 1px;
   background: var(--vision-metal-gradient);
-  box-shadow: 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.4);
+  box-shadow: 0 1px 0 rgb(var(--vision-warm-white-rgb) / 0.42);
+  opacity: 0;
   transform: scaleX(0);
   transform-origin: left;
-  animation: hero-vision-line-mobile 1.28s 520ms var(--ease-vision-out) forwards;
+  animation: hero-vision-line-mobile 720ms 380ms var(--ease-vision-out) forwards;
 }
 
 .copy {
@@ -48,14 +48,14 @@
 }
 
 .eyebrow {
-  margin: 0 0 0.8rem;
+  margin: 0 0 0.82rem;
   color: var(--vision-muted);
   font-size: clamp(0.68rem, 2.9vw, 0.76rem);
   font-weight: 600;
   line-height: 1.35;
-  opacity: 0;
+  opacity: 0.68;
   transform: translateY(8px);
-  animation: hero-copy-detail 760ms 220ms var(--ease-vision-out) forwards;
+  animation: hero-copy-detail 620ms 120ms var(--ease-vision-out) forwards;
 }
 
 .copy h1 {
@@ -77,45 +77,45 @@
 
 .titleLine > span {
   display: block;
-  opacity: 0;
-  transform: translate3d(0, 112%, 0);
-  animation: hero-title-line 980ms var(--ease-vision-out) forwards;
+  opacity: 0.72;
+  transform: translate3d(0, 10px, 0);
+  animation: hero-title-line 760ms var(--ease-vision-out) forwards;
 }
 
 .titleLine:nth-child(1) > span {
-  animation-delay: 300ms;
+  animation-delay: 180ms;
 }
 
 .titleLine:nth-child(2) > span {
-  animation-delay: 410ms;
+  animation-delay: 260ms;
 }
 
 .titleLine:nth-child(3) > span {
-  animation-delay: 520ms;
+  animation-delay: 340ms;
 }
 
 .support {
   width: 100%;
   max-width: 28rem;
-  margin: clamp(1.05rem, 3.6vw, 1.35rem) 0 0;
+  margin: clamp(1.02rem, 3.5vw, 1.3rem) 0 0;
   color: var(--vision-muted);
   font-size: clamp(0.88rem, 3.65vw, 0.98rem);
   line-height: 1.52;
-  opacity: 0;
-  transform: translateY(12px);
-  animation: hero-copy-detail 820ms 690ms var(--ease-vision-out) forwards;
+  opacity: 0.54;
+  transform: translateY(10px);
+  animation: hero-copy-detail 680ms 470ms var(--ease-vision-out) forwards;
 }
 
 .actions {
   display: grid;
   width: 100%;
   max-width: 28rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   gap: 0.5rem;
   margin-top: clamp(1.05rem, 3.6vw, 1.35rem);
-  opacity: 0;
-  transform: translateY(12px);
-  animation: hero-copy-detail 820ms 820ms var(--ease-vision-out) forwards;
+  opacity: 0.62;
+  transform: translateY(10px);
+  animation: hero-copy-detail 680ms 560ms var(--ease-vision-out) forwards;
 }
 
 .actions a {
@@ -123,52 +123,30 @@
   min-height: 46px;
   max-width: 100%;
   justify-content: center;
-  padding: 0.7rem 0.72rem;
+  padding-inline: 0.72rem;
   white-space: nowrap;
 }
 
 .visual {
-  --line-y: 7%;
   position: relative;
   min-width: 0;
-  min-height: clamp(24rem, 48svh, 31rem);
-  touch-action: pan-y;
-}
-
-.visual[data-layout="narrow"] {
-  --line-y: 11%;
-}
-
-.visual[data-layout="open"] {
-  --line-y: 3%;
+  min-height: 100%;
+  overflow: hidden;
 }
 
 .mediaField {
   position: absolute;
-  inset: 0 0 48px;
+  inset: 0;
   isolation: isolate;
   overflow: hidden;
   contain: layout paint style;
-  background: var(--vision-paper);
-  transform: translate3d(2vw, 0, 0) scaleX(0.96);
-  transform-origin: right center;
-  transition:
-    border-radius 1.18s var(--ease-vision-out),
-    transform 1.18s var(--ease-vision-out);
+  border-top: 1px solid rgb(var(--vision-steel-rgb) / 0.44);
+  background: var(--vision-bg-soft);
 }
 
-.visual[data-layout="narrow"] .mediaField {
-  transform: translate3d(-3.5vw, 0, 0) scaleX(0.93);
-  transform-origin: left center;
-}
-
-.visual[data-layout="open"] .mediaField {
-  transform: none;
-}
-
-.mediaField figure,
-.mediaField picture,
-.mediaField img {
+.media,
+.media picture,
+.media img {
   position: absolute;
   display: block;
   inset: 0;
@@ -177,194 +155,66 @@
   margin: 0;
 }
 
-.mediaField img {
-  object-fit: cover;
-  object-position: var(--mobile-object-position, 50% 50%);
-  transform: scale(var(--mobile-media-scale, 1));
-  transform-origin: var(--mobile-object-position, 50% 50%);
-  transition: none;
+.media picture {
+  opacity: 0;
 }
 
-.active,
-.incoming {
-  inset: 0;
+.media picture[data-ready="true"] {
+  opacity: 1;
+}
+
+.media {
+  z-index: 1;
   overflow: hidden;
-  border-radius: 0;
-  background-color: var(--vision-paper);
+  background-color: var(--vision-bg-soft);
   background-image: var(--hero-fallback-image, none);
   background-position: var(--mobile-object-position, 50% 50%);
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.active {
-  z-index: 2;
+.media img {
+  object-fit: cover;
+  object-position: var(--mobile-object-position, 50% 50%);
+  transform: scale(var(--mobile-media-scale, 1));
+  transform-origin: var(--mobile-object-position, 50% 50%);
 }
 
-.incoming {
-  z-index: 1;
-}
-
-.staged {
-  z-index: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.active picture,
-.incoming picture {
-  inset: -2px;
-  width: auto;
-  height: auto;
-}
-
-.paperPlane {
+.mediaField::after {
+  content: "";
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   inset: 0;
-  clip-path: inset(0 0 calc(100% - var(--line-y)) 0);
-  background: var(--vision-paper);
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / 0.26);
   pointer-events: none;
 }
 
 .entryCurtain {
   position: absolute;
-  z-index: 5;
+  z-index: 3;
   inset: 0;
   background: var(--vision-paper);
   pointer-events: none;
-  animation: hero-curtain-mobile 1.52s 620ms cubic-bezier(0.72, 0, 0.18, 1) both;
-  will-change: clip-path;
+  animation: hero-curtain-mobile 800ms 180ms cubic-bezier(0.72, 0, 0.18, 1) both;
 }
 
 .entryLine {
   position: absolute;
-  z-index: 6;
-  inset: 0;
-  border-top: 1px solid var(--vision-steel);
-  background: transparent;
-  filter: drop-shadow(0 7px 18px rgb(var(--vision-champagne-rgb) / 0.2));
-  pointer-events: none;
-  animation: hero-line-mobile 1.52s 620ms cubic-bezier(0.72, 0, 0.18, 1) both;
-  will-change: transform, opacity;
-}
-
-.restLine {
-  position: absolute;
-  top: var(--line-y);
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: var(--vision-metal-gradient);
-  opacity: 0.82;
-  transition: opacity 160ms linear;
-}
-
-.cutGuide {
-  position: absolute;
   z-index: 4;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.cutLine {
-  position: absolute;
-  display: block;
-  top: var(--line-y);
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: var(--vision-metal-gradient);
-  box-shadow: 0 8px 28px rgb(var(--vision-champagne-rgb) / 0.18);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-.visual[data-state="preparing"] .cutGuide,
-.visual[data-state="transitioning"] .cutGuide {
-  visibility: visible;
-}
-
-.visual[data-state="preparing"] .restLine,
-.visual[data-state="transitioning"] .restLine {
-  opacity: 0;
-}
-
-.galleryControls {
-  position: absolute;
+  top: 16%;
   right: 0;
   bottom: 0;
   left: 0;
-  display: grid;
-  min-height: 48px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.8rem;
-  padding-inline: 4vw;
-  border-top: 1px solid var(--vision-line);
-  background: var(--vision-paper);
-  opacity: 0;
-  animation: hero-copy-detail 720ms 1.52s var(--ease-vision-out) forwards;
-}
-
-.galleryStatus,
-.swipeHint {
-  margin: 0;
-  color: var(--vision-muted);
-  font-size: 0.68rem;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.galleryStatus span:first-child {
-  color: var(--vision-ink);
-  font-weight: 650;
-}
-
-.swipeHint {
-  overflow: hidden;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.nextButton {
-  display: inline-flex;
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0 0 0 0.5rem;
-  border: 0;
-  background: transparent;
-  color: var(--vision-ink);
-  cursor: pointer;
-}
-
-.nextButton span {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.nextButton:disabled {
-  cursor: wait;
-  opacity: 0.42;
+  border-top: 1px solid var(--vision-steel);
+  filter: drop-shadow(0 7px 18px rgb(var(--vision-champagne-rgb) / 0.2));
+  pointer-events: none;
+  animation: hero-line-mobile 800ms 180ms cubic-bezier(0.72, 0, 0.18, 1) both;
 }
 
 @keyframes hero-title-line {
   from {
-    opacity: 0;
-    transform: translate3d(0, 112%, 0);
+    opacity: 0.72;
+    transform: translate3d(0, 10px, 0);
   }
 
   to {
@@ -376,7 +226,7 @@
 @keyframes hero-copy-detail {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
 
   to {
@@ -386,16 +236,12 @@
 }
 
 @keyframes hero-vision-line-mobile {
-  0% {
+  from {
     opacity: 0;
     transform: scaleX(0);
   }
 
-  22% {
-    opacity: 1;
-  }
-
-  100% {
+  to {
     opacity: 0.72;
     transform: scaleX(1);
   }
@@ -403,7 +249,7 @@
 
 @keyframes hero-curtain-mobile {
   from {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(16% 0 0 0);
   }
 
   to {
@@ -427,30 +273,21 @@
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 370px) {
   .copy h1 {
     font-size: clamp(2.3rem, 11vw, 2.55rem);
   }
 
   .actions {
-    gap: 0.4rem;
-  }
-
-  .actions a {
-    padding-inline: 0.55rem;
-    font-size: 0.78rem;
-  }
-
-  .swipeHint {
-    text-align: left;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (min-width: 721px) {
   .stage {
-    grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
-    grid-template-rows: minmax(0, 1fr);
     min-height: max(42rem, calc(100svh - 88px - env(safe-area-inset-top, 0px)));
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+    grid-template-rows: minmax(0, 1fr);
   }
 
   .copyField {
@@ -502,50 +339,19 @@
     padding-inline: 1rem;
   }
 
-  .visual {
-    --line-x: 9%;
-    min-height: 100%;
-  }
-
-  .visual[data-layout="narrow"] {
-    --line-x: 15%;
-  }
-
-  .visual[data-layout="open"] {
-    --line-x: 4%;
-  }
-
   .mediaField {
-    inset: 0 0 52px;
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    transform: translate3d(1.8vw, 2vh, 0) scale(0.96, 0.94);
-    transform-origin: right center;
+    border-top: 0;
+    border-left: 1px solid rgb(var(--vision-steel-rgb) / 0.44);
   }
 
-  .visual[data-layout="narrow"] .mediaField {
-    border-radius: 0 0 var(--radius-sm) 0;
-    transform: translate3d(-2.4vw, 0, 0) scaleX(0.92);
-    transform-origin: left center;
-  }
-
-  .visual[data-layout="open"] .mediaField {
-    border-radius: 0;
-    transform: none;
-  }
-
-  .mediaField img {
-    object-position: var(--desktop-object-position, 50% 50%);
-    transform: scale(var(--desktop-media-scale, 1));
-    transform-origin: var(--desktop-object-position, 50% 50%);
-  }
-
-  .active,
-  .incoming {
+  .media {
     background-position: var(--desktop-object-position, 50% 50%);
   }
 
-  .paperPlane {
-    clip-path: inset(0 calc(100% - var(--line-x)) 0 0);
+  .media img {
+    object-position: var(--desktop-object-position, 50% 50%);
+    transform: scale(var(--desktop-media-scale, 1));
+    transform-origin: var(--desktop-object-position, 50% 50%);
   }
 
   .entryCurtain {
@@ -553,69 +359,23 @@
   }
 
   .entryLine {
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 16%;
     border-top: 0;
     border-left: 1px solid var(--vision-steel);
     animation-name: hero-line-desktop;
-    will-change: transform, opacity;
-  }
-
-  .restLine {
-    top: 0;
-    right: auto;
-    bottom: 0;
-    left: var(--line-x);
-    width: 1px;
-    height: auto;
-  }
-
-  .cutLine {
-    top: 0;
-    right: auto;
-    bottom: 0;
-    left: var(--line-x);
-    width: 1px;
-    height: auto;
-  }
-
-  .galleryControls {
-    min-height: 52px;
-    padding-inline: clamp(1.2rem, 2vw, 2.25rem);
-  }
-
-  .swipeHint {
-    visibility: hidden;
-  }
-
-  .nextButton {
-    min-width: auto;
-    padding-left: 0.75rem;
-  }
-
-  .nextButton span {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: nowrap;
-    font-size: 0.72rem;
-    font-weight: 600;
   }
 }
 
 @keyframes hero-vision-line-desktop {
-  0% {
+  from {
     opacity: 0;
     transform: scaleY(0);
   }
 
-  22% {
-    opacity: 1;
-  }
-
-  100% {
+  to {
     opacity: 0.72;
     transform: scaleY(1);
   }
@@ -623,7 +383,7 @@
 
 @keyframes hero-curtain-desktop {
   from {
-    clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 16%);
   }
 
   to {
@@ -654,22 +414,14 @@
   .support,
   .actions,
   .entryCurtain,
-  .entryLine,
-  .restLine,
-  .galleryControls {
+  .entryLine {
     animation: none;
-    transition: none;
-  }
-
-  .mediaField {
-    transition: none;
   }
 
   .eyebrow,
   .titleLine > span,
   .support,
-  .actions,
-  .galleryControls {
+  .actions {
     opacity: 1;
     transform: none;
   }
@@ -685,7 +437,6 @@
 
   .entryLine {
     opacity: 0;
-    transform: translate3d(0, 100%, 0);
   }
 }
 
@@ -696,9 +447,5 @@
 
   .entryCurtain {
     clip-path: inset(0 0 0 100%);
-  }
-
-  .entryLine {
-    transform: translate3d(100%, 0, 0);
   }
 }

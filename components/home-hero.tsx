@@ -1,43 +1,32 @@
-import { visionTakeoverMedia } from "@/lib/assets";
+import { heroMedia } from "@/lib/assets";
 import { galleryImageUrl } from "@/lib/gallery/display-media";
 import { getHomeHeroMedia } from "@/lib/gallery/hero";
 
+import type { HeroWallMedia } from "./hero/hero-types";
 import { VisionEditorialTakeover } from "./vision-editorial-takeover";
 
-type HeroDisplayMedia = {
-  alt: string;
-  desktopScale: number;
-  desktopObjectPosition: string;
-  fallbackSrc?: string;
-  height: number;
-  id: string;
-  mobileObjectPosition: string;
-  mobileScale: number;
-  mobileSrc?: string;
-  src: string;
-  width: number;
-};
-
-function localHeroMedia(): HeroDisplayMedia[] {
-  return visionTakeoverMedia.map((item, index) => ({
-    alt: item.alt,
+function localHeroMedia(): HeroWallMedia {
+  return {
+    alt: heroMedia.alt,
     desktopScale: 1,
-    desktopObjectPosition: item.objectPosition,
-    height: item.height,
-    id: `local-hero-${index}`,
-    mobileObjectPosition: item.objectPosition,
+    desktopObjectPosition: heroMedia.objectPosition,
+    height: heroMedia.height,
+    id: "local-hero",
+    mobileObjectPosition: heroMedia.objectPosition,
     mobileScale: 1,
-    src: item.src,
-    width: item.width,
-  }));
+    src: heroMedia.src,
+    width: heroMedia.width,
+  };
 }
 
-function publishedHeroMedia(items: Awaited<ReturnType<typeof getHomeHeroMedia>>): HeroDisplayMedia[] {
-  return items.map((item, index) => ({
+function publishedHeroMedia(
+  item: Awaited<ReturnType<typeof getHomeHeroMedia>>[number],
+): HeroWallMedia {
+  return {
     alt: item.altText,
     desktopScale: item.desktopScale,
     desktopObjectPosition: item.desktopObjectPosition,
-    fallbackSrc: visionTakeoverMedia[index % visionTakeoverMedia.length]?.src,
+    fallbackSrc: heroMedia.src,
     height: item.height,
     id: item.id,
     mobileObjectPosition: item.mobileObjectPosition,
@@ -45,13 +34,13 @@ function publishedHeroMedia(items: Awaited<ReturnType<typeof getHomeHeroMedia>>)
     mobileSrc: galleryImageUrl(item, "mobile"),
     src: galleryImageUrl(item, "desktop"),
     width: item.width,
-  }));
+  };
 }
 
-/** The published hero snapshot is the source of truth; local media preserves a resilient public fallback. */
+/** The first published image can replace the documented local hero without turning it into a slideshow. */
 export async function HomeHero() {
-  const published = await getHomeHeroMedia();
-  const media = published.length ? publishedHeroMedia(published) : localHeroMedia();
+  const [published] = await getHomeHeroMedia();
+  const media = published ? publishedHeroMedia(published) : localHeroMedia();
 
   return <VisionEditorialTakeover media={media} />;
 }

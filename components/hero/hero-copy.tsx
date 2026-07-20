@@ -1,44 +1,42 @@
-import { Glasses, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 import { LINKS } from "@/lib/links";
 
+import { InstagramIcon } from "../instagram-icon";
 import { VisionButton } from "../vision-button";
 import styles from "../vision-editorial-takeover.module.css";
-
-const titleLines = ["Armações que dão", "forma à sua", "presença."] as const;
+import { heroContent } from "./hero-content";
 
 export function HeroCopy() {
   return (
     <div className={styles.copyField}>
       <div className={styles.copy}>
-        <p className={styles.eyebrow}>Armações e lentes · Araguaína - TO</p>
+        <p className={styles.eyebrow}>{heroContent.eyebrow}</p>
         <h1 id="hero-title">
-          {titleLines.map((line) => (
+          {heroContent.titleLines.map((line) => (
             <span className={styles.titleLine} key={line}>
               <span>{line}</span>
             </span>
           ))}
         </h1>
-        <p className={styles.support}>
-          Armações nacionais e importadas, com lentes confeccionadas pela Vision
-          em Araguaína.
-        </p>
+        <p className={styles.support}>{heroContent.support}</p>
         <div className={styles.actions}>
           <VisionButton
-            ariaLabel="Ver catálogo da Ótica Vision"
-            href={LINKS.catalog}
-            icon={Glasses}
-          >
-            Catálogo
-          </VisionButton>
-          <VisionButton
-            ariaLabel="Falar com a Ótica Vision pelo WhatsApp"
+            ariaLabel={heroContent.actions.primary.ariaLabel}
             external
             href={LINKS.whatsapp}
             icon={MessageCircle}
+          >
+            {heroContent.actions.primary.label}
+          </VisionButton>
+          <VisionButton
+            ariaLabel={heroContent.actions.secondary.ariaLabel}
+            external
+            href={LINKS.instagram}
+            icon={InstagramIcon}
             variant="secondary"
           >
-            WhatsApp
+            {heroContent.actions.secondary.label}
           </VisionButton>
         </div>
       </div>

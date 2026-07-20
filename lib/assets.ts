@@ -248,13 +248,9 @@ const visualSeries = {
   ],
 } as const;
 
-export const visionTakeoverMedia = [
-  visualSeries.series6[0],
-  visualSeries.series6[1],
-  visualSeries.series6[2],
-] as const;
+export const heroMedia = visualSeries.series2[0];
 
-export const heroMedia = visionTakeoverMedia[0];
+export const visionTakeoverMedia = [heroMedia] as const;
 
 export const homeVideos = [
   video(
@@ -290,25 +286,9 @@ export const editorialGalleryImages = homeGalleryChapters.flatMap(
 export const brandLogos = [
   brand("Ray-Ban", "logo-rayban.png", 1280, 1280, 1.34, 104, 42),
   brand("Carrera", "carrera (1).png", 800, 157, 0.9, 112, 30),
-  brand(
-    "Persol",
-    "persol-logo-png-transparent.png",
-    2400,
-    2400,
-    1.42,
-    104,
-    40,
-  ),
+  brand("Persol", "persol-logo-png-transparent.png", 2400, 2400, 1.42, 104, 40),
   brand("Tom Ford", "Tom-Ford-logo.png", 3840, 2160, 1.12, 108, 30),
-  brand(
-    "Swarovski",
-    "Swarovski-Logo-2016.png",
-    3840,
-    2160,
-    1.1,
-    108,
-    34,
-  ),
+  brand("Swarovski", "Swarovski-Logo-2016.png", 3840, 2160, 1.1, 108, 34),
   brand(
     "Dolce & Gabbana",
     "images__2_-removebg-preview.png",
@@ -318,26 +298,10 @@ export const brandLogos = [
     86,
     38,
   ),
-  brand(
-    "Jimmy Choo",
-    "Jimmy_Choo_Ltd-Logo.wine.png",
-    3000,
-    2000,
-    1.6,
-    104,
-    36,
-  ),
+  brand("Jimmy Choo", "Jimmy_Choo_Ltd-Logo.wine.png", 3000, 2000, 1.6, 104, 36),
   brand("Max Mara", "Max-Mara-logo.png", 1280, 720, 1.1, 104, 30),
   brand("Versace", "versace-logo.png", 1280, 659, 0.88, 94, 42),
-  brand(
-    "Emilio Pucci",
-    "Emilio-Pucci-Logo.png",
-    1280,
-    720,
-    1.28,
-    106,
-    34,
-  ),
+  brand("Emilio Pucci", "Emilio-Pucci-Logo.png", 1280, 720, 1.28, 106, 34),
 ] as const;
 
 export const labMedia = visualSeries.series5;
