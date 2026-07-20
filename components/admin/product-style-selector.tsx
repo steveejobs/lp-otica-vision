@@ -31,7 +31,6 @@ export function ProductStyleSelector({
   const [selected, setSelected] = useState(initialSelected);
   const [primary, setPrimary] = useState(assignments.find((item) => item.isPrimary)?.styleId ?? initialSelected[0] ?? "");
   const [search, setSearch] = useState("");
-  const assignmentById = useMemo(() => new Map(assignments.map((item) => [item.styleId, item])), [assignments]);
   const visible = options.filter((option) => `${option.label} ${option.description}`.toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR").trim()));
 
   function toggle(id: string, checked: boolean) {
@@ -56,12 +55,14 @@ export function ProductStyleSelector({
         <span>Buscar estilo</span>
         <input onChange={(event) => setSearch(event.target.value)} placeholder="Buscar nas opções" type="search" value={search} />
       </label>
+      <p className={styles.styleSelectionHint}>Escolha até três estilos. O primeiro escolhido fica como principal, sem abrir controles adicionais.</p>
+      <input name="style_primary" type="hidden" value={primary} />
+      {selected.map((styleId, index) => <input key={styleId} name={`style_order_${styleId}`} type="hidden" value={index} />)}
       <div className={styles.styleOptions}>
         {visible.map((option) => {
           const checked = selected.includes(option.id);
-          const assignment = assignmentById.get(option.id);
           return (
-            <div className={styles.styleOption} data-selected={checked || undefined} key={option.id}>
+            <div className={styles.styleOption} data-primary={primary === option.id || undefined} data-selected={checked || undefined} key={option.id}>
               <label className={styles.checkboxField}>
                 <input
                   checked={checked}
@@ -74,19 +75,6 @@ export function ProductStyleSelector({
                 <span>{option.label}{option.active ? "" : " · inativo"}</span>
               </label>
               <p>{option.description}</p>
-              {checked ? (
-                <div className={styles.styleControls}>
-                  <label className={styles.checkboxField}>
-                    <input checked={primary === option.id} name="style_primary" onChange={() => setPrimary(option.id)} required type="radio" value={option.id} />
-                    <span>Principal</span>
-                  </label>
-                  <label className={styles.checkboxField}>
-                    <input defaultChecked={assignment?.isFeatured} name="style_featured_ids" type="checkbox" value={option.id} />
-                    <span>Destaque neste estilo</span>
-                  </label>
-                  <input name={`style_order_${option.id}`} type="hidden" value={assignment?.displayOrder ?? selected.indexOf(option.id)} />
-                </div>
-              ) : null}
             </div>
           );
         })}

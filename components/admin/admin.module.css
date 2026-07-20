@@ -3248,24 +3248,33 @@
 .styleOptions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0 1.25rem;
 }
 
 .styleOption {
   display: grid;
-  align-content: start;
-  gap: 0.65rem;
+  gap: 0.28rem;
   min-width: 0;
-  padding: 1rem;
-  border: 1px solid var(--vision-line);
-  border-radius: var(--radius-sm);
+  padding: 0.2rem 0 0.7rem;
+  border-bottom: 1px solid var(--admin-line);
 }
 
-.styleOption[data-selected="true"] { border-color: var(--vision-steel-dark); background: rgb(var(--vision-champagne-rgb) / 0.16); }
-.styleOption > p { color: var(--vision-muted); font-size: 0.76rem; line-height: 1.45; }
-.styleControls { display: grid; gap: 0.65rem; padding-top: 0.65rem; border-top: 1px solid var(--vision-line); }
-.compactField { display: grid; gap: 0.3rem; font-size: 0.72rem; }
-.compactField input { min-height: 40px; width: 7rem; }
+.styleOption .checkboxField {
+  min-height: 2.45rem;
+  padding: 0.15rem 0;
+  border: 0;
+}
+
+.styleOption[data-selected="true"] .checkboxField > span { color: var(--admin-ink); }
+.styleOption[data-primary="true"] .checkboxField > span::before {
+  color: var(--admin-bronze);
+  content: "Principal";
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.styleOption > p { padding-right: 2.4rem; color: var(--vision-muted); font-size: 0.76rem; line-height: 1.45; }
+.styleSelectionHint { color: var(--admin-muted); font-size: 0.72rem; line-height: 1.5; }
 .eligibility { display: grid; gap: 0.25rem; padding: 0.85rem 1rem; border-left: 3px solid var(--vision-champagne); background: var(--vision-paper); }
 .eligibility[data-eligible="true"] { border-left-color: var(--vision-positive); }
 .eligibility strong { font-size: 0.82rem; }
