@@ -31,6 +31,7 @@ const ctaTargets = ["whatsapp", "instagram", "maps"] as const;
 function promotionPayload(formData: FormData) {
   const startsAt = dateTimeValue(formData, "starts_at");
   const endsAt = dateTimeValue(formData, "ends_at");
+  const title = textValue(formData, "title", { max: 160 });
   ensureDateWindow(startsAt, endsAt);
   const active = booleanValue(formData, "active");
   const featured = booleanValue(formData, "featured");
@@ -41,13 +42,13 @@ function promotionPayload(formData: FormData) {
     cta_target: enumValue(formData, "cta_target", ctaTargets),
     ends_at: endsAt,
     featured,
-    image_alt_text: textValue(formData, "image_alt_text", { max: 220 }),
+    image_alt_text: `Imagem do destaque ${title}`,
     image_object_position: objectPositionValue(formData, "image_object_position"),
     priority: integerValue(formData, "priority", { max: 100_000 }),
     short_description: optionalTextValue(formData, "short_description", { max: 600 }),
     slug: slugValue(formData),
     starts_at: startsAt,
-    title: textValue(formData, "title", { max: 160 }),
+    title,
     type: enumValue(formData, "type", promotionTypes),
   };
 }

@@ -46,6 +46,16 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
     });
   }
 
+  function chooseAnotherImage() {
+    const uploadSection = document.getElementById("gallery-upload");
+    const fileInput = document.getElementById("gallery-files") as HTMLInputElement | null;
+    uploadSection?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "start",
+    });
+    fileInput?.click();
+  }
+
   if (!ordered.length) return <p className={styles.notice}>Nenhuma imagem cadastrada. Comece adicionando uma foto na etapa anterior.</p>;
 
   return (
@@ -109,7 +119,6 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
                 <div>
                   <span className={item.published ? styles.statusPositive : styles.statusNeutral}>{item.published ? "Publicada" : "Rascunho"}</span>
                   <strong>Imagem {index + 1}</strong>
-                  <p>{item.altText}</p>
                   <button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar enquadramento acima</button>
                 </div>
               </div>
@@ -121,8 +130,8 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
                 <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
                 <input name="mobile_scale" type="hidden" value={item.mobileScale.toFixed(2)} />
                 <input name="desktop_scale" type="hidden" value={item.desktopScale.toFixed(2)} />
+                <input name="alt_text" type="hidden" value={item.altText} />
                 <div className={styles.formGrid}>
-                  <label className={`${styles.field} ${styles.fieldWide}`}><span>Descrição da imagem para acessibilidade</span><input defaultValue={item.altText} maxLength={220} name="alt_text" required /><small className={styles.fieldHint}>Descreva o que aparece, sem texto promocional.</small></label>
                   <label className={`${styles.checkboxField} ${styles.fieldWide}`}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Incluir esta imagem na próxima publicação</span></label>
                 </div>
 
@@ -136,7 +145,7 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
                     <BackgroundColorField initialValue={item.backgroundColor} />
                   </div>
                 </details>
-                <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar informações da imagem</AdminSubmitButton>
+                <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar opções da imagem</AdminSubmitButton>
               </form>
 
               <details className={styles.adminDetails}>
@@ -155,6 +164,10 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
               </details>
             </article>
           ))}
+        </div>
+        <div className={styles.galleryAddMore}>
+          <div><strong>Quer incluir outra foto?</strong><span>O novo arquivo será colocado depois da última imagem.</span></div>
+          <button className={styles.buttonLink} onClick={chooseAnotherImage} type="button">Adicionar outra imagem</button>
         </div>
       </section>
     </div>

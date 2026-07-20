@@ -47,8 +47,9 @@ export default async function AdminCategoriesPage({
               <input maxLength={120} name="name" required />
             </label>
             <label className={styles.field}>
-              <span>Slug</span>
+              <span>Identificador na URL</span>
               <input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />
+              <small className={styles.fieldHint}>Use letras minúsculas e hífens, sem espaços.</small>
             </label>
             <label className={styles.field}>
               <span>Ordem</span>
@@ -72,10 +73,16 @@ export default async function AdminCategoriesPage({
       {categories.length === 0 ? (
         <AdminEmptyState>Nenhuma categoria foi criada sem necessidade real.</AdminEmptyState>
       ) : (
-        <AdminTable label="Categorias cadastradas">
+        <><div className={styles.mobileRecordList}>{categories.map((category) => (
+          <article className={styles.mobileRecordCard} key={category.id}>
+            <div><strong>{category.name}</strong><AdminStatus active={category.active} /></div>
+            <p>{linkedCounts.get(category.id) ?? 0} produtos · ordem {category.display_order} · atualizado em {formatAdminDate(category.updated_at)}</p>
+            <div className={styles.rowActions}><Link className={styles.textButton} href={`/admin/categorias/${category.id}`} prefetch={false}>Editar</Link><form action={toggleCategoryAction}><input name="id" type="hidden" value={category.id} /><AdminSubmitButton pendingLabel="Salvando..." variant="secondary">{category.active ? "Desativar" : "Ativar"}</AdminSubmitButton></form></div>
+          </article>
+        ))}</div><div className={styles.desktopRecordTable}><AdminTable label="Categorias cadastradas">
           <thead>
             <tr>
-              <th>Categoria</th><th>Slug</th><th>Produtos</th><th>Ordem</th><th>Status</th><th>Atualização</th><th>Ações</th>
+              <th>Categoria</th><th>Identificador</th><th>Produtos</th><th>Ordem</th><th>Status</th><th>Atualização</th><th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +108,7 @@ export default async function AdminCategoriesPage({
               </tr>
             ))}
           </tbody>
-        </AdminTable>
+        </AdminTable></div></>
       )}
     </>
   );

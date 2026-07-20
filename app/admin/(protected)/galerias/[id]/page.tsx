@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AdminSubmitButton, ConfirmSubmitButton } from "@/components/admin/admin-form-controls";
+import { AdminInfoTip } from "@/components/admin/admin-info-tip";
 import styles from "@/components/admin/admin.module.css";
 import { AdminFeedback, AdminPageHeader, AdminStatus } from "@/components/admin/admin-ui";
 import { BackgroundColorField } from "@/components/admin/background-color-field";
@@ -70,7 +71,11 @@ export default async function EditGalleryPage({ params, searchParams }: { params
         <AdminStatus active={gallery.published} trueLabel="Publicada" falseLabel="Rascunho" />
       </div>
 
-      <GalleryLocationCard location={location} published={gallery.published} />
+      <GalleryLocationCard
+        images={items.map((item) => ({ id: item.id, signedUrl: item.signedUrl }))}
+        location={location}
+        published={gallery.published}
+      />
 
       <section className={styles.formPanel} aria-labelledby="gallery-data-title">
         <StepHeading description="Confirme o nome e o lugar onde as imagens serão exibidas." number="1" title="Onde esta galeria aparece" />
@@ -79,7 +84,10 @@ export default async function EditGalleryPage({ params, searchParams }: { params
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome para identificar no ADM</span><input defaultValue={gallery.name} maxLength={160} name="name" required /></label>
             <label className={styles.field}><span>Seção do site</span><select defaultValue={`${gallery.route_key}.${gallery.placement_key}`} name="location_key" required>{GALLERY_LOCATIONS.map((entry) => <option key={entry.key} value={entry.key}>{entry.label}</option>)}</select><small className={styles.fieldHint}>A descrição do local aparece no cartão acima.</small></label>
-            <label className={`${styles.checkboxField} ${styles.fieldWide}`}><input defaultChecked={gallery.autoplay} name="autoplay" type="checkbox" /><span>Trocar as imagens automaticamente no site</span></label>
+            <div className={`${styles.checkboxWithInfo} ${styles.fieldWide}`}>
+              <label className={styles.checkboxField}><input defaultChecked={gallery.autoplay} name="autoplay" type="checkbox" /><span>Trocar as imagens automaticamente no site</span></label>
+              <AdminInfoTip label="O que significa trocar as imagens automaticamente?">Quando ativado, o site avança sozinho entre as fotos. O visitante ainda pode trocar manualmente e o movimento é desativado quando o aparelho pede menos animações.</AdminInfoTip>
+            </div>
           </div>
           <details className={styles.adminDetails}>
             <summary>Configurações avançadas</summary>
@@ -93,7 +101,7 @@ export default async function EditGalleryPage({ params, searchParams }: { params
         </form>
       </section>
 
-      <section className={styles.formPanel} aria-labelledby="gallery-upload-title">
+      <section className={styles.formPanel} id="gallery-upload" aria-labelledby="gallery-upload-title">
         <StepHeading description="Escolha uma ou mais fotos. O enquadramento será ajustado visualmente na próxima etapa." number="2" title="Adicionar imagens" />
         <form action={uploadGalleryItemsAction} className={styles.adminForm}>
           <input name="gallery_id" type="hidden" value={gallery.id} />
@@ -103,7 +111,6 @@ export default async function EditGalleryPage({ params, searchParams }: { params
           <input name="desktop_scale" type="hidden" value="1.00" />
           <div className={styles.formGrid}>
             <div className={styles.fieldWide}><FilePreviewInput id="gallery-files" multiple name="files" required /></div>
-            <label className={`${styles.field} ${styles.fieldWide}`}><span>Descrição base para acessibilidade</span><input maxLength={170} name="alt_base" placeholder="Ex.: Pessoa usando armação de acetato em ambiente interno" required /><small className={styles.fieldHint}>Ao enviar várias fotos, o sistema acrescenta “imagem 1”, “imagem 2” e assim por diante.</small></label>
             <label className={`${styles.checkboxField} ${styles.fieldWide}`}><input name="published" type="checkbox" /><span>Deixar estas imagens prontas para a próxima publicação</span></label>
           </div>
           <details className={styles.adminDetails}>

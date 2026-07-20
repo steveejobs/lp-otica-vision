@@ -161,10 +161,12 @@ export async function uploadCollectionCoverAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   let errorCode: string | null = null;
   try {
+    const { data: collection, error: collectionError } = await supabase.from("collections").select("name, cover_path").eq("id", id).single();
+    if (collectionError || !collection) throw collectionError ?? new AdminValidationError("invalid");
     const mobilePosition = objectPositionValue(formData, "cover_mobile_object_position");
     const desktopPosition = objectPositionValue(formData, "cover_desktop_object_position");
     const commonPayload = {
-      cover_alt_text: textValue(formData, "cover_alt_text", { max: 220 }),
+      cover_alt_text: `Capa da coleção ${collection.name}`,
       cover_desktop_object_position: desktopPosition,
       cover_desktop_scale: decimalValue(formData, "cover_desktop_scale"),
       cover_mobile_object_position: mobilePosition,
@@ -184,8 +186,7 @@ export async function uploadCollectionCoverAction(formData: FormData) {
       }).eq("id", id);
       if (error) throw error;
     } else {
-      const { data: existing, error: existingError } = await supabase.from("collections").select("cover_path").eq("id", id).single();
-      if (existingError || !existing.cover_path) throw new AdminValidationError("image");
+      if (!collection.cover_path) throw new AdminValidationError("image");
       const { error } = await supabase.from("collections").update(commonPayload).eq("id", id);
       if (error) throw error;
     }

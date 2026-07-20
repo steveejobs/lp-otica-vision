@@ -6,7 +6,6 @@ import {
   removeProductImageAction,
   reorderProductImagesAction,
   setProductCoverAction,
-  updateProductImageAction,
 } from "@/app/admin/(protected)/produtos/actions";
 
 import { AdminSubmitButton, ConfirmSubmitButton } from "./admin-form-controls";
@@ -89,16 +88,6 @@ export function ProductImageManager({
             </div> : null}
           </div>
           {!readOnly ? <div className={styles.stack}>
-            <form action={updateProductImageAction} className={styles.adminForm}>
-              <input name="image_id" type="hidden" value={image.id} />
-              <input name="product_id" type="hidden" value={productId} />
-              <div className={styles.formGrid}>
-                <label className={styles.field}><span>Descrição da imagem</span><input defaultValue={image.altText} maxLength={220} name="alt_text" required /></label>
-                <input name="object_position" type="hidden" value={image.objectPosition} />
-              </div>
-              <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar descrição</AdminSubmitButton>
-            </form>
-
             {!image.isCover ? (
               <form action={setProductCoverAction}>
                 <input name="image_id" type="hidden" value={image.id} />

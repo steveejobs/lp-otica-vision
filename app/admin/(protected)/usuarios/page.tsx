@@ -41,7 +41,19 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
       </section>
       <div className={styles.sectionBar}><h2>Usuários e aprovações</h2><span className={styles.phaseBadge}>{profiles.length} registros · {pendingCount} pendentes</span></div>
       {profiles.length === 0 ? <AdminEmptyState>Nenhum perfil autorizado.</AdminEmptyState> : (
-        <AdminTable label="Usuários e aprovações">
+        <><div className={styles.mobileRecordList}>{profiles.map((profile) => {
+          const authUser = authMap.get(profile.id);
+          const isSelf = profile.id === session.profile.id;
+          return <article className={styles.mobileRecordCard} key={profile.id}>
+            <div><strong>{profile.name ?? "Nome não informado"}{isSelf ? " · você" : ""}</strong><AdminStatus active={profile.active} falseLabel="Pendente" /></div>
+            <p>{authUser?.email ?? "Identidade indisponível"}</p>
+            <p>{roleLabels[profile.role]} · atualizado em {formatAdminDateTime(profile.updated_at)}</p>
+            <div className={styles.rowActions}>
+              {!profile.active ? <form action={approveUserAction}><input name="id" type="hidden" value={profile.id} /><AdminSubmitButton pendingLabel="Aprovando..." variant="secondary">Aprovar</AdminSubmitButton></form> : isSelf ? <span className={styles.phaseBadge}>Sessão atual</span> : <form action={blockUserAction}><input name="id" type="hidden" value={profile.id} /><AdminSubmitButton pendingLabel="Bloqueando..." variant="secondary">Bloquear</AdminSubmitButton></form>}
+              <Link className={styles.textButton} href={`/admin/usuarios/${profile.id}`} prefetch={false}>Gerenciar</Link>
+            </div>
+          </article>;
+        })}</div><div className={styles.desktopRecordTable}><AdminTable label="Usuários e aprovações">
           <thead><tr><th>Nome</th><th>E-mail</th><th>Papel</th><th>Status</th><th>Última atualização</th><th>Ações</th></tr></thead>
           <tbody>{profiles.map((profile) => {
             const authUser = authMap.get(profile.id);
@@ -74,7 +86,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
               </tr>
             );
           })}</tbody>
-        </AdminTable>
+        </AdminTable></div></>
       )}
     </>
   );

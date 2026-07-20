@@ -44,7 +44,7 @@ export default async function EditCategoryPage({
           <input name="id" type="hidden" value={category.id} />
           <div className={styles.formGrid}>
             <label className={styles.field}><span>Nome</span><input defaultValue={category.name} maxLength={120} name="name" required /></label>
-            <label className={styles.field}><span>Slug</span><input defaultValue={category.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
+            <label className={styles.field}><span>Identificador na URL</span><input defaultValue={category.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /><small className={styles.fieldHint}>Altere somente se precisar mudar o endereço interno desta categoria.</small></label>
             <label className={styles.field}><span>Ordem</span><input defaultValue={category.display_order} min="0" name="display_order" required type="number" /></label>
             <label className={styles.checkboxField}><input defaultChecked={category.active} name="active" type="checkbox" /><span>Ativa</span></label>
           </div>

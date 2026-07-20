@@ -51,7 +51,6 @@ export function ProductImageUploader({
     }
 
     const formData = new FormData(form);
-    const altBase = String(formData.get("alt_base") ?? "");
     const objectPosition = String(formData.get("object_position") ?? "50% 50%");
     let uploadIds: string[] = [];
     setPending(true);
@@ -81,7 +80,7 @@ export function ProductImageUploader({
       setMessage(replacing ? "Gerando novamente os derivados..." : "Gerando derivados otimizados...");
       const finalResult = replacing && imageId
         ? await finalizeProductImageReplacementAction({ imageId, productId, uploadId: uploadIds[0] })
-        : await finalizeProductImageUploadsAction({ altBase, objectPosition, productId, uploadIds });
+        : await finalizeProductImageUploadsAction({ objectPosition, productId, uploadIds });
       if (!finalResult.ok) throw new Error(finalResult.error);
 
       setMessage("Imagens processadas com sucesso.");
@@ -102,10 +101,6 @@ export function ProductImageUploader({
     <form className={styles.adminForm} onSubmit={submit}>
       {!replacing ? (
         <div className={styles.formGrid}>
-          <label className={styles.field}>
-            <span>Descrição das imagens</span>
-            <input disabled={pending} maxLength={170} name="alt_base" required />
-          </label>
           <input name="object_position" type="hidden" value="50% 50%" />
           <div className={styles.fieldWide}>
             <FilePreviewInput

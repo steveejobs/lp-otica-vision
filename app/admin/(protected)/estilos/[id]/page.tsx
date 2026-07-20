@@ -36,7 +36,7 @@ export default async function EditStylePage({ params, searchParams }: { params: 
           <fieldset className={styles.formFieldset} disabled={!canManage}>
             <div className={styles.formGrid}>
               <label className={styles.field}><span>Nome</span><input defaultValue={style.label} maxLength={80} name="label" required /></label>
-              <label className={styles.field}><span>Slug</span><input defaultValue={style.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
+              <label className={styles.field}><span>Identificador na URL</span><input defaultValue={style.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /><small className={styles.fieldHint}>Altere somente se precisar mudar o endereço interno deste estilo.</small></label>
               <label className={`${styles.field} ${styles.fieldWide}`}><span>Descrição curta</span><input defaultValue={style.description} maxLength={240} name="description" required /></label>
               <label className={styles.field}><span>Ordem</span><input defaultValue={style.display_order} min="0" name="display_order" required type="number" /></label>
               <label className={styles.checkboxField}><input defaultChecked={style.active} name="active" type="checkbox" /><span>Ativo</span></label>

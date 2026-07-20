@@ -99,7 +99,7 @@ export async function uploadGalleryItemsAction(formData: FormData) {
   const uploadedPaths: string[] = [];
   let errorCode: string | null = null;
   try {
-    const { data: gallery, error: galleryError } = await supabase.from("galleries").select("route_key, placement_key").eq("id", galleryId).single();
+    const { data: gallery, error: galleryError } = await supabase.from("galleries").select("name, route_key, placement_key").eq("id", galleryId).single();
     if (galleryError) throw galleryError;
     const files = formData.getAll("files").filter((value): value is File => value instanceof File && value.size > 0);
     const placement = getGalleryLocation(gallery.route_key, gallery.placement_key);
@@ -108,7 +108,6 @@ export async function uploadGalleryItemsAction(formData: FormData) {
     if (countError) throw countError;
     if (!files.length || files.length + (count ?? 0) > (placement.maxItems ?? 10)) throw new AdminValidationError("image");
 
-    const altBase = textValue(formData, "alt_base", { max: 170 });
     const mobilePosition = objectPositionValue(formData, "mobile_object_position");
     const desktopPosition = objectPositionValue(formData, "desktop_object_position");
     const role = enumValue(formData, "editorial_role", editorialRoles);
@@ -119,7 +118,7 @@ export async function uploadGalleryItemsAction(formData: FormData) {
       uploadedPaths.push(...allManifestPaths(uploaded.manifest, uploaded.storagePath));
       const itemId = randomUUID();
       const { error } = await supabase.from("gallery_items").insert({
-        alt_text: files.length > 1 ? `${altBase} — imagem ${index + 1}` : altBase,
+        alt_text: `Imagem ${(count ?? 0) + index + 1} da galeria ${gallery.name}`,
         asset_version: uploaded.assetVersion,
         background_color: optionalColor(formData, "background_color"),
         blur_data_url: uploaded.blurDataUrl,

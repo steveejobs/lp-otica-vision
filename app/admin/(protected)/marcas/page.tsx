@@ -55,8 +55,9 @@ export default async function AdminBrandsPage({
               <input maxLength={120} name="name" required />
             </label>
             <label className={styles.field}>
-              <span>Slug</span>
+              <span>Identificador na URL</span>
               <input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />
+              <small className={styles.fieldHint}>Use letras minúsculas e hífens, sem espaços.</small>
             </label>
             <label className={styles.field}>
               <span>Ordem</span>
@@ -83,12 +84,21 @@ export default async function AdminBrandsPage({
       {brands.length === 0 ? (
         <AdminEmptyState>Cadastre somente marcas confirmadas pela Ótica Vision.</AdminEmptyState>
       ) : (
-        <AdminTable label="Marcas cadastradas">
+        <><div className={styles.mobileRecordList}>{brands.map((brand) => {
+          const logo = brand.logo_url ? signedLogos.get(brand.logo_url) : null;
+          return <article className={styles.mobileRecordCard} key={brand.id}>
+            <div><strong>{brand.name}</strong><AdminStatus active={brand.active} /></div>
+            {/* eslint-disable-next-line @next/next/no-img-element -- short-lived private Storage URL. */}
+            {logo ? <img alt="" className={styles.mobileRecordImage} src={logo} /> : <p>Logo ainda não enviado.</p>}
+            <p>Ordem {brand.display_order} · atualizado em {formatAdminDate(brand.updated_at)}</p>
+            <div className={styles.rowActions}><Link className={styles.textButton} href={`/admin/marcas/${brand.id}`} prefetch={false}>Editar</Link><form action={toggleBrandAction}><input name="id" type="hidden" value={brand.id} /><AdminSubmitButton pendingLabel="Salvando..." variant="secondary">{brand.active ? "Desativar" : "Ativar"}</AdminSubmitButton></form></div>
+          </article>;
+        })}</div><div className={styles.desktopRecordTable}><AdminTable label="Marcas cadastradas">
           <thead>
             <tr>
               <th>Logo</th>
               <th>Marca</th>
-              <th>Slug</th>
+              <th>Identificador</th>
               <th>Ordem</th>
               <th>Status</th>
               <th>Atualização</th>
@@ -128,7 +138,7 @@ export default async function AdminBrandsPage({
               );
             })}
           </tbody>
-        </AdminTable>
+        </AdminTable></div></>
       )}
       <nav aria-label="Paginação de marcas" className={styles.pagination}>
         {currentPage > 1 ? <Link className={styles.buttonLink} href={`/admin/marcas?page=${currentPage - 1}`} prefetch={false}>Anterior</Link> : <span />}

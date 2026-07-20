@@ -46,7 +46,7 @@ export default async function AdminStylesPage({ searchParams }: { searchParams: 
           <form action={createStyleAction} className={styles.adminForm}>
             <div className={styles.formGrid}>
               <label className={styles.field}><span>Nome</span><input maxLength={80} name="label" required /></label>
-              <label className={styles.field}><span>Slug</span><input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /></label>
+              <label className={styles.field}><span>Identificador na URL</span><input maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required /><small className={styles.fieldHint}>Use letras minúsculas e hífens, sem espaços.</small></label>
               <label className={`${styles.field} ${styles.fieldWide}`}><span>Descrição curta</span><input maxLength={240} name="description" required /></label>
               <label className={styles.field}><span>Ordem</span><input defaultValue="0" min="0" name="display_order" required type="number" /></label>
               <label className={styles.checkboxField}><input defaultChecked name="active" type="checkbox" /><span>Ativo</span></label>
@@ -57,7 +57,14 @@ export default async function AdminStylesPage({ searchParams }: { searchParams: 
       ) : null}
       <div className={styles.sectionBar}><h2>Direções cadastradas</h2><span className={styles.phaseBadge}>{stylesData.length} registros</span></div>
       {!stylesData.length ? <AdminEmptyState>{schemaAvailable ? "Nenhum estilo cadastrado." : "Estrutura indisponível neste preview."}</AdminEmptyState> : (
-        <AdminTable label="Estilos cadastrados">
+        <><div className={styles.mobileRecordList}>{stylesData.map((style) => (
+          <article className={styles.mobileRecordCard} key={style.id}>
+            <div><strong>{style.label}</strong><AdminStatus active={style.active} /></div>
+            <p>{style.description}</p>
+            <p>{count(style.id)} produtos · {count(style.id, true)} prontos para exibição · ordem {style.display_order}</p>
+            <div className={styles.rowActions}><Link className={styles.textButton} href={`/admin/estilos/${style.id}`} prefetch={false}>Abrir</Link>{canManage ? <form action={toggleStyleAction}><input name="id" type="hidden" value={style.id} /><AdminSubmitButton pendingLabel="Salvando..." variant="secondary">{style.active ? "Desativar" : "Ativar"}</AdminSubmitButton></form> : null}</div>
+          </article>
+        ))}</div><div className={styles.desktopRecordTable}><AdminTable label="Estilos cadastrados">
           <thead><tr><th>Estilo</th><th>Produtos</th><th>Elegíveis</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead>
           <tbody>{stylesData.map((style) => (
             <tr key={style.id}>
@@ -66,7 +73,7 @@ export default async function AdminStylesPage({ searchParams }: { searchParams: 
               <td><div className={styles.rowActions}><Link className={styles.textButton} href={`/admin/estilos/${style.id}`} prefetch={false}>Abrir</Link>{canManage ? <form action={toggleStyleAction}><input name="id" type="hidden" value={style.id} /><AdminSubmitButton pendingLabel="Salvando..." variant="secondary">{style.active ? "Desativar" : "Ativar"}</AdminSubmitButton></form> : null}</div></td>
             </tr>
           ))}</tbody>
-        </AdminTable>
+        </AdminTable></div></>
       )}
     </>
   );

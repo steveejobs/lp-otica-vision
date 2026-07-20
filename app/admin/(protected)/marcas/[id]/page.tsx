@@ -60,8 +60,9 @@ export default async function EditBrandPage({
               <input defaultValue={brand.name} maxLength={120} name="name" required />
             </label>
             <label className={styles.field}>
-              <span>Slug</span>
+              <span>Identificador na URL</span>
               <input defaultValue={brand.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />
+              <small className={styles.fieldHint}>Altere somente se precisar mudar o endereço interno desta marca.</small>
             </label>
             <label className={styles.field}>
               <span>Ordem</span>

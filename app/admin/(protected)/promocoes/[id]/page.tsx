@@ -52,7 +52,6 @@ export default async function EditPromotionPage({ params, searchParams }: { para
 
             <section className={styles.productFormSection}>
               <Step number="2" text="Toque no ponto que precisa permanecer visível dentro do quadro." title="Imagem e enquadramento" />
-              <label className={styles.field}><span>Descrição da imagem para acessibilidade</span><input defaultValue={promotion.image_alt_text ?? ""} maxLength={220} name="image_alt_text" required /></label>
               <ImageFocusInput alt={promotion.image_alt_text ?? promotion.title} initialDesktopPosition={promotion.image_object_position} initialImageUrl={imageUrl} positionNames={{ desktop: "image_object_position" }} responsive={false} />
             </section>
 

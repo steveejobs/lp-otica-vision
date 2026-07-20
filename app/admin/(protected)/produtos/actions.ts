@@ -533,7 +533,6 @@ export async function discardProductImageUploadsAction(input: {
 }
 
 export async function finalizeProductImageUploadsAction(input: {
-  altBase: string;
   objectPosition: string;
   productId: string;
   uploadIds: string[];
@@ -546,12 +545,10 @@ export async function finalizeProductImageUploadsAction(input: {
   try {
     if (!isUuidString(input.productId)) throw new AdminValidationError("invalid");
     const uploadIds = parseUploadIds(input.uploadIds);
-    const altBase = input.altBase?.trim();
-    if (!altBase || altBase.length > 170) throw new AdminValidationError("image");
     const objectPosition = normalizedObjectPosition(input.objectPosition);
 
     const [productResult, uploadResult, countResult, coverResult] = await Promise.all([
-      supabase.from("products").select("id").eq("id", input.productId).is("archived_at", null).maybeSingle(),
+      supabase.from("products").select("id, name").eq("id", input.productId).is("archived_at", null).maybeSingle(),
       supabase
         .from("product_image_uploads")
         .select("*")
@@ -580,7 +577,7 @@ export async function finalizeProductImageUploadsAction(input: {
       generatedSets.push(uploaded);
       const imageId = randomUUID();
       const { error: imageError } = await supabase.from("product_images").insert({
-        alt_text: stagedUploads.length > 1 ? `${altBase} — imagem ${index + 1}` : altBase,
+        alt_text: `Imagem ${(countResult.count ?? 0) + index + 1} do produto ${productResult.data.name}`,
         asset_version: uploaded.assetVersion,
         blur_data_url: uploaded.blurDataUrl,
         display_order: (countResult.count ?? 0) + index,

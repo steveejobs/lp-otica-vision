@@ -118,7 +118,6 @@ export default async function EditCollectionPage({ params, searchParams }: { par
         <StepHeading description="Toque no ponto principal da foto e confira separadamente o celular e o computador." number="2" title="Capa e enquadramento" />
         <form action={uploadCollectionCoverAction} className={styles.adminForm}>
           <input name="collection_id" type="hidden" value={collection.id} />
-          <label className={styles.field}><span>Descrição da capa para acessibilidade</span><input defaultValue={collection.cover_alt_text ?? ""} maxLength={220} name="cover_alt_text" required /></label>
           <ImageFocusInput
             alt={collection.cover_alt_text ?? "Prévia da capa da coleção"}
             aspectRatios={{ desktop: "16 / 9", mobile: "3 / 4" }}

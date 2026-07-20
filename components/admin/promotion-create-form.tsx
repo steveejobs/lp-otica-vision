@@ -34,7 +34,6 @@ export function PromotionCreateForm() {
 
         <section className={styles.productFormSection}>
           <Step number="2" text="Escolha a imagem e toque no ponto que deve permanecer visível." title="Imagem e enquadramento" />
-          <label className={styles.field}><span>Descrição da imagem para acessibilidade</span><input maxLength={220} name="image_alt_text" required /></label>
           <ImageFocusInput alt="Prévia do novo destaque" fileInput={{ id: "promotion-image", name: "file", required: true }} positionNames={{ desktop: "image_object_position" }} responsive={false} />
         </section>
 
