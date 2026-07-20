@@ -26,7 +26,7 @@ export function ActivityMap({ cities }: { cities: CityActivity[] }) {
         const label = `${cleanLocation(city.city)}, ${cleanLocation(city.country)}: ${city.activeUsers} ${city.activeUsers === 1 ? "visitante ativo" : "visitantes ativos"}`;
         return <button aria-label={label} className={styles.mapBubble} key={`${city.countryCode}-${city.city}`} style={{ "--bubble-size": `${size}px`, left: `${point.x}%`, top: `${point.y}%` } as CSSProperties} type="button"><span role="tooltip"><strong>{cleanLocation(city.city)}</strong><small>{cleanLocation(city.country)}</small><b>{city.activeUsers} {city.activeUsers === 1 ? "ativo" : "ativos"}</b></span></button>;
       })}
-      {!mapped.length ? <div className={styles.mapEmpty}><strong>Localização não disponível</strong><p>A contagem total permanece preservada, sem posicionar visitantes artificialmente.</p></div> : null}
+      {!mapped.length ? <div className={styles.mapEmpty}><strong>Sem atividade geográfica no momento</strong><p>O mapa exibe somente cidades informadas pelo Google Analytics.</p></div> : null}
     </div>
     <div className={styles.cityAlternative}>
       <h3>Cidades ativas</h3>

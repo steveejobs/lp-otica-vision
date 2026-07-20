@@ -40,3 +40,6 @@ user-data-dir*/
 .DS_Store
 Thumbs.db
 *.swp
+
+.vercel
+.env*

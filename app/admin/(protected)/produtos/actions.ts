@@ -324,6 +324,36 @@ export async function createProductDraftAction(formData: FormData): Promise<
   }
 }
 
+export async function publishProductAfterImageUploadAction(input: { productId: string }): Promise<
+  { ok: true } | { error: string; ok: false }
+> {
+  await requireAdminRole(["admin", "editor"]);
+  try {
+    if (!isUuidString(input.productId)) throw new AdminValidationError("invalid");
+    const supabase = await createSupabaseServerClient();
+    const [productResult, coverResult] = await Promise.all([
+      supabase.from("products").select("archived_at, slug").eq("id", input.productId).maybeSingle(),
+      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", input.productId).eq("is_cover", true),
+    ]);
+    if (productResult.error || !productResult.data || coverResult.error) {
+      throw productResult.error ?? coverResult.error ?? new AdminValidationError("invalid");
+    }
+    if (productResult.data.archived_at || (coverResult.count ?? 0) < 1) throw new AdminValidationError("constraint");
+    const { error } = await supabase
+      .from("products")
+      .update({ published: true })
+      .eq("id", input.productId)
+      .is("archived_at", null);
+    if (error) throw error;
+    revalidatePath("/admin/produtos");
+    revalidatePath(`/admin/produtos/${input.productId}`);
+    revalidatePublicCatalog(productResult.data.slug);
+    return { ok: true };
+  } catch (error) {
+    return { error: mutationErrorCode(error), ok: false };
+  }
+}
+
 export async function discardNewProductDraftAction(input: { productId: string }): Promise<{ ok: boolean }> {
   await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();

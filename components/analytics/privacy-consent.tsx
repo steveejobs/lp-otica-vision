@@ -33,26 +33,25 @@ export function PrivacyConsent({ initialChoice }: { initialChoice: AnalyticsCons
   if (!open) return null;
 
   return (
-    <aside aria-label="Preferências de privacidade" className={styles.panel} data-configuring={configuring || undefined}>
+    <aside aria-label="Preferências de cookies" className={styles.panel} data-configuring={configuring || undefined}>
       <div className={styles.heading}>
-        <strong>Medição e privacidade</strong>
-        <p>Usamos dados agregados para entender a experiência. O Google Analytics só é ativado com sua escolha.</p>
+        <strong>Cookies</strong>
+        <p>Usamos cookies necessários para o funcionamento e, com sua escolha, cookies opcionais para melhorar a experiência.</p>
       </div>
       {configuring ? (
         <div className={styles.options}>
-          <div><span><strong>Medição necessária</strong><small>Sessão, segurança e funcionamento técnico.</small></span><b>Sempre ativa</b></div>
-          <label><span><strong>Medição de experiência</strong><small>Controla o Google Analytics.</small></span><input checked={experience} onChange={(event) => setExperience(event.currentTarget.checked)} type="checkbox" /></label>
-          <div><span><strong>Publicidade</strong><small>Nenhuma integração publicitária nesta etapa.</small></span><b>Desativada</b></div>
+          <div><span><strong>Cookies necessários</strong><small>Sessão, segurança e funcionamento técnico.</small></span><b>Sempre ativos</b></div>
+          <label><span><strong>Cookies opcionais</strong><small>Ajudam a melhorar a experiência no site.</small></span><input checked={experience} onChange={(event) => setExperience(event.currentTarget.checked)} type="checkbox" /></label>
         </div>
       ) : null}
       <div className={styles.actions}>
         {configuring ? (
-          <button className={styles.primary} onClick={() => save(experience ? "accepted" : "rejected")} type="button">Salvar preferência</button>
+          <button className={styles.primary} onClick={() => save(experience ? "accepted" : "rejected")} type="button">Salvar preferências</button>
         ) : (
           <>
-            <button className={styles.primary} onClick={() => save("accepted")} type="button">Aceitar medição</button>
-            <button onClick={() => save("rejected")} type="button">Recusar</button>
-            <button onClick={() => setConfiguring(true)} type="button">Configurar</button>
+            <button className={styles.primary} onClick={() => save("accepted")} type="button">Aceitar cookies</button>
+            <button onClick={() => save("rejected")} type="button">Recusar opcionais</button>
+            <button onClick={() => setConfiguring(true)} type="button">Configurar cookies</button>
           </>
         )}
       </div>

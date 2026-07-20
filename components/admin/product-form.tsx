@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState, type FormEvent } from "react";
 
-import { createProductDraftAction, discardNewProductDraftAction } from "@/app/admin/(protected)/produtos/actions";
+import { createProductDraftAction, discardNewProductDraftAction, publishProductAfterImageUploadAction } from "@/app/admin/(protected)/produtos/actions";
 import {
   createInlineBrandAction,
   type InlineBrandState,
@@ -164,9 +164,20 @@ export function ProductForm({
       router.refresh();
       return;
     }
+
+    if (publication === "published") {
+      setCreatePhase("processing");
+      setCreateMessage("Imagens prontas. Publicando o produto...");
+      const publicationResult = await publishProductAfterImageUploadAction({ productId: productResult.productId });
+      if (!publicationResult.ok) {
+        router.push(`/admin/produtos/${productResult.productId}?status=created&error=publish`);
+        router.refresh();
+        return;
+      }
+    }
     setCreatePhase("processing");
-    setCreateMessage("Produto e imagens cadastrados. Abrindo a edição...");
-    router.push(`/admin/produtos/${productResult.productId}?status=created`);
+    setCreateMessage(publication === "published" ? "Produto publicado. Abrindo a edição..." : "Produto e imagens cadastrados. Abrindo a edição...");
+    router.push(`/admin/produtos/${productResult.productId}?status=${publication === "published" ? "published" : "created"}`);
     router.refresh();
   }
 
@@ -340,11 +351,17 @@ export function ProductForm({
                   </label>
                 </div>
               ) : (
-                <>
-                  <input name="published" type="hidden" value="false" />
+                <div className={styles.publicationFields}>
+                  <fieldset className={styles.choiceGroup}>
+                    <legend>Estado após o cadastro</legend>
+                    <div className={styles.segmentedControl}>
+                      <label><input checked={publication === "draft"} name="published" onChange={() => setPublication("draft")} type="radio" value="false" /><span>Rascunho</span></label>
+                      <label><input checked={publication === "published"} name="published" onChange={() => setPublication("published")} type="radio" value="true" /><span>Publicado</span></label>
+                    </div>
+                  </fieldset>
                   <input name="featured" type="hidden" value="false" />
-                  <p className={styles.choiceHint}>Este produto será salvo como rascunho. Adicione uma capa antes de publicar.</p>
-                </>
+                  <p className={styles.choiceHint}>{publication === "published" ? "O produto será publicado somente depois que a capa for processada." : "O produto ficará visível somente no painel administrativo."}</p>
+                </div>
               )}
             </section>
           </div>
