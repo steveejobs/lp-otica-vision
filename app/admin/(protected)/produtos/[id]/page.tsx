@@ -139,7 +139,7 @@ export default async function EditProductPage({
       ) : null}
 
       <section className={styles.formPanel} aria-labelledby="product-images-title">
-        <div className={styles.panelHeading}><div><h2 id="product-images-title">Imagens do produto</h2><p>Arraste ou use os botões para ordenar. Escolha uma única imagem de capa.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
+        <div className={styles.panelHeading}><div><h2 id="product-images-title">Imagens do produto</h2><p>Use “Mover antes” e “Mover depois” para ordenar. Escolha uma única imagem de capa.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
         <ProductImageManager images={images} productId={product.id} readOnly={Boolean(product.archived_at)} />
       </section>
 

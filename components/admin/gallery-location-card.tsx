@@ -24,10 +24,9 @@ export function GalleryLocationCard({ location, published }: { location: Gallery
         </span>
       </div>
       <dl className={styles.locationDetails}>
-        <div><dt>Rota</dt><dd>{location.route}</dd></div>
-        <div><dt>Posição</dt><dd>{location.description}</dd></div>
-        <div><dt>Dispositivo</dt><dd>{galleryDeviceLabels[location.device]}</dd></div>
-        <div><dt>Componente</dt><dd>{location.component}</dd></div>
+        <div><dt>Página</dt><dd>{location.route === "/" ? "Página inicial" : "Bio"}</dd></div>
+        <div><dt>Onde fica</dt><dd>{location.description}</dd></div>
+        <div><dt>Formatos</dt><dd>{galleryDeviceLabels[location.device]}</dd></div>
       </dl>
       <a className={styles.buttonLink} href={location.href} target="_blank" rel="noopener noreferrer">Ver na página</a>
     </aside>

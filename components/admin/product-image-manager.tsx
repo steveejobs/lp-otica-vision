@@ -43,7 +43,6 @@ export function ProductImageManager({
   readOnly?: boolean;
 }) {
   const [ordered, setOrdered] = useState(images);
-  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   function move(id: string, offset: number) {
     setOrdered((current) => {
@@ -54,19 +53,6 @@ export function ProductImageManager({
       [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
       return next;
     });
-  }
-
-  function drop(targetId: string) {
-    if (!draggingId || draggingId === targetId) return;
-    setOrdered((current) => {
-      const source = current.find((image) => image.id === draggingId);
-      if (!source) return current;
-      const without = current.filter((image) => image.id !== draggingId);
-      const targetIndex = without.findIndex((image) => image.id === targetId);
-      without.splice(targetIndex, 0, source);
-      return without;
-    });
-    setDraggingId(null);
   }
 
   if (!ordered.length) return <p className={styles.notice}>Nenhuma imagem vinculada a este produto.</p>;
@@ -83,14 +69,8 @@ export function ProductImageManager({
 
       {ordered.map((image, index) => (
         <article
-          aria-grabbed={draggingId === image.id}
           className={styles.imageRow}
-          draggable={!readOnly}
           key={image.id}
-          onDragEnd={() => setDraggingId(null)}
-          onDragOver={(event) => event.preventDefault()}
-          onDragStart={() => { if (!readOnly) setDraggingId(image.id); }}
-          onDrop={() => { if (!readOnly) drop(image.id); }}
         >
           <div>
             {image.signedUrl ? (
@@ -104,8 +84,8 @@ export function ProductImageManager({
               {image.isCover ? <strong>Capa</strong> : null}
             </p>
             {!readOnly ? <div className={styles.rowActions}>
-              <button className={styles.textButton} disabled={index === 0} onClick={() => move(image.id, -1)} type="button">Subir</button>
-              <button className={styles.textButton} disabled={index === ordered.length - 1} onClick={() => move(image.id, 1)} type="button">Descer</button>
+              <button aria-label={`Mover imagem ${index + 1} uma posição para trás`} className={styles.textButton} disabled={index === 0} onClick={() => move(image.id, -1)} type="button">Mover antes</button>
+              <button aria-label={`Mover imagem ${index + 1} uma posição para frente`} className={styles.textButton} disabled={index === ordered.length - 1} onClick={() => move(image.id, 1)} type="button">Mover depois</button>
             </div> : null}
           </div>
           {!readOnly ? <div className={styles.stack}>

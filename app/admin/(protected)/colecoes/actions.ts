@@ -161,25 +161,34 @@ export async function uploadCollectionCoverAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
   let errorCode: string | null = null;
   try {
-    if (!(file instanceof File) || !file.size) throw new AdminValidationError("image");
-    const uploaded = await uploadGalleryImageSet({ file, parentId: id });
     const mobilePosition = objectPositionValue(formData, "cover_mobile_object_position");
     const desktopPosition = objectPositionValue(formData, "cover_desktop_object_position");
-    const { error } = await supabase.from("collections").update({
+    const commonPayload = {
       cover_alt_text: textValue(formData, "cover_alt_text", { max: 220 }),
-      cover_asset_version: uploaded.assetVersion,
-      cover_blur_data_url: uploaded.blurDataUrl,
       cover_desktop_object_position: desktopPosition,
       cover_desktop_scale: decimalValue(formData, "cover_desktop_scale"),
-      cover_height: uploaded.height,
-      cover_media_manifest: uploaded.manifest,
       cover_mobile_object_position: mobilePosition,
       cover_mobile_scale: decimalValue(formData, "cover_mobile_scale"),
       cover_object_position: desktopPosition,
-      cover_path: uploaded.storagePath,
-      cover_width: uploaded.width,
-    }).eq("id", id);
-    if (error) throw error;
+    };
+    if (file instanceof File && file.size > 0) {
+      const uploaded = await uploadGalleryImageSet({ file, parentId: id });
+      const { error } = await supabase.from("collections").update({
+        ...commonPayload,
+        cover_asset_version: uploaded.assetVersion,
+        cover_blur_data_url: uploaded.blurDataUrl,
+        cover_height: uploaded.height,
+        cover_media_manifest: uploaded.manifest,
+        cover_path: uploaded.storagePath,
+        cover_width: uploaded.width,
+      }).eq("id", id);
+      if (error) throw error;
+    } else {
+      const { data: existing, error: existingError } = await supabase.from("collections").select("cover_path").eq("id", id).single();
+      if (existingError || !existing.cover_path) throw new AdminValidationError("image");
+      const { error } = await supabase.from("collections").update(commonPayload).eq("id", id);
+      if (error) throw error;
+    }
   } catch (error) { errorCode = mutationErrorCode(error) === "failed" ? "image" : mutationErrorCode(error); }
   if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
   revalidatePath(destination);

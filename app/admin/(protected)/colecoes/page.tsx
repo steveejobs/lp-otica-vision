@@ -18,11 +18,11 @@ export default async function AdminCollectionsPage({ searchParams }: { searchPar
   const query = await searchParams;
   return (
     <>
-      <AdminPageHeader description="Curadorias com modelos prontos, capa privada, produtos ordenados e janela opcional. Datas não geram urgência automática." title="Coleções" />
+      <AdminPageHeader description="Reúna produtos em uma seleção e escolha, com calma, onde ela deve aparecer." title="Coleções" />
       <AdminFeedback error={query.error} status={query.status} />
+      <CollectionRecordsTable collections={collections} />
       <CollectionPresetGrid collections={collections} />
       <CollectionCreateForm />
-      <CollectionRecordsTable collections={collections} />
     </>
   );
 }

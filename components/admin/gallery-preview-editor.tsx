@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- private short-lived Storage URLs are not Next image sources. */
 
-import { useState } from "react";
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 import type { GalleryLocation } from "@/lib/admin/gallery-locations";
 
@@ -31,6 +31,10 @@ export type GalleryPreviewItem = {
 };
 
 type PreviewDevice = "desktop" | "mobile";
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 function positionParts(value: string) {
   const keyword: Record<string, number> = { bottom: 100, center: 50, left: 0, right: 100, top: 0 };
@@ -80,6 +84,7 @@ export function GalleryPreviewEditor({
   onScaleChange: (id: string, device: PreviewDevice, value: number) => void;
 }) {
   const [device, setDevice] = useState<PreviewDevice>("desktop");
+  const pointerRef = useRef<number | null>(null);
   const activeIndex = Math.max(0, items.findIndex((item) => item.id === activeId));
   const active = items[activeIndex];
   const previous = items[(activeIndex - 1 + items.length) % items.length];
@@ -113,31 +118,70 @@ export function GalleryPreviewEditor({
     onPositionChange(active.id, device, `${nextHorizontal}% ${nextVertical}%`);
   };
 
+  const setFocusFromPoint = (element: HTMLElement, clientX: number, clientY: number) => {
+    const bounds = element.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const nextHorizontal = Math.round(clamp(((clientX - bounds.left) / bounds.width) * 100, 0, 100));
+    const nextVertical = Math.round(clamp(((clientY - bounds.top) / bounds.height) * 100, 0, 100));
+    onPositionChange(active.id, device, `${nextHorizontal}% ${nextVertical}%`);
+  };
+
+  const pointerHandlers = {
+    onPointerCancel: (event: PointerEvent<HTMLElement>) => {
+      if (pointerRef.current === event.pointerId) pointerRef.current = null;
+    },
+    onPointerDown: (event: PointerEvent<HTMLElement>) => {
+      pointerRef.current = event.pointerId;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setFocusFromPoint(event.currentTarget, event.clientX, event.clientY);
+    },
+    onPointerMove: (event: PointerEvent<HTMLElement>) => {
+      if (pointerRef.current !== event.pointerId) return;
+      setFocusFromPoint(event.currentTarget, event.clientX, event.clientY);
+    },
+    onPointerUp: (event: PointerEvent<HTMLElement>) => {
+      if (pointerRef.current === event.pointerId) pointerRef.current = null;
+    },
+  };
+
+  const handleKeyboard = (event: KeyboardEvent<HTMLElement>) => {
+    const step = event.shiftKey ? 10 : 3;
+    const movement: Record<string, [number, number]> = {
+      ArrowDown: [0, step], ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step],
+    };
+    const delta = movement[event.key];
+    if (!delta) return;
+    event.preventDefault();
+    onPositionChange(active.id, device, `${clamp(horizontal + delta[0], 0, 100)}% ${clamp(vertical + delta[1], 0, 100)}%`);
+  };
+
   return (
     <section className={styles.galleryPreviewPanel} aria-labelledby="gallery-preview-title">
       <div className={styles.panelHeading}>
         <div>
-          <h3 id="gallery-preview-title">Prévia real do enquadramento</h3>
-          <p>{location ? `${location.label} · ${location.component}` : "Defina a localização para carregar a proporção pública."}</p>
+          <h3 id="gallery-preview-title">Enquadramento da imagem</h3>
+          <p>{location ? `${location.label} · mesma proporção usada na página.` : "Defina onde a galeria aparece para carregar o formato correto."}</p>
         </div>
         <div className={styles.previewDeviceSwitch} role="group" aria-label="Dispositivo da prévia">
-          <button aria-pressed={device === "mobile"} onClick={() => setDevice("mobile")} type="button">Mobile 390×844</button>
-          <button aria-pressed={device === "desktop"} onClick={() => setDevice("desktop")} type="button">Desktop 1440×900</button>
+          <button aria-pressed={device === "mobile"} onClick={() => setDevice("mobile")} type="button">Celular</button>
+          <button aria-pressed={device === "desktop"} onClick={() => setDevice("desktop")} type="button">Computador</button>
         </div>
       </div>
 
       <div className={styles.previewWorkspace} data-device={device}>
         <div className={styles.previewSequence}>
-          {showContext ? <PreviewFrame item={previous} position={device === "desktop" ? previous.desktopObjectPosition : previous.mobileObjectPosition} ratio={aspectRatio} context="previous" /> : null}
-          {location?.key === "home.hero" ? <HeroPreviewFrame device={device} item={active} position={position} ratio={aspectRatio} scale={scale} /> : <PreviewFrame item={active} position={position} ratio={aspectRatio} context="active" />}
-          {showContext ? <PreviewFrame item={next} position={device === "desktop" ? next.desktopObjectPosition : next.mobileObjectPosition} ratio={aspectRatio} context="next" /> : null}
+          {showContext ? <PreviewFrame backgroundColor={previous.backgroundColor} item={previous} position={device === "desktop" ? previous.desktopObjectPosition : previous.mobileObjectPosition} ratio={aspectRatio} scale={device === "desktop" ? previous.desktopScale : previous.mobileScale} context="previous" /> : null}
+          {location?.key === "home.hero" ? <HeroPreviewFrame device={device} item={active} onKeyDown={handleKeyboard} pointerHandlers={pointerHandlers} position={position} ratio={aspectRatio} scale={scale} /> : <PreviewFrame backgroundColor={active.backgroundColor} item={active} onKeyDown={handleKeyboard} pointerHandlers={pointerHandlers} position={position} ratio={aspectRatio} scale={scale} context="active" />}
+          {showContext ? <PreviewFrame backgroundColor={next.backgroundColor} item={next} position={device === "desktop" ? next.desktopObjectPosition : next.mobileObjectPosition} ratio={aspectRatio} scale={device === "desktop" ? next.desktopScale : next.mobileScale} context="next" /> : null}
         </div>
         <div className={styles.cropControls}>
-          <p><strong>{activeIndex + 1} de {items.length}</strong>{active.visualSeries ? ` · Série ${active.visualSeries} · posição ${active.seriesOrder ?? "?"}` : " · Item independente"}</p>
-          <label><span>Posição horizontal <output>{horizontal}%</output></span><input aria-label="Posição horizontal" max="100" min="0" onChange={(event) => changePosition("horizontal", Number(event.target.value))} type="range" value={horizontal} /></label>
-          <label><span>Posição vertical <output>{vertical}%</output></span><input aria-label="Posição vertical" max="100" min="0" onChange={(event) => changePosition("vertical", Number(event.target.value))} type="range" value={vertical} /></label>
-          <label><span>Escala <output>{scale.toFixed(2)}×</output></span><input aria-label="Escala" max="1.4" min="0.8" onChange={(event) => onScaleChange(active.id, device, Number(event.target.value))} step="0.01" type="range" value={scale} /></label>
-          <p className={styles.fieldHint}>{location?.key === "home.hero" ? `Ajuste visual salvo para ${device === "desktop" ? "desktop" : "mobile"}.` : `Valor salvo para ${device === "desktop" ? "desktop" : "mobile"}: ${position}`}</p>
+          <p><strong>Imagem {activeIndex + 1} de {items.length}</strong> · {device === "desktop" ? "computador" : "celular"}</p>
+          <p className={styles.focusInstruction}>Toque no rosto ou na armação, ou arraste o marcador sobre a imagem.</p>
+          <label><span>Foco para os lados <output>{horizontal}%</output></span><input aria-label="Mover foco para os lados" max="100" min="0" onChange={(event) => changePosition("horizontal", Number(event.target.value))} type="range" value={horizontal} /></label>
+          <label><span>Foco para cima ou para baixo <output>{vertical}%</output></span><input aria-label="Mover foco para cima ou para baixo" max="100" min="0" onChange={(event) => changePosition("vertical", Number(event.target.value))} type="range" value={vertical} /></label>
+          <label><span>Aproximação <output>{Math.round(scale * 100)}%</output></span><input aria-label="Aproximação da imagem" max="1.4" min="0.8" onChange={(event) => onScaleChange(active.id, device, Number(event.target.value))} step="0.01" type="range" value={scale} /></label>
+          <div className={styles.focusQuickActions}><button className={styles.textButton} onClick={() => onPositionChange(active.id, device, "50% 50%")} type="button">Centralizar foco</button><button className={styles.textButton} onClick={() => onPositionChange(active.id, device, "50% 35%")} type="button">Priorizar parte superior</button></div>
+          <p className={styles.fieldHint}>Este ajuste ainda precisa ser salvo. Use o botão “Salvar enquadramento” logo abaixo da prévia.</p>
           {warnings.length ? <ul className={styles.previewWarnings}>{warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul> : <p className={styles.previewReady}>Enquadramento sem alertas automáticos.</p>}
         </div>
       </div>
@@ -149,25 +193,26 @@ export function GalleryPreviewEditor({
   );
 }
 
-function HeroPreviewFrame({ item, position, ratio, scale, device }: { item: GalleryPreviewItem; position: string; ratio: string; scale: number; device: PreviewDevice }) {
+function HeroPreviewFrame({ item, position, ratio, scale, device, onKeyDown, pointerHandlers }: { item: GalleryPreviewItem; position: string; ratio: string; scale: number; device: PreviewDevice; onKeyDown: (event: KeyboardEvent<HTMLElement>) => void; pointerHandlers: Record<string, (event: PointerEvent<HTMLElement>) => void> }) {
   return (
-    <figure className={styles.heroPreview} data-device={device} style={{ aspectRatio: ratio, background: item.backgroundColor ?? "#d7c3ad" }}>
+    <figure aria-label="Ajustar ponto principal da imagem" className={styles.heroPreview} data-device={device} onKeyDown={onKeyDown} role="button" style={{ aspectRatio: ratio, background: item.backgroundColor ?? "#d7c3ad" }} tabIndex={0}>
       <span className={styles.heroPreviewCopy}>
         <BrandLogo size="header" />
         <strong>Armações que dão forma à sua presença.</strong>
         <em>Armações nacionais e importadas, com lentes confeccionadas pela Vision em Araguaína.</em>
         <span className={styles.heroPreviewActions}><span>Catálogo</span><span>WhatsApp</span></span>
       </span>
-      <span className={styles.heroPreviewPhoto}>{item.signedUrl ? <img alt={item.altText} src={item.signedUrl} style={{ objectPosition: position, transform: `scale(${scale})`, transformOrigin: position }} /> : null}<span className={styles.safeArea} aria-hidden="true" /></span>
+      <span className={`${styles.heroPreviewPhoto} ${styles.focusablePreview}`} data-focus-surface {...pointerHandlers}>{item.signedUrl ? <img alt={item.altText} draggable={false} src={item.signedUrl} style={{ objectPosition: position, transform: `scale(${scale})`, transformOrigin: position }} /> : null}<span className={styles.safeArea} aria-hidden="true" /><i className={styles.focusMarker} aria-hidden="true" style={{ left: `${positionParts(position)[0]}%`, top: `${positionParts(position)[1]}%` }} /></span>
     </figure>
   );
 }
 
-function PreviewFrame({ item, position, ratio, context }: { item: GalleryPreviewItem; position: string; ratio: string; context: "active" | "next" | "previous" }) {
+function PreviewFrame({ item, position, ratio, scale, context, backgroundColor, onKeyDown, pointerHandlers }: { item: GalleryPreviewItem; position: string; ratio: string; scale: number; context: "active" | "next" | "previous"; backgroundColor?: string | null; onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void; pointerHandlers?: Record<string, (event: PointerEvent<HTMLElement>) => void> }) {
+  const interactive = context === "active";
   return (
-    <figure className={styles.previewFrame} data-context={context} style={{ aspectRatio: ratio }}>
-      {item.signedUrl ? <img alt={context === "active" ? item.altText : ""} src={item.signedUrl} style={{ objectPosition: position }} /> : <span>Prévia indisponível</span>}
-      {context === "active" ? <span className={styles.safeArea} aria-hidden="true" /> : null}
+    <figure aria-label={interactive ? "Ajustar ponto principal da imagem" : undefined} className={`${styles.previewFrame} ${interactive ? styles.focusablePreview : ""}`} data-context={context} data-focus-surface={interactive || undefined} onKeyDown={onKeyDown} role={interactive ? "button" : undefined} style={{ aspectRatio: ratio, background: backgroundColor ?? "#ddd4ca" }} tabIndex={interactive ? 0 : undefined} {...pointerHandlers}>
+      {item.signedUrl ? <img alt={interactive ? item.altText : ""} draggable={false} src={item.signedUrl} style={{ objectPosition: position, transform: `scale(${scale})`, transformOrigin: position }} /> : <span>Prévia indisponível. Recarregue a página para renovar o acesso à imagem.</span>}
+      {interactive ? <><span className={styles.safeArea} aria-hidden="true" /><i className={styles.focusMarker} aria-hidden="true" style={{ left: `${positionParts(position)[0]}%`, top: `${positionParts(position)[1]}%` }} /></> : null}
     </figure>
   );
 }

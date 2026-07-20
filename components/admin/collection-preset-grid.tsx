@@ -21,8 +21,8 @@ export function CollectionPresetGrid({ collections }: { collections: CollectionP
     <section className={styles.formPanel} aria-labelledby="collection-presets-title">
       <div className={styles.panelHeading}>
         <div>
-          <h2 id="collection-presets-title">Modelos prontos</h2>
-          <p>Destaques e estações já entram como rascunho, com texto seguro e ordem definida.</p>
+          <h2 id="collection-presets-title">Criar a partir de um modelo</h2>
+          <p>Escolha uma base. Ela será criada como rascunho e poderá ser editada antes de aparecer no site.</p>
         </div>
         <span className={styles.phaseBadge}>{COLLECTION_PRESETS.length} modelos</span>
       </div>

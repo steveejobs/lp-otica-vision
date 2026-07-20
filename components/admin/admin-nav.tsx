@@ -1,7 +1,7 @@
 "use client";
 
 import Link, { useLinkStatus } from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import type { AdminRole } from "@/lib/auth/admin-access";
 
@@ -29,12 +29,20 @@ const navigation = [
 
 export function AdminNav({ role }: { role: AdminRole }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const visibleNavigation = navigation.filter((item) => (item.roles as readonly AdminRole[]).includes(role));
+  const currentHref = visibleNavigation.find((item) => item.href === "/admin" ? pathname === item.href : pathname === item.href || pathname.startsWith(`${item.href}/`))?.href ?? "/admin";
 
   return (
-    <nav aria-label="Navegação administrativa" className={styles.nav}>
-      {navigation
-        .filter((item) => (item.roles as readonly AdminRole[]).includes(role))
-        .map((item) => {
+    <>
+      <label className={styles.mobileNavControl}>
+        <span>Área da administração</span>
+        <select aria-label="Área da administração" onChange={(event) => router.push(event.currentTarget.value)} value={currentHref}>
+          {visibleNavigation.map((item) => <option key={item.href} value={item.href}>{item.label}</option>)}
+        </select>
+      </label>
+      <nav aria-label="Navegação administrativa" className={styles.nav}>
+      {visibleNavigation.map((item) => {
           const active =
             item.href === "/admin"
               ? pathname === item.href
@@ -50,7 +58,8 @@ export function AdminNav({ role }: { role: AdminRole }) {
             </Link>
           );
         })}
-    </nav>
+      </nav>
+    </>
   );
 }
 

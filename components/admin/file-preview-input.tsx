@@ -26,20 +26,24 @@ export function FilePreviewInput({
 
   return (
     <div className={styles.filePicker}>
-      <input
-        accept="image/avif,image/jpeg,image/png,image/webp"
-        disabled={disabled}
-        id={id}
-        multiple={multiple}
-        name={name}
-        onChange={(event) => {
-          const selectedFiles = Array.from(event.currentTarget.files ?? []);
-          setFiles(selectedFiles);
-          onFilesChange?.(selectedFiles);
-        }}
-        required={required}
-        type="file"
-      />
+      <label className={styles.friendlyFileInput} htmlFor={id}>
+        <span>{multiple ? "Escolher imagens" : "Escolher imagem"}</span>
+        <small>{files.length ? files.map((file) => file.name).join(", ") : "JPEG, PNG, WebP ou AVIF · até 8 MB por arquivo"}</small>
+        <input
+          accept="image/avif,image/jpeg,image/png,image/webp"
+          disabled={disabled}
+          id={id}
+          multiple={multiple}
+          name={name}
+          onChange={(event) => {
+            const selectedFiles = Array.from(event.currentTarget.files ?? []);
+            setFiles(selectedFiles);
+            onFilesChange?.(selectedFiles);
+          }}
+          required={required}
+          type="file"
+        />
+      </label>
       {previews.length ? (
         <div aria-label="Pré-visualização dos arquivos" className={styles.previewGrid}>
           {previews.map((url, index) => (
@@ -48,7 +52,7 @@ export function FilePreviewInput({
           ))}
         </div>
       ) : (
-        <p>JPEG, PNG, WebP ou AVIF · até 8 MB por arquivo.</p>
+        <p>Nenhuma imagem selecionada.</p>
       )}
     </div>
   );

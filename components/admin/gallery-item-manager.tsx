@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element -- private short-lived Storage URLs are not Next image sources. */
+
 import { useState } from "react";
 
 import {
@@ -11,15 +13,15 @@ import {
 import type { GalleryLocation } from "@/lib/admin/gallery-locations";
 
 import { AdminSubmitButton, ConfirmSubmitButton } from "./admin-form-controls";
+import { BackgroundColorField } from "./background-color-field";
 import { FilePreviewInput } from "./file-preview-input";
 import { GalleryPreviewEditor, type GalleryPreviewItem } from "./gallery-preview-editor";
 import styles from "./admin.module.css";
 
 export function GalleryItemManager({ galleryId, items, location }: { galleryId: string; items: GalleryPreviewItem[]; location: GalleryLocation | null }) {
   const [ordered, setOrdered] = useState(items);
-  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
-  const isHomeHero = location?.key === "home.hero";
+  const activeItem = ordered.find((item) => item.id === activeId) ?? ordered[0];
 
   function updatePosition(id: string, device: "desktop" | "mobile", value: string) {
     setOrdered((current) => current.map((item) => item.id === id
@@ -44,85 +46,117 @@ export function GalleryItemManager({ galleryId, items, location }: { galleryId: 
     });
   }
 
-  function drop(targetId: string) {
-    if (!draggingId || draggingId === targetId) return;
-    setOrdered((current) => {
-      const source = current.find((item) => item.id === draggingId);
-      if (!source) return current;
-      const next = current.filter((item) => item.id !== draggingId);
-      next.splice(next.findIndex((item) => item.id === targetId), 0, source);
-      return next;
-    });
-    setDraggingId(null);
-  }
-
-  if (!ordered.length) return <p className={styles.notice}>Nenhum item cadastrado nesta galeria.</p>;
+  if (!ordered.length) return <p className={styles.notice}>Nenhuma imagem cadastrada. Comece adicionando uma foto na etapa anterior.</p>;
 
   return (
-    <div className={styles.stack}>
-      <p className={styles.notice}>{isHomeHero ? "Arraste ou use os comandos para definir a ordem real do ciclo público." : "Itens da mesma série devem permanecer contíguos e na ordem interna indicada. O servidor rejeita qualquer sequência que quebre silenciosamente essa regra."}</p>
+    <div className={styles.stackLarge}>
       <GalleryPreviewEditor activeId={activeId} items={ordered} location={location} onActiveChange={setActiveId} onPositionChange={updatePosition} onScaleChange={updateScale} />
-      <form action={reorderGalleryItemsAction} className={styles.formActions}>
-        <input name="gallery_id" type="hidden" value={galleryId} />
-        <input name="ordered_ids" type="hidden" value={JSON.stringify(ordered.map((item) => item.id))} />
-        <AdminSubmitButton pendingLabel="Validando sequência..." variant="secondary">Salvar ordem geral</AdminSubmitButton>
-      </form>
-      {ordered.map((item, index) => {
-        const previousSeries = index > 0 ? ordered[index - 1].visualSeries : null;
-        const startsSeries = Boolean(item.visualSeries && item.visualSeries !== previousSeries);
-        return (
-          <article
-            aria-grabbed={draggingId === item.id}
-            className={`${styles.imageRow} ${startsSeries ? styles.seriesBoundary : ""}`}
-            draggable
-            key={item.id}
-            onDragEnd={() => setDraggingId(null)}
-            onDragOver={(event) => event.preventDefault()}
-            onDragStart={() => setDraggingId(item.id)}
-            onDrop={() => drop(item.id)}
-          >
-            <div>
-              {isHomeHero ? <span className={item.activeInPublication ? styles.statusPositive : styles.statusNeutral}>{item.activeInPublication ? "Ativo na versão pública" : "Fora da versão pública"}</span> : item.visualSeries ? <span className={styles.seriesBadge}>Série: {item.visualSeries} · posição {item.seriesOrder ?? "?"}</span> : <span className={styles.phaseBadge}>Item independente</span>}
-              {item.signedUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- short-lived private Storage URL.
-                <img alt={item.altText} className={styles.imagePreview} src={item.signedUrl} style={{ objectPosition: item.desktopObjectPosition }} />
-              ) : <div className={styles.imagePreview}>Prévia indisponível</div>}
-              <p className={styles.recordMeta}><span>{index + 1} de {ordered.length}</span><span>{item.width ?? "?"} × {item.height ?? "?"}</span><span>{item.published ? "Publicado" : "Rascunho"}</span><span>{item.assetStatus}</span>{item.updatedAt ? <span>Atualizado em {new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(item.updatedAt))}</span> : null}</p>
+
+      {activeItem ? (
+        <form action={updateGalleryItemAction} className={styles.focusSaveBar}>
+          <input name="gallery_id" type="hidden" value={galleryId} />
+          <input name="item_id" type="hidden" value={activeItem.id} />
+          <input name="alt_text" type="hidden" value={activeItem.altText} />
+          <input name="visual_series" type="hidden" value={activeItem.visualSeries ?? ""} />
+          <input name="series_order" type="hidden" value={activeItem.seriesOrder ?? ""} />
+          <input name="mobile_object_position" type="hidden" value={activeItem.mobileObjectPosition} />
+          <input name="desktop_object_position" type="hidden" value={activeItem.desktopObjectPosition} />
+          <input name="mobile_scale" type="hidden" value={activeItem.mobileScale.toFixed(2)} />
+          <input name="desktop_scale" type="hidden" value={activeItem.desktopScale.toFixed(2)} />
+          <input name="editorial_role" type="hidden" value={activeItem.editorialRole} />
+          <input name="background_color" type="hidden" value={activeItem.backgroundColor ?? ""} />
+          {activeItem.published ? <input name="published" type="hidden" value="true" /> : null}
+          <div><strong>Imagem {ordered.findIndex((item) => item.id === activeItem.id) + 1}</strong><span>Salva o foco e a aproximação do celular e do computador.</span></div>
+          <AdminSubmitButton pendingLabel="Salvando enquadramento...">Salvar enquadramento</AdminSubmitButton>
+        </form>
+      ) : null}
+
+      <section className={styles.orderPlanner} aria-labelledby="gallery-order-title">
+        <div className={styles.panelHeading}>
+          <div><h3 id="gallery-order-title">Ordem das imagens</h3><p>A primeira aparece antes. No celular, use os botões; nenhuma ação depende de arrastar.</p></div>
+        </div>
+        <ol className={styles.galleryOrderList}>
+          {ordered.map((item, index) => (
+            <li data-active={item.id === activeId || undefined} key={item.id}>
+              <button className={styles.orderThumbnail} onClick={() => setActiveId(item.id)} type="button">
+                <span>{index + 1}</span>
+                {item.signedUrl ? <img alt="" src={item.signedUrl} /> : null}
+              </button>
+              <div><strong>Imagem {index + 1}</strong><small>{item.published ? "Publicada" : "Rascunho"}</small></div>
               <div className={styles.rowActions}>
-                <button className={styles.textButton} disabled={index === 0} onClick={() => move(item.id, -1)} type="button">Subir</button>
-                <button className={styles.textButton} disabled={index === ordered.length - 1} onClick={() => move(item.id, 1)} type="button">Descer</button>
+                <button aria-label={`Mover imagem ${index + 1} uma posição para trás`} className={styles.textButton} disabled={index === 0} onClick={() => move(item.id, -1)} type="button">Mover antes</button>
+                <button aria-label={`Mover imagem ${index + 1} uma posição para frente`} className={styles.textButton} disabled={index === ordered.length - 1} onClick={() => move(item.id, 1)} type="button">Mover depois</button>
               </div>
-            </div>
-            <div className={styles.stack}>
-              <form action={updateGalleryItemAction} className={styles.adminForm}>
-                <input name="gallery_id" type="hidden" value={galleryId} /><input name="item_id" type="hidden" value={item.id} />
-                <div className={styles.formGrid}>
-                  <label className={`${styles.field} ${styles.fieldWide}`}><span>Texto alternativo</span><input defaultValue={item.altText} maxLength={220} name="alt_text" required /></label>
-                  <label className={styles.field}><span>Série visual</span><input defaultValue={item.visualSeries ?? ""} maxLength={80} name="visual_series" /></label>
-                  <label className={styles.field}><span>Ordem na série</span><input defaultValue={item.seriesOrder ?? ""} min="0" name="series_order" type="number" /></label>
-                  <input name="mobile_object_position" type="hidden" value={item.mobileObjectPosition} />
-                  <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
-                  <input name="mobile_scale" type="hidden" value={item.mobileScale} /><input name="desktop_scale" type="hidden" value={item.desktopScale} />
-                  <div className={styles.field}><span>Enquadramento salvo</span><p className={styles.fieldHint}>{isHomeHero ? "Ajustado visualmente para desktop e mobile." : <>Mobile: {item.mobileObjectPosition} · {item.mobileScale.toFixed(2)}×<br />Desktop: {item.desktopObjectPosition} · {item.desktopScale.toFixed(2)}×</>}</p><button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar na prévia</button></div>
-                  <label className={styles.field}><span>{isHomeHero ? "Função da imagem" : "Papel editorial"}</span><select defaultValue={item.editorialRole} name="editorial_role"><option value="primary">Imagem principal</option><option value="secondary">Complementar</option><option value="detail">Detalhe</option></select></label>
-                  <label className={styles.field}><span>Cor de fundo</span><input defaultValue={item.backgroundColor ?? "#d7c3ad"} name="background_color" pattern="#[0-9A-Fa-f]{6}" /></label>
-                  <label className={styles.checkboxField}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Publicado</span></label>
+            </li>
+          ))}
+        </ol>
+        <form action={reorderGalleryItemsAction} className={styles.formActions}>
+          <input name="gallery_id" type="hidden" value={galleryId} />
+          <input name="ordered_ids" type="hidden" value={JSON.stringify(ordered.map((item) => item.id))} />
+          <AdminSubmitButton pendingLabel="Salvando nova ordem..." variant="secondary">Salvar ordem das imagens</AdminSubmitButton>
+        </form>
+      </section>
+
+      <section aria-labelledby="gallery-details-title">
+        <div className={styles.panelHeading}><div><h3 id="gallery-details-title">Informações de cada imagem</h3><p>Abra apenas a imagem que deseja editar. As opções técnicas ficam recolhidas.</p></div></div>
+        <div className={styles.itemEditorList}>
+          {ordered.map((item, index) => (
+            <article className={styles.itemEditorCard} key={item.id}>
+              <div className={styles.itemEditorSummary}>
+                <button className={styles.itemPreviewButton} onClick={() => setActiveId(item.id)} type="button">
+                  {item.signedUrl ? <img alt={item.altText} src={item.signedUrl} style={{ objectPosition: item.desktopObjectPosition }} /> : <span>Prévia indisponível</span>}
+                </button>
+                <div>
+                  <span className={item.published ? styles.statusPositive : styles.statusNeutral}>{item.published ? "Publicada" : "Rascunho"}</span>
+                  <strong>Imagem {index + 1}</strong>
+                  <p>{item.altText}</p>
+                  <button aria-pressed={activeId === item.id} className={styles.textButton} onClick={() => setActiveId(item.id)} type="button">Ajustar enquadramento acima</button>
                 </div>
-                <AdminSubmitButton pendingLabel="Salvando item..." variant="secondary">Salvar item</AdminSubmitButton>
+              </div>
+
+              <form action={updateGalleryItemAction} className={styles.adminForm}>
+                <input name="gallery_id" type="hidden" value={galleryId} />
+                <input name="item_id" type="hidden" value={item.id} />
+                <input name="mobile_object_position" type="hidden" value={item.mobileObjectPosition} />
+                <input name="desktop_object_position" type="hidden" value={item.desktopObjectPosition} />
+                <input name="mobile_scale" type="hidden" value={item.mobileScale.toFixed(2)} />
+                <input name="desktop_scale" type="hidden" value={item.desktopScale.toFixed(2)} />
+                <div className={styles.formGrid}>
+                  <label className={`${styles.field} ${styles.fieldWide}`}><span>Descrição da imagem para acessibilidade</span><input defaultValue={item.altText} maxLength={220} name="alt_text" required /><small className={styles.fieldHint}>Descreva o que aparece, sem texto promocional.</small></label>
+                  <label className={`${styles.checkboxField} ${styles.fieldWide}`}><input defaultChecked={item.published} name="published" type="checkbox" /><span>Incluir esta imagem na próxima publicação</span></label>
+                </div>
+
+                <details className={styles.adminDetails}>
+                  <summary>Opções avançadas da imagem</summary>
+                  <p>Use somente quando precisar agrupar uma sequência ou mudar a função visual.</p>
+                  <div className={styles.formGrid}>
+                    <label className={styles.field}><span>Nome do grupo de imagens</span><input defaultValue={item.visualSeries ?? ""} maxLength={80} name="visual_series" /><small className={styles.fieldHint}>Deixe vazio para uma imagem independente.</small></label>
+                    <label className={styles.field}><span>Posição dentro do grupo</span><input defaultValue={item.seriesOrder ?? ""} min="0" name="series_order" type="number" /></label>
+                    <label className={`${styles.field} ${styles.fieldWide}`}><span>Função visual</span><select defaultValue={item.editorialRole} name="editorial_role"><option value="primary">Principal — recebe mais destaque</option><option value="secondary">Complementar — acompanha a principal</option><option value="detail">Detalhe — mostra acabamento</option></select></label>
+                    <BackgroundColorField initialValue={item.backgroundColor} />
+                  </div>
+                </details>
+                <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar informações da imagem</AdminSubmitButton>
               </form>
-              <form action={replaceGalleryItemAction} className={styles.adminForm}>
-                <input name="gallery_id" type="hidden" value={galleryId} /><input name="item_id" type="hidden" value={item.id} />
-                <FilePreviewInput id={`gallery-replace-${item.id}`} name="file" required />
-                <AdminSubmitButton pendingLabel="Substituindo..." variant="secondary">Substituir arquivo</AdminSubmitButton>
-              </form>
-              <form action={removeGalleryItemAction}>
-                <input name="gallery_id" type="hidden" value={galleryId} /><input name="item_id" type="hidden" value={item.id} />
-                <ConfirmSubmitButton confirmation="Remover este item do banco e do Storage?">Remover item</ConfirmSubmitButton>
-              </form>
-            </div>
-          </article>
-        );
-      })}
+
+              <details className={styles.adminDetails}>
+                <summary>Substituir ou remover esta imagem</summary>
+                <div className={styles.destructiveActions}>
+                  <form action={replaceGalleryItemAction} className={styles.adminForm}>
+                    <input name="gallery_id" type="hidden" value={galleryId} /><input name="item_id" type="hidden" value={item.id} />
+                    <FilePreviewInput id={`gallery-replace-${item.id}`} name="file" required />
+                    <AdminSubmitButton pendingLabel="Substituindo..." variant="secondary">Substituir arquivo</AdminSubmitButton>
+                  </form>
+                  <form action={removeGalleryItemAction}>
+                    <input name="gallery_id" type="hidden" value={galleryId} /><input name="item_id" type="hidden" value={item.id} />
+                    <ConfirmSubmitButton confirmation="Remover esta imagem do banco e do armazenamento?">Remover imagem</ConfirmSubmitButton>
+                  </form>
+                </div>
+              </details>
+            </article>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
