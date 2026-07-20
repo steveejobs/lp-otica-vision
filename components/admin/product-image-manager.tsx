@@ -33,13 +33,6 @@ type ManagedProductImage = {
   width: number | null;
 };
 
-function fileSize(bytes: number | null) {
-  if (!bytes) return "tamanho pendente";
-  if (bytes < 1_024) return `${bytes} B`;
-  if (bytes < 1_048_576) return `${Math.round(bytes / 1_024)} KB`;
-  return `${(bytes / 1_048_576).toFixed(1)} MB`;
-}
-
 export function ProductImageManager({
   images,
   productId,
@@ -108,9 +101,6 @@ export function ProductImageManager({
             )}
             <p className={styles.recordMeta}>
               <span>{index + 1} de {ordered.length}</span>
-              <span>{image.width ?? "?"} × {image.height ?? "?"}</span>
-              <span>{image.mimeType?.replace("image/", "").toUpperCase() ?? "MIME pendente"} · {fileSize(image.sizeBytes)}</span>
-              <span>{image.variants.length} derivados</span>
               {image.isCover ? <strong>Capa</strong> : null}
             </p>
             {!readOnly ? <div className={styles.rowActions}>
@@ -123,10 +113,10 @@ export function ProductImageManager({
               <input name="image_id" type="hidden" value={image.id} />
               <input name="product_id" type="hidden" value={productId} />
               <div className={styles.formGrid}>
-                <label className={styles.field}><span>Texto alternativo</span><input defaultValue={image.altText} maxLength={220} name="alt_text" required /></label>
-                <label className={styles.field}><span>Object-position</span><input defaultValue={image.objectPosition} maxLength={40} name="object_position" pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)" required /></label>
+                <label className={styles.field}><span>Descrição da imagem</span><input defaultValue={image.altText} maxLength={220} name="alt_text" required /></label>
+                <input name="object_position" type="hidden" value={image.objectPosition} />
               </div>
-              <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar metadados</AdminSubmitButton>
+              <AdminSubmitButton pendingLabel="Salvando imagem..." variant="secondary">Salvar descrição</AdminSubmitButton>
             </form>
 
             {!image.isCover ? (

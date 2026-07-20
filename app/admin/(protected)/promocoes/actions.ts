@@ -147,6 +147,26 @@ export async function syncPromotionProductsAction(formData: FormData) {
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
+export async function savePromotionProductOrderAction(input: {
+  entityId: string;
+  orderedIds: string[];
+}) {
+  await requireAdminRole(["admin", "editor"]);
+  const formData = new FormData();
+  formData.set("entity_id", input.entityId);
+  formData.set("ordered_ids", JSON.stringify(input.orderedIds));
+  const id = uuidValue(formData, "entity_id");
+  const orderedIds = orderedUuidList(formData.get("ordered_ids"));
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("sync_promotion_products", {
+    ordered_product_ids: orderedIds,
+    target_promotion_id: id,
+  });
+  if (error) return { error: mutationErrorCode(error), ok: false } as const;
+  revalidatePath(`/admin/promocoes/${id}`);
+  return { ok: true } as const;
+}
+
 export async function deletePromotionAction(formData: FormData) {
   await requireAdminRole(["admin", "editor"]);
   const id = uuidValue(formData, "id");
@@ -176,4 +196,3 @@ export async function deletePromotionAction(formData: FormData) {
   revalidatePath("/admin/promocoes");
   redirect(appendFeedback("/admin/promocoes", "status", "deleted"));
 }
-

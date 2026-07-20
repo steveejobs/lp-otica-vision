@@ -11,7 +11,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { archiveProductAction, duplicateProductAction } from "./actions";
 
 const PAGE_SIZE = 20;
-const availabilityValues = ["available", "last_unit", "consultation", "unavailable"] as const;
+const availabilityValues = ["available", "last_unit", "unavailable"] as const;
 
 type ProductSearchParams = {
   archive?: string;

@@ -2,7 +2,6 @@ import type { CatalogAvailability, CatalogQuery } from "./types";
 
 const availabilityValues = new Set<CatalogAvailability>([
   "available",
-  "consultation",
   "last_unit",
   "unavailable",
 ]);

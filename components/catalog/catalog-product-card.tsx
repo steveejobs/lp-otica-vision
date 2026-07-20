@@ -36,8 +36,8 @@ export function CatalogProductCard({
   const productHref = href ?? `/catalogo/${product.slug}`;
   const label = actionLabel ?? (presentation === "preview" ? "Abrir modelo" : "Ver produto");
   const linkLabel = external
-    ? `Consultar ${product.name}, código ${product.sku}, pelo WhatsApp`
-    : `Ver ${product.name}, código ${product.sku}`;
+    ? `Consultar ${product.name} pelo WhatsApp`
+    : `Ver ${product.name}`;
   const content = (
     <>
       <div className={styles.media} data-catalog-transition-media>

@@ -1,6 +1,6 @@
 import type { Database } from "@/types/supabase";
 
-export type CatalogAvailability = Database["public"]["Enums"]["availability_status"];
+export type CatalogAvailability = Exclude<Database["public"]["Enums"]["availability_status"], "consultation">;
 export type CatalogPriceVisibility = Database["public"]["Enums"]["price_visibility"];
 
 export type CatalogTaxonomy = {

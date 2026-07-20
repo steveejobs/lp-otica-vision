@@ -14,7 +14,6 @@ import { availabilityLabels, formatCatalogPrice } from "@/lib/catalog/format";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import { catalogHref, catalogProductHref, parseCatalogQuery, type CatalogSearchParams } from "@/lib/catalog/query";
 import { getCatalogProductUrl, getCatalogSiteBase } from "@/lib/catalog/site-url";
-import { getCurationStyleOptions } from "@/lib/curation/data";
 import { buildProductWhatsappUrl } from "@/lib/whatsapp/product-link";
 
 import styles from "./product.module.css";
@@ -70,20 +69,11 @@ export default async function CatalogProductPage({
   const product = await getPublishedCatalogProduct(slug);
   if (!product) notFound();
 
-  const [related, curationStyles] = await Promise.all([
-    getRelatedCatalogProducts(product),
-    originQuery.style ? getCurationStyleOptions(originQuery.category) : Promise.resolve([]),
-  ]);
-  const selectedStyle = curationStyles.find((style) => style.slug === originQuery.style)?.label ?? originQuery.style;
+  const related = await getRelatedCatalogProducts(product);
   const whatsappUrl = await buildProductWhatsappUrl({
-      brand: product.brand?.name,
-      category: originQuery.category,
-      color: product.color,
       model: product.model,
       productName: product.name,
       productUrl: getCatalogProductUrl(product.slug),
-      sku: product.sku,
-      style: selectedStyle,
     });
   const backHref = catalogHref(originQuery, {});
   const price = formatCatalogPrice(product.price, product.priceVisibility);
@@ -99,7 +89,7 @@ export default async function CatalogProductPage({
     ...(product.brand ? { brand: { "@type": "Brand", name: product.brand.name } } : {}),
     ...(product.color ? { color: product.color } : {}),
     ...(product.shortDescription ? { description: product.shortDescription } : {}),
-    ...(product.priceVisibility === "visible" && product.price !== null
+    ...(product.priceVisibility === "visible" && product.price !== null && product.price > 0
       ? {
           offers: {
             "@type": "Offer",
@@ -134,7 +124,7 @@ export default async function CatalogProductPage({
               <h1>{product.name}</h1>
             </header>
             {product.shortDescription ? <p className={styles.description}>{product.shortDescription}</p> : null}
-            <div className={styles.commercial}>
+            <div className={styles.commercial} data-availability={product.availability}>
               <span className={styles.availability}>{availabilityLabels[product.availability]}</span>
               {price ? <strong className={styles.price}>{price}</strong> : null}
             </div>
@@ -147,7 +137,7 @@ export default async function CatalogProductPage({
             ) : null}
             <ProductWhatsappButton
               href={whatsappUrl}
-              label={product.availability === "unavailable" ? "Consultar modelo" : "Consultar no WhatsApp"}
+              label="Consultar no WhatsApp"
               productId={product.id}
               curated={Boolean(originQuery.style)}
             />

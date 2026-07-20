@@ -50,7 +50,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
         {featuredProduct ? (
           <div className={styles.showcase} data-layout={products.length === 1 ? "protagonist" : products.length === 2 ? "diptych" : products.length === 3 ? "editorial" : "rail"}>
             <Link
-              aria-label={`Ver ${featuredProduct.name}, código ${featuredProduct.sku}`}
+              aria-label={`Ver ${featuredProduct.name}`}
               className={styles.feature}
               data-catalog-product-id={featuredProduct.id}
               data-catalog-transition-link

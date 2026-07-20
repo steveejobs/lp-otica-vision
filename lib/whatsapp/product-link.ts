@@ -5,14 +5,9 @@ import { cache } from "react";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type ProductWhatsappInput = {
-  brand?: string | null;
-  category?: string | null;
-  color?: string | null;
   model?: string | null;
   productName: string;
   productUrl: string;
-  sku: string;
-  style?: string | null;
 };
 
 function cleanLine(value: string, field: string, maxLength: number) {
@@ -65,39 +60,14 @@ const getOfficialPhone = cache(async function getOfficialPhone() {
 
 export function buildProductWhatsappUrlWithPhone(phone: string, input: ProductWhatsappInput) {
   const productName = cleanLine(input.productName, "Nome do produto", 160);
-  const sku = cleanLine(input.sku, "SKU", 80);
-  const brand = input.brand?.trim()
-    ? cleanLine(input.brand, "Marca", 120)
-    : null;
   const model = input.model?.trim()
     ? cleanLine(input.model, "Modelo", 120)
     : null;
-  const color = input.color?.trim()
-    ? cleanLine(input.color, "Cor", 100)
-    : null;
-  const style = input.style?.trim()
-    ? cleanLine(input.style, "Estilo", 100)
-    : null;
-  const category = input.category?.trim()
-    ? cleanLine(input.category, "Categoria", 100)
-    : null;
   const productUrl = validateProductUrl(input.productUrl);
-  const message = [
-    "Olá! Tenho interesse neste produto:",
-    "",
-    productName,
-    `Código: ${sku}`,
-    ...(brand ? [`Marca: ${brand}`] : []),
-    ...(model ? [`Modelo: ${model}`] : []),
-    ...(color ? [`Cor: ${color}`] : []),
-    ...(style ? [`Estilo selecionado: ${style}`] : []),
-    ...(category ? [`Categoria selecionada: ${category}`] : []),
-    "",
-    "Link:",
-    productUrl,
-    "",
-    "Gostaria de confirmar a disponibilidade.",
-  ].join("\n");
+  const interest = model
+    ? `Olá! Tenho interesse no ${productName}, modelo ${model}. Gostaria de confirmar a disponibilidade.`
+    : `Olá! Tenho interesse no ${productName}. Gostaria de confirmar a disponibilidade.`;
+  const message = `${interest}\n\n${productUrl}`;
 
   return `https://api.whatsapp.com/send/?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
 }

@@ -78,6 +78,18 @@
   font-weight: 700;
 }
 
+.commercial[data-availability="available"] .availability {
+  color: var(--vision-ink);
+}
+
+.commercial[data-availability="last_unit"] .availability {
+  color: var(--vision-bronze);
+}
+
+.commercial[data-availability="unavailable"] .availability {
+  color: var(--vision-muted);
+}
+
 .price {
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 2.25rem);

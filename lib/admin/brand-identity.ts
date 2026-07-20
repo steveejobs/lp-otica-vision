@@ -7,5 +7,12 @@ export function normalizeBrandIdentity(value: string) {
 }
 
 export function brandSlugFromName(value: string) {
-  return normalizeBrandIdentity(value);
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120)
+    .replace(/-+$/g, "");
 }

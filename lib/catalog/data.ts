@@ -8,6 +8,7 @@ import type { Database } from "@/types/supabase";
 import { CATALOG_CACHE_TAG } from "./cache";
 import { availabilityLabels } from "./format";
 import type {
+  CatalogAvailability,
   CatalogFilterOption,
   CatalogFilterOptions,
   CatalogImage,
@@ -25,6 +26,12 @@ const HOME_CATALOG_PREVIEW_CANDIDATE_SIZE = 60;
 type SearchRow = Database["public"]["Functions"]["search_catalog_products"]["Returns"][number];
 type CuratedSearchRow = Database["public"]["Functions"]["search_curated_catalog_products"]["Returns"][number];
 type CatalogSearchRow = SearchRow | CuratedSearchRow;
+
+function showcaseAvailability(
+  value: Database["public"]["Enums"]["availability_status"],
+): CatalogAvailability {
+  return value === "consultation" ? "available" : value;
+}
 
 function taxonomy(id: string | null, name: string | null, slug: string | null): CatalogTaxonomy | null {
   return id && name && slug ? { id, name, slug } : null;
@@ -45,7 +52,7 @@ function coverFromSearch(row: CatalogSearchRow): CatalogImage {
 
 function cardFromSearch(row: CatalogSearchRow): CatalogProductCard {
   return {
-    availability: row.availability_status,
+    availability: showcaseAvailability(row.availability_status),
     brand: taxonomy(row.brand_id, row.brand_name, row.brand_slug),
     category: taxonomy(row.category_id, row.category_name, row.category_slug),
     color: row.color ?? null,
@@ -147,7 +154,15 @@ const getCachedFilterOptions = unstable_cache(
     groups.brands.sort(sortOptions);
     groups.categories.sort(sortOptions);
     groups.collections.sort(sortOptions);
-    groups.availability.sort(sortOptions);
+    const availabilityOrder: Record<CatalogAvailability, number> = {
+      available: 0,
+      last_unit: 1,
+      unavailable: 2,
+    };
+    groups.availability.sort((left, right) => (
+      (availabilityOrder[left.key as CatalogAvailability] ?? 99)
+      - (availabilityOrder[right.key as CatalogAvailability] ?? 99)
+    ));
     return groups;
   },
   ["catalog-filter-options-v1"],
@@ -201,7 +216,7 @@ function cardFromEmbedded(row: EmbeddedCardRow): CatalogProductCard | null {
   ) return null;
 
   return {
-    availability: row.availability_status,
+    availability: showcaseAvailability(row.availability_status as Database["public"]["Enums"]["availability_status"]),
     brand: row.brand ? taxonomy(row.brand.id, row.brand.name, row.brand.slug) : null,
     category: row.category ? taxonomy(row.category.id, row.category.name, row.category.slug) : null,
     color: row.color,
@@ -337,7 +352,7 @@ const getCachedPublishedProduct = unstable_cache(
     if (!cover) return null;
 
     return {
-      availability: data.availability_status,
+      availability: showcaseAvailability(data.availability_status),
       brand: data.brand ? taxonomy(data.brand.id, data.brand.name, data.brand.slug) : null,
       category: data.category ? taxonomy(data.category.id, data.category.name, data.category.slug) : null,
       color: data.color,

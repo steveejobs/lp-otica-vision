@@ -84,10 +84,7 @@ export function ProductStyleSelector({
                     <input defaultChecked={assignment?.isFeatured} name="style_featured_ids" type="checkbox" value={option.id} />
                     <span>Destaque neste estilo</span>
                   </label>
-                  <label className={styles.compactField}>
-                    <span>Ordem editorial</span>
-                    <input defaultValue={assignment?.displayOrder ?? 0} min="0" name={`style_order_${option.id}`} type="number" />
-                  </label>
+                  <input name={`style_order_${option.id}`} type="hidden" value={assignment?.displayOrder ?? selected.indexOf(option.id)} />
                 </div>
               ) : null}
             </div>

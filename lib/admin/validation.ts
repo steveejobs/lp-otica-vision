@@ -153,6 +153,17 @@ export function optionalMoneyValue(formData: FormData, key: string) {
   return value;
 }
 
+export function optionalPositiveMoneyCentsValue(formData: FormData, key: string) {
+  const raw = formData.get(key);
+  if (raw === null || raw === "") return null;
+  if (typeof raw !== "string" || !/^\d{1,12}$/.test(raw)) {
+    throw new AdminValidationError("price");
+  }
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value <= 0) throw new AdminValidationError("price");
+  return value;
+}
+
 export function enumValue<const T extends readonly string[]>(
   formData: FormData,
   key: string,

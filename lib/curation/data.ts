@@ -30,7 +30,7 @@ function cover(row: CuratedRow): CatalogImage {
 
 function product(row: CuratedRow): CuratedProduct {
   return {
-    availability: row.availability_status,
+    availability: row.availability_status === "consultation" ? "available" : row.availability_status,
     brand: taxonomy(row.brand_id, row.brand_name, row.brand_slug),
     category: taxonomy(row.category_id, row.category_name, row.category_slug),
     color: row.color ?? null,
@@ -159,4 +159,3 @@ export async function getCurationSelection(input: {
     total: result.total,
   };
 }
-

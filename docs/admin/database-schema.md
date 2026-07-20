@@ -37,12 +37,12 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 ## Tipos controlados
 
 - papel: `admin`, `editor`, `attendant`;
-- preço: `visible`, `consult`, `hidden`;
-- disponibilidade: `available`, `last_unit`, `consultation`, `unavailable`;
+- preço no cadastro comum: `visible` ou `consult`; `hidden` permanece apenas como valor legado do enum e não pode ser persistido em produto;
+- disponibilidade no cadastro comum: `available`, `last_unit`, `unavailable`; `consultation` permanece apenas como valor legado do enum e não pode ser persistido em produto;
 - destaque: `promotion`, `highlight`, `launch`, `collection`;
 - analytics: `page_view`, `product_view`, `product_whatsapp_click`, `collection_view`, `promotion_view`, `promotion_click`, `gallery_interaction`, `catalog_search`, `catalog_filter`.
 
-`products.availability_status` começa em `consultation`. Não existe quantidade de estoque.
+`products.availability_status` começa em `available`. Não existe quantidade de estoque. Registros legados em `consultation` são normalizados para `available` pela migration de simplificação da vitrine.
 
 ## Integridade
 
@@ -50,7 +50,7 @@ As migrations SQL em `supabase/migrations` são a fonte da verdade. O schema rem
 - `galleries.route_key` é único;
 - uma constraint parcial permite somente uma imagem com `is_cover = true` por produto;
 - janelas de publicação não aceitam fim anterior ao início;
-- preços, dimensões e ordens não aceitam valores negativos;
+- preço definido exige valor positivo; “Sob consulta” limpa o preço; dimensões e ordens não aceitam valores negativos;
 - metadados de analytics precisam ser objeto JSON e ter no máximo 4 KiB;
 - FKs impedem órfãos e usam `restrict`, `cascade` ou `set null` conforme a relação.
 - produto arquivado é despublicado e não pode aparecer para anônimo;

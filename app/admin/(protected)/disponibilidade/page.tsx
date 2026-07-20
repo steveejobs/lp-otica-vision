@@ -8,6 +8,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { updateAvailabilityAction } from "../produtos/actions";
 
+const availabilityValues = ["available", "last_unit", "unavailable"] as const;
+
 export default async function AvailabilityPage({
   searchParams,
 }: {
@@ -41,7 +43,7 @@ export default async function AvailabilityPage({
               <div><h2>{product.name}</h2><p>{product.sku}{product.model ? ` · ${product.model}` : ""}{product.color ? ` · ${product.color}` : ""}</p></div>
               <form action={updateAvailabilityAction} className={styles.availabilityForm}>
                 <input name="id" type="hidden" value={product.id} /><input name="return_to" type="hidden" value={returnTo} />
-                <label className={styles.field}><span>Disponibilidade atual</span><select defaultValue={product.availability_status} name="availability_status">{Object.entries(availabilityLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+                <label className={styles.field}><span>Disponibilidade atual</span><select defaultValue={product.availability_status === "consultation" ? "available" : product.availability_status} name="availability_status">{availabilityValues.map((value) => <option key={value} value={value}>{availabilityLabels[value]}</option>)}</select></label>
                 <AdminSubmitButton pendingLabel="Atualizando...">Atualizar</AdminSubmitButton>
               </form>
             </article>
@@ -51,4 +53,3 @@ export default async function AvailabilityPage({
     </>
   );
 }
-

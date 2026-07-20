@@ -42,7 +42,7 @@ export function dateTimeInputValue(value: string | null) {
 
 export const availabilityLabels = {
   available: "Disponível",
-  consultation: "Sob consulta",
+  consultation: "Disponível",
   last_unit: "Última unidade",
   unavailable: "Indisponível",
 } as const;

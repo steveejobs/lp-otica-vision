@@ -6,11 +6,8 @@ import {
   createInlineBrandAction,
   type InlineBrandState,
 } from "@/app/admin/(protected)/marcas/actions";
-import { brandSlugFromName } from "@/lib/admin/brand-identity";
 
 import { AdminSubmitButton } from "./admin-form-controls";
-import { FilePreviewInput } from "./file-preview-input";
-import { ProductSkuField } from "./product-sku-field";
 import { ProductStyleSelector, type ProductStyleAssignment } from "./product-style-selector";
 import styles from "./admin.module.css";
 
@@ -19,7 +16,6 @@ type ProductDefaults = {
   brand_id?: string | null;
   category_id?: string | null;
   color?: string | null;
-  display_order?: number;
   featured?: boolean;
   id?: string;
   model?: string | null;
@@ -28,12 +24,20 @@ type ProductDefaults = {
   price_visibility?: "consult" | "hidden" | "visible";
   published?: boolean;
   short_description?: string | null;
-  sku?: string;
-  slug?: string;
-  whatsapp_message_override?: string | null;
 };
 
 const initialInlineBrandState: InlineBrandState = { status: "idle" };
+const NEW_BRAND_VALUE = "__create_brand__";
+const brlFormatter = new Intl.NumberFormat("pt-BR", {
+  currency: "BRL",
+  minimumFractionDigits: 2,
+  style: "currency",
+});
+
+function priceInCents(defaults: ProductDefaults) {
+  if (defaults.price_visibility !== "visible" || !defaults.price || defaults.price <= 0) return "";
+  return String(Math.round(defaults.price * 100));
+}
 
 export function ProductForm({
   action,
@@ -60,6 +64,16 @@ export function ProductForm({
   const [brandOptions, setBrandOptions] = useState(brands);
   const [selectedBrandId, setSelectedBrandId] = useState(defaults.brand_id ?? "");
   const [brandName, setBrandName] = useState("");
+  const [priceMode, setPriceMode] = useState<"consult" | "defined">(
+    defaults.price_visibility === "visible" && Boolean(defaults.price && defaults.price > 0)
+      ? "defined"
+      : "consult",
+  );
+  const [priceCents, setPriceCents] = useState(() => priceInCents(defaults));
+  const [publication, setPublication] = useState<"draft" | "published">(
+    defaults.published ? "published" : "draft",
+  );
+  const [featured, setFeatured] = useState(Boolean(defaults.featured));
   const [brandState, submitBrand, brandPending] = useActionState(
     async (previous: InlineBrandState, formData: FormData) => {
       const result = await createInlineBrandAction(previous, formData);
@@ -88,131 +102,190 @@ export function ProductForm({
     dialogRef.current?.close();
   }
 
+  function selectBrand(value: string) {
+    if (value === NEW_BRAND_VALUE) {
+      dialogRef.current?.showModal();
+      return;
+    }
+    setSelectedBrandId(value);
+  }
+
+  const maskedPrice = priceCents ? brlFormatter.format(Number(priceCents) / 100) : "";
+  const submitLabel = !editing
+    ? "Salvar rascunho"
+    : !defaults.published && publication === "published"
+      ? "Publicar produto"
+      : !defaults.published
+        ? "Salvar rascunho"
+        : "Salvar alterações";
+
   return (
     <>
       <form action={action} className={styles.adminForm}>
-      {defaults.id ? <input name="id" type="hidden" value={defaults.id} /> : null}
-      <fieldset className={styles.formFieldset} disabled={archived}>
-        <div className={styles.formGrid}>
-          <ProductSkuField defaultValue={defaults.sku} generateEnabled={!editing} />
-          <label className={styles.field}>
-            <span>Slug</span>
-            <input defaultValue={defaults.slug} maxLength={120} name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required />
-          </label>
-          <label className={`${styles.field} ${styles.fieldWide}`}>
-            <span>Nome</span>
-            <input defaultValue={defaults.name} maxLength={160} name="name" required />
-          </label>
-          <div className={styles.field}>
-            <span id="product-brand-label">Marca</span>
-            <div className={styles.inlineSelectAction}>
-              <select aria-labelledby="product-brand-label" name="brand_id" onChange={(event) => setSelectedBrandId(event.target.value)} value={selectedBrandId}>
-                <option value="">Sem marca vinculada</option>
-                {brandOptions.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}{brand.active ? "" : " · inativa"}</option>)}
-              </select>
-              <button className={styles.secondaryButton} onClick={() => dialogRef.current?.showModal()} type="button">Nova marca</button>
-            </div>
-            {brandState.status === "created" ? <small className={styles.fieldStatus}>{brandState.message}</small> : null}
+        {defaults.id ? <input name="id" type="hidden" value={defaults.id} /> : null}
+        <fieldset className={styles.formFieldset} disabled={archived}>
+          <div className={styles.productFormSections}>
+            <section aria-labelledby="product-main-title" className={styles.productFormSection}>
+              <div className={styles.formSectionHeading}>
+                <span>1</span>
+                <div><h3 id="product-main-title">Informações principais</h3><p>O essencial para identificar o produto na vitrine.</p></div>
+              </div>
+              <div className={styles.formGrid}>
+                <label className={`${styles.field} ${styles.fieldWide}`}>
+                  <span>Nome do produto</span>
+                  <input autoFocus defaultValue={defaults.name} maxLength={160} name="name" required />
+                </label>
+                <div className={styles.field}>
+                  <span id="product-brand-label">Marca</span>
+                  <select
+                    aria-labelledby="product-brand-label"
+                    name="brand_id"
+                    onChange={(event) => selectBrand(event.target.value)}
+                    value={selectedBrandId}
+                  >
+                    <option value="">Sem marca informada</option>
+                    {brandOptions.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}{brand.active ? "" : " · inativa"}</option>)}
+                    <option value={NEW_BRAND_VALUE}>Criar nova marca</option>
+                  </select>
+                  {brandState.status === "created" ? <small className={styles.fieldStatus}>{brandState.message}</small> : null}
+                </div>
+                <label className={styles.field}>
+                  <span>Modelo (opcional)</span>
+                  <input defaultValue={defaults.model ?? ""} maxLength={120} name="model" />
+                </label>
+                <label className={styles.field}>
+                  <span>Categoria</span>
+                  <select defaultValue={defaults.category_id ?? ""} name="category_id">
+                    <option value="">Sem categoria informada</option>
+                    {categories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? "" : " · inativa"}</option>)}
+                  </select>
+                </label>
+                <label className={styles.field}>
+                  <span>Cor (opcional)</span>
+                  <input defaultValue={defaults.color ?? ""} maxLength={120} name="color" />
+                </label>
+              </div>
+              {styleOptions.length ? (
+                <ProductStyleSelector
+                  assignments={styleAssignments}
+                  eligibilityReasons={styleEligibilityReasons}
+                  options={styleOptions}
+                />
+              ) : null}
+            </section>
+
+            <section aria-labelledby="product-presentation-title" className={styles.productFormSection}>
+              <div className={styles.formSectionHeading}>
+                <span>2</span>
+                <div><h3 id="product-presentation-title">Apresentação</h3><p>{editing ? "Adicione as imagens e escolha a capa logo abaixo deste formulário." : "Depois de salvar o rascunho, você poderá adicionar as imagens e escolher a capa."}</p></div>
+              </div>
+              <div className={styles.formGrid}>
+                <label className={`${styles.field} ${styles.fieldWide}`}>
+                  <span>Descrição curta (opcional)</span>
+                  <textarea defaultValue={defaults.short_description ?? ""} maxLength={600} name="short_description" />
+                </label>
+              </div>
+            </section>
+
+            <section aria-labelledby="product-sale-title" className={styles.productFormSection}>
+              <div className={styles.formSectionHeading}>
+                <span>3</span>
+                <div><h3 id="product-sale-title">Venda e contato</h3><p>Preço e estado comercial, sem controle de quantidade.</p></div>
+              </div>
+              <div className={styles.commercialFields}>
+                <fieldset className={styles.choiceGroup}>
+                  <legend>Preço</legend>
+                  <div className={styles.segmentedControl}>
+                    <label><input checked={priceMode === "defined"} name="price_mode" onChange={() => setPriceMode("defined")} type="radio" value="defined" /><span>Preço definido</span></label>
+                    <label><input checked={priceMode === "consult"} name="price_mode" onChange={() => { setPriceMode("consult"); setPriceCents(""); }} type="radio" value="consult" /><span>Sob consulta</span></label>
+                  </div>
+                  <input name="price_cents" type="hidden" value={priceMode === "defined" ? priceCents : ""} />
+                  {priceMode === "defined" ? (
+                    <label className={styles.field}>
+                      <span>Valor</span>
+                      <input
+                        autoComplete="off"
+                        inputMode="numeric"
+                        name="price_display"
+                        onChange={(event) => {
+                          const cents = event.currentTarget.value.replace(/\D/g, "").slice(0, 12);
+                          setPriceCents(cents);
+                          event.currentTarget.setCustomValidity(Number(cents) > 0 ? "" : "Informe um valor maior que zero.");
+                        }}
+                        onInvalid={(event) => event.currentTarget.setCustomValidity("Informe um valor maior que zero.")}
+                        placeholder="R$ 1.290,00"
+                        required
+                        value={maskedPrice}
+                      />
+                      <small className={styles.fieldHint}>Digite somente o valor; a formatação em reais é automática.</small>
+                    </label>
+                  ) : <p className={styles.choiceHint}>A vitrine mostrará “Sob consulta” e nenhum valor será armazenado.</p>}
+                </fieldset>
+
+                <fieldset className={styles.choiceGroup}>
+                  <legend>Disponibilidade</legend>
+                  <div className={styles.availabilityChoices}>
+                    {([
+                      ["available", "Disponível"],
+                      ["last_unit", "Última unidade"],
+                      ["unavailable", "Indisponível"],
+                    ] as const).map(([value, label]) => (
+                      <label data-availability={value} key={value}>
+                        <input defaultChecked={(defaults.availability_status === "consultation" ? "available" : defaults.availability_status ?? "available") === value} name="availability_status" type="radio" value={value} />
+                        <span>{label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              </div>
+            </section>
+
+            <section aria-labelledby="product-publication-title" className={styles.productFormSection}>
+              <div className={styles.formSectionHeading}>
+                <span>4</span>
+                <div><h3 id="product-publication-title">Publicação</h3><p>Rascunhos ficam visíveis somente no painel administrativo.</p></div>
+              </div>
+              {editing ? (
+                <div className={styles.publicationFields}>
+                  <fieldset className={styles.choiceGroup}>
+                    <legend>Estado</legend>
+                    <div className={styles.segmentedControl}>
+                      <label><input checked={publication === "draft"} name="published" onChange={() => { setPublication("draft"); setFeatured(false); }} type="radio" value="false" /><span>Rascunho</span></label>
+                      <label><input checked={publication === "published"} name="published" onChange={() => setPublication("published")} type="radio" value="true" /><span>Publicado</span></label>
+                    </div>
+                  </fieldset>
+                  <label className={styles.checkboxField}>
+                    <input checked={featured} disabled={publication !== "published"} name="featured" onChange={(event) => setFeatured(event.target.checked)} type="checkbox" />
+                    <span>Destacar na vitrine</span>
+                  </label>
+                </div>
+              ) : (
+                <>
+                  <input name="published" type="hidden" value="false" />
+                  <input name="featured" type="hidden" value="false" />
+                  <p className={styles.choiceHint}>Este produto será salvo como rascunho. Adicione uma capa antes de publicar.</p>
+                </>
+              )}
+            </section>
           </div>
-          <label className={styles.field}>
-            <span>Categoria</span>
-            <select defaultValue={defaults.category_id ?? ""} name="category_id">
-              <option value="">Sem categoria vinculada</option>
-              {categories.map((category) => <option key={category.id} value={category.id}>{category.name}{category.active ? "" : " · inativa"}</option>)}
-            </select>
-          </label>
-          <label className={styles.field}>
-            <span>Modelo</span>
-            <input defaultValue={defaults.model ?? ""} maxLength={120} name="model" />
-          </label>
-          <label className={styles.field}>
-            <span>Cor</span>
-            <input defaultValue={defaults.color ?? ""} maxLength={120} name="color" />
-          </label>
-          <label className={`${styles.field} ${styles.fieldWide}`}>
-            <span>Descrição curta</span>
-            <textarea defaultValue={defaults.short_description ?? ""} maxLength={600} name="short_description" />
-          </label>
-          <label className={styles.field}>
-            <span>Preço opcional</span>
-            <input defaultValue={defaults.price ?? ""} min="0" name="price" step="0.01" type="number" />
-          </label>
-          <label className={styles.field}>
-            <span>Visibilidade do preço</span>
-            <select defaultValue={defaults.price_visibility ?? "consult"} name="price_visibility" required>
-              <option value="consult">Consultar</option>
-              <option value="visible">Visível</option>
-              <option value="hidden">Oculto</option>
-            </select>
-          </label>
-          <label className={styles.field}>
-            <span>Disponibilidade</span>
-            <select defaultValue={defaults.availability_status ?? "consultation"} name="availability_status" required>
-              <option value="consultation">Sob consulta</option>
-              <option value="available">Disponível</option>
-              <option value="last_unit">Última unidade</option>
-              <option value="unavailable">Indisponível</option>
-            </select>
-          </label>
-          <label className={styles.field}>
-            <span>Ordem</span>
-            <input defaultValue={defaults.display_order ?? 0} min="0" name="display_order" required type="number" />
-          </label>
-          {editing ? (
-            <>
-              <label className={styles.checkboxField}>
-                <input defaultChecked={defaults.published} name="published" type="checkbox" />
-                <span>Publicado</span>
-              </label>
-              <label className={styles.checkboxField}>
-                <input defaultChecked={defaults.featured} name="featured" type="checkbox" />
-                <span>Destaque na home</span>
-              </label>
-            </>
-          ) : (
-            <>
-              <input name="published" type="hidden" value="false" />
-              <input name="featured" type="hidden" value="false" />
-            </>
-          )}
-          <label className={`${styles.field} ${styles.fieldWide}`}>
-            <span>Mensagem personalizada do WhatsApp</span>
-            <textarea defaultValue={defaults.whatsapp_message_override ?? ""} maxLength={1200} name="whatsapp_message_override" />
-            <small className={styles.fieldHint}>Opcional. Não inclua prazo, estoque ou condição comercial não confirmada.</small>
-          </label>
-          {styleOptions.length ? (
-            <ProductStyleSelector
-              assignments={styleAssignments}
-              eligibilityReasons={styleEligibilityReasons}
-              options={styleOptions}
-            />
-          ) : null}
-        </div>
-        <div className={styles.formActions}>
-          <AdminSubmitButton pendingLabel={editing ? "Salvando produto..." : "Criando rascunho..."}>
-            {editing ? "Salvar produto" : "Criar rascunho"}
-          </AdminSubmitButton>
-        </div>
-      </fieldset>
+          <div className={styles.formActions}>
+            <AdminSubmitButton pendingLabel="Salvando produto...">{submitLabel}</AdminSubmitButton>
+          </div>
+        </fieldset>
       </form>
 
       <dialog aria-labelledby="new-inline-brand-title" className={styles.inlineDialog} ref={dialogRef}>
         <form action={submitBrand} className={styles.inlineDialogCard}>
           <div className={styles.panelHeading}>
-            <div><p className={styles.eyebrow}>Produtos</p><h2 id="new-inline-brand-title">Nova marca</h2><p>Confirme a criação. Digitar um nome no produto nunca cria uma marca automaticamente.</p></div>
+            <div><p className={styles.eyebrow}>Marca</p><h2 id="new-inline-brand-title">Criar nova marca</h2><p>Informe somente o nome. A nova marca será selecionada automaticamente.</p></div>
             <button aria-label="Fechar criação de marca" className={styles.textButton} onClick={() => dialogRef.current?.close()} type="button">Fechar</button>
           </div>
-          <div className={styles.formGrid}>
-            <label className={`${styles.field} ${styles.fieldWide}`}><span>Nome</span><input autoFocus maxLength={120} name="name" onChange={(event) => setBrandName(event.target.value)} required value={brandName} /></label>
-            <label className={styles.field}><span>Slug gerado automaticamente</span><input aria-readonly="true" name="slug_preview" readOnly value={brandSlugFromName(brandName)} /></label>
-            <label className={styles.field}><span>Ordem opcional</span><input min="0" name="display_order" placeholder="0" type="number" /></label>
-            <div className={styles.fieldWide}><FilePreviewInput id="inline-brand-logo" name="logo" /></div>
-          </div>
+          <label className={styles.field}><span>Nome da marca</span><input autoFocus maxLength={120} name="name" onChange={(event) => setBrandName(event.target.value)} required value={brandName} /></label>
           {brandState.status === "duplicate" ? <div className={styles.inlineSuggestion}><p>{brandState.message} Use o cadastro existente para evitar duplicidade.</p><button className={styles.secondaryButton} onClick={useExistingBrand} type="button">Usar marca existente</button></div> : null}
           {brandState.status === "error" ? <p className={styles.formError}>{brandState.message}</p> : null}
           <div className={styles.formActions}>
             <button className={styles.secondaryButton} onClick={() => dialogRef.current?.close()} type="button">Cancelar</button>
-            <button className={styles.primaryButton} disabled={brandPending || !brandName.trim()} type="submit">{brandPending ? "Criando marca..." : "Confirmar nova marca"}</button>
+            <button className={styles.primaryButton} disabled={brandPending || !brandName.trim()} type="submit">{brandPending ? "Criando marca..." : "Criar marca"}</button>
           </div>
         </form>
       </dialog>

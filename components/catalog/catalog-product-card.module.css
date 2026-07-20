@@ -121,19 +121,19 @@
 }
 
 .card[data-availability="available"] .availability {
-  color: var(--vision-positive);
+  color: var(--vision-ink);
 }
 
 .card[data-availability="last_unit"] .availability {
-  color: var(--vision-muted);
+  color: var(--vision-bronze);
 }
 
 .card[data-availability="unavailable"] .availability {
-  color: var(--vision-red);
+  color: var(--vision-muted);
 }
 
 .card[data-availability="unavailable"] .media img {
-  filter: saturate(0.52) contrast(0.92);
+  filter: saturate(0.72) contrast(0.96);
 }
 
 .action {

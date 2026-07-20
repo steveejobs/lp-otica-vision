@@ -84,7 +84,6 @@ export default async function EditProductPage({
   const blockingIssues = [
     ...(!product.sku.trim() ? ["SKU ausente"] : []),
     ...(!product.name.trim() ? ["nome ausente"] : []),
-    ...(!product.slug.trim() ? ["slug ausente"] : []),
     ...(!hasCover ? ["capa completa ausente"] : []),
     ...(linkedBrand && !linkedBrand.active ? ["marca vinculada inativa"] : []),
     ...(linkedCategory && !linkedCategory.active ? ["categoria vinculada inativa"] : []),
@@ -129,24 +128,24 @@ export default async function EditProductPage({
         </p>
       ) : null}
       <section className={styles.formPanel} aria-labelledby="product-data-title">
-        <div className={styles.panelHeading}><h2 id="product-data-title">Dados do produto</h2><p>SKU e slug são únicos.</p></div>
+        <div className={styles.panelHeading}><h2 id="product-data-title">Cadastro do produto</h2><p>Identificação, apresentação, contato e publicação em uma sequência simples.</p></div>
         <ProductForm action={updateProductAction} archived={Boolean(product.archived_at)} brands={brandResult.data} categories={categoryResult.data} defaults={product} editing styleAssignments={styleAssignments} styleEligibilityReasons={styleEligibilityReasons} styleOptions={styleOptions} />
       </section>
 
       {!product.archived_at ? (
         <section className={styles.formPanel} aria-labelledby="product-upload-title">
-          <div className={styles.panelHeading}><div><h2 id="product-upload-title">Adicionar imagens</h2><p>A primeira imagem vira capa quando ainda não existe capa. Miniatura, card, home, detalhe e Open Graph são gerados uma vez no upload.</p></div></div>
+          <div className={styles.panelHeading}><div><h2 id="product-upload-title">Adicionar imagens</h2><p>A primeira imagem será usada como capa quando ainda não houver uma capa definida.</p></div></div>
           <ProductImageUploader productId={product.id} />
         </section>
       ) : null}
 
       <section className={styles.formPanel} aria-labelledby="product-images-title">
-        <div className={styles.panelHeading}><div><h2 id="product-images-title">Imagens do produto</h2><p>Arraste ou use os botões para ordenar. Apenas uma imagem permanece como capa.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
+        <div className={styles.panelHeading}><div><h2 id="product-images-title">Imagens do produto</h2><p>Arraste ou use os botões para ordenar. Escolha uma única imagem de capa.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
         <ProductImageManager images={images} productId={product.id} readOnly={Boolean(product.archived_at)} />
       </section>
 
       <section className={styles.dangerZone} aria-labelledby="product-actions-title">
-        <div className={styles.panelHeading}><div><h2 id="product-actions-title">Ações do registro</h2><p>Duplicações não copiam imagens nem relações e sempre nascem como rascunho sob consulta.</p></div></div>
+        <div className={styles.panelHeading}><div><h2 id="product-actions-title">Outras ações</h2><p>Duplicações não copiam imagens e sempre nascem como rascunho no final da vitrine.</p></div></div>
         <div className={styles.formActions}>
           <form action={duplicateProductAction}><input name="id" type="hidden" value={product.id} /><AdminSubmitButton pendingLabel="Duplicando..." variant="secondary">Duplicar produto</AdminSubmitButton></form>
           {product.archived_at ? (

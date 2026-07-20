@@ -10,17 +10,16 @@ import {
   appendFeedback,
   booleanValue,
   enumValue,
-  integerValue,
   isUuidString,
   mutationErrorCode,
   objectPositionValue,
-  optionalMoneyValue,
+  optionalPositiveMoneyCentsValue,
   optionalTextValue,
   orderedUuidList,
-  slugValue,
   textValue,
   uuidValue,
 } from "@/lib/admin/validation";
+import { nextAvailableProductSlug, productSlugFromName } from "@/lib/admin/product-identity";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import {
   isProductImageUploadMime,
@@ -39,8 +38,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/supabase";
 
-const availabilityValues = ["available", "last_unit", "consultation", "unavailable"] as const;
-const priceVisibilityValues = ["visible", "consult", "hidden"] as const;
+const availabilityValues = ["available", "last_unit", "unavailable"] as const;
+const priceModeValues = ["defined", "consult"] as const;
 const generatedProductSkuPattern = /^OV-\d{8,}$/;
 
 type ProductImageUploadDescriptor = {
@@ -188,23 +187,64 @@ function safeReturnPath(formData: FormData, fallback: string) {
 }
 
 function productPayload(formData: FormData) {
+  const priceMode = enumValue(formData, "price_mode", priceModeValues);
+  const priceCents = priceMode === "defined"
+    ? optionalPositiveMoneyCentsValue(formData, "price_cents")
+    : null;
+  if (priceMode === "defined" && priceCents === null) throw new AdminValidationError("price");
+
   return {
     availability_status: enumValue(formData, "availability_status", availabilityValues),
     brand_id: uuidValue(formData, "brand_id", true),
     category_id: uuidValue(formData, "category_id", true),
     color: optionalTextValue(formData, "color", { max: 120 }),
-    display_order: integerValue(formData, "display_order", { max: 100_000 }),
     featured: booleanValue(formData, "featured"),
     model: optionalTextValue(formData, "model", { max: 120 }),
     name: textValue(formData, "name", { max: 160 }),
-    price: optionalMoneyValue(formData, "price"),
-    price_visibility: enumValue(formData, "price_visibility", priceVisibilityValues),
+    price: priceCents === null ? null : priceCents / 100,
+    price_visibility: priceMode === "defined" ? "visible" as const : "consult" as const,
     published: booleanValue(formData, "published"),
     short_description: optionalTextValue(formData, "short_description", { max: 600 }),
-    sku: textValue(formData, "sku", { max: 80 }).toUpperCase(),
-    slug: slugValue(formData),
-    whatsapp_message_override: optionalTextValue(formData, "whatsapp_message_override", { max: 1200 }),
-  } satisfies Database["public"]["Tables"]["products"]["Update"];
+  };
+}
+
+async function allocateProductSku() {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin.rpc("allocate_product_sku");
+  if (error || typeof data !== "string" || !generatedProductSkuPattern.test(data)) {
+    throw error ?? new AdminValidationError("failed");
+  }
+  return data;
+}
+
+async function allocateProductSlug(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  name: string,
+) {
+  const base = productSlugFromName(name);
+  if (!base) throw new AdminValidationError("slug");
+  const { data, error } = await supabase
+    .from("products")
+    .select("slug")
+    .like("slug", `${base}%`)
+    .limit(5_000);
+  if (error || !data) throw error ?? new AdminValidationError("failed");
+  const slug = nextAvailableProductSlug(name, data.map((product) => product.slug));
+  if (!slug) throw new AdminValidationError("slug");
+  return slug;
+}
+
+async function nextProductDisplayOrder(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+) {
+  const { data, error } = await supabase
+    .from("products")
+    .select("display_order")
+    .order("display_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return (data?.display_order ?? -1) + 1;
 }
 
 function productStyleAssignments(formData: FormData) {
@@ -236,12 +276,11 @@ export async function generateProductSkuAction(): Promise<
   { ok: true; sku: string } | { ok: false; error: string }
 > {
   await requireAdminRole(["admin", "editor"]);
-  const admin = createSupabaseAdminClient();
-  const { data, error } = await admin.rpc("allocate_product_sku");
-  if (error || typeof data !== "string" || !generatedProductSkuPattern.test(data)) {
+  try {
+    return { ok: true, sku: await allocateProductSku() };
+  } catch {
     return { ok: false, error: "Não foi possível gerar o SKU. Tente novamente." };
   }
-  return { ok: true, sku: data };
 }
 
 export async function createProductAction(formData: FormData) {
@@ -251,9 +290,14 @@ export async function createProductAction(formData: FormData) {
   let errorCode: string | null = null;
   try {
     const payload = productPayload(formData);
+    const [displayOrder, sku, slug] = await Promise.all([
+      nextProductDisplayOrder(supabase),
+      allocateProductSku(),
+      allocateProductSlug(supabase, payload.name),
+    ]);
     const { data, error } = await supabase
       .from("products")
-      .insert({ ...payload, featured: false, published: false })
+      .insert({ ...payload, display_order: displayOrder, featured: false, published: false, sku, slug })
       .select("id")
       .single();
     if (error) throw error;
@@ -285,12 +329,12 @@ export async function updateProductAction(formData: FormData) {
   let errorCode: string | null = null;
   let productSlug: string | null = null;
   try {
-    const { data: product, error: readError } = await supabase.from("products").select("archived_at").eq("id", id).single();
+    const { data: product, error: readError } = await supabase.from("products").select("archived_at, slug").eq("id", id).single();
     if (readError) throw readError;
     if (product.archived_at) throw new AdminValidationError("constraint");
     const payload = productPayload(formData);
     const assignments = productStyleAssignments(formData);
-    productSlug = payload.slug;
+    productSlug = product.slug;
     if (payload.featured && !payload.published) throw new AdminValidationError("constraint");
     const { error } = await supabase.from("products").update(payload).eq("id", id);
     if (error) throw error;
@@ -321,24 +365,28 @@ export async function duplicateProductAction(formData: FormData) {
     const { data: source, error } = await supabase.from("products").select("*").eq("id", id).single();
     if (error) throw error;
     duplicatedId = randomUUID();
-    const suffix = duplicatedId.slice(0, 8);
+    const duplicatedName = `${source.name.slice(0, 150)} (cópia)`;
+    const [displayOrder, sku, slug] = await Promise.all([
+      nextProductDisplayOrder(supabase),
+      allocateProductSku(),
+      allocateProductSlug(supabase, duplicatedName),
+    ]);
     const { error: insertError } = await supabase.from("products").insert({
-      availability_status: "consultation",
+      availability_status: "available",
       brand_id: source.brand_id,
       category_id: source.category_id,
       color: source.color,
-      display_order: source.display_order,
+      display_order: displayOrder,
       featured: false,
       id: duplicatedId,
       model: source.model,
-      name: `${source.name.slice(0, 150)} (cópia)`,
+      name: duplicatedName,
       price: source.price,
       price_visibility: source.price_visibility,
       published: false,
       short_description: source.short_description,
-      sku: `${source.sku.slice(0, 65)}-COPY-${suffix}`.toUpperCase(),
-      slug: `${source.slug.slice(0, 100)}-copia-${suffix}`,
-      whatsapp_message_override: source.whatsapp_message_override,
+      sku,
+      slug,
     });
     if (insertError) throw insertError;
   } catch (error) {

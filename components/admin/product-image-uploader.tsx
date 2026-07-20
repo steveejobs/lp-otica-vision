@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import {
@@ -28,6 +29,7 @@ export function ProductImageUploader({
   const [files, setFiles] = useState<File[]>([]);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
   const replacing = Boolean(imageId);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -84,7 +86,9 @@ export function ProductImageUploader({
 
       setMessage("Imagens processadas com sucesso.");
       setPending(false);
-      window.location.assign(`/admin/produtos/${productId}?status=uploaded`);
+      setFiles([]);
+      form.reset();
+      router.refresh();
     } catch {
       if (uploadIds.length) {
         await discardProductImageUploadsAction({ uploadIds });
@@ -99,20 +103,10 @@ export function ProductImageUploader({
       {!replacing ? (
         <div className={styles.formGrid}>
           <label className={styles.field}>
-            <span>Texto alternativo base</span>
+            <span>Descrição das imagens</span>
             <input disabled={pending} maxLength={170} name="alt_base" required />
           </label>
-          <label className={styles.field}>
-            <span>Object-position</span>
-            <input
-              defaultValue="50% 50%"
-              disabled={pending}
-              maxLength={40}
-              name="object_position"
-              pattern="(?:\d{1,3}%|left|center|right) (?:\d{1,3}%|top|center|bottom)"
-              required
-            />
-          </label>
+          <input name="object_position" type="hidden" value="50% 50%" />
           <div className={styles.fieldWide}>
             <FilePreviewInput
               disabled={pending}
@@ -143,7 +137,7 @@ export function ProductImageUploader({
         disabled={pending}
         type="submit"
       >
-        {pending ? (replacing ? "Substituindo..." : "Processando imagens...") : (replacing ? "Substituir arquivo" : "Enviar imagens")}
+        {pending ? (replacing ? "Substituindo..." : "Adicionando imagens...") : (replacing ? "Substituir imagem" : "Adicionar imagens")}
       </button>
     </form>
   );

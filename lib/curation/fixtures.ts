@@ -35,7 +35,7 @@ function productsFor(styleSlug: string, categorySlug: string | null): CuratedPro
   return (memberships[style.slug] ?? memberships.classica)
     .filter((index) => !categorySlug || (categorySlug === "grupo-qa-a" ? index < 4 : index >= 4))
     .map((index, order) => ({
-      availability: "consultation",
+      availability: "available",
       brand: null,
       category: {
         id: index < 4 ? categories[0].id : categories[1].id,
@@ -61,7 +61,7 @@ function productsFor(styleSlug: string, categorySlug: string | null): CuratedPro
       model: null,
       name: `Item QA ${String(index + 1).padStart(2, "0")}`,
       price: null,
-      priceVisibility: "hidden",
+      priceVisibility: "consult",
       shortDescription: null,
       sku: `QA-${String(index + 1).padStart(2, "0")}`,
       slug: `item-qa-${String(index + 1).padStart(2, "0")}`,

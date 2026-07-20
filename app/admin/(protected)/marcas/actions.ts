@@ -48,23 +48,20 @@ export async function createInlineBrandAction(
   await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();
   const id = randomUUID();
-  let uploadedPath: string | null = null;
 
   try {
     const name = textValue(formData, "name", { max: 120 });
     const identity = normalizeBrandIdentity(name);
     const slug = brandSlugFromName(name);
     if (!identity || !slug) throw new AdminValidationError("slug");
-    const displayOrderRaw = formData.get("display_order");
-    const displayOrder = displayOrderRaw === null || displayOrderRaw === ""
-      ? 0
-      : integerValue(formData, "display_order", { max: 100_000 });
-
-    const { data: existingBrands, error: lookupError } = await supabase
-      .from("brands")
-      .select("id, name, slug, active")
-      .limit(500);
-    if (lookupError || !existingBrands) throw lookupError ?? new Error("brand_lookup");
+    const [existingResult, orderResult] = await Promise.all([
+      supabase.from("brands").select("id, name, slug, active").limit(500),
+      supabase.from("brands").select("display_order").order("display_order", { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    const existingBrands = existingResult.data;
+    if (existingResult.error || !existingBrands || orderResult.error) {
+      throw existingResult.error ?? orderResult.error ?? new Error("brand_lookup");
+    }
     const existing = existingBrands.find((brand) =>
       normalizeBrandIdentity(brand.name) === identity || brand.slug === slug,
     );
@@ -76,11 +73,10 @@ export async function createInlineBrandAction(
       };
     }
 
-    const file = imageFile(formData);
-    if (file) uploadedPath = (await uploadManagedImage({ bucket: "brand-logos", file, parentId: id })).path;
+    const displayOrder = (orderResult.data?.display_order ?? -1) + 1;
     const { data, error } = await supabase
       .from("brands")
-      .insert({ active: true, display_order: displayOrder, id, logo_url: uploadedPath, name, slug })
+      .insert({ active: true, display_order: displayOrder, id, logo_url: null, name, slug })
       .select("id, name, active")
       .single();
     if (error || !data) throw error ?? new Error("brand_insert");
@@ -89,9 +85,6 @@ export async function createInlineBrandAction(
     revalidatePublicCatalog();
     return { brand: data, message: `${data.name} foi criada e selecionada.`, status: "created" };
   } catch (error) {
-    if (uploadedPath) {
-      try { await removeManagedImage("brand-logos", uploadedPath); } catch { /* Storage QA reports cleanup failures. */ }
-    }
     if (mutationErrorCode(error) === "duplicate") {
       const { data } = await supabase.from("brands").select("id, name, active").eq("slug", brandSlugFromName(String(formData.get("name") ?? ""))).maybeSingle();
       if (data) return { brand: data, message: `Já existe a marca ${data.name}.`, status: "duplicate" };

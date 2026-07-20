@@ -219,6 +219,27 @@ export async function syncCollectionProductsAction(formData: FormData) {
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
+export async function saveCollectionProductOrderAction(input: {
+  entityId: string;
+  orderedIds: string[];
+}) {
+  await requireAdminRole(["admin", "editor"]);
+  const formData = new FormData();
+  formData.set("entity_id", input.entityId);
+  formData.set("ordered_ids", JSON.stringify(input.orderedIds));
+  const id = uuidValue(formData, "entity_id");
+  const orderedIds = orderedUuidList(formData.get("ordered_ids"));
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.rpc("sync_collection_products", {
+    ordered_product_ids: orderedIds,
+    target_collection_id: id,
+  });
+  if (error) return { error: mutationErrorCode(error), ok: false } as const;
+  revalidatePath(`/admin/colecoes/${id}`);
+  revalidatePublicCatalog();
+  return { ok: true } as const;
+}
+
 export async function publishCollectionRevisionAction(formData: FormData) {
   await requireAdminRole(["admin", "editor"]);
   const id = uuidValue(formData, "collection_id");
