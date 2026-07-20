@@ -6,8 +6,6 @@ import { ProductForm } from "@/components/admin/product-form";
 import { requireAdminRole } from "@/lib/auth/admin-access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { createProductAction } from "../actions";
-
 export default async function NewProductPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   await requireAdminRole(["admin", "editor"]);
   const supabase = await createSupabaseServerClient();
@@ -22,6 +20,6 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
     <AdminPageHeader eyebrow="Produtos" description="Cadastre as informações e selecione até 10 imagens. A primeira foto será usada como capa do rascunho." title="Novo produto" />
     <AdminFeedback error={query.error} />
     <div className={styles.adminToolbar}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link></div>
-    <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Cadastro do produto</h2><ProductForm action={createProductAction} brands={brands} categories={categories} styleEligibilityReasons={["produto ainda nao publicado", "sem capa publicada", "sem estilo ativo"]} styleOptions={styleResult.error ? [] : styleResult.data ?? []} /></section>
+    <section className={styles.formPanel} aria-labelledby="new-product-form"><h2 className={styles.eyebrow} id="new-product-form">Cadastro do produto</h2><ProductForm brands={brands} categories={categories} styleEligibilityReasons={["produto ainda nao publicado", "sem capa publicada", "sem estilo ativo"]} styleOptions={styleResult.error ? [] : styleResult.data ?? []} /></section>
   </>;
 }

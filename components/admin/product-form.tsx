@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState, type FormEvent } from "react";
 
-import { createProductDraftAction } from "@/app/admin/(protected)/produtos/actions";
+import { createProductDraftAction, discardNewProductDraftAction } from "@/app/admin/(protected)/produtos/actions";
 import {
   createInlineBrandAction,
   type InlineBrandState,
@@ -54,7 +54,7 @@ export function ProductForm({
   styleEligibilityReasons = [],
   styleOptions = [],
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action?: (formData: FormData) => Promise<void>;
   archived?: boolean;
   brands: { active: boolean; id: string; name: string }[];
   categories: { active: boolean; id: string; name: string }[];
@@ -65,6 +65,7 @@ export function ProductForm({
   styleOptions?: { active: boolean; description: string; id: string; label: string }[];
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const submittingRef = useRef(false);
   const router = useRouter();
   const [brandOptions, setBrandOptions] = useState(brands);
   const [selectedBrandId, setSelectedBrandId] = useState(defaults.brand_id ?? "");
@@ -82,6 +83,7 @@ export function ProductForm({
   const [newProductFiles, setNewProductFiles] = useState<File[]>([]);
   const [createPending, setCreatePending] = useState(false);
   const [createMessage, setCreateMessage] = useState<string | null>(null);
+  const [createPhase, setCreatePhase] = useState<"error" | "idle" | "images" | "product" | "processing">("idle");
   const [brandState, submitBrand, brandPending] = useActionState(
     async (previous: InlineBrandState, formData: FormData) => {
       const result = await createInlineBrandAction(previous, formData);
@@ -121,29 +123,50 @@ export function ProductForm({
   async function submitNewProduct(event: FormEvent<HTMLFormElement>) {
     if (editing) return;
     event.preventDefault();
+    if (submittingRef.current) return;
     const validationError = productImageSelectionError(newProductFiles);
-    if (validationError) { setCreateMessage(validationError); return; }
+    if (validationError) { setCreateMessage(validationError); setCreatePhase("error"); return; }
 
     const formData = new FormData(event.currentTarget);
     // Os arquivos seguem pelo upload assinado; nunca devem atravessar o limite da Server Action.
     formData.delete("files");
+    submittingRef.current = true;
     setCreatePending(true);
+    setCreatePhase("product");
     setCreateMessage("Salvando as informações do produto...");
     const productResult = await createProductDraftAction(formData);
     if (!productResult.ok) {
       setCreateMessage("Não foi possível criar o produto. Revise os campos e tente novamente.");
+      setCreatePhase("error");
       setCreatePending(false);
+      submittingRef.current = false;
       return;
     }
 
     const imageResult = await uploadProductImages({
       files: newProductFiles,
-      onProgress: setCreateMessage,
+      onProgress: (message) => {
+        setCreateMessage(message);
+        setCreatePhase(message.startsWith("Enviando") ? "images" : "processing");
+      },
       productId: productResult.productId,
     });
-    const params = new URLSearchParams({ status: "created" });
-    if (!imageResult.ok) params.set("error", "image");
-    router.push(`/admin/produtos/${productResult.productId}?${params.toString()}`);
+    if (!imageResult.ok) {
+      const discarded = await discardNewProductDraftAction({ productId: productResult.productId });
+      if (discarded.ok) {
+        setCreateMessage("O envio não terminou. Nada incompleto foi cadastrado; seus campos e imagens continuam aqui para tentar novamente.");
+        setCreatePhase("error");
+        setCreatePending(false);
+        submittingRef.current = false;
+        return;
+      }
+      router.push(`/admin/produtos/${productResult.productId}?status=created&error=image`);
+      router.refresh();
+      return;
+    }
+    setCreatePhase("processing");
+    setCreateMessage("Produto e imagens cadastrados. Abrindo a edição...");
+    router.push(`/admin/produtos/${productResult.productId}?status=created`);
     router.refresh();
   }
 
@@ -158,7 +181,7 @@ export function ProductForm({
 
   return (
     <>
-      <form action={action} className={styles.adminForm} onSubmit={editing ? undefined : submitNewProduct}>
+      <form action={editing ? action : undefined} className={styles.adminForm} onSubmit={editing ? undefined : submitNewProduct}>
         {defaults.id ? <input name="id" type="hidden" value={defaults.id} /> : null}
         <fieldset className={styles.formFieldset} disabled={archived || createPending}>
           <div className={styles.productFormSections}>
@@ -224,7 +247,7 @@ export function ProductForm({
                   id="new-product-images"
                   multiple
                   name="files"
-                  onFilesChange={(files) => { setNewProductFiles(files); setCreateMessage(null); }}
+                  onFilesChange={(files) => { setNewProductFiles(files); setCreateMessage(null); setCreatePhase("idle"); }}
                   required
                 />
                 <p className={styles.choiceHint}>{newProductFiles.length ? `${newProductFiles.length} ${newProductFiles.length === 1 ? "imagem selecionada" : "imagens selecionadas"}. Você poderá alterar a capa e a ordem depois de salvar.` : "Escolha pelo menos uma imagem para cadastrar o produto."}</p>
@@ -325,9 +348,21 @@ export function ProductForm({
               )}
             </section>
           </div>
-          {!editing && createMessage ? <p className={createMessage.startsWith("Não foi possível") || createMessage.startsWith("Selecione") || createMessage.startsWith("Use imagens") ? styles.formError : styles.fieldHint} role="status">{createMessage}</p> : null}
+          {!editing && createMessage ? (
+            <div className={styles.productCreateProgress} data-error={createPhase === "error" || undefined} role="status">
+              <div aria-hidden="true">
+                <span data-active={createPhase === "product" || undefined} data-done={["images", "processing"].includes(createPhase) || undefined}>1</span>
+                <i />
+                <span data-active={createPhase === "images" || undefined} data-done={createPhase === "processing" || undefined}>2</span>
+                <i />
+                <span data-active={createPhase === "processing" || undefined}>3</span>
+              </div>
+              <strong>{createPhase === "error" ? "Cadastro não concluído" : createPhase === "product" ? "Salvando produto" : createPhase === "images" ? "Enviando imagens" : "Finalizando"}</strong>
+              <p>{createMessage}</p>
+            </div>
+          ) : null}
           <div className={styles.formActions}>
-            {editing ? <AdminSubmitButton pendingLabel="Salvando produto...">{submitLabel}</AdminSubmitButton> : <button className={styles.primaryButton} disabled={createPending} type="submit">{createPending ? "Criando produto e enviando imagens..." : "Cadastrar produto e imagens"}</button>}
+            {editing ? <AdminSubmitButton pendingLabel="Salvando produto...">{submitLabel}</AdminSubmitButton> : <button className={styles.primaryButton} disabled={createPending} type="submit">{createPending ? "Aguarde, estamos concluindo..." : createPhase === "error" ? "Tentar cadastrar novamente" : "Cadastrar produto e imagens"}</button>}
           </div>
         </fieldset>
       </form>

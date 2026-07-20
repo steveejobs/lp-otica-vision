@@ -17,6 +17,7 @@ export function ProductImageUploader({
   const [files, setFiles] = useState<File[]>([]);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [resetSignal, setResetSignal] = useState(0);
   const router = useRouter();
   const replacing = Boolean(imageId);
 
@@ -32,6 +33,7 @@ export function ProductImageUploader({
       setMessage("Imagens processadas com sucesso.");
       setPending(false);
       setFiles([]);
+      setResetSignal((current) => current + 1);
       form.reset();
       router.refresh();
     } else {
@@ -49,6 +51,7 @@ export function ProductImageUploader({
             <FilePreviewInput
               disabled={pending}
               id={`product-images-${productId}`}
+              key={resetSignal}
               multiple
               name="files"
               onFilesChange={setFiles}
@@ -60,6 +63,7 @@ export function ProductImageUploader({
         <FilePreviewInput
           disabled={pending}
           id={`replace-${imageId}`}
+          key={resetSignal}
           name="file"
           onFilesChange={setFiles}
           required

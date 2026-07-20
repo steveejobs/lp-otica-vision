@@ -1996,6 +1996,68 @@
   line-height: 1.55;
 }
 
+.productCreateProgress {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid rgba(128, 98, 71, 0.3);
+  border-radius: 0.5rem;
+  background: #f3eadf;
+}
+
+.productCreateProgress > div {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(1.5rem, 5rem) 1.75rem minmax(1.5rem, 5rem) 1.75rem;
+  align-items: center;
+  width: min(100%, 15rem);
+  margin-bottom: 0.25rem;
+}
+
+.productCreateProgress span {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid rgba(128, 98, 71, 0.3);
+  border-radius: 50%;
+  background: var(--admin-surface);
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.productCreateProgress span[data-active="true"],
+.productCreateProgress span[data-done="true"] {
+  border-color: var(--admin-bronze);
+  background: var(--admin-bronze);
+  color: white;
+}
+
+.productCreateProgress i {
+  height: 1px;
+  background: rgba(128, 98, 71, 0.3);
+}
+
+.productCreateProgress strong {
+  font-size: 0.78rem;
+}
+
+.productCreateProgress p {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.productCreateProgress[data-error="true"] {
+  border-color: rgba(126, 65, 57, 0.35);
+  background: #f7eeea;
+}
+
+.productCreateProgress[data-error="true"] strong,
+.productCreateProgress[data-error="true"] p {
+  color: #733f38;
+}
+
 .field,
 .checkboxField {
   display: grid;
@@ -2452,6 +2514,48 @@
   height: 4.5rem;
   object-fit: contain;
   object-position: left center;
+}
+
+.editorJumpNav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.editorJumpNav a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--admin-line);
+  border-radius: 0.4rem;
+  background: var(--admin-surface);
+  color: var(--admin-ink);
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.editorJumpNav a:focus-visible {
+  outline: 3px solid rgba(128, 98, 71, 0.28);
+  outline-offset: 2px;
+}
+
+.emptyMediaState {
+  display: grid;
+  justify-items: start;
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px dashed rgba(128, 98, 71, 0.4);
+  border-radius: 0.5rem;
+  background: rgba(243, 234, 223, 0.45);
+}
+
+.emptyMediaState p {
+  color: var(--admin-muted);
+  font-size: 0.74rem;
 }
 
 .dangerZone {
@@ -2956,6 +3060,10 @@
   .mobileRecordCard .rowActions button,
   .mobileRecordCard .rowActions a {
     width: 100%;
+  }
+
+  .editorJumpNav {
+    grid-template-columns: 1fr;
   }
 
   .desktopRecordTable {

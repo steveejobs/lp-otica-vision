@@ -324,6 +324,28 @@ export async function createProductDraftAction(formData: FormData): Promise<
   }
 }
 
+export async function discardNewProductDraftAction(input: { productId: string }): Promise<{ ok: boolean }> {
+  await requireAdminRole(["admin", "editor"]);
+  const supabase = await createSupabaseServerClient();
+  try {
+    if (!isUuidString(input.productId)) throw new AdminValidationError("invalid");
+    const [productResult, imageResult] = await Promise.all([
+      supabase.from("products").select("id, published, archived_at").eq("id", input.productId).maybeSingle(),
+      supabase.from("product_images").select("id", { count: "exact", head: true }).eq("product_id", input.productId),
+    ]);
+    if (productResult.error || imageResult.error || !productResult.data) throw productResult.error ?? imageResult.error ?? new AdminValidationError("invalid");
+    if (productResult.data.published || productResult.data.archived_at || (imageResult.count ?? 0) > 0) throw new AdminValidationError("constraint");
+    const { error: styleError } = await supabase.from("product_styles").delete().eq("product_id", input.productId);
+    if (styleError) throw styleError;
+    const { error } = await supabase.from("products").delete().eq("id", input.productId);
+    if (error) throw error;
+    revalidatePath("/admin/produtos");
+    return { ok: true };
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function createProductAction(formData: FormData) {
   await requireAdminRole(["admin", "editor"]);
   let id: string | null = null;

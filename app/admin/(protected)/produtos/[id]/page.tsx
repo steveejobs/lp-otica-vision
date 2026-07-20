@@ -111,12 +111,18 @@ export default async function EditProductPage({
 
   return (
     <>
-      <AdminPageHeader eyebrow="Produtos" description="Edite dados, publicação e mídia. Toda mudança é autorizada no servidor e registrada na auditoria." title={product.name} />
+      <AdminPageHeader eyebrow="Produtos" description="Edite as informações, organize as fotos e publique quando o produto estiver completo." title={product.name} />
       <AdminFeedback error={query.error} status={query.status} />
       <div className={styles.adminToolbar}>
         <div className={styles.toolbarActions}><Link className={styles.buttonLink} href="/admin/produtos" prefetch={false}>Voltar para produtos</Link><Link className={styles.buttonLink} href="/admin/disponibilidade" prefetch={false}>Disponibilidade rápida</Link>{product.published && !product.archived_at && hasCover ? <Link className={styles.buttonLink} href={`/catalogo/${product.slug}`} target="_blank">Ver página pública</Link> : null}</div>
         <AdminStatus active={product.published && !product.archived_at} trueLabel={product.featured ? "Publicado · destaque" : "Publicado"} falseLabel={product.archived_at ? "Arquivado" : "Rascunho"} />
       </div>
+
+      <nav aria-label="Atalhos da edição do produto" className={styles.editorJumpNav}>
+        <a href="#product-data">Editar informações</a>
+        <a href="#product-upload">Adicionar imagens</a>
+        <a href="#product-images">Capa e sequência</a>
+      </nav>
 
       {product.archived_at ? <p className={styles.notice}>Produto arquivado. Restaure-o antes de editar ou publicar.</p> : null}
       {!product.archived_at && (blockingIssues.length || editorialIndicators.length) ? (
@@ -126,21 +132,21 @@ export default async function EditProductPage({
           {editorialIndicators.length ? ` Indicadores editoriais: ${editorialIndicators.join(", ")}.` : ""}
         </p>
       ) : null}
-      <section className={styles.formPanel} aria-labelledby="product-data-title">
+      <section className={styles.formPanel} id="product-data" aria-labelledby="product-data-title">
         <div className={styles.panelHeading}><h2 id="product-data-title">Cadastro do produto</h2><p>Identificação, apresentação, contato e publicação em uma sequência simples.</p></div>
         <ProductForm action={updateProductAction} archived={Boolean(product.archived_at)} brands={brandResult.data} categories={categoryResult.data} defaults={product} editing styleAssignments={styleAssignments} styleEligibilityReasons={styleEligibilityReasons} styleOptions={styleOptions} />
       </section>
 
       {!product.archived_at ? (
-        <section className={styles.formPanel} aria-labelledby="product-upload-title">
+        <section className={styles.formPanel} id="product-upload" aria-labelledby="product-upload-title">
           <div className={styles.panelHeading}><div><h2 id="product-upload-title">Adicionar imagens</h2><p>A primeira imagem será usada como capa quando ainda não houver uma capa definida.</p></div></div>
           <ProductImageUploader productId={product.id} />
         </section>
       ) : null}
 
-      <section className={styles.formPanel} aria-labelledby="product-images-title">
-        <div className={styles.panelHeading}><div><h2 id="product-images-title">Imagens do produto</h2><p>Use “Mover antes” e “Mover depois” para ordenar. Escolha uma única imagem de capa.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
-        <ProductImageManager images={images} productId={product.id} readOnly={Boolean(product.archived_at)} />
+      <section className={styles.formPanel} id="product-images" aria-labelledby="product-images-title">
+        <div className={styles.panelHeading}><div><h2 id="product-images-title">Capa e sequência</h2><p>Use “Mover antes” e “Mover depois”. A ordem e a capa são salvas automaticamente.</p></div><span className={styles.phaseBadge}>{images.length} imagens</span></div>
+        <ProductImageManager key={images.map((image) => `${image.id}:${image.isCover}`).join("|")} images={images} productId={product.id} readOnly={Boolean(product.archived_at)} />
       </section>
 
       <section className={styles.dangerZone} aria-labelledby="product-actions-title">
