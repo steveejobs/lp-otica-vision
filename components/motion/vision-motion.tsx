@@ -26,6 +26,10 @@ function isModifiedClick(event: MouseEvent) {
   return event.metaKey || event.altKey || event.ctrlKey || event.shiftKey || event.button !== 0;
 }
 
+function isAdminPath(pathname: string) {
+  return pathname === "/admin" || pathname.startsWith("/admin/");
+}
+
 function getInternalNavigationUrl(target: EventTarget | null) {
   if (!(target instanceof Element)) return null;
 
@@ -42,6 +46,7 @@ function getInternalNavigationUrl(target: EventTarget | null) {
 
   const url = new URL(anchor.href, window.location.href);
   if (url.origin !== window.location.origin) return null;
+  if (isAdminPath(url.pathname)) return null;
 
   const current = window.location;
   const samePage = url.pathname === current.pathname && url.search === current.search;
@@ -69,6 +74,12 @@ export function VisionMotion() {
   useEffect(() => {
     if (enterTimerRef.current) {
       window.clearTimeout(enterTimerRef.current);
+    }
+
+    if (isAdminPath(pathname)) {
+      setRouteTarget();
+      setRouteState("idle");
+      return;
     }
 
     const isCatalogPath = pathname === "/catalogo" || pathname.startsWith("/catalogo/");
@@ -99,6 +110,8 @@ export function VisionMotion() {
 
   useEffect(() => {
     const root = document.documentElement;
+    if (isAdminPath(pathname)) return;
+
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const observedTargets = new WeakSet<HTMLElement>();
     const revealTimers = new WeakMap<HTMLElement, number>();

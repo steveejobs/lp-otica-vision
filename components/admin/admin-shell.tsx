@@ -22,6 +22,18 @@ type AdminShellProps = {
 export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
   return (
     <div className={styles.adminRoot}>
+      <header className={styles.mobileHeader}>
+        <Link href="/admin">Ótica Vision · ADM</Link>
+        <div>
+          <span>{roleLabels[profile.role]}</span>
+          <form action={onLogout}>
+            <button className={styles.logoutButton} type="submit">
+              Sair
+            </button>
+          </form>
+        </div>
+      </header>
+
       <aside className={styles.sidebar}>
         <Link className={styles.sidebarBrand} href="/admin" aria-label="Início do ADM" prefetch={false}>
           <BrandLogo priority />
@@ -43,18 +55,7 @@ export function AdminShell({ children, onLogout, profile }: AdminShellProps) {
         </div>
       </aside>
 
-      <div className={styles.adminCanvas}>
-        <header className={styles.mobileHeader}>
-          <Link href="/admin" prefetch={false}>Ótica Vision · ADM</Link>
-          <div>
-            <span>{roleLabels[profile.role]}</span>
-            <form action={onLogout}>
-              <button className={styles.logoutButton} type="submit">
-                Sair
-              </button>
-            </form>
-          </div>
-        </header>
+      <div className={styles.adminCanvas} data-admin-scroll-container>
         <main className={styles.adminMain} id="main-content">
           <AdminRouteFocus />
           {children}

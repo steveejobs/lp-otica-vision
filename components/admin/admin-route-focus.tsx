@@ -1,13 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 export function AdminRouteFocus() {
   const pathname = usePathname();
   const lastHeadingRef = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const scrollContainer = document.querySelector<HTMLElement>("[data-admin-scroll-container]");
+    if (scrollContainer) scrollContainer.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     const previousHeading = lastHeadingRef.current;
     let attempts = 0;
     let frame = 0;

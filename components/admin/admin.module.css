@@ -16,19 +16,27 @@
 .adminRoot {
   display: grid;
   grid-template-columns: 17.5rem minmax(0, 1fr);
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
 }
 
 .sidebar {
-  position: sticky;
-  top: 0;
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
-  height: 100vh;
-  height: 100svh;
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   padding: 1.4rem 1rem 1rem;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   background: var(--admin-dark);
   color: #f8f4ee;
+  scrollbar-gutter: stable;
 }
 
 .sidebarBrand {
@@ -53,6 +61,7 @@
 
 .nav {
   display: grid;
+  flex: 0 0 auto;
   gap: 0.2rem;
   margin-top: 1.35rem;
 }
@@ -73,15 +82,13 @@
   transition:
     background 180ms var(--ease-vision),
     border-color 180ms var(--ease-vision),
-    color 180ms var(--ease-vision),
-    transform 180ms var(--ease-vision);
+    color 180ms var(--ease-vision);
 }
 
 .navLink:hover {
   border-color: rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.045);
   color: #fffdf9;
-  transform: translateX(2px);
 }
 
 .navLinkActive {
@@ -96,7 +103,7 @@
   color: #fffdf9;
 }
 
-.navLinkPending .navDot {
+.navDot[data-pending="true"] {
   border-color: #d3b694;
   animation: adminPendingPulse 700ms ease-in-out infinite alternate;
 }
@@ -160,7 +167,14 @@
 }
 
 .adminCanvas {
+  grid-column: 2;
+  grid-row: 1;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
 }
 
 .mobileHeader {
@@ -1776,6 +1790,10 @@
 @media (max-width: 960px) {
   .adminRoot {
     display: block;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: visible;
   }
 
   .presetGrid {
@@ -1783,10 +1801,14 @@
   }
 
   .sidebar {
-    position: static;
+    position: sticky;
+    z-index: 30;
+    top: 0;
     display: block;
     width: 100%;
     height: auto;
+    min-height: 0;
+    overflow: visible;
     padding: 0.75rem;
   }
 
@@ -1850,6 +1872,13 @@
 
   .adminMain {
     min-height: auto;
+  }
+
+  .adminCanvas {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    scrollbar-gutter: auto;
   }
 }
 
@@ -2075,7 +2104,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .loginCard,
-  .navLinkPending .navDot {
+  .navDot[data-pending="true"] {
     animation: none;
   }
 

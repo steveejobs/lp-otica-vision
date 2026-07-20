@@ -48,7 +48,7 @@ export function HeroMedia({
         {
           "--desktop-object-position": item.desktopObjectPosition,
           "--desktop-media-scale": Math.max(1, item.desktopScale),
-          "--hero-fallback-image": item.fallbackSrc
+          "--hero-fallback-image": useFallback && item.fallbackSrc
             ? `url("${item.fallbackSrc}")`
             : "none",
           "--mobile-object-position": item.mobileObjectPosition,
