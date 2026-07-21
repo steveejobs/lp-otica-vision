@@ -26,12 +26,14 @@ export function CatalogEntrance({
   useEffect(() => {
     try {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (prefersReducedMotion || window.sessionStorage.getItem(INTRO_PLAYED_KEY) === "true") {
-        setIntroPlayed(true);
-        return;
-      }
       
-      setIntroPlayed(false);
+      setTimeout(() => {
+        if (prefersReducedMotion || window.sessionStorage.getItem(INTRO_PLAYED_KEY) === "true") {
+          setIntroPlayed(true);
+          return;
+        }
+        setIntroPlayed(false);
+      }, 0);
       
       const timer = window.setTimeout(() => {
         window.sessionStorage.setItem(INTRO_PLAYED_KEY, "true");

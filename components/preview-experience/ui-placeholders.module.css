@@ -1,0 +1,122 @@
+.brandRail {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  scrollbar-width: none; /* Firefox */
+  border-bottom: 1px solid var(--vision-line, #eee);
+}
+
+.brandRail::-webkit-scrollbar {
+  display: none;
+}
+
+.brandItem {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.brandItem:hover {
+  opacity: 0.9;
+}
+
+.brandItem.active {
+  opacity: 1;
+}
+
+.brandItem.empty {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.brandName {
+  font-family: inherit;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  color: var(--vision-graphite, #333);
+}
+
+.brandItem.active .brandName {
+  font-weight: 600;
+  border-bottom: 2px solid var(--vision-graphite, #333);
+}
+
+/* Filters */
+.filtersBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.desktopFilters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mobileFilters {
+  display: none;
+}
+
+.filterChip {
+  background: var(--vision-paper, #fff);
+  border: 1px solid var(--vision-line, #ddd);
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  color: var(--vision-graphite, #333);
+  cursor: pointer;
+}
+
+.searchBox {
+  flex-shrink: 0;
+}
+
+.searchInput {
+  border: 1px solid var(--vision-line, #ddd);
+  background: var(--vision-paper, #fff);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .desktopFilters {
+    display: none;
+  }
+  .mobileFilters {
+    display: block;
+  }
+  .mobileFilterBtn {
+    background: var(--vision-graphite, #333);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .filterBadge {
+    background: white;
+    color: var(--vision-graphite, #333);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .searchBox {
+    display: none; /* Hide search on mobile compact bar */
+  }
+}

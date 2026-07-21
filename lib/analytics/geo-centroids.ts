@@ -13,7 +13,21 @@ export function normalizeLocation(value: string) {
 }
 
 export function resolveCityCoordinates(cityId: string, city: string): GeoCoordinates | null {
-  if (!/^\d+$/.test(cityId) || normalizeLocation(city) === "not set") return null;
+  const normalizedCity = normalizeLocation(city);
+  if (normalizedCity === "not set") return null;
+
+  if (normalizedCity === "araguaina") {
+    return {
+      latitude: -7.1911,
+      longitude: -48.2078,
+      region: "BR-TO",
+      resolvedName: city,
+      source: "manual-fallback",
+    };
+  }
+
+  if (!/^\d+$/.test(cityId)) return null;
+  
   const match = CITY_COORDINATES[cityId];
   if (!match) return null;
   return {

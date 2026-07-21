@@ -3,7 +3,7 @@ export type GeoCoordinates = {
   longitude: number;
   region: string | null;
   resolvedName: string;
-  source: "google-geotargets-geonames";
+  source: "google-geotargets-geonames" | "manual-fallback";
 };
 
 export const GEO_SOURCE_COVERAGE = {
