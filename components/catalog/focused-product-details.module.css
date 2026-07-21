@@ -1,0 +1,138 @@
+
+.details {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  gap: clamp(2rem, 4vw, 4rem);
+  background: var(--vision-paper);
+  width: 100%;
+  min-height: 40vh;
+  animation: detailsReveal 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.galleryCol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.infoCol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 0;
+  padding-right: clamp(1rem, 3vw, 2rem);
+  animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--vision-warm-white);
+  color: var(--vision-ink);
+  border: 1px solid var(--vision-line);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: var(--vision-ink);
+  color: var(--vision-paper);
+}
+
+.brand {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vision-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 400;
+  color: var(--vision-ink);
+  line-height: 1.1;
+  margin: 0 0 1rem 0;
+}
+
+.description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--vision-muted);
+  margin-bottom: 2rem;
+  max-width: 480px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--vision-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.pageLink:hover {
+  color: var(--vision-ink);
+}
+
+@keyframes detailsReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .details {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-bottom: 4rem;
+  }
+
+  .infoCol {
+    padding: 1rem 0 2rem 0;
+  }
+
+  .closeButton {
+    position: fixed;
+    top: auto;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 9999;
+  }
+}

@@ -38,6 +38,7 @@ function getInternalNavigationUrl(target: EventTarget | null) {
   if (anchor.target && anchor.target !== "_self") return null;
   if (anchor.hasAttribute("download")) return null;
   if (anchor.dataset.noPageTransition === "true") return null;
+  if (anchor.hasAttribute("data-vision-motion-ignore")) return null;
   if (
     anchor.hasAttribute("data-catalog-transition-link") ||
     anchor.hasAttribute("data-catalog-filter-link") ||

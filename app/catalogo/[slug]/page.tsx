@@ -162,7 +162,6 @@ export default async function CatalogProductPage({
             <div className={styles.relatedGrid}>
               {related.map((item) => (
                 <CatalogProductCard
-                  href={catalogProductHref(item.slug, originQuery)}
                   key={item.id}
                   product={item}
                 />

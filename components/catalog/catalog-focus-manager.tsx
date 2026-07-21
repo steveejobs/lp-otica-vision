@@ -6,10 +6,15 @@ import { catalogHref } from "@/lib/catalog/query";
 
 type FocusMode = "grid" | "focused" | "rail";
 
+interface FocusProductInput {
+  slug: string;
+  flipFrame: HTMLElement | null;
+}
+
 interface CatalogFocusContextValue {
   focusedSlug: string | null;
   focusedProductData: CatalogProduct | null;
-  focusProduct: (slug: string, originElement: HTMLElement) => void;
+  focusProduct: (input: FocusProductInput) => void;
   closeFocus: () => void;
   getMode: (slug: string) => FocusMode;
   preloadProduct: (slug: string) => void;
@@ -60,14 +65,17 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
   const [focusedSlug, setFocusedSlug] = useState<string | null>(initialSlug);
   const [focusedProductData, setFocusedProductData] = useState<CatalogProduct | null>(initialProduct);
   const flipOrigins = useRef<Map<string, FlipGeometry>>(new Map());
-  
+  const didInitRef = useRef(false);
+
+  // Only use initialSlug/initialProduct on first mount, not on re-renders
   useEffect(() => {
-    setFocusedSlug(initialSlug);
-    setFocusedProductData(initialProduct);
-  }, [initialSlug, initialProduct]);
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+    // Already set via useState initial values
+  }, []);
 
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = () => {
       const url = new URL(window.location.href);
       const slug = url.searchParams.get("produto");
       setFocusedSlug(slug);
@@ -107,40 +115,63 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     };
   }, [focusedSlug]);
 
-  const focusProduct = (slug: string, originElement: HTMLElement) => {
+  const focusProduct = ({ slug, flipFrame }: FocusProductInput) => {
     if (slug === focusedSlug) return;
 
-    // 1. FIRST - Ler dimensões antes do setState
-    const frames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    // 1. FIRST — capture geometry before setState
     flipOrigins.current.clear();
-    frames.forEach(frame => {
-      const productEl = frame.closest("[data-catalog-product-slug]");
-      const productSlug = productEl?.getAttribute("data-catalog-product-slug");
+    
+    // Use the passed flipFrame directly for the focused product
+    if (flipFrame) {
+      const productSlug = flipFrame.closest("[data-catalog-product-slug]")?.getAttribute("data-catalog-product-slug");
       if (productSlug) {
-        flipOrigins.current.set(productSlug, { rect: frame.getBoundingClientRect() });
+        flipOrigins.current.set(productSlug, { rect: flipFrame.getBoundingClientRect() });
+      }
+    }
+    
+    // Also capture other visible flip frames for rail animation
+    const allFrames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    allFrames.forEach(frame => {
+      const productEl = frame.closest("[data-catalog-product-slug]");
+      const frameSlug = productEl?.getAttribute("data-catalog-product-slug");
+      if (frameSlug && !flipOrigins.current.has(frameSlug)) {
+        const rect = frame.getBoundingClientRect();
+        // Only capture visible frames
+        if (rect.bottom > 0 && rect.top < window.innerHeight) {
+          flipOrigins.current.set(frameSlug, { rect });
+        }
       }
     });
     
     const isFromRail = focusedSlug !== null;
+    const catalogScrollY = isFromRail ? undefined : window.scrollY;
+    
     setFocusedSlug(slug);
     
     const newUrl = catalogHref(query, { product: slug });
+    const statePayload = {
+      ...window.history.state,
+      showroomFocus: true,
+      focusedSlug: slug,
+      catalogScrollY,
+    };
+    
     if (isFromRail) {
-      window.history.replaceState({ showroomFocus: true }, "", newUrl);
+      window.history.replaceState(statePayload, "", newUrl);
     } else {
-      window.history.pushState({ showroomFocus: true }, "", newUrl);
+      window.history.pushState(statePayload, "", newUrl);
     }
   };
 
   const closeFocus = () => {
-    // 1. FIRST (Closing)
-    const frames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    // 1. FIRST (Closing) — capture geometry
     flipOrigins.current.clear();
-    frames.forEach(frame => {
+    const allFrames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    allFrames.forEach(frame => {
       const productEl = frame.closest("[data-catalog-product-slug]");
-      const productSlug = productEl?.getAttribute("data-catalog-product-slug");
-      if (productSlug) {
-        flipOrigins.current.set(productSlug, { rect: frame.getBoundingClientRect() });
+      const frameSlug = productEl?.getAttribute("data-catalog-product-slug");
+      if (frameSlug) {
+        flipOrigins.current.set(frameSlug, { rect: frame.getBoundingClientRect() });
       }
     });
 
@@ -157,14 +188,16 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
   useLayoutEffect(() => {
     if (flipOrigins.current.size === 0) return;
     
-    // 2. LAST
+    // 2. LAST — measure new positions
     const frames = Array.from(document.querySelectorAll<HTMLElement>("[data-flip-frame]"));
-    const inverts = frames.map(frame => {
+    const inverts: { frame: HTMLElement; invertTransform: string }[] = [];
+    
+    for (const frame of frames) {
       const productSlug = frame.closest("[data-catalog-product-slug]")?.getAttribute("data-catalog-product-slug");
-      if (!productSlug) return null;
+      if (!productSlug) continue;
       
       const first = flipOrigins.current.get(productSlug);
-      if (!first) return null;
+      if (!first) continue;
       
       const lastRect = frame.getBoundingClientRect();
       const firstRect = first.rect;
@@ -175,7 +208,7 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
       const scaleY = firstRect.height / lastRect.height;
       
       if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5 && Math.abs(scaleX - 1) < 0.01 && Math.abs(scaleY - 1) < 0.01) {
-        return null;
+        continue;
       }
       
       // 3. INVERT
@@ -183,15 +216,18 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
       const invertTransform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
       frame.style.transform = invertTransform;
       
-      return { frame, invertTransform };
-    }).filter(Boolean) as { frame: HTMLElement, invertTransform: string }[];
+      inverts.push({ frame, invertTransform });
+    }
     
     flipOrigins.current.clear();
     if (inverts.length === 0) return;
     
-    // 4. PLAY (Request Animation Frame)
+    // 4. PLAY
     requestAnimationFrame(() => {
-      inverts.forEach(({ frame, invertTransform }) => {
+      for (const { frame, invertTransform } of inverts) {
+        // Cancel any existing animations on this frame
+        frame.getAnimations().forEach(a => a.cancel());
+        
         frame.style.transform = "";
         
         frame.animate([
@@ -202,7 +238,7 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
           easing: "cubic-bezier(0.22, 1, 0.36, 1)",
           fill: "both"
         });
-      });
+      }
     });
   }, [focusedSlug]);
 

@@ -1,4 +1,4 @@
-.card {
+ï»¿.card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -9,7 +9,20 @@
   height: 100%;
 }
 
-.link {
+.focusTrigger {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.externalLink {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -29,6 +42,11 @@
   transition: transform 120ms ease-out, opacity 120ms ease-out;
 }
 
+.flipFrame {
+  width: 100%;
+  will-change: transform;
+}
+
 .media {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -45,7 +63,7 @@
   transition: opacity 0.3s ease;
 }
 
-.content {
+.summary {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -53,7 +71,7 @@
   justify-content: flex-end;
 }
 
-.content h3 {
+.summary h3 {
   margin: 0;
   font-size: 1rem;
   font-weight: 500;
@@ -80,7 +98,20 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Hover effects */
+.canonicalLink {
+  display: block;
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  color: var(--vision-muted);
+  text-decoration: none;
+  text-align: right;
+  transition: color 0.2s ease;
+}
+
+.canonicalLink:hover {
+  color: var(--vision-ink);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .card:hover {
     transform: translateY(-2px);
@@ -98,7 +129,11 @@
     border: 1px solid var(--vision-line);
   }
   
-  .link {
+  .focusTrigger {
+    padding: 0.75rem;
+  }
+
+  .externalLink {
     padding: 0.75rem;
   }
 
@@ -107,7 +142,7 @@
   }
 
   .cta {
-    opacity: 1; /* Always visible on mobile since no hover */
+    opacity: 1;
     transform: translateY(0);
     color: var(--vision-muted);
   }
@@ -118,8 +153,19 @@
   order: -1;
   background: var(--vision-paper);
   border: 1px solid var(--vision-line);
-  padding: 2rem;
   margin-bottom: 2rem;
+}
+
+.card[data-mode="focused"] .focusTrigger {
+  cursor: default;
+}
+
+.card[data-mode="focused"] .summary {
+  display: none;
+}
+
+.card[data-mode="focused"] .canonicalLink {
+  display: none;
 }
 
 @media (max-width: 720px) {
@@ -128,30 +174,25 @@
     order: -1;
     width: 100vw;
     margin-left: -4vw;
-    padding: 1rem 4vw;
+    padding: 0 4vw;
     border-radius: 0;
     border-left: none;
     border-right: none;
-    min-height: 100vh;
   }
 }
-
-.card[data-mode="rail"] {
-  /* For now, just let them reflow */
-}
-
 
 .card[data-mode="rail"] {
   opacity: 0.6;
   filter: grayscale(20%);
   transform: scale(0.98);
-  pointer-events: none; /* impede cliques múltiplos rápidos ou hovers indesejados no rail */
   transition: all 0.4s ease;
 }
 
-/* Quando o foco está ativo no grid, os cards perdem o hover normal para não distrair */
+.card[data-mode="rail"] .canonicalLink {
+  display: none;
+}
+
 [data-catalog-focus-active="true"] .card:hover {
   transform: scale(0.98);
   background-color: var(--vision-paper);
 }
-
