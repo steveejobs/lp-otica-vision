@@ -140,3 +140,18 @@
   /* For now, just let them reflow */
 }
 
+
+.card[data-mode="rail"] {
+  opacity: 0.6;
+  filter: grayscale(20%);
+  transform: scale(0.98);
+  pointer-events: none; /* impede cliques múltiplos rápidos ou hovers indesejados no rail */
+  transition: all 0.4s ease;
+}
+
+/* Quando o foco está ativo no grid, os cards perdem o hover normal para não distrair */
+[data-catalog-focus-active="true"] .card:hover {
+  transform: scale(0.98);
+  background-color: var(--vision-paper);
+}
+
