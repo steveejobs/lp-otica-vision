@@ -168,7 +168,7 @@ export function CatalogProductCard({
       data-catalog-product-brand={clone ? undefined : product.brand?.slug}
       data-presentation={presentation}
     >
-      <Link
+      <a
         aria-label={linkLabel}
         className={styles.link}
         href={productHref}
@@ -176,10 +176,9 @@ export function CatalogProductCard({
         onPointerEnter={handlePreload}
         onFocus={handlePreload}
         tabIndex={clone ? -1 : undefined}
-        scroll={false}
       >
         {content}
-      </Link>
+      </a>
     </article>
   );
 }

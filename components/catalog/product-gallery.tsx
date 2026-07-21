@@ -11,9 +11,6 @@ import type { CatalogImage as CatalogImageData } from "@/lib/catalog/types";
 import { ProductMediaShell } from "./product-media-shell";
 import styles from "./product-gallery.module.css";
 
-const blurDataUrl =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZBfq3UUnYALVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
-
 export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
   const [activeIndex, setActiveIndex] = useState(initialIndex);
@@ -43,11 +40,9 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
           <ProductMediaShell presentation="gallery" ref={targetRef} className={styles.mainShell}>
             <Image
               alt={activeImage.altText}
-              blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
             fetchPriority="high"
             fill
             loading="eager"
-            placeholder="blur"
             sizes="(max-width: 900px) 92vw, 58vw"
             src={catalogImageUrl(activeImage, "product_detail")}
             style={{ objectPosition: activeImage.objectPosition, opacity: imgOpacity, transition: "opacity 0.15s ease-in-out" }}
@@ -67,7 +62,6 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
           {prevIndex !== null && isFading && (
             <Image
               alt={images[prevIndex].altText}
-              blurDataURL={images[prevIndex].blurDataUrl ?? blurDataUrl}
               fill
               src={catalogImageUrl(images[prevIndex], "product_detail")}
               style={{ objectPosition: images[prevIndex].objectPosition, opacity: 1, zIndex: 1 }}
@@ -78,11 +72,9 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
           <Image
             key={activeImage.id}
             alt={activeImage.altText}
-            blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
             fetchPriority={isCoverActive ? "high" : "auto"}
             fill
             loading={isCoverActive ? "eager" : "lazy"}
-            placeholder="blur"
             sizes="(max-width: 900px) 92vw, 58vw"
             src={catalogImageUrl(activeImage, "product_detail")}
             style={{ 
