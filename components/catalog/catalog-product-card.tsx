@@ -47,32 +47,21 @@ export function CatalogProductCard({
   // I will just use category name or style if available.
   const styleText = product.category?.name || "Óculos de Sol";
 
-const ENABLE_PRODUCT_TRANSITIONS = true;
-
-  const imageElement = (
-    <Image
-      alt={product.cover.altText}
-      fill
-      priority={priority}
-      sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
-      src={catalogImageUrl(product.cover, imageVariant)}
-      style={{ objectPosition: product.cover.objectPosition }}
-      unoptimized
-    />
-  );
-
-  const mediaContent = (
-    <div 
-      className={styles.media}
-      style={ENABLE_PRODUCT_TRANSITIONS ? { viewTransitionName: `product-media-${product.id}` } as React.CSSProperties : undefined}
-    >
-      {imageElement}
-    </div>
-  );
-
   const content = (
     <>
-      {mediaContent}
+      <div className={styles.media}>
+        <Image
+          alt={product.cover.altText}
+          blurDataURL={product.cover.blurDataUrl ?? blurDataUrl}
+          fill
+          placeholder="blur"
+          priority={priority}
+          sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
+          src={catalogImageUrl(product.cover, imageVariant)}
+          style={{ objectPosition: product.cover.objectPosition }}
+          unoptimized
+        />
+      </div>
 
       <div className={styles.content}>
         <h3>{product.name}</h3>
@@ -83,12 +72,6 @@ const ENABLE_PRODUCT_TRANSITIONS = true;
       </div>
     </>
   );
-
-  const preloadHighRes = () => {
-    if (!ENABLE_PRODUCT_TRANSITIONS || typeof window === 'undefined') return;
-    const img = new window.Image();
-    img.src = catalogImageUrl(product.cover, "product_detail");
-  };
 
   return (
     <article
@@ -117,9 +100,6 @@ const ENABLE_PRODUCT_TRANSITIONS = true;
           className={styles.link}
           href={productHref}
           tabIndex={clone ? -1 : undefined}
-          onPointerEnter={preloadHighRes}
-          onFocus={preloadHighRes}
-          onPointerDown={preloadHighRes}
         >
           {content}
         </Link>

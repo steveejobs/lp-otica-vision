@@ -23,6 +23,12 @@
   box-shadow: 0 0 0 2px var(--vision-ink);
 }
 
+.card:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+  transition: transform 120ms ease-out, opacity 120ms ease-out;
+}
+
 .media {
   position: relative;
   aspect-ratio: 4 / 3;

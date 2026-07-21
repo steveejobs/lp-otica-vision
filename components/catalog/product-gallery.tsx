@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogImage } from "@/lib/catalog/types";
@@ -11,8 +11,6 @@ import styles from "./product-gallery.module.css";
 
 const blurDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZBfq3UUnYALVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
-
-const ENABLE_PRODUCT_TRANSITIONS = true;
 
 export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -87,50 +85,38 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
         role="region"
         tabIndex={0}
       >
-        {images.map((image, index) => {
-          const isInitial = index === initialIndex;
-          
-          const imageElement = loadedIndexes.has(index) ? (
-            <Image
-              alt={image.altText}
-              blurDataURL={isInitial ? undefined : (image.blurDataUrl ?? blurDataUrl)}
-              fetchPriority={isInitial ? "high" : "auto"}
-              fill
-              loading={isInitial ? "eager" : "lazy"}
-              placeholder={isInitial ? "empty" : "blur"}
-              sizes="(max-width: 900px) 92vw, 58vw"
-              src={catalogImageUrl(image, "product_detail")}
-              style={{ objectPosition: image.objectPosition }}
-              unoptimized
-            />
-          ) : (
-            <span
-              aria-hidden="true"
-              className={styles.lazyPlaceholder}
-              style={{
-                backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
-                backgroundPosition: image.objectPosition,
-              }}
-            />
-          );
-
-          const figureContent = (
-            <figure
-              className={styles.slide}
-              data-catalog-product-hero={isInitial ? productId : undefined}
-              data-catalog-transition-media={isInitial ? "" : undefined}
-              style={isInitial && ENABLE_PRODUCT_TRANSITIONS ? { viewTransitionName: `product-media-${productId}` } as React.CSSProperties : undefined}
-            >
-              {imageElement}
-            </figure>
-          );
-
-          return (
-            <React.Fragment key={image.id}>
-              {figureContent}
-            </React.Fragment>
-          );
-        })}
+        {images.map((image, index) => (
+          <figure
+            className={styles.slide}
+            data-catalog-product-hero={index === initialIndex ? productId : undefined}
+            data-catalog-transition-media={index === initialIndex ? "" : undefined}
+            key={image.id}
+          >
+            {loadedIndexes.has(index) ? (
+              <Image
+                alt={image.altText}
+                blurDataURL={image.blurDataUrl ?? blurDataUrl}
+                fetchPriority={index === initialIndex ? "high" : "auto"}
+                fill
+                loading={index === initialIndex ? "eager" : "lazy"}
+                placeholder="blur"
+                sizes="(max-width: 900px) 92vw, 58vw"
+                src={catalogImageUrl(image, "product_detail")}
+                style={{ objectPosition: image.objectPosition }}
+                unoptimized
+              />
+            ) : (
+              <span
+                aria-hidden="true"
+                className={styles.lazyPlaceholder}
+                style={{
+                  backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
+                  backgroundPosition: image.objectPosition,
+                }}
+              />
+            )}
+          </figure>
+        ))}
       </div>
 
       {images.length > 1 ? (
