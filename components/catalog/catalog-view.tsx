@@ -49,9 +49,8 @@ export function CatalogView({
 }: CatalogViewProps) {
   const activeBrand = filters.brands.find((brand) => brand.key === query.brand);
   const activeStyle = styleOptions.find((style) => style.slug === query.style);
-  const singlePublishedBrand = filters.brands.length === 1 ? filters.brands[0] : null;
   const hasFilters = hasActiveCatalogFilters(query);
-  const title = singlePublishedBrand?.name || activeBrand?.name || "Catálogo";
+  const title = activeBrand?.name || "Catálogo";
   
   const motionKey = [
     query.search,
