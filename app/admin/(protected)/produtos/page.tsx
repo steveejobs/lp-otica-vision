@@ -89,6 +89,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
         <div className={styles.toolbarActions}>
           <Link className={styles.buttonLink} href="/admin/produtos/novo-produto" prefetch={false}>Novo produto</Link>
           <Link className={styles.buttonLink} href="/admin/disponibilidade" prefetch={false}>Disponibilidade rápida</Link>
+          <Link className={styles.buttonLink} href="/admin/produtos/destaques" prefetch={false}>Ordenar destaques</Link>
         </div>
       </div>
 

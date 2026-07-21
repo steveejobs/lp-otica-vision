@@ -86,8 +86,8 @@ function createOptionalSupabasePublicClient() {
 export async function getCatalogPage(query: CatalogQuery): Promise<CatalogPageResult> {
   const supabase = createSupabasePublicClient();
   const commonArgs = {
-    p_page_offset: (query.page - 1) * CATALOG_PAGE_SIZE,
-    p_page_size: CATALOG_PAGE_SIZE,
+    p_page_offset: 0, // Progressive pagination: always start from 0
+    p_page_size: query.page * CATALOG_PAGE_SIZE,
   };
 
   const optionalArgs = {

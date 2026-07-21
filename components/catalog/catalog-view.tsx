@@ -7,12 +7,12 @@ import {
 } from "lucide-react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
+import { CatalogEntrance } from "@/components/catalog/catalog-entrance";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
-import { CatalogShowroom } from "@/components/catalog/catalog-showroom";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import type { CatalogFilterOptions, CatalogPageResult } from "@/lib/catalog/types";
+import type { CatalogFilterOptions, CatalogPageResult, CatalogProductCard as CatalogProductCardType } from "@/lib/catalog/types";
 import {
   catalogHref,
   catalogProductHref,
@@ -27,6 +27,7 @@ import styles from "../../app/catalogo/catalog.module.css";
 interface CatalogViewProps {
   catalog: CatalogPageResult;
   collectionId: string | null;
+  featuredProducts: CatalogProductCardType[];
   filters: CatalogFilterOptions;
   query: CatalogQuery;
   styleOptions: CurationStyleOption[];
@@ -35,6 +36,7 @@ interface CatalogViewProps {
 export function CatalogView({
   catalog,
   collectionId,
+  featuredProducts,
   filters,
   query,
   styleOptions,
@@ -70,18 +72,9 @@ export function CatalogView({
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        <section className={styles.hero} aria-labelledby="catalog-title">
-          <div className={styles.heroInner} data-catalog-enter="hero">
-            <p className="eyebrow">Catálogo Vision</p>
-            <div className={styles.heroCopy}>
-              <h1 id="catalog-title">Uma seleção para olhar de perto.</h1>
-              <p className={styles.intro}>
-                Explore a seleção Vision e consulte os detalhes pelo WhatsApp.
-              </p>
-            </div>
-            <span className={styles.location}>Araguaína - TO</span>
-          </div>
-        </section>
+        {!hasFilters && !query.page || query.page === 1 ? (
+          <CatalogEntrance products={featuredProducts} />
+        ) : null}
 
         <section className={styles.filters} aria-label="Explorar o catálogo">
           <div className={styles.filterInner} data-catalog-enter="filters">
@@ -259,8 +252,6 @@ export function CatalogView({
                   </a>
                 </div>
               </div>
-            ) : catalog.products.length <= 4 ? (
-              <CatalogShowroom items={showroomItems} />
             ) : (
               <>
                 <CatalogResultsMotion motionKey={motionKey}>
@@ -279,20 +270,19 @@ export function CatalogView({
               </>
             )}
 
-            {catalog.totalPages > 1 ? (
-              <nav className={styles.pagination} aria-label="Paginação do catálogo" data-motion-reveal>
-                {catalog.page > 1 ? (
-                  <Link data-catalog-filter-link href={catalogHref(query, { page: catalog.page - 1 })} scroll={false}>
-                    <ArrowLeft aria-hidden="true" size={16} />Anterior
-                  </Link>
-                ) : <span />}
-                <span>Página {catalog.page} de {catalog.totalPages}</span>
-                {catalog.page < catalog.totalPages ? (
-                  <Link data-catalog-filter-link href={catalogHref(query, { page: catalog.page + 1 })} scroll={false}>
-                    Próxima<ArrowRight aria-hidden="true" size={16} />
-                  </Link>
-                ) : <span />}
-              </nav>
+            {catalog.page < catalog.totalPages ? (
+              <div className={styles.pagination} data-motion-reveal>
+                <Link 
+                  className={styles.loadMore}
+                  data-catalog-filter-link 
+                  href={catalogHref(query, { page: catalog.page + 1 })} 
+                  replace
+                  scroll={false}
+                >
+                  Ver mais modelos
+                </Link>
+                <span>Mostrando {catalog.products.length} de {catalog.total}</span>
+              </div>
             ) : null}
           </div>
         </section>
