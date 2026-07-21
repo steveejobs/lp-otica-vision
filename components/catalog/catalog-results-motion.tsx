@@ -77,7 +77,7 @@ export function CatalogResultsMotion({ children, motionKey }: CatalogResultsMoti
         { clipPath: "inset(0)", opacity: 1, transform: "translate3d(0, 0, 0) scale(1)", filter: "blur(0px)" },
       ],
       {
-        delay: Math.min(index, 8) * 35,
+        delay: index * 60,
         duration: 480,
         easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
         fill: "both",

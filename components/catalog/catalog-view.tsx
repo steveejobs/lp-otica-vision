@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
-import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
+import { CatalogProductCard } from "@/components/catalog/v2/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -21,7 +21,7 @@ import {
 import type { CurationStyle } from "@/lib/curation/types";
 import { LINKS } from "@/lib/links";
 
-import styles from "../../app/catalogo/catalog.module.css";
+import styles from "./catalog.module.css";
 
 interface CatalogViewProps {
   catalog: CatalogPageResult;
@@ -40,6 +40,9 @@ const BRAND_LOGOS: Record<string, string> = {
   "swarovski": "/media/brands/Swarovski-Logo-2016.png",
   "tom-ford": "/media/brands/Tom-Ford-logo.png",
   "versace": "/media/brands/versace-logo.png",
+  "emilio-pucci": "/media/brands/Emilio-Pucci-Logo.png",
+  "jimmy-choo": "/media/brands/Jimmy_Choo_Ltd-Logo.wine.png",
+  "vision": "/media/brands/images__2_-removebg-preview.png",
 };
 
 export function CatalogView({
@@ -60,9 +63,6 @@ export function CatalogView({
     query.availability,
     query.collection,
   ].filter(Boolean).length;
-  const resultTitle = activeStyle?.label
-    ?? activeBrand?.name
-    ?? (singlePublishedBrand ? `Edição ${singlePublishedBrand.name}` : "Seleção Vision");
   const motionKey = [
     query.search,
     query.brand,
@@ -244,12 +244,16 @@ export function CatalogView({
 
         <section className={styles.results} aria-labelledby="catalog-results-title">
           <div className={styles.resultsInner}>
-            <div className={styles.resultSummary} data-catalog-enter="summary">
-              <div>
-                <p className="eyebrow">Curadoria atual</p>
-                <h1 id="catalog-results-title">{resultTitle}</h1>
+            <div className={styles.compactHeader} data-catalog-enter="summary">
+              <div className={styles.compactHeaderTitle}>
+                {singlePublishedBrand || activeBrand ? (
+                  <h1 id="catalog-results-title">{singlePublishedBrand?.name || activeBrand?.name}</h1>
+                ) : (
+                  <h1 id="catalog-results-title">Catálogo</h1>
+                )}
+                <p>Explore os modelos e consulte os detalhes pelo WhatsApp.</p>
               </div>
-              <p aria-live="polite">
+              <p aria-live="polite" className={styles.compactModelCount}>
                 {catalog.total} {catalog.total === 1 ? "modelo" : "modelos"}
               </p>
             </div>
@@ -310,3 +314,5 @@ export function CatalogView({
     </div>
   );
 }
+
+

@@ -21,6 +21,6 @@ export function formatCatalogPrice(
   price: number | null,
   visibility: CatalogPriceVisibility,
 ) {
-  if (visibility !== "visible" || price === null || price <= 0) return "Sob consulta";
+  if (visibility !== "visible" || price === null || price <= 0) return "R$ Sob consulta";
   return currencyFormatter.format(price);
 }

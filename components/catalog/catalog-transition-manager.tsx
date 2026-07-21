@@ -195,10 +195,10 @@ export function CatalogTransitionManager() {
         const sy = destination.height / Math.max(1, pending.source.height);
         const transition = pending.node.animate(
           [
-            { borderRadius: "var(--radius-md)", opacity: .96, transform: "translate3d(0,0,0) scale(1)" },
-            { borderRadius: "var(--radius-md)", opacity: 1, transform: `translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})` },
+            { borderRadius: "var(--radius-md)", opacity: .96, transform: "translate3d(0,0,0)", left: `${pending.source.left}px`, top: `${pending.source.top}px`, width: `${pending.source.width}px`, height: `${pending.source.height}px` },
+            { borderRadius: "var(--radius-md)", opacity: 1, transform: "translate3d(0,0,0)", left: `${destination.left}px`, top: `${destination.top}px`, width: `${destination.width}px`, height: `${destination.height}px` },
           ],
-          { duration: 300, easing: "cubic-bezier(.22,.72,.18,1)", fill: "forwards" },
+          { duration: 420, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)", fill: "forwards" },
         );
         transition.finished.finally(() => {
           pending.node.remove();

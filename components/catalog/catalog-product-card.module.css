@@ -44,8 +44,8 @@
 
 .content {
   display: grid;
-  gap: 0.32rem;
-  padding: 0.78rem 0.04rem 0;
+  gap: 0.2rem;
+  padding: 0.9rem 0.2rem 0;
 }
 
 .meta {
@@ -57,21 +57,24 @@
 }
 
 .brand {
-  color: var(--vision-ink, #000);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  color: var(--vision-muted, #666);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  line-height: 1.35;
+  line-height: 1.2;
 }
 
 .content h3 {
   margin: 0;
-  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--vision-ink, #000);
   text-wrap: balance;
+  padding-bottom: 0.4rem;
 }
 
 .descriptor {
@@ -82,35 +85,36 @@
 
 .commercialLine {
   display: flex;
-  min-height: 2.4rem;
-  align-items: flex-start;
+  min-height: 2.2rem;
+  align-items: center;
   justify-content: space-between;
   gap: 0.65rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid var(--vision-line);
+  padding-top: 0.5rem;
+  border-top: 1px solid rgb(var(--vision-steel-rgb) / 0.4);
   flex-wrap: wrap;
 }
 
 .commercialLine strong,
 .availability {
-  font-size: 0.7rem;
-  line-height: 1.35;
+  font-size: 0.68rem;
+  line-height: 1.2;
 }
 
 .commercialLine strong {
   flex: 0 0 auto;
-  font-weight: 700;
+  font-weight: 600;
   text-align: right;
+  letter-spacing: -0.01em;
 }
 
 .availability {
   display: inline-flex;
   align-items: center;
   color: var(--vision-muted);
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .availability i {
@@ -135,10 +139,6 @@
 
 .card[data-presentation="preview"] .media {
   aspect-ratio: 4 / 3;
-}
-
-.card[data-presentation="preview"] .content {
-  gap: 0.32rem;
   padding-top: 0.72rem;
 }
 
