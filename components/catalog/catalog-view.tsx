@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
-import { CatalogProductCard } from "@/components/catalog/v2/catalog-product-card";
+import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";

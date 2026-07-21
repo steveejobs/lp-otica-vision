@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { LINKS } from "@/lib/links";
 
-import styles from "./catalog.module.css";
+import styles from "@/components/catalog/catalog.module.css";
 
 export default function CatalogError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (

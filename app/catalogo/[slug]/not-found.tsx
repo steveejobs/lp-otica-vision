@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { LINKS } from "@/lib/links";
 
-import catalogStyles from "../catalog.module.css";
+import catalogStyles from "@/components/catalog/catalog.module.css";
 
 export default function ProductNotFound() {
   return (
