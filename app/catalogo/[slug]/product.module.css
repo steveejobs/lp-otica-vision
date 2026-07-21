@@ -1,11 +1,11 @@
 @keyframes productDetailsEntrance {
   0% {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px) scale(0.99);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -33,26 +33,38 @@
   color: var(--vision-muted);
   font-size: 0.78rem;
   font-weight: 700;
+  margin-bottom: 1rem;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
+.back:hover {
+  color: var(--vision-ink);
+  transform: translateX(-3px);
+}
+
+/* === FULL PRODUCT PAGE CARD: Solid White Background with Rounded Corners & Soft Shadow === */
 .product {
   display: grid;
   grid-template-columns: minmax(0, 1.22fr) minmax(18rem, 0.78fr);
-  gap: clamp(2.4rem, 6vw, 6rem);
+  gap: clamp(2rem, 5vw, 5rem);
   align-items: start;
-  padding-top: 1rem;
+  background: #ffffff;
+  border: 1px solid var(--vision-line);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  box-shadow: 0 16px 40px -12px rgba(25, 22, 20, 0.08);
+  animation: productDetailsEntrance 350ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .details {
   display: grid;
   gap: 1.35rem;
-  padding-top: clamp(0.5rem, 2vw, 2rem);
-  opacity: 0;
-  animation: productDetailsEntrance 200ms cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
+  padding-top: clamp(0.5rem, 2vw, 1.5rem);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .details {
+  .product {
     animation: productDetailsEntranceReduced 200ms ease forwards;
   }
 }
@@ -71,14 +83,15 @@
 }
 
 .details h1 {
-  max-width: 11ch;
+  max-width: 14ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
   font-weight: 400;
-  letter-spacing: -0.045em;
-  line-height: 0.9;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
   text-wrap: balance;
+  color: var(--vision-ink);
 }
 
 .description {
@@ -154,8 +167,8 @@
 }
 
 .related {
-  margin-top: clamp(5rem, 10vw, 9rem);
-  padding-top: clamp(2.5rem, 5vw, 4.5rem);
+  margin-top: clamp(4rem, 8vw, 7rem);
+  padding-top: clamp(2rem, 4vw, 3.5rem);
   border-top: 1px solid var(--vision-line);
 }
 
@@ -175,7 +188,7 @@
 .related h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 5vw, 4.4rem);
+  font-size: clamp(2rem, 4.5vw, 3.8rem);
   font-weight: 400;
   line-height: 0.95;
 }
@@ -184,8 +197,16 @@
   display: inline-flex;
   min-height: 44px;
   align-items: center;
+  gap: 0.4rem;
   font-size: 0.78rem;
   font-weight: 700;
+  color: var(--vision-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.relatedHeader a:hover {
+  color: var(--vision-ink);
 }
 
 .relatedGrid {
@@ -209,6 +230,8 @@
   .product {
     grid-template-columns: 1fr;
     gap: 1.8rem;
+    padding: 1.25rem;
+    border-radius: 12px;
   }
 
   .relatedGrid {
@@ -222,7 +245,7 @@
   }
 
   .product {
-    padding-top: 0.35rem;
+    padding: 1rem;
   }
 
   .details {
@@ -230,7 +253,7 @@
   }
 
   .details h1 {
-    font-size: clamp(3.1rem, 15vw, 5rem);
+    font-size: clamp(2.5rem, 12vw, 3.8rem);
   }
 
   .relatedHeader {

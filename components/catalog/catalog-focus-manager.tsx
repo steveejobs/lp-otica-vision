@@ -84,9 +84,45 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
       const slug = url.searchParams.get("produto");
       setFocusedSlug(slug);
     };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!focusedSlug) return;
+      // Don't intercept if user is typing in an input/textarea
+      if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeFocus();
+        return;
+      }
+
+      if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        const productEls = Array.from(document.querySelectorAll<HTMLElement>("[data-catalog-product-slug]"));
+        const slugs = Array.from(new Set(productEls.map(el => el.getAttribute("data-catalog-product-slug")).filter(Boolean))) as string[];
+        if (slugs.length <= 1) return;
+
+        const currentIndex = slugs.indexOf(focusedSlug);
+        if (currentIndex === -1) return;
+
+        e.preventDefault();
+        const nextIndex = e.key === "ArrowRight"
+          ? (currentIndex + 1) % slugs.length
+          : (currentIndex - 1 + slugs.length) % slugs.length;
+        
+        const nextSlug = slugs[nextIndex];
+        const nextEl = document.querySelector<HTMLElement>(`[data-catalog-product-slug="${nextSlug}"] [data-flip-frame]`);
+        
+        focusProduct({ slug: nextSlug, flipFrame: nextEl });
+      }
+    };
+
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [focusedSlug]);
 
   // Fetch logic when focusedSlug changes
   useEffect(() => {

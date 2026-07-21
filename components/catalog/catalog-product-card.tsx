@@ -305,15 +305,6 @@ export function CatalogProductCard({
           <span className={styles.cta}>Visualizar modelo</span>
         </div>
       </button>
-
-      <Link
-        href={productHref}
-        className={styles.canonicalLink}
-        data-vision-motion-ignore=""
-        tabIndex={clone ? -1 : undefined}
-      >
-        Ver página completa
-      </Link>
     </article>
   );
 }
