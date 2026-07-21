@@ -108,20 +108,27 @@
 .mapSection { min-width: 0; display: grid; align-content: start; gap: .7rem; }
 .mapCoverage { align-self: end; color: var(--admin-muted); font-size: .62rem; font-weight: 700; }
 .mapWorkspace { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr) minmax(205px,.29fr); border: 1px solid var(--admin-line); background: var(--admin-surface); }
-.mapFrame { position: relative; min-width: 0; min-height: 430px; height: clamp(430px,46vw,570px); overflow: hidden; border: 0; border-right: 1px solid var(--admin-line); background: #e8e2d9; cursor: grab; touch-action: none; outline: none; user-select: none; }
-.mapFrame[data-panning="true"] { cursor: grabbing; }
-.mapFrame:focus-visible { box-shadow: inset 0 0 0 3px #6d5945; }
-.mapBase { position: absolute; inset: 0; width: 100%; height: 100%; background: #e9e3da; pointer-events: none; }
-.mapLand { fill: #d3cec6; stroke: #7f8589; stroke-width: .34; vector-effect: non-scaling-stroke; }
+.mapFrameWrapper { position: relative; display: flex; flex-direction: column; z-index: 1; }
+.mapFrame { position: relative; min-width: 0; min-height: 430px; height: clamp(430px,46vw,570px); overflow: hidden; border: 0; border-right: 1px solid var(--admin-line); background: #e8e2d9; outline: none; }
+.mapFrame :global(.leaflet-control-container) { z-index: 9; }
+.mapFrame :global(.leaflet-pane) { z-index: 1; }
+.mapFrame :global(.leaflet-top), .mapFrame :global(.leaflet-bottom) { z-index: 9; }
+.mapLoading { display: grid; place-items: center; height: clamp(430px,46vw,570px); background: #e8e2d9; border-right: 1px solid var(--admin-line); color: var(--admin-muted); font-size: .8rem; font-weight: 500; }
 .mapControls { position: absolute; z-index: 8; top: .75rem; left: .75rem; display: grid; overflow: hidden; border: 1px solid rgb(39 36 33 / .3); background: #f8f4ee; box-shadow: 0 5px 18px rgb(27 24 22 / .12); }
 .mapControls button { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-bottom: 1px solid rgb(39 36 33 / .18); background: transparent; color: var(--admin-ink); cursor: pointer; }
 .mapControls button:last-child { border-bottom: 0; }.mapControls button:hover { background: #e7ddd0; }.mapControls button:focus-visible { position: relative; z-index: 1; outline: 2px solid #574637; outline-offset: -3px; }.mapControls button:disabled { color: rgb(39 36 33 / .3); cursor: default; }
 .mapZoom { position: absolute; z-index: 7; top: .75rem; right: .75rem; padding: .34rem .5rem; border: 1px solid rgb(39 36 33 / .22); background: rgb(248 244 238 / .94); color: #514b46; font-size: .58rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
-.mapMarker { --marker-size: 36px; position: absolute; z-index: 4; left: var(--marker-x); top: var(--marker-y); width: var(--marker-size); height: var(--marker-size); display: grid; place-items: center; transform: translate(-50%,-50%); border: 2px solid #f8f4ee; border-radius: 999px; background: #a57950; color: #fffaf3; box-shadow: 0 0 0 1px #5b4634,0 5px 14px rgb(32 27 23 / .22); cursor: pointer; transition: transform 150ms ease,background-color 150ms ease,box-shadow 150ms ease; }
-.mapMarker > b { font-size: .62rem; line-height: 1; }.mapMarker[data-cluster="true"] { border-color: #36312d; background: #f5eee4; color: #302b27; box-shadow: 0 0 0 3px rgb(165 121 80 / .3),0 5px 14px rgb(32 27 23 / .22); }.mapMarker[data-selected="true"] { z-index: 6; transform: translate(-50%,-50%) scale(1.12); background: #332e2a; box-shadow: 0 0 0 4px rgb(165 121 80 / .38),0 7px 18px rgb(32 27 23 / .27); }
-.mapMarker:hover,.mapMarker:focus-visible { z-index: 9; transform: translate(-50%,-50%) scale(1.08); outline: 2px solid #332e2a; outline-offset: 3px; }
-.mapTooltip { position: absolute; left: calc(50% + var(--tooltip-shift)); bottom: calc(100% + .72rem); width: max-content; max-width: min(240px,72vw); display: none; gap: .13rem; transform: translateX(-50%); padding: .58rem .68rem; border: 1px solid rgb(255 255 255 / .14); background: #292725; color: #f8f4ee; box-shadow: 0 9px 26px rgb(27 24 22 / .22); text-align: left; pointer-events: none; }
-.mapTooltip[data-side="below"] { top: calc(100% + .72rem); bottom: auto; }.mapMarker:hover .mapTooltip,.mapMarker:focus-visible .mapTooltip { display: grid; }.mapTooltip strong { font-size: .69rem; }.mapTooltip small { color: rgb(248 244 238 / .7); font-size: .59rem; font-style: normal; }.mapTooltip b { margin-top: .13rem; font-size: .61rem; font-weight: 700; }
+.mapMarker { display: grid; place-items: center; border: 2px solid #f8f4ee; border-radius: 999px; background: #a57950; color: #fffaf3; box-shadow: 0 0 0 1px #5b4634,0 5px 14px rgb(32 27 23 / .22); cursor: pointer; transition: transform 150ms ease,background-color 150ms ease,box-shadow 150ms ease; }
+.mapMarker > b { font-size: .62rem; line-height: 1; }
+.mapMarker[data-cluster="true"] { border-color: #36312d; background: #f5eee4; color: #302b27; box-shadow: 0 0 0 3px rgb(165 121 80 / .3),0 5px 14px rgb(32 27 23 / .22); }
+.mapMarker[data-selected="true"] { transform: scale(1.12); background: #332e2a; box-shadow: 0 0 0 4px rgb(165 121 80 / .38),0 7px 18px rgb(32 27 23 / .27); }
+.mapMarker:hover, .mapMarker:focus-visible { transform: scale(1.08); outline: 2px solid #332e2a; outline-offset: 3px; }
+.mapTooltip { background: #292725 !important; border: 1px solid rgb(255 255 255 / .14) !important; color: #f8f4ee !important; box-shadow: 0 9px 26px rgb(27 24 22 / .22) !important; padding: 0 !important; border-radius: 6px !important; }
+.mapTooltip::before { border-top-color: #292725 !important; }
+.mapTooltipInner { display: grid; gap: .13rem; padding: .58rem .68rem; text-align: left; }
+.mapTooltipInner strong { font-size: .69rem; line-height: 1.2; }
+.mapTooltipInner small { color: rgb(248 244 238 / .7); font-size: .59rem; font-style: normal; line-height: 1.2; }
+.mapTooltipInner b { margin-top: .13rem; font-size: .61rem; font-weight: 700; line-height: 1.2; }
 .mapEmpty { position: absolute; z-index: 3; inset: 50% auto auto 50%; width: min(360px,76%); transform: translate(-50%,-50%); padding: 1rem; border: 1px solid rgb(96 100 104 / .3); background: rgb(248 244 238 / .94); text-align: center; }
 .mapEmpty strong { font-family: Georgia,"Times New Roman",serif; font-size: .98rem; font-weight: 500; }.mapEmpty p { margin-top: .3rem; color: var(--admin-muted); font-size: .66rem; line-height: 1.5; }
 .mapAttribution { position: absolute; z-index: 7; right: .35rem; bottom: .35rem; padding: .2rem .35rem; background: rgb(248 244 238 / .92); color: #4f4943; font-size: .52rem; }
