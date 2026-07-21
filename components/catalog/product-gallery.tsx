@@ -7,7 +7,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogImage } from "@/lib/catalog/types";
 
-import { useCatalogMediaTransition } from "./catalog-transition-provider";
+import type { CatalogImage as CatalogImageData } from "@/lib/catalog/types";
 import { ProductMediaShell } from "./product-media-shell";
 import styles from "./product-gallery.module.css";
 
@@ -15,15 +15,13 @@ const blurDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZBfq3UUnYALVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
 
 export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
-  const targetRef = useRef<HTMLDivElement>(null);
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   
   // To handle smooth crossfade between main images:
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const [isFading, setIsFading] = useState(false);
-
-  const { state, enabled, registerTarget, markTargetReady } = useCatalogMediaTransition();
+  const targetRef = useRef<HTMLDivElement>(null);
 
   const goTo = useCallback((index: number) => {
     if (index === activeIndex) return;
@@ -33,22 +31,9 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
     setActiveIndex(safeIndex);
   }, [activeIndex, images.length]);
 
-  // Register target when mounted
-  useLayoutEffect(() => {
-    if (!enabled || !targetRef.current || !state.transitionId || state.productId !== productId) return;
-    const targetEl = targetRef.current;
-    const rect = targetEl.getBoundingClientRect();
-    registerTarget(productId, state.transitionId, rect);
-  }, [enabled, state.transitionId, state.productId, productId, registerTarget]);
-
-  const isTransitioningCurrentProduct = 
-    enabled && 
-    state.productId === productId && 
-    (state.status === "animating" || state.status === "settling");
-
   const activeImage = images[activeIndex];
   const isCoverActive = activeIndex === initialIndex;
-  const imgOpacity = isCoverActive && isTransitioningCurrentProduct ? 0 : 1;
+  const imgOpacity = 1;
 
   // Single Image Layout
   if (images.length === 1) {
@@ -67,11 +52,6 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
             src={catalogImageUrl(activeImage, "product_detail")}
             style={{ objectPosition: activeImage.objectPosition, opacity: imgOpacity, transition: "opacity 0.15s ease-in-out" }}
             unoptimized
-            onLoad={() => {
-              if (isTransitioningCurrentProduct && state.transitionId) {
-                markTargetReady(state.transitionId);
-              }
-            }}
           />
         </ProductMediaShell>
         </div>
@@ -114,18 +94,14 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
             unoptimized
             onLoad={() => {
               if (isFading) {
-                // When new image loads, fade it in over 180ms
                 requestAnimationFrame(() => setIsFading(false));
-              }
-              if (isCoverActive && isTransitioningCurrentProduct && state.transitionId) {
-                markTargetReady(state.transitionId);
               }
             }}
           />
         </ProductMediaShell>
       </div>
 
-      <div className={styles.thumbnailRail} style={{ opacity: isTransitioningCurrentProduct ? 0 : 1, transition: "opacity 0.2s ease" }}>
+      <div className={styles.thumbnailRail}>
         {images.map((img, idx) => (
           <button 
             key={img.id} 

@@ -135,7 +135,13 @@ export function CatalogProductCard({
     }
   };
 
-  if (mode === "focused" && focusContext?.focusedProductData) {
+  if (mode === "focused") {
+    // Usar dados completos se disponíveis, senão usar os dados básicos do card
+    const displayProduct = focusContext?.focusedProductData ?? {
+      ...product,
+      images: [product.cover]
+    } as any;
+
     return (
       <article
         className={styles.card}
@@ -146,7 +152,7 @@ export function CatalogProductCard({
         data-catalog-product-brand={product.brand?.slug}
         data-presentation={presentation}
       >
-        <FocusedProductView product={focusContext.focusedProductData} />
+        <FocusedProductView product={displayProduct} />
       </article>
     );
   }
@@ -170,6 +176,7 @@ export function CatalogProductCard({
         onPointerEnter={handlePreload}
         onFocus={handlePreload}
         tabIndex={clone ? -1 : undefined}
+        scroll={false}
       >
         {content}
       </Link>

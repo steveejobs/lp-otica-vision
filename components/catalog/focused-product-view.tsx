@@ -45,3 +45,5 @@ export function FocusedProductView({ product }: { product: CatalogProduct }) {
     </div>
   );
 }
+
+
