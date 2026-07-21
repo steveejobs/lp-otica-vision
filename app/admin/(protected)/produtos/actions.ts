@@ -738,6 +738,30 @@ export async function reorderProductImagesAction(formData: FormData) {
   redirect(appendFeedback(destination, "status", "reordered"));
 }
 
+export async function reorderFeaturedProductsAction(formData: FormData) {
+  await requireAdminRole(["admin", "editor"]);
+  const destination = "/admin/produtos/destaques";
+  const orderedIds = orderedUuidList(formData.get("ordered_ids"));
+  const supabase = await createSupabaseServerClient();
+  let errorCode: string | null = null;
+  try {
+    for (let i = 0; i < orderedIds.length; i++) {
+      const { error } = await supabase
+        .from("products")
+        .update({ display_order: i })
+        .eq("id", orderedIds[i]);
+      if (error) throw error;
+    }
+  } catch (error) {
+    errorCode = mutationErrorCode(error);
+  }
+  if (errorCode) redirect(appendFeedback(destination, "error", errorCode));
+  revalidatePath(destination);
+  revalidatePath("/admin/produtos");
+  revalidatePublicCatalog();
+  redirect(appendFeedback(destination, "status", "reordered"));
+}
+
 export async function finalizeProductImageReplacementAction(input: {
   imageId: string;
   productId: string;

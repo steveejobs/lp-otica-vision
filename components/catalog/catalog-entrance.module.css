@@ -235,3 +235,26 @@
     aspect-ratio: 1 / 1;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .entrance[data-intro-played="false"] .introOverlay,
+  .entrance[data-intro-played="false"] .introLine,
+  .entrance[data-intro-played="false"] .introTitle,
+  .entrance[data-intro-played="false"] .heroCopy,
+  .entrance[data-intro-played="false"] .card,
+  .entrance[data-intro-played="false"] .card[data-index="0"] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  .entrance[data-intro-played="false"] .introOverlay {
+    display: none;
+  }
+}
