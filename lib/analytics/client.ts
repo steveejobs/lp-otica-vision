@@ -23,6 +23,7 @@ const LAST_GOOGLE_PAGE_KEY = "vision.analytics.last-google-page";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const allowedProperties = new Set<string>(analyticsPropertyNames);
 const recentEvents = new Map<string, number>();
+const pendingGoogleEvents: Array<{ eventName: string; productId?: string | null; properties: AnalyticsProperties }> = [];
 
 function anonymousSessionId() {
   try {
@@ -81,8 +82,8 @@ function sendInternal(payload: object, transport: AnalyticsEventInput["transport
   }).catch(() => undefined);
 }
 
-function sendGoogle(eventName: string, properties: AnalyticsProperties, productId?: string | null) {
-  if (readAnalyticsConsent() !== "accepted" || typeof window.gtag !== "function") return;
+function dispatchGoogle(eventName: string, properties: AnalyticsProperties, productId?: string | null) {
+  if (typeof window.gtag !== "function") return;
   const debugMode = (() => { try { return window.sessionStorage.getItem("vision.ga.debug") === "1"; } catch { return false; } })();
   window.gtag("event", eventName, {
     ...properties,
@@ -98,8 +99,25 @@ function sendGoogle(eventName: string, properties: AnalyticsProperties, productI
   });
 }
 
+function sendGoogle(eventName: string, properties: AnalyticsProperties, productId?: string | null) {
+  if (readAnalyticsConsent() !== "accepted") return;
+  if (typeof window.gtag !== "function") {
+    pendingGoogleEvents.push({ eventName, productId, properties });
+    if (pendingGoogleEvents.length > 40) pendingGoogleEvents.shift();
+    return;
+  }
+  dispatchGoogle(eventName, properties, productId);
+}
+
+export function flushPendingGoogleEvents() {
+  if (readAnalyticsConsent() !== "accepted" || typeof window.gtag !== "function") return;
+  const pending = pendingGoogleEvents.splice(0);
+  pending.forEach((event) => dispatchGoogle(event.eventName, event.properties, event.productId));
+}
+
 export function trackEvent(input: AnalyticsEventInput) {
   if (typeof window === "undefined") return;
+  if (readAnalyticsConsent() !== "accepted") return;
   const properties = cleanProperties(input.properties);
   if (isAccidentalDuplicate(input, properties)) return;
   const payload = {
@@ -120,11 +138,13 @@ export function trackEvent(input: AnalyticsEventInput) {
 }
 
 export function trackGooglePageView(properties: AnalyticsProperties) {
-  if (typeof window === "undefined" || readAnalyticsConsent() !== "accepted" || typeof window.gtag !== "function") return;
+  if (typeof window === "undefined" || readAnalyticsConsent() !== "accepted") return;
   const signature = String(properties.page_location ?? window.location.href);
+  const now = Date.now();
   try {
-    if (window.sessionStorage.getItem(LAST_GOOGLE_PAGE_KEY) === signature) return;
-    window.sessionStorage.setItem(LAST_GOOGLE_PAGE_KEY, signature);
+    const last = JSON.parse(window.sessionStorage.getItem(LAST_GOOGLE_PAGE_KEY) ?? "null") as { location?: string; time?: number } | null;
+    if (last?.location === signature && typeof last.time === "number" && now - last.time < 1500) return;
+    window.sessionStorage.setItem(LAST_GOOGLE_PAGE_KEY, JSON.stringify({ location: signature, time: now }));
   } catch {}
   sendGoogle("page_view", properties);
 }
@@ -154,6 +174,7 @@ export function trackPageView(input: { location: string; referrer?: string; titl
 
 export function updateAnalyticsConsent(choice: Exclude<AnalyticsConsentChoice, "unknown">) {
   writeAnalyticsConsent(choice);
+  if (choice === "rejected") pendingGoogleEvents.splice(0);
   if (typeof window.gtag === "function") {
     window.gtag("consent", "update", {
       ad_personalization: "denied",

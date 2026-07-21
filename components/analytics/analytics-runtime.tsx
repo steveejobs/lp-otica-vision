@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { readAnalyticsConsent, ANALYTICS_CONSENT_CHANGE_EVENT, type AnalyticsConsentChoice } from "@/lib/analytics/consent";
-import { trackEvent, trackGooglePageView, trackPageView } from "@/lib/analytics/client";
+import { flushPendingGoogleEvents, trackEvent, trackPageView } from "@/lib/analytics/client";
 
 import { PrivacyConsent } from "./privacy-consent";
 
@@ -37,6 +37,7 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
   const [consent, setConsent] = useState<AnalyticsConsentChoice>("unknown");
   const [initialized, setInitialized] = useState(false);
   const previousLocation = useRef("");
+  const previousPathname = useRef("");
   const initializedMeasurementId = useRef<string | null>(null);
   const publicRoute = !pathname.startsWith("/admin") && !pathname.startsWith("/preview");
   const location = useMemo(() => `${pathname}${filteredSearch(pathname, searchParams)}`, [pathname, searchParams]);
@@ -66,6 +67,8 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
     });
     window.gtag("js", new Date());
     window.gtag("config", measurementId, { anonymize_ip: true, send_page_view: false });
+    window.__visionGaReady = true;
+    flushPendingGoogleEvents();
 
     const existing = document.getElementById("vision-google-analytics");
     if (!existing) {
@@ -87,16 +90,6 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
 
   useEffect(() => {
     if (!initialized || consent !== "accepted" || !publicRoute) return;
-    const url = new URL(location, window.location.origin);
-    trackGooglePageView({
-      page_location: url.href,
-      page_title: document.title.slice(0, 100),
-      source_route: pathname,
-    });
-  }, [consent, initialized, location, pathname, publicRoute]);
-
-  useEffect(() => {
-    if (!publicRoute) return;
     const milestones = [25, 50, 75, 100];
     const sent = new Set<number>();
     const handleScroll = () => {
@@ -120,18 +113,21 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
       window.cancelAnimationFrame(initialFrame);
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [location, pathname, publicRoute]);
+  }, [consent, initialized, location, pathname, publicRoute]);
 
   useEffect(() => {
-    if (!publicRoute) return;
+    if (!initialized || consent !== "accepted" || !publicRoute) return;
     const referrer = previousLocation.current;
     trackPageView({ location, referrer, title: document.title });
-    if (pathname === "/catalogo") trackEvent({ eventName: "catalog_opened", properties: { source_route: referrer || "/" } });
+    if (pathname === "/catalogo" && previousPathname.current !== "/catalogo") {
+      trackEvent({ eventName: "catalog_opened", properties: { source_route: referrer || "/" } });
+    }
     previousLocation.current = location;
-  }, [location, pathname, publicRoute]);
+    previousPathname.current = pathname;
+  }, [consent, initialized, location, pathname, publicRoute]);
 
   useEffect(() => {
-    if (!publicRoute) return;
+    if (!initialized || consent !== "accepted" || !publicRoute) return;
     const timers = new WeakMap<Element, number>();
     const sent = new Set<string>();
     const observer = new IntersectionObserver((entries) => {
@@ -153,7 +149,7 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
     }, { threshold: [0.35] });
     document.querySelectorAll<HTMLElement>("[data-analytics-section]").forEach((element) => observer.observe(element));
     return () => observer.disconnect();
-  }, [location, pathname, publicRoute]);
+  }, [consent, initialized, location, pathname, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute) return;

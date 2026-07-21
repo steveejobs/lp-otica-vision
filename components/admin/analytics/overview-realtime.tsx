@@ -1,13 +1,14 @@
 import Link from "next/link";
 
 import type { GoogleAnalyticsResult } from "@/lib/analytics/google-data";
+import type { CityActivity } from "@/lib/analytics/geo-types";
 
 import { ActivityMap } from "./activity-map";
 import { SourceBadge } from "./analytics-ui";
 import styles from "./analytics.module.css";
 
 type RealtimeData = {
-  cities: Array<{ activeUsers: number; city: string; country: string; countryCode: string; eventCount: number }>;
+  cities: CityActivity[];
   events: Array<{ eventCount: number; eventName: string }>;
   overview: { activeUsers: number; eventCount: number; pageViews: number };
   pages: Array<{ activeUsers: number; page: string; views: number }>;
@@ -36,7 +37,9 @@ export function OverviewRealtime({ report }: { report: GoogleAnalyticsResult<Rea
           <div><dt>Produtos vistos</dt><dd>{data ? products : "—"}</dd></div>
           <div><dt>WhatsApp</dt><dd>{data ? whatsapp : "—"}</dd></div>
         </dl>
-        {report.error ? <p>{report.error}. O mapa permanece vazio até a conexão ser concluída.</p> : <p>Atualizado {report.updatedAt ? new Date(report.updatedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "agora"}.</p>}
+        {report.error
+          ? <p>{report.data ? `${report.error}. O último relatório válido foi preservado.` : `${report.error}. Ainda não há relatório válido para exibir.`}</p>
+          : <p>Relatório obtido {report.updatedAt ? new Date(report.updatedAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Araguaina" }) : "agora"}.</p>}
       </aside>
     </div>
   </section>;

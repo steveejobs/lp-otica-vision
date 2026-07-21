@@ -114,12 +114,13 @@ export async function getInternalAnalyticsReport(days: number) {
     return {
       data: report,
       error: scrollDepth.error ? "A leitura por profundidade ainda não está disponível neste ambiente." : null,
+      scrollDepthAvailable: !scrollDepth.error,
       source: "Dados internos" as const,
     };
   }
   const legacy = await supabase.rpc("admin_catalog_analytics", { p_days: days });
-  if (!legacy.error && legacy.data) return { data: parseLegacy(legacy.data, days), error: "A migração analítica do preview ainda não foi aplicada; exibindo o relatório legado.", source: "Dados internos" as const };
-  return { data: empty(days), error: "Dados internos temporariamente indisponíveis.", source: "Dados internos" as const };
+  if (!legacy.error && legacy.data) return { data: parseLegacy(legacy.data, days), error: "A migração analítica do preview ainda não foi aplicada; exibindo o relatório legado.", scrollDepthAvailable: false, source: "Dados internos" as const };
+  return { data: empty(days), error: "Dados internos temporariamente indisponíveis.", scrollDepthAvailable: false, source: "Dados internos" as const };
 }
 
 export async function getAnalyticsProductCovers(productIds: string[]) {

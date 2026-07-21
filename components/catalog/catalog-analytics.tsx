@@ -15,6 +15,7 @@ export function CatalogAnalytics({
   resultCount: number;
 }) {
   const lastSignature = useRef("");
+  const previousFilters = useRef<Record<string, string | null | undefined>>({});
 
   useEffect(() => {
     const signature = JSON.stringify(query);
@@ -38,7 +39,10 @@ export function CatalogAnalytics({
     ] as const;
 
     for (const [filter, value] of filters) {
+      const previousValue = previousFilters.current[filter];
+      previousFilters.current[filter] = value;
       if (!value) continue;
+      if (previousValue === value) continue;
       void trackCatalogEvent({
         eventName: "catalog_filter_changed",
         metadata: { filter_name: filter, filter_value: value },

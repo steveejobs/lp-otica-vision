@@ -21,7 +21,7 @@ export default async function RealtimePage() {
   return <div className={styles.stack}>
     <AdminPageHeader eyebrow="Analytics" title="Tempo real" description="Atividade recente e agregada. O mapa não representa GPS nem identifica visitantes." />
     <RealtimeControls error={google.error} updatedAt={google.updatedAt} />
-    {google.error ? <ReportNotice source="Google Analytics">{google.error}. Nenhuma posição foi estimada e os dados internos continuam abaixo.</ReportNotice> : null}
+    {google.error ? <ReportNotice source="Google Analytics">{google.error}. {google.data ? "O último relatório válido permanece visível, identificado pelo horário." : "Nenhuma posição foi estimada; os dados internos continuam abaixo."}</ReportNotice> : null}
     <div className={styles.realtimeLayout}>
       <ActivityMap cities={data?.cities ?? []} />
       <aside className={styles.realtimeSummary} aria-label="Resumo da atividade recente">

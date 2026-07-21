@@ -3,15 +3,22 @@ import "server-only";
 import { NextResponse } from "next/server";
 
 import { testGoogleAnalyticsConnection } from "@/lib/analytics/google-data";
+import { hasValidAdminAnalyticsOrigin } from "@/lib/analytics/request-origin";
 import { getAdminSession } from "@/lib/auth/admin-access";
 
 export const runtime = "nodejs";
 
+function json(body: object, status: number) {
+  return NextResponse.json(body, {
+    headers: { "Cache-Control": "private, no-store, max-age=0" },
+    status,
+  });
+}
+
 export async function POST(request: Request) {
   const session = await getAdminSession();
-  if (!session || session.profile.role !== "admin") return NextResponse.json({ message: "Acesso negado." }, { status: 403 });
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) return NextResponse.json({ message: "Origem inválida." }, { status: 403 });
+  if (!session || session.profile.role !== "admin") return json({ message: "Acesso negado." }, 403);
+  if (!hasValidAdminAnalyticsOrigin(request)) return json({ message: "Origem inválida." }, 403);
   const result = await testGoogleAnalyticsConnection();
-  return NextResponse.json({ message: result.message, ok: result.ok }, { headers: { "Cache-Control": "private, no-store" }, status: result.ok ? 200 : 503 });
+  return json({ message: result.message, ok: result.ok }, result.ok ? 200 : 503);
 }

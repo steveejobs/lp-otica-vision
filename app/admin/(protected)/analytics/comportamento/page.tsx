@@ -47,7 +47,9 @@ export default async function BehaviorPage({
           </div>
           <p>Sessões que alcançaram cada marco da página.</p>
         </div>
-        <ScrollDepth rows={internal.data.scrollDepth} />
+        {internal.scrollDepthAvailable
+          ? <ScrollDepth rows={internal.data.scrollDepth} />
+          : <div className={styles.analyticsEmpty}><strong>Relatório interno ainda indisponível</strong><p>O evento scroll_depth já chega ao GA4. Os marcos internos de 25%, 50%, 75% e 100% dependem das duas migrations pendentes, que não foram aplicadas.</p></div>}
       </section>
 
       <div className={styles.compactGrid}>

@@ -69,6 +69,18 @@ async function googleRequest(method: "runReport" | "runRealtimeReport", body: ob
   return normalizedRows(await response.json());
 }
 
+async function googleGet(url: string) {
+  const response = await fetch(url, {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${await accessToken()}` },
+  });
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) throw new Error("API administrativa do Google Analytics sem permissão");
+    throw new Error("Configuração da propriedade temporariamente indisponível");
+  }
+  return response.json() as Promise<unknown>;
+}
+
 function result<T>(data: T): GoogleAnalyticsResult<T> { return { data, error: null, source: "Google Analytics", updatedAt: new Date().toISOString() }; }
 function failure<T>(error: unknown): GoogleAnalyticsResult<T> { return { data: null, error: error instanceof Error ? error.message : "Falha sanitizada na integração", source: "Google Analytics", updatedAt: null }; }
 function dateRange(period: GoogleAnalyticsPeriod) { return typeof period === "number" ? [{ endDate: "today", startDate: `${Math.min(Math.max(period, 1), 365)}daysAgo` }] : [period]; }
@@ -109,23 +121,85 @@ const cachedConversions = unstable_cache(async (days: number) => {
 const cachedRealtime = unstable_cache(async () => {
   const [overview, geo, pages, events] = await Promise.all([
     googleRequest("runRealtimeReport", { metrics: [{ name: "activeUsers" }, { name: "eventCount" }, { name: "screenPageViews" }] }),
-    googleRequest("runRealtimeReport", { dimensions: [{ name: "countryId" }, { name: "country" }, { name: "city" }], limit: 100, metrics: [{ name: "activeUsers" }, { name: "eventCount" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }] }),
+    googleRequest("runRealtimeReport", { dimensions: [{ name: "countryId" }, { name: "country" }, { name: "cityId" }, { name: "city" }], limit: 100, metrics: [{ name: "activeUsers" }, { name: "eventCount" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }] }),
     googleRequest("runRealtimeReport", { dimensions: [{ name: "unifiedScreenName" }], limit: 50, metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }] }),
     googleRequest("runRealtimeReport", { dimensions: [{ name: "eventName" }], limit: 75, metrics: [{ name: "eventCount" }], orderBys: [{ metric: { metricName: "eventCount" }, desc: true }] }),
   ]);
+  const { resolveCityActivities } = await import("./geo-centroids");
+  const cities = resolveCityActivities(geo.map((row) => ({
+    activeUsers: row.metrics[0],
+    city: row.dimensions[3] ?? "",
+    cityId: row.dimensions[2] ?? "",
+    country: row.dimensions[1] ?? "",
+    countryCode: row.dimensions[0] ?? "",
+    eventCount: row.metrics[1],
+  })));
   return {
-    cities: geo.map((row) => ({ activeUsers: row.metrics[0], city: row.dimensions[2], country: row.dimensions[1], countryCode: row.dimensions[0], eventCount: row.metrics[1] })),
-    events: events.map((row) => ({ eventCount: row.metrics[0], eventName: row.dimensions[0] })),
-    overview: { activeUsers: overview[0]?.metrics[0] ?? 0, eventCount: overview[0]?.metrics[1] ?? 0, pageViews: overview[0]?.metrics[2] ?? 0 },
-    pages: pages.map((row) => ({ activeUsers: row.metrics[0], page: row.dimensions[0], views: row.metrics[1] })),
+    data: {
+      cities,
+      events: events.map((row) => ({ eventCount: row.metrics[0], eventName: row.dimensions[0] })),
+      overview: { activeUsers: overview[0]?.metrics[0] ?? 0, eventCount: overview[0]?.metrics[1] ?? 0, pageViews: overview[0]?.metrics[2] ?? 0 },
+      pages: pages.map((row) => ({ activeUsers: row.metrics[0], page: row.dimensions[0], views: row.metrics[1] })),
+    },
+    fetchedAt: new Date().toISOString(),
   };
 }, ["ga4-realtime"], { revalidate: 45, tags: ["ga4:realtime"] });
+
+const cachedPropertyAudit = unstable_cache(async () => {
+  const config = getGoogleAnalyticsServerConfig();
+  if (!config) throw new Error("Integração incompleta");
+  const [propertyPayload, streamsPayload] = await Promise.all([
+    googleGet(`https://analyticsadmin.googleapis.com/v1beta/properties/${encodeURIComponent(config.propertyId)}`),
+    googleGet(`https://analyticsadmin.googleapis.com/v1beta/properties/${encodeURIComponent(config.propertyId)}/dataStreams`),
+  ]);
+  const property = propertyPayload && typeof propertyPayload === "object" ? propertyPayload as Record<string, unknown> : {};
+  const streamsRoot = streamsPayload && typeof streamsPayload === "object" ? streamsPayload as { dataStreams?: unknown } : {};
+  const streams = Array.isArray(streamsRoot.dataStreams) ? streamsRoot.dataStreams.flatMap((raw) => {
+    if (!raw || typeof raw !== "object") return [];
+    const stream = raw as { displayName?: unknown; type?: unknown; webStreamData?: unknown };
+    const web = stream.webStreamData && typeof stream.webStreamData === "object" ? stream.webStreamData as Record<string, unknown> : {};
+    return [{
+      defaultUri: typeof web.defaultUri === "string" ? web.defaultUri : "",
+      displayName: typeof stream.displayName === "string" ? stream.displayName : "",
+      isConfiguredStream: web.measurementId === config.measurementId,
+      measurementId: typeof web.measurementId === "string" ? web.measurementId : "",
+      type: typeof stream.type === "string" ? stream.type : "",
+    }];
+  }) : [];
+  return {
+    fetchedAt: new Date().toISOString(),
+    propertyTimeZone: typeof property.timeZone === "string" ? property.timeZone : "",
+    streamMatchesMeasurementId: streams.some((stream) => stream.isConfiguredStream),
+    streams,
+  };
+}, ["ga4-property-audit"], { revalidate: 3600, tags: ["ga4:configuration"] });
+
+type RealtimePayload = Awaited<ReturnType<typeof cachedRealtime>>;
+let lastValidRealtime: RealtimePayload | null = null;
 
 export async function getOverviewReport(days: number) { try { return result(await cachedOverview(days)); } catch (error) { return failure<Awaited<ReturnType<typeof cachedOverview>>>(error); } }
 export async function getAcquisitionReport(period: GoogleAnalyticsPeriod) { try { return result(await cachedAcquisition(period)); } catch (error) { return failure<Awaited<ReturnType<typeof cachedAcquisition>>>(error); } }
 export async function getBehaviorReport(days: number) { try { return result(await cachedBehavior(days)); } catch (error) { return failure<Awaited<ReturnType<typeof cachedBehavior>>>(error); } }
 export async function getConversionReport(days: number) { try { return result(await cachedConversions(days)); } catch (error) { return failure<Awaited<ReturnType<typeof cachedConversions>>>(error); } }
-export async function getRealtimeReport() { try { return result(await cachedRealtime()); } catch (error) { return failure<Awaited<ReturnType<typeof cachedRealtime>>>(error); } }
+export async function getRealtimeReport() {
+  try {
+    const payload = await cachedRealtime();
+    lastValidRealtime = payload;
+    return { data: payload.data, error: null, source: "Google Analytics" as const, updatedAt: payload.fetchedAt };
+  } catch (error) {
+    const failed = failure<RealtimePayload["data"]>(error);
+    return lastValidRealtime
+      ? { ...failed, data: lastValidRealtime.data, updatedAt: lastValidRealtime.fetchedAt }
+      : failed;
+  }
+}
+export async function getGoogleAnalyticsPropertyAudit() {
+  try {
+    return { data: await cachedPropertyAudit(), error: null };
+  } catch (error) {
+    return { data: null, error: error instanceof Error ? error.message : "Falha sanitizada na auditoria da propriedade" };
+  }
+}
 export async function testGoogleAnalyticsConnection() {
   try {
     await googleRequest("runReport", { dateRanges: [{ startDate: "yesterday", endDate: "today" }], limit: 1, metrics: [{ name: "activeUsers" }] });
