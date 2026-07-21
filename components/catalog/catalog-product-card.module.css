@@ -9,6 +9,7 @@
   height: 100%;
 }
 
+/* === Button reset for primary focus trigger === */
 .focusTrigger {
   all: unset;
   display: flex;
@@ -47,7 +48,8 @@
   will-change: transform;
 }
 
-.media {
+/* --- GRID MODE MEDIA: Transparent cutout with shadow --- */
+.gridMedia {
   position: relative;
   aspect-ratio: 4 / 3;
   width: 100%;
@@ -58,9 +60,10 @@
   margin-bottom: 1rem;
 }
 
-.media img {
+.gridMedia img {
   object-fit: contain !important;
   transition: opacity 0.3s ease;
+  filter: drop-shadow(0 4px 12px rgba(25, 22, 20, 0.08));
 }
 
 .summary {
@@ -112,13 +115,14 @@
   color: var(--vision-ink);
 }
 
+/* Hover effects for grid cards */
 @media (hover: hover) and (pointer: fine) {
-  .card:hover {
+  .card[data-mode="grid"]:hover {
     transform: translateY(-2px);
     background-color: var(--vision-warm-white);
   }
 
-  .card:hover .cta {
+  .card[data-mode="grid"]:hover .cta {
     opacity: 1;
     transform: translateY(0);
   }
@@ -128,16 +132,12 @@
   .card {
     border: 1px solid var(--vision-line);
   }
-  
-  .focusTrigger {
+
+  .focusTrigger, .externalLink {
     padding: 0.75rem;
   }
 
-  .externalLink {
-    padding: 0.75rem;
-  }
-
-  .media {
+  .gridMedia {
     margin-bottom: 0.75rem;
   }
 
@@ -148,41 +148,202 @@
   }
 }
 
+/* === FOCUSED MODE: Sleek 60/40 Editorial Layout with Rounded Card Media === */
 .card[data-mode="focused"] {
   grid-column: 1 / -1;
   order: -1;
   background: var(--vision-paper);
   border: 1px solid var(--vision-line);
+  border-radius: var(--radius-md, 12px);
   margin-bottom: 2rem;
+  padding: 2rem;
+  box-shadow: 0 16px 40px -12px rgba(25, 22, 20, 0.12);
 }
 
-.card[data-mode="focused"] .focusTrigger {
-  cursor: default;
+.focusedContainer {
+  position: relative;
+  width: 100%;
 }
 
-.card[data-mode="focused"] .summary {
-  display: none;
+.closeButton {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.5rem;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--vision-warm-white, #f4eee6);
+  color: var(--vision-ink);
+  border: 1px solid var(--vision-line);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.card[data-mode="focused"] .canonicalLink {
-  display: none;
+.closeButton:hover {
+  background: var(--vision-ink);
+  color: var(--vision-paper);
 }
 
-@media (max-width: 720px) {
-  .card[data-mode="focused"] {
-    grid-column: 1 / -1;
-    order: -1;
-    width: 100vw;
-    margin-left: -4vw;
-    padding: 0 4vw;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
+.focusedGrid {
+  display: grid;
+  grid-template-columns: 52% 44%;
+  gap: 4%;
+  align-items: center;
+  width: 100%;
+}
+
+.focusedStageCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Focused Media Shell: Revealing a soft rounded white/paper card with light border and shadow */
+.focusedMediaShell {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--vision-line);
+  background: #ffffff;
+  box-shadow: 0 8px 24px -4px rgba(25, 22, 20, 0.06);
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.focusedMediaShell img {
+  object-fit: contain !important;
+}
+
+/* Thumbnail Rail under main focused stage */
+.thumbnailRail {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.25rem 0;
+}
+
+.thumbnailBtn {
+  all: unset;
+  cursor: pointer;
+  flex: 0 0 72px;
+  height: 54px;
+  border-radius: 8px;
+  border: 1px solid var(--vision-line);
+  overflow: hidden;
+  background: #ffffff;
+  opacity: 0.65;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.thumbnailBtn[aria-pressed="true"] {
+  opacity: 1;
+  border-color: var(--vision-ink);
+  box-shadow: 0 0 0 1px var(--vision-ink);
+}
+
+.thumbnailShell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.thumbnailShell img {
+  object-fit: contain !important;
+}
+
+/* Focused Info Column */
+.focusedInfoCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 1rem;
+  animation: slideUpFade 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
+}
+
+.brand {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vision-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 400;
+  color: var(--vision-ink);
+  line-height: 1.1;
+  margin: 0 0 1rem 0;
+}
+
+.description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--vision-muted);
+  margin-bottom: 1.75rem;
+  max-width: 480px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.focusedCanonicalLink {
+  font-size: 0.85rem;
+  color: var(--vision-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.focusedCanonicalLink:hover {
+  color: var(--vision-ink);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+@media (max-width: 900px) {
+  .focusedGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .card[data-mode="focused"] {
+    padding: 1.25rem;
+  }
+
+  .focusedInfoCol {
+    padding-right: 0;
+  }
+
+  .closeButton {
+    top: -0.25rem;
+    right: -0.25rem;
+  }
+}
+
+/* === RAIL MODE === */
 .card[data-mode="rail"] {
-  opacity: 0.6;
+  opacity: 0.5;
   filter: grayscale(20%);
   transform: scale(0.98);
   transition: all 0.4s ease;
@@ -192,7 +353,7 @@
   display: none;
 }
 
-[data-catalog-focus-active="true"] .card:hover {
+[data-catalog-focus-active="true"] .card[data-mode="rail"]:hover {
   transform: scale(0.98);
-  background-color: var(--vision-paper);
+  opacity: 0.8;
 }
