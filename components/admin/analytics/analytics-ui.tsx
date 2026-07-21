@@ -28,3 +28,26 @@ export function Funnel({ rows }: { rows: Array<{ label: string; sessions: number
   const first = Math.max(rows[0]?.sessions ?? 0, 1);
   return <ol className={styles.funnel}>{rows.map((row, index) => { const previous = index ? rows[index - 1]?.sessions ?? 0 : row.sessions; return <li key={row.label} style={{ "--funnel-width": `${Math.max(18, row.sessions / first * 100)}%` } as React.CSSProperties}><span>{row.label}</span><strong>{row.sessions}</strong><small>{index === 0 || !previous ? "Base" : `${Math.round(row.sessions / previous * 100)}% da etapa anterior`}</small></li>; })}</ol>;
 }
+
+export function ScrollDepth({ rows }: { rows: Array<{ events: number; percent: number; sessions: number }> }) {
+  const base = Math.max(rows.find((row) => row.percent === 25)?.sessions ?? 0, 1);
+  return (
+    <ol className={styles.scrollDepth}>
+      {rows.map((row) => {
+        const reach = Math.round((row.sessions / base) * 100);
+        return (
+          <li key={row.percent}>
+            <div className={styles.scrollDepthLabel}>
+              <span>{row.percent}% da página</span>
+              <strong>{row.sessions} {row.sessions === 1 ? "sessão" : "sessões"}</strong>
+            </div>
+            <div aria-hidden="true" className={styles.scrollDepthTrack}>
+              <i style={{ "--scroll-reach": `${Math.min(100, reach)}%` } as React.CSSProperties} />
+            </div>
+            <small>{row.events} {row.events === 1 ? "registro" : "registros"} · {row.percent === 25 ? "base de leitura" : `${reach}% da base chegou até aqui`}</small>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}

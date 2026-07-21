@@ -111,11 +111,11 @@ const cachedRealtime = unstable_cache(async () => {
     googleRequest("runRealtimeReport", { metrics: [{ name: "activeUsers" }, { name: "eventCount" }, { name: "screenPageViews" }] }),
     googleRequest("runRealtimeReport", { dimensions: [{ name: "countryId" }, { name: "country" }, { name: "city" }], limit: 100, metrics: [{ name: "activeUsers" }, { name: "eventCount" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }] }),
     googleRequest("runRealtimeReport", { dimensions: [{ name: "unifiedScreenName" }], limit: 50, metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }], orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }] }),
-    googleRequest("runRealtimeReport", { dimensions: [{ name: "eventName" }], limit: 75, metrics: [{ name: "activeUsers" }, { name: "eventCount" }], orderBys: [{ metric: { metricName: "eventCount" }, desc: true }] }),
+    googleRequest("runRealtimeReport", { dimensions: [{ name: "eventName" }], limit: 75, metrics: [{ name: "eventCount" }], orderBys: [{ metric: { metricName: "eventCount" }, desc: true }] }),
   ]);
   return {
     cities: geo.map((row) => ({ activeUsers: row.metrics[0], city: row.dimensions[2], country: row.dimensions[1], countryCode: row.dimensions[0], eventCount: row.metrics[1] })),
-    events: events.map((row) => ({ activeUsers: row.metrics[0], eventCount: row.metrics[1], eventName: row.dimensions[0] })),
+    events: events.map((row) => ({ eventCount: row.metrics[0], eventName: row.dimensions[0] })),
     overview: { activeUsers: overview[0]?.metrics[0] ?? 0, eventCount: overview[0]?.metrics[1] ?? 0, pageViews: overview[0]?.metrics[2] ?? 0 },
     pages: pages.map((row) => ({ activeUsers: row.metrics[0], page: row.dimensions[0], views: row.metrics[1] })),
   };

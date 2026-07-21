@@ -8,7 +8,7 @@ import styles from "./analytics.module.css";
 
 type RealtimeData = {
   cities: Array<{ activeUsers: number; city: string; country: string; countryCode: string; eventCount: number }>;
-  events: Array<{ activeUsers: number; eventCount: number; eventName: string }>;
+  events: Array<{ eventCount: number; eventName: string }>;
   overview: { activeUsers: number; eventCount: number; pageViews: number };
   pages: Array<{ activeUsers: number; page: string; views: number }>;
 };

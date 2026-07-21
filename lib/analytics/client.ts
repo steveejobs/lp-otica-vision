@@ -2,6 +2,7 @@
 
 import { readAnalyticsConsent, writeAnalyticsConsent, type AnalyticsConsentChoice } from "./consent";
 import {
+  analyticsEventSignature,
   analyticsPropertyNames,
   googleRecommendedEventMap,
   type AnalyticsEventInput,
@@ -54,7 +55,7 @@ function cleanProperties(properties: AnalyticsProperties | undefined) {
 function isAccidentalDuplicate(input: AnalyticsEventInput, properties: AnalyticsProperties) {
   if (input.eventName === "page_view") return false;
   const now = Date.now();
-  const key = JSON.stringify([input.eventName, input.productId, input.collectionId, properties.click_location, window.location.pathname]);
+  const key = analyticsEventSignature(input, properties, window.location.pathname);
   const previous = recentEvents.get(key) ?? 0;
   recentEvents.set(key, now);
   if (recentEvents.size > 80) {

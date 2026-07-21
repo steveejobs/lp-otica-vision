@@ -102,17 +102,25 @@ export function AnalyticsRuntime({ measurementId }: { measurementId: string }) {
     const handleScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollHeight <= 0) return;
-      const percent = Math.round((window.scrollY / scrollHeight) * 100);
+      const currentScroll = Math.min(Math.max(window.scrollY, 0), scrollHeight);
+      const percent = (currentScroll / scrollHeight) * 100;
       for (const milestone of milestones) {
         if (percent >= milestone && !sent.has(milestone)) {
           sent.add(milestone);
-          trackEvent({ eventName: "scroll_depth" as Parameters<typeof trackEvent>[0]["eventName"], properties: { scroll_percent: String(milestone), source_route: pathname } });
+          trackEvent({
+            eventName: "scroll_depth",
+            properties: { scroll_percent: milestone, source_route: pathname },
+          });
         }
       }
     };
+    const initialFrame = window.requestAnimationFrame(handleScroll);
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname, publicRoute]);
+    return () => {
+      window.cancelAnimationFrame(initialFrame);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [location, pathname, publicRoute]);
 
   useEffect(() => {
     if (!publicRoute) return;

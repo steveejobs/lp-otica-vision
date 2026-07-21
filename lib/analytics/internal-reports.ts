@@ -12,6 +12,7 @@ export type InternalAnalyticsReport = {
   recent: Array<{ createdAt: string; eventName: string; productId: string | null; route: string }>;
   retention: { aggregateDays: number; enforcement: string; rawDays: number; version: number } | null;
   routes: Array<{ route: string; views: number }>;
+  scrollDepth: Array<{ events: number; percent: number; sessions: number }>;
   timeline: Array<{ date: string; pageViews: number; whatsapp: number }>;
   topBrands: Array<{ slug: string; uses: number }>;
   topCategories: Array<{ slug: string; uses: number }>;
@@ -36,7 +37,34 @@ function text(value: Json | undefined) { return typeof value === "string" ? valu
 function number(value: Json | undefined) { return typeof value === "number" && Number.isFinite(value) ? value : 0; }
 
 function empty(days: number): InternalAnalyticsReport {
-  return { counts: {}, days, external: [], filters: [], funnel: [], recent: [], retention: null, routes: [], timeline: [], topBrands: [], topCategories: [], topCollections: [], topProducts: [], topStyles: [] };
+  return {
+    counts: {},
+    days,
+    external: [],
+    filters: [],
+    funnel: [],
+    recent: [],
+    retention: null,
+    routes: [],
+    scrollDepth: [25, 50, 75, 100].map((percent) => ({ events: 0, percent, sessions: 0 })),
+    timeline: [],
+    topBrands: [],
+    topCategories: [],
+    topCollections: [],
+    topProducts: [],
+    topStyles: [],
+  };
+}
+
+function parseScrollDepth(value: Json) {
+  return array(value)
+    .map((row) => ({
+      events: number(row.events),
+      percent: number(row.percent),
+      sessions: number(row.sessions),
+    }))
+    .filter((row) => [25, 50, 75, 100].includes(row.percent))
+    .sort((left, right) => left.percent - right.percent);
 }
 
 function parseNew(value: Json, days: number): InternalAnalyticsReport {
@@ -74,8 +102,21 @@ function parseLegacy(value: Json, days: number) {
 
 export async function getInternalAnalyticsReport(days: number) {
   const supabase = await createSupabaseServerClient();
-  const current = await supabase.rpc("admin_analytics_report", { p_days: days });
-  if (!current.error && current.data) return { data: parseNew(current.data, days), error: null, source: "Dados internos" as const };
+  const [current, scrollDepth] = await Promise.all([
+    supabase.rpc("admin_analytics_report", { p_days: days }),
+    supabase.rpc("admin_analytics_scroll_depth_report", { p_days: days }),
+  ]);
+  if (!current.error && current.data) {
+    const report = parseNew(current.data, days);
+    if (!scrollDepth.error && scrollDepth.data) {
+      report.scrollDepth = parseScrollDepth(scrollDepth.data);
+    }
+    return {
+      data: report,
+      error: scrollDepth.error ? "A leitura por profundidade ainda não está disponível neste ambiente." : null,
+      source: "Dados internos" as const,
+    };
+  }
   const legacy = await supabase.rpc("admin_catalog_analytics", { p_days: days });
   if (!legacy.error && legacy.data) return { data: parseLegacy(legacy.data, days), error: "A migração analítica do preview ainda não foi aplicada; exibindo o relatório legado.", source: "Dados internos" as const };
   return { data: empty(days), error: "Dados internos temporariamente indisponíveis.", source: "Dados internos" as const };

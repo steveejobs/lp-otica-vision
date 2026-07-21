@@ -1237,6 +1237,10 @@ export type Database = {
     Functions: {
       admin_catalog_analytics: { Args: { p_days?: number }; Returns: Json }
       admin_analytics_report: { Args: { p_days?: number }; Returns: Json }
+      admin_analytics_scroll_depth_report: {
+        Args: { p_days?: number }
+        Returns: Json
+      }
       allocate_product_sku: { Args: never; Returns: string }
       catalog_filter_options: {
         Args: never
@@ -1458,6 +1462,7 @@ export type Database = {
         | "bio_link_clicked"
         | "lab_cta_clicked"
         | "external_link_clicked"
+        | "scroll_depth"
       availability_status:
         | "available"
         | "last_unit"
@@ -1636,6 +1641,7 @@ export const Constants = {
         "bio_link_clicked",
         "lab_cta_clicked",
         "external_link_clicked",
+        "scroll_depth",
       ],
       availability_status: [
         "available",

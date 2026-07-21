@@ -63,6 +63,20 @@ export type AnalyticsEventInput = {
   transport?: "beacon" | "fetch";
 };
 
+export function analyticsEventSignature(
+  input: Pick<AnalyticsEventInput, "collectionId" | "eventName" | "productId">,
+  properties: AnalyticsProperties,
+  pathname: string,
+) {
+  return JSON.stringify([
+    input.eventName,
+    input.productId,
+    input.collectionId,
+    properties,
+    pathname,
+  ]);
+}
+
 export const googleRecommendedEventMap: Partial<Record<AnalyticsEventName, string>> = {
   search_performed: "search",
   product_opened: "view_item",

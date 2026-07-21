@@ -5,34 +5,15 @@ import { createHmac } from "node:crypto";
 import { NextResponse } from "next/server";
 
 import { analyticsEventNames, type AnalyticsEventName } from "@/lib/analytics/events";
+import { sanitizeAnalyticsMetadata } from "@/lib/analytics/server-event";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import type { Database, Json } from "@/types/supabase";
+import type { Database } from "@/types/supabase";
 
 export const runtime = "nodejs";
 
 type EventName = Database["public"]["Enums"]["analytics_event_name"];
 const eventNames = new Set<AnalyticsEventName>(analyticsEventNames);
-const metadataKeys = new Set([
-  "availability",
-  "brand_slug",
-  "category_slug",
-  "click_location",
-  "collection_slug",
-  "filter_name",
-  "filter_value",
-  "product_slug",
-  "search_result_count",
-  "source_route",
-  "style_slug",
-  "utm_campaign",
-  "utm_content",
-  "utm_medium",
-  "utm_source",
-  "utm_term",
-]);
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const FILTER_VALUE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const ROUTE_PATTERN = /^\/[a-z0-9/_-]*$/i;
 
 function jsonResponse(body: object, status: number) {
   return NextResponse.json(body, {
@@ -44,32 +25,6 @@ function jsonResponse(body: object, status: number) {
 function optionalUuid(value: unknown) {
   if (value === undefined || value === null || value === "") return null;
   return typeof value === "string" && UUID_PATTERN.test(value) ? value : undefined;
-}
-
-function sanitizeMetadata(value: unknown): Json {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-
-  const clean: Record<string, Json> = {};
-
-  for (const [key, item] of Object.entries(value).slice(0, 8)) {
-    if (!metadataKeys.has(key)) continue;
-    if (typeof item === "boolean" || typeof item === "number") {
-      clean[key] = item;
-    } else if (typeof item === "string") {
-      const normalized = item.normalize("NFKC").replace(/\s+/g, " ").trim();
-      if (!normalized || normalized.length > 100) continue;
-      if (normalized.includes("@") || /https?:\/\//i.test(normalized) || /\d{6,}/.test(normalized)) continue;
-      if (key === "source_route") {
-        if (ROUTE_PATTERN.test(normalized)) clean[key] = normalized;
-      } else if (["brand_slug", "category_slug", "collection_slug", "filter_name", "filter_value", "product_slug", "style_slug", "availability"].includes(key)) {
-        if (FILTER_VALUE_PATTERN.test(normalized)) clean[key] = normalized;
-      } else clean[key] = normalized;
-    }
-  }
-
-  return JSON.stringify(clean).length <= 1024 ? clean : {};
 }
 
 function referrerDomain(value: string | null) {
@@ -158,7 +113,7 @@ export async function POST(request: Request) {
     p_collection_id: collectionId,
     p_event_name: eventName as EventName,
     p_fingerprint_hash: fingerprintHash,
-    p_metadata: sanitizeMetadata(body.metadata),
+    p_metadata: sanitizeAnalyticsMetadata(body.metadata),
     p_product_id: productId,
     p_promotion_id: promotionId,
     p_referrer_domain: referrerDomain(request.headers.get("referer")),

@@ -1,0 +1,342 @@
+.showroom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(240px, .62fr);
+  align-items: start;
+  gap: clamp(2rem, 5vw, 5.5rem);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.stage {
+  min-width: 0;
+}
+
+.stageTopline,
+.indexHeading {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--vision-line);
+  color: var(--vision-muted);
+  font-size: .68rem;
+  font-weight: 650;
+}
+
+.media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgb(var(--vision-steel-rgb) / .5);
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: 0 24px 54px rgb(var(--vision-graphite-rgb) / .075);
+  isolation: isolate;
+  touch-action: pan-y;
+}
+
+.media::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  border: 1px solid rgb(var(--vision-warm-white-rgb) / .65);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.productImage {
+  z-index: 1;
+  object-fit: contain;
+  padding: clamp(1.25rem, 4.5vw, 4.5rem);
+  opacity: 0;
+  transform: translate3d(1.5%, 0, 0) scale(.978);
+  transition:
+    opacity 540ms var(--ease-vision),
+    transform 720ms var(--ease-vision),
+    filter 420ms var(--ease-vision);
+}
+
+.productImage[data-active] {
+  z-index: 2;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.caption {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: clamp(1rem, 2vw, 2rem);
+  padding: 1.2rem 0 1.5rem;
+  border-bottom: 1px solid var(--vision-line);
+}
+
+.brand,
+.descriptor,
+.indexHeading p,
+.note {
+  color: var(--vision-muted);
+}
+
+.brand {
+  margin: 0 0 .38rem;
+  font-size: .67rem;
+  font-weight: 700;
+}
+
+.caption h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
+  font-weight: 400;
+  line-height: .94;
+}
+
+.descriptor {
+  margin: .45rem 0 0;
+  font-size: .76rem;
+}
+
+.commercial {
+  display: grid;
+  justify-items: end;
+  gap: .45rem;
+  padding-bottom: .15rem;
+  white-space: nowrap;
+}
+
+.commercial strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.commercial span {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
+  color: var(--vision-muted);
+  font-size: .67rem;
+}
+
+.commercial i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--vision-steel-dark);
+  box-shadow: 0 0 0 3px rgb(var(--vision-steel-rgb) / .22);
+}
+
+.commercial[data-availability="last_unit"] i {
+  background: var(--vision-bronze);
+}
+
+.commercial[data-availability="unavailable"] {
+  opacity: .62;
+}
+
+.detailLink {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: .45rem;
+  padding-bottom: .1rem;
+  border-bottom: 1px solid var(--vision-steel-dark);
+  font-size: .76rem;
+  font-weight: 750;
+}
+
+.detailLink svg {
+  transition: transform 220ms var(--ease-vision);
+}
+
+.detailLink:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.index {
+  min-width: 0;
+}
+
+.indexHeading p {
+  margin: 0;
+  font-size: .68rem;
+  font-weight: 650;
+}
+
+.controls {
+  display: flex;
+  gap: .4rem;
+}
+
+.controls button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--vision-line);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: .25;
+  cursor: default;
+}
+
+.index ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.index li {
+  border-bottom: 1px solid var(--vision-line);
+}
+
+.index li button {
+  position: relative;
+  width: 100%;
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: 1.85rem minmax(0, 1fr);
+  align-content: center;
+  align-items: baseline;
+  gap: .25rem .7rem;
+  padding: .8rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--vision-ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.index li button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -.75rem;
+  width: 1px;
+  background: var(--vision-bronze);
+  opacity: 0;
+  transform: scaleY(.2);
+  transition:
+    opacity 220ms var(--ease-vision),
+    transform 420ms var(--ease-vision);
+}
+
+.index li button[aria-current="true"]::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.index li button > span {
+  grid-row: 1 / span 2;
+  color: var(--vision-muted);
+  font-size: .63rem;
+}
+
+.index li strong {
+  font-family: var(--font-display);
+  font-size: 1.03rem;
+  font-weight: 400;
+}
+
+.index li small {
+  color: var(--vision-muted);
+  font-size: .65rem;
+}
+
+.index li button[aria-current="true"] strong {
+  color: var(--vision-bronze);
+}
+
+.note {
+  margin: 1rem 0 0;
+  font-size: .67rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .showroom {
+    grid-template-columns: minmax(0, 1.45fr) minmax(210px, .55fr);
+    gap: 2rem;
+  }
+
+  .caption {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .detailLink {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 720px) {
+  .showroom {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+    padding-top: .8rem;
+  }
+
+  .stageTopline {
+    min-height: 40px;
+  }
+
+  .media {
+    width: 100vw;
+    margin-left: -4vw;
+    aspect-ratio: 4 / 3;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    box-shadow: 0 16px 34px rgb(var(--vision-graphite-rgb) / .055);
+  }
+
+  .productImage {
+    padding: clamp(1rem, 8vw, 2.3rem);
+  }
+
+  .caption {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-top: 1rem;
+  }
+
+  .caption h3 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .commercial {
+    gap: .35rem;
+  }
+
+  .detailLink {
+    grid-column: 1 / -1;
+  }
+
+  .indexHeading {
+    margin-top: .35rem;
+  }
+
+  .controls button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .index li button {
+    min-height: 68px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .productImage,
+  .detailLink svg,
+  .index li button::before {
+    transition: none;
+  }
+}

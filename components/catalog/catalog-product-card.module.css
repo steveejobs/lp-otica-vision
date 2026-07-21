@@ -52,7 +52,7 @@
   display: flex;
   min-width: 0;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 0.5rem;
 }
 
@@ -62,15 +62,6 @@
   font-weight: 650;
   letter-spacing: 0;
   line-height: 1.35;
-}
-
-.reference {
-  overflow: hidden;
-  color: var(--vision-muted);
-  font-size: 0.61rem;
-  line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .content h3 {
@@ -83,7 +74,6 @@
 }
 
 .descriptor {
-  min-height: 1.3em;
   color: var(--vision-muted);
   font-size: 0.77rem;
   line-height: 1.4;
@@ -113,7 +103,18 @@
 }
 
 .availability {
+  display: inline-flex;
+  align-items: center;
+  gap: .42rem;
   color: var(--vision-muted);
+}
+
+.availability i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--vision-steel-dark);
+  box-shadow: 0 0 0 3px rgb(var(--vision-steel-rgb) / .22);
 }
 
 .card[data-availability="available"] .availability {
@@ -122,6 +123,10 @@
 
 .card[data-availability="last_unit"] .availability {
   color: var(--vision-bronze);
+}
+
+.card[data-availability="last_unit"] .availability i {
+  background: var(--vision-bronze);
 }
 
 .card[data-availability="unavailable"] .availability {
@@ -196,8 +201,7 @@
     font-size: 0.98rem;
   }
 
-  .brand,
-  .reference {
+  .brand {
     font-size: 0.6rem;
   }
 

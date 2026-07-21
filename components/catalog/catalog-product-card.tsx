@@ -64,13 +64,13 @@ export function CatalogProductCard({
           <p className={styles.brand}>
             {product.brand?.name ?? "Seleção Vision"}
           </p>
-          <span className={styles.reference}>Ref. {product.sku}</span>
         </div>
         <h3>{product.name}</h3>
         {descriptor ? <p className={styles.descriptor}>{descriptor}</p> : null}
         {presentation === "catalog" ? (
           <div className={styles.commercialLine}>
             <span className={styles.availability}>
+              <i aria-hidden="true" />
               {availabilityLabels[product.availability]}
             </span>
             {price ? <strong>{price}</strong> : null}

@@ -47,7 +47,7 @@ export default async function RealtimePage() {
     </section>
     <div className={styles.compactGrid}>
       <section className={styles.section}><SourceBadge>Google Analytics</SourceBadge><h2>Páginas ativas</h2><ReportTable label="Páginas ativas"><thead><tr><th>Página</th><th>Ativos</th><th>Views</th></tr></thead><tbody>{(data?.pages ?? []).map((page) => <tr key={page.page}><td>{page.page || "Página não disponível"}</td><td>{page.activeUsers}</td><td>{page.views}</td></tr>)}</tbody></ReportTable></section>
-      <section className={styles.section}><SourceBadge>Google Analytics</SourceBadge><h2>Eventos recentes</h2><ReportTable label="Eventos recentes"><thead><tr><th>Evento</th><th>Usuários</th><th>Ocorrências</th></tr></thead><tbody>{(data?.events ?? []).map((event) => <tr key={event.eventName}><td>{event.eventName}</td><td>{event.activeUsers}</td><td>{event.eventCount}</td></tr>)}</tbody></ReportTable></section>
+      <section className={styles.section}><SourceBadge>Google Analytics</SourceBadge><h2>Eventos recentes</h2><ReportTable label="Eventos recentes"><thead><tr><th>Evento</th><th>Ocorrências</th></tr></thead><tbody>{(data?.events ?? []).map((event) => <tr key={event.eventName}><td>{event.eventName}</td><td>{event.eventCount}</td></tr>)}</tbody></ReportTable></section>
     </div>
   </div>;
 }
