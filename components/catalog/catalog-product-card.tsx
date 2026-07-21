@@ -23,7 +23,7 @@ export function CatalogProductCard({
   clone = false,
   external = false,
   href,
-  imageVariant = "catalog_card",
+  imageVariant = "product_detail",
   presentation = "catalog",
   priority = false,
   product,
@@ -34,7 +34,7 @@ export function CatalogProductCard({
   href?: string;
   imageVariant?: Extract<
     ProductImageVariantKind,
-    "catalog_card" | "home_preview"
+    "catalog_card" | "home_preview" | "product_detail"
   >;
   presentation?: "catalog" | "preview";
   priority?: boolean;
@@ -72,7 +72,6 @@ export function CatalogProductCard({
           </p>
         </div>
         <h3>{product.name}</h3>
-        {descriptor ? <p className={styles.descriptor}>{descriptor}</p> : null}
         {presentation === "catalog" ? (
           <div className={styles.commercialLine}>
             <span className={styles.availability}>

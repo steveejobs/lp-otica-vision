@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
-import { CatalogEntrance } from "@/components/catalog/catalog-entrance";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
 import { SiteFooter } from "@/components/site-footer";
@@ -82,10 +81,6 @@ export function CatalogView({
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        {!hasFilters && !query.page || query.page === 1 ? (
-          <CatalogEntrance products={featuredProducts} />
-        ) : null}
-
         <section className={styles.filters} aria-label="Explorar o catálogo">
           <div className={styles.filterInner} data-catalog-enter="filters">
             <div className={styles.brandBlock}>
@@ -252,7 +247,7 @@ export function CatalogView({
             <div className={styles.resultSummary} data-catalog-enter="summary">
               <div>
                 <p className="eyebrow">Curadoria atual</p>
-                <h2 id="catalog-results-title">{resultTitle}</h2>
+                <h1 id="catalog-results-title">{resultTitle}</h1>
               </div>
               <p aria-live="polite">
                 {catalog.total} {catalog.total === 1 ? "modelo" : "modelos"}
