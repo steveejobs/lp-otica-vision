@@ -21,7 +21,11 @@ export function FocusedProductView({ product }: { product: CatalogProduct }) {
          <p>{product.category?.name}</p>
          
          <div style={{ marginTop: "2rem" }}>
-           <ProductWhatsappButton productName={product.name} />
+           <ProductWhatsappButton 
+             href={`https://api.whatsapp.com/send/?phone=5563992231522&text=Ol%C3%A1%21+Gostaria+de+saber+mais+sobre+o+modelo+${encodeURIComponent(product.name)}&type=phone_number&app_absent=0&utm_source=ig`}
+             label={`Consultar ${product.name}`}
+             productId={product.id}
+           />
          </div>
          
          <button onClick={() => focusManager?.closeFocus()} style={{ marginTop: "1rem" }}>

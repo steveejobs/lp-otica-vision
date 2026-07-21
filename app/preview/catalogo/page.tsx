@@ -40,6 +40,7 @@ export default async function CatalogPreviewPage({
       filters={filters}
       query={query}
       styleOptions={[]}
+      initialFocusedProduct={null}
     />
   );
 }
