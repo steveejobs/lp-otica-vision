@@ -12,13 +12,14 @@ interface CatalogFocusContextValue {
   focusProduct: (slug: string, originElement: HTMLElement) => void;
   closeFocus: () => void;
   getMode: (slug: string) => FocusMode;
+  preloadProduct: (slug: string) => void;
 }
 
 const CatalogFocusContext = createContext<CatalogFocusContextValue | null>(null);
 
 export function useCatalogFocus() {
   const ctx = useContext(CatalogFocusContext);
-  if (!ctx) return null; // Retorna null silenciosamente se não estiver no contexto, permitindo uso genérico.
+  if (!ctx) return null;
   return ctx;
 }
 
@@ -29,65 +30,181 @@ interface CatalogFocusManagerProps {
   query: CatalogQuery;
 }
 
+type FlipGeometry = {
+  rect: DOMRect;
+};
+
+// Simple Deduplicated Cache
+const detailCache = new Map<string, CatalogProduct>();
+const fetchPromises = new Map<string, Promise<CatalogProduct>>();
+
+export function preloadProductData(slug: string) {
+  if (detailCache.has(slug) || fetchPromises.has(slug)) return;
+  
+  const promise = fetch(`/api/catalog/products/${slug}`)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+       if (data) detailCache.set(slug, data);
+       fetchPromises.delete(slug);
+       return data;
+    })
+    .catch(() => {
+       fetchPromises.delete(slug);
+       return null;
+    });
+    
+  fetchPromises.set(slug, promise);
+}
+
 export function CatalogFocusManager({ children, initialSlug, initialProduct, query }: CatalogFocusManagerProps) {
   const [focusedSlug, setFocusedSlug] = useState<string | null>(initialSlug);
   const [focusedProductData, setFocusedProductData] = useState<CatalogProduct | null>(initialProduct);
+  const flipOrigins = useRef<Map<string, FlipGeometry>>(new Map());
   
-  // Sincronizar quando a prop do server mudar (ex: navegação via filtros)
   useEffect(() => {
     setFocusedSlug(initialSlug);
     setFocusedProductData(initialProduct);
   }, [initialSlug, initialProduct]);
 
-  // Handle popstate for back button
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       const url = new URL(window.location.href);
       const slug = url.searchParams.get("produto");
-      
-      // If we go back, we don't need FLIP if we just restore the grid.
-      // But we will let the normal state update handle it.
       setFocusedSlug(slug);
-      
-      // We don't have the full data anymore unless we cached it, but that's fine, 
-      // the card uses standard cover image.
     };
-    
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  // Fetch logic when focusedSlug changes
+  useEffect(() => {
+    if (!focusedSlug) {
+      setFocusedProductData(null);
+      return;
+    }
+    
+    let isMounted = true;
+    
+    if (detailCache.has(focusedSlug)) {
+      setFocusedProductData(detailCache.get(focusedSlug)!);
+      return;
+    }
+    
+    const promise = fetchPromises.get(focusedSlug) || (
+      fetch(`/api/catalog/products/${focusedSlug}`)
+        .then(r => r.ok ? r.json() : null)
+    );
+    
+    promise.then(data => {
+      if (isMounted && data) {
+        detailCache.set(focusedSlug, data);
+        setFocusedProductData(data);
+      }
+    });
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [focusedSlug]);
+
   const focusProduct = (slug: string, originElement: HTMLElement) => {
-    // 6. Fazer todas as leituras First antes do setState.
-    // Lógica do FLIP começará aqui depois
+    if (slug === focusedSlug) return;
+
+    // 1. FIRST - Ler dimensões antes do setState
+    const frames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    flipOrigins.current.clear();
+    frames.forEach(frame => {
+      const productEl = frame.closest("[data-catalog-product-slug]");
+      const productSlug = productEl?.getAttribute("data-catalog-product-slug");
+      if (productSlug) {
+        flipOrigins.current.set(productSlug, { rect: frame.getBoundingClientRect() });
+      }
+    });
     
     const isFromRail = focusedSlug !== null;
-    
     setFocusedSlug(slug);
     
-    // 3. Atualizar URL com pushState (se vindo do grid) ou replaceState (se trocando no rail)
     const newUrl = catalogHref(query, { product: slug });
-    
     if (isFromRail) {
       window.history.replaceState({ showroomFocus: true }, "", newUrl);
     } else {
       window.history.pushState({ showroomFocus: true }, "", newUrl);
     }
-    
-    // TODO: Disparar preload/fetch do data da API
   };
 
   const closeFocus = () => {
+    // 1. FIRST (Closing)
+    const frames = document.querySelectorAll<HTMLElement>("[data-flip-frame]");
+    flipOrigins.current.clear();
+    frames.forEach(frame => {
+      const productEl = frame.closest("[data-catalog-product-slug]");
+      const productSlug = productEl?.getAttribute("data-catalog-product-slug");
+      if (productSlug) {
+        flipOrigins.current.set(productSlug, { rect: frame.getBoundingClientRect() });
+      }
+    });
+
     setFocusedSlug(null);
     const newUrl = catalogHref(query, { product: null });
     
     if (window.history.state?.showroomFocus) {
-      // 3. Fechar com history.back somente quando essa entrada tiver sido criada pelo Showroom Focus.
       window.history.back();
     } else {
       window.history.replaceState(null, "", newUrl);
     }
   };
+
+  useLayoutEffect(() => {
+    if (flipOrigins.current.size === 0) return;
+    
+    // 2. LAST
+    const frames = Array.from(document.querySelectorAll<HTMLElement>("[data-flip-frame]"));
+    const inverts = frames.map(frame => {
+      const productSlug = frame.closest("[data-catalog-product-slug]")?.getAttribute("data-catalog-product-slug");
+      if (!productSlug) return null;
+      
+      const first = flipOrigins.current.get(productSlug);
+      if (!first) return null;
+      
+      const lastRect = frame.getBoundingClientRect();
+      const firstRect = first.rect;
+      
+      const deltaX = firstRect.left - lastRect.left;
+      const deltaY = firstRect.top - lastRect.top;
+      const scaleX = firstRect.width / lastRect.width;
+      const scaleY = firstRect.height / lastRect.height;
+      
+      if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5 && Math.abs(scaleX - 1) < 0.01 && Math.abs(scaleY - 1) < 0.01) {
+        return null;
+      }
+      
+      // 3. INVERT
+      frame.style.transformOrigin = "top left";
+      const invertTransform = `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`;
+      frame.style.transform = invertTransform;
+      
+      return { frame, invertTransform };
+    }).filter(Boolean) as { frame: HTMLElement, invertTransform: string }[];
+    
+    flipOrigins.current.clear();
+    if (inverts.length === 0) return;
+    
+    // 4. PLAY (Request Animation Frame)
+    requestAnimationFrame(() => {
+      inverts.forEach(({ frame, invertTransform }) => {
+        frame.style.transform = "";
+        
+        frame.animate([
+          { transform: invertTransform },
+          { transform: "translate(0, 0) scale(1)" }
+        ], {
+          duration: 480,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          fill: "both"
+        });
+      });
+    });
+  }, [focusedSlug]);
 
   const getMode = (slug: string): FocusMode => {
     if (!focusedSlug) return "grid";
@@ -96,7 +213,14 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
   };
 
   return (
-    <CatalogFocusContext.Provider value={{ focusedSlug, focusedProductData, focusProduct, closeFocus, getMode }}>
+    <CatalogFocusContext.Provider value={{ 
+      focusedSlug, 
+      focusedProductData, 
+      focusProduct, 
+      closeFocus, 
+      getMode,
+      preloadProduct: preloadProductData
+    }}>
       {children}
     </CatalogFocusContext.Provider>
   );

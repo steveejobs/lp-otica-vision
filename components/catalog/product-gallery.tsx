@@ -54,10 +54,11 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
   if (images.length === 1) {
     return (
       <div className={styles.gallery} data-count="1">
-        <ProductMediaShell presentation="gallery" ref={targetRef} className={styles.mainShell}>
-          <Image
-            alt={activeImage.altText}
-            blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
+        <div data-flip-frame className={styles.flipFrame}>
+          <ProductMediaShell presentation="gallery" ref={targetRef} className={styles.mainShell}>
+            <Image
+              alt={activeImage.altText}
+              blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
             fetchPriority="high"
             fill
             loading="eager"
@@ -73,6 +74,7 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
             }}
           />
         </ProductMediaShell>
+        </div>
       </div>
     );
   }
@@ -80,7 +82,7 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
   // Multi Image Layout (2 or 3+)
   return (
     <div className={styles.gallery} data-count={images.length >= 3 ? "many" : "2"}>
-      <div className={styles.mainView}>
+      <div data-flip-frame className={styles.mainView}>
         <ProductMediaShell presentation="gallery" ref={isCoverActive ? targetRef : undefined} className={styles.mainShell}>
           {prevIndex !== null && isFading && (
             <Image

@@ -6,6 +6,7 @@ import {
   getCatalogPage,
   getFeaturedCatalogProducts,
   getPublishedCollectionId,
+  getPublishedCatalogProduct,
 } from "@/lib/catalog/data";
 import { parseCatalogQuery, type CatalogSearchParams } from "@/lib/catalog/query";
 import { getCurationStyleOptions } from "@/lib/curation/data";
@@ -37,7 +38,7 @@ export default async function CatalogPage({
   searchParams: Promise<CatalogSearchParams>;
 }) {
   const query = parseCatalogQuery(await searchParams);
-  const [catalog, filters, collectionId, styleOptions, featuredProducts] = await Promise.all([
+  const [catalog, filters, collectionId, styleOptions, featuredProducts, initialFocusedProduct] = await Promise.all([
     getCatalogPage(query),
     getCatalogFilterOptions(),
     query.collection
@@ -45,6 +46,7 @@ export default async function CatalogPage({
       : Promise.resolve(null),
     getCurationStyleOptions(query.category),
     getFeaturedCatalogProducts(),
+    query.product ? getPublishedCatalogProduct(query.product) : Promise.resolve(null),
   ]);
 
   return (
@@ -55,6 +57,7 @@ export default async function CatalogPage({
       filters={filters}
       query={query}
       styleOptions={styleOptions}
+      initialFocusedProduct={initialFocusedProduct}
     />
   );
 }

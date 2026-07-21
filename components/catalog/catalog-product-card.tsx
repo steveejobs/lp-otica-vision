@@ -10,6 +10,7 @@ import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog
 
 import { ProductMediaShell } from "./product-media-shell";
 import { useCatalogFocus } from "./catalog-focus-manager";
+import { FocusedProductView } from "./focused-product-view";
 import styles from "./catalog-product-card.module.css";
 
 const blurDataUrl =
@@ -128,6 +129,28 @@ export function CatalogProductCard({
     );
   }
 
+  const handlePreload = () => {
+    if (focusContext && !external) {
+      focusContext.preloadProduct(product.slug);
+    }
+  };
+
+  if (mode === "focused" && focusContext?.focusedProductData) {
+    return (
+      <article
+        className={styles.card}
+        data-mode={mode}
+        data-catalog-product-id={product.id}
+        data-catalog-product-name={product.name}
+        data-catalog-product-slug={product.slug}
+        data-catalog-product-brand={product.brand?.slug}
+        data-presentation={presentation}
+      >
+        <FocusedProductView product={focusContext.focusedProductData} />
+      </article>
+    );
+  }
+
   return (
     <article
       aria-hidden={clone || undefined}
@@ -144,6 +167,8 @@ export function CatalogProductCard({
         className={styles.link}
         href={productHref}
         onClick={handleLinkClick}
+        onPointerEnter={handlePreload}
+        onFocus={handlePreload}
         tabIndex={clone ? -1 : undefined}
       >
         {content}

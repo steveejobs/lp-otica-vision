@@ -4,7 +4,8 @@ import { MessageCircle } from "lucide-react";
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
-import { CatalogFocusManager, useCatalogFocus } from "@/components/catalog/catalog-focus-manager";
+import { CatalogFocusManager } from "@/components/catalog/catalog-focus-manager";
+import { FocusGridWrapper } from "@/components/catalog/focus-grid-wrapper";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { CatalogFilterOptions, CatalogPageResult, CatalogProductCard as CatalogProductCardType, CatalogProduct } from "@/lib/catalog/types";
@@ -185,30 +186,6 @@ export function CatalogFocusView({
         <CatalogAnalytics collectionId={collectionId} query={query} resultCount={catalog.total} />
       </main>
       <SiteFooter />
-    </div>
-  );
-}
-
-function FocusGridWrapper({ catalog, query }: { catalog: CatalogPageResult, query: CatalogQuery }) {
-  const focusManager = useCatalogFocus();
-  const hasFocus = !!focusManager?.focusedSlug;
-  
-  return (
-    <div 
-      className={styles.grid} 
-      data-catalog-results-grid 
-      data-count={Math.min(catalog.products.length, 9)}
-      data-catalog-focus-active={hasFocus}
-    >
-      {catalog.products.map((product, index) => (
-        <CatalogProductCard
-          href={catalogProductHref(product.slug, query)}
-          key={product.id}
-          priority={index === 0}
-          product={product}
-          presentation="preview"
-        />
-      ))}
     </div>
   );
 }

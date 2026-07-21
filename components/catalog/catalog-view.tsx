@@ -4,9 +4,11 @@ import { MessageCircle } from "lucide-react";
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
+import { CatalogFocusManager } from "@/components/catalog/catalog-focus-manager";
+import { FocusGridWrapper } from "@/components/catalog/focus-grid-wrapper";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import type { CatalogFilterOptions, CatalogPageResult, CatalogProductCard as CatalogProductCardType } from "@/lib/catalog/types";
+import type { CatalogFilterOptions, CatalogPageResult, CatalogProductCard as CatalogProductCardType, CatalogProduct } from "@/lib/catalog/types";
 import { catalogHref, catalogProductHref, hasActiveCatalogFilters, type CatalogQuery } from "@/lib/catalog/query";
 import type { CurationStyle } from "@/lib/curation/types";
 import { LINKS } from "@/lib/links";
@@ -20,6 +22,7 @@ interface CatalogViewProps {
   filters: CatalogFilterOptions;
   query: CatalogQuery;
   styleOptions: CurationStyle[];
+  initialFocusedProduct: CatalogProduct | null;
 }
 
 const BRAND_LOGOS: Record<string, string> = {
@@ -42,6 +45,7 @@ export function CatalogView({
   filters,
   query,
   styleOptions,
+  initialFocusedProduct,
 }: CatalogViewProps) {
   const activeBrand = filters.brands.find((brand) => brand.key === query.brand);
   const activeStyle = styleOptions.find((style) => style.slug === query.style);
@@ -80,7 +84,7 @@ export function CatalogView({
               <Link
                 aria-current={!query.brand ? "page" : undefined}
                 data-catalog-filter-link
-                href={catalogHref(query, { brand: null, page: 1 })}
+                href={catalogHref(query, { brand: null, page: 1, product: null })}
                 scroll={false}
                 className={styles.brandLinkText}
               >
@@ -92,7 +96,7 @@ export function CatalogView({
                   <Link
                     aria-current={query.brand === brand.key ? "page" : undefined}
                     data-catalog-filter-link
-                    href={catalogHref(query, { brand: brand.key, page: 1 })}
+                    href={catalogHref(query, { brand: brand.key, page: 1, product: null })}
                     key={brand.key}
                     scroll={false}
                     className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
@@ -114,7 +118,7 @@ export function CatalogView({
                 <Link
                   aria-current={!query.style ? "page" : undefined}
                   data-catalog-filter-link
-                  href={catalogHref(query, { page: 1, style: null })}
+                  href={catalogHref(query, { page: 1, style: null, product: null })}
                   scroll={false}
                   className={styles.styleTab}
                 >
@@ -124,7 +128,7 @@ export function CatalogView({
                   <Link
                     aria-current={query.style === style.slug ? "page" : undefined}
                     data-catalog-filter-link
-                    href={catalogHref(query, { page: 1, style: style.slug })}
+                    href={catalogHref(query, { page: 1, style: style.slug, product: null })}
                     key={style.id}
                     scroll={false}
                     className={styles.styleTab}
@@ -156,18 +160,11 @@ export function CatalogView({
                 </div>
               </div>
             ) : (
-              <CatalogResultsMotion motionKey={motionKey}>
-                <div className={styles.grid} data-catalog-results-grid data-count={Math.min(catalog.products.length, 9)}>
-                  {catalog.products.map((product, index) => (
-                    <CatalogProductCard
-                      href={catalogProductHref(product.slug, query)}
-                      key={product.id}
-                      priority={index === 0}
-                      product={product}
-                    />
-                  ))}
-                </div>
-              </CatalogResultsMotion>
+              <CatalogFocusManager initialSlug={query.product} initialProduct={initialFocusedProduct} query={query}>
+                <CatalogResultsMotion motionKey={motionKey}>
+                  <FocusGridWrapper catalog={catalog} query={query} />
+                </CatalogResultsMotion>
+              </CatalogFocusManager>
             )}
 
             {catalog.page < catalog.totalPages ? (

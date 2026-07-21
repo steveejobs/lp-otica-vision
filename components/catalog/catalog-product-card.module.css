@@ -112,3 +112,31 @@
     color: var(--vision-muted);
   }
 }
+
+.card[data-mode="focused"] {
+  grid-column: 1 / -1;
+  order: -1;
+  background: var(--vision-paper);
+  border: 1px solid var(--vision-line);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 720px) {
+  .card[data-mode="focused"] {
+    grid-column: 1 / -1;
+    order: -1;
+    width: 100vw;
+    margin-left: -4vw;
+    padding: 1rem 4vw;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    min-height: 100vh;
+  }
+}
+
+.card[data-mode="rail"] {
+  /* For now, just let them reflow */
+}
+
