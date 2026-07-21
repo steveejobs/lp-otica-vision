@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
@@ -6,7 +9,7 @@ import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
 
 import { ProductMediaShell } from "./product-media-shell";
-import { ProductTransitionLink } from "./product-transition-link";
+import { useCatalogFocus } from "./catalog-focus-manager";
 import styles from "./catalog-product-card.module.css";
 
 const blurDataUrl =
@@ -34,6 +37,9 @@ export function CatalogProductCard({
   priority?: boolean;
   product: CatalogProductCardData;
 }) {
+  const focusContext = useCatalogFocus();
+  const mode = focusContext?.getMode(product.slug) ?? "grid";
+  
   const productHref = href ?? `/catalogo/${product.slug}`;
   const label =
     actionLabel ??
@@ -57,9 +63,11 @@ export function CatalogProductCard({
   );
 
   const mediaContent = (
-    <ProductMediaShell presentation="catalog" className={styles.media}>
-      {imageElement}
-    </ProductMediaShell>
+    <div data-flip-frame className={styles.flipFrame}>
+      <ProductMediaShell presentation="catalog" className={styles.media}>
+        {imageElement}
+      </ProductMediaShell>
+    </div>
   );
 
   const content = (
@@ -75,26 +83,71 @@ export function CatalogProductCard({
       </div>
     </>
   );
+  
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!focusContext || external) return;
+    
+    if (
+      e.button !== 0 || // Não é botão principal
+      e.ctrlKey ||
+      e.metaKey ||
+      e.shiftKey ||
+      e.altKey ||
+      e.defaultPrevented
+    ) {
+      return;
+    }
+    
+    e.preventDefault();
+    focusContext.focusProduct(product.slug, e.currentTarget);
+  };
+
+  if (external) {
+    return (
+      <article
+        aria-hidden={clone || undefined}
+        className={styles.card}
+        data-mode={mode}
+        data-catalog-product-id={clone ? undefined : product.id}
+        data-catalog-product-name={clone ? undefined : product.name}
+        data-catalog-product-slug={clone ? undefined : product.slug}
+        data-catalog-product-brand={clone ? undefined : product.brand?.slug}
+        data-presentation={presentation}
+      >
+        <a
+          aria-label={linkLabel}
+          className={styles.link}
+          href={productHref}
+          rel="noopener noreferrer"
+          tabIndex={clone ? -1 : undefined}
+          target="_blank"
+        >
+          {content}
+        </a>
+      </article>
+    );
+  }
 
   return (
     <article
       aria-hidden={clone || undefined}
       className={styles.card}
+      data-mode={mode}
       data-catalog-product-id={clone ? undefined : product.id}
       data-catalog-product-name={clone ? undefined : product.name}
       data-catalog-product-slug={clone ? undefined : product.slug}
       data-catalog-product-brand={clone ? undefined : product.brand?.slug}
       data-presentation={presentation}
     >
-      <ProductTransitionLink
-        clone={clone}
-        external={external}
+      <Link
+        aria-label={linkLabel}
+        className={styles.link}
         href={productHref}
-        linkLabel={linkLabel}
-        product={product}
+        onClick={handleLinkClick}
+        tabIndex={clone ? -1 : undefined}
       >
         {content}
-      </ProductTransitionLink>
+      </Link>
     </article>
   );
 }

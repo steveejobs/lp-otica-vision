@@ -40,6 +40,7 @@ export function parseCatalogQuery(params: CatalogSearchParams): CatalogQuery {
     brand: safeSlug(params.marca),
     category: safeSlug(params.categoria),
     collection: safeSlug(params.colecao),
+    product: safeSlug(params.produto),
     page:
       Number.isSafeInteger(requestedPage) && requestedPage > 0
         ? Math.min(requestedPage, 1000)
@@ -62,6 +63,7 @@ export function catalogHref(
   if (next.availability) query.set("disponibilidade", next.availability);
   if (next.collection) query.set("colecao", next.collection);
   if (next.style) query.set("estilo", next.style);
+  if (next.product) query.set("produto", next.product);
   if (next.page > 1) query.set("pagina", String(next.page));
 
   const value = query.toString();
