@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
-import { availabilityLabels, formatCatalogPrice } from "@/lib/catalog/format";
+import { formatCatalogPrice } from "@/lib/catalog/format";
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
@@ -10,7 +10,13 @@ import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog
 import styles from "./catalog-product-card.module.css";
 
 const blurDataUrl =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
+
+const luxuryAvailabilityLabels = {
+  available: "Pronta Entrega",
+  last_unit: "Última Peça",
+  unavailable: "Indisponível",
+};
 
 export function CatalogProductCard({
   actionLabel,
@@ -39,10 +45,10 @@ export function CatalogProductCard({
   const productHref = href ?? `/catalogo/${product.slug}`;
   const label =
     actionLabel ??
-    (presentation === "preview" ? "Abrir modelo" : "Ver detalhes");
+    (presentation === "preview" ? "Abrir modelo" : "Explorar");
   const linkLabel = external
     ? `Consultar ${product.name} pelo WhatsApp`
-    : `Ver ${product.name}`;
+    : `Explorar ${product.name}`;
   const content = (
     <>
       <div className={styles.media} data-catalog-transition-media>
@@ -62,7 +68,7 @@ export function CatalogProductCard({
       <div className={styles.content}>
         <div className={styles.meta}>
           <p className={styles.brand}>
-            {product.brand?.name ?? "Seleção Vision"}
+            {product.brand?.name ?? "Vision"}
           </p>
         </div>
         <h3>{product.name}</h3>
@@ -70,16 +76,11 @@ export function CatalogProductCard({
         {presentation === "catalog" ? (
           <div className={styles.commercialLine}>
             <span className={styles.availability}>
-              <i aria-hidden="true" />
-              {availabilityLabels[product.availability]}
+              {luxuryAvailabilityLabels[product.availability]}
             </span>
             {price ? <strong>{price}</strong> : null}
           </div>
         ) : null}
-        <span className={styles.action}>
-          {label}
-          <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
-        </span>
       </div>
     </>
   );

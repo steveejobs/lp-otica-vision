@@ -118,8 +118,10 @@
 .mapControls button { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-bottom: 1px solid rgb(39 36 33 / .18); background: transparent; color: var(--admin-ink); cursor: pointer; }
 .mapControls button:last-child { border-bottom: 0; }.mapControls button:hover { background: #e7ddd0; }.mapControls button:focus-visible { position: relative; z-index: 1; outline: 2px solid #574637; outline-offset: -3px; }.mapControls button:disabled { color: rgb(39 36 33 / .3); cursor: default; }
 .mapZoom { position: absolute; z-index: 7; top: .75rem; right: .75rem; padding: .34rem .5rem; border: 1px solid rgb(39 36 33 / .22); background: rgb(248 244 238 / .94); color: #514b46; font-size: .58rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
-.mapMarker { display: grid; place-items: center; border: 2px solid #f8f4ee; border-radius: 999px; background: #a57950; color: #fffaf3; box-shadow: 0 0 0 1px #5b4634,0 5px 14px rgb(32 27 23 / .22); cursor: pointer; transition: transform 150ms ease,background-color 150ms ease,box-shadow 150ms ease; }
-.mapMarker > b { font-size: .62rem; line-height: 1; }
+.mapMarker { position: relative; display: grid; place-items: center; border: 2px solid #f8f4ee; border-radius: 999px; background: #a57950; color: #fffaf3; box-shadow: 0 0 0 1px #5b4634,0 5px 14px rgb(32 27 23 / .22); cursor: pointer; transition: transform 150ms ease,background-color 150ms ease,box-shadow 150ms ease; }
+.mapMarker > b { font-size: .62rem; line-height: 1; z-index: 1; }
+.mapRadar { position: absolute; inset: 0; border-radius: 999px; background-color: inherit; pointer-events: none; animation: ping 2.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@keyframes ping { 0% { transform: scale(1); opacity: 0.6; } 75%, 100% { transform: scale(2.2); opacity: 0; } }
 .mapMarker[data-cluster="true"] { border-color: #36312d; background: #f5eee4; color: #302b27; box-shadow: 0 0 0 3px rgb(165 121 80 / .3),0 5px 14px rgb(32 27 23 / .22); }
 .mapMarker[data-selected="true"] { transform: scale(1.12); background: #332e2a; box-shadow: 0 0 0 4px rgb(165 121 80 / .38),0 7px 18px rgb(32 27 23 / .27); }
 .mapMarker:hover, .mapMarker:focus-visible { transform: scale(1.08); outline: 2px solid #332e2a; outline-offset: 3px; }

@@ -57,19 +57,20 @@
 }
 
 .brand {
-  color: var(--vision-muted);
-  font-size: 0.68rem;
-  font-weight: 650;
-  letter-spacing: 0;
+  color: var(--vision-ink, #000);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   line-height: 1.35;
 }
 
 .content h3 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.02rem, 1.7vw, 1.32rem);
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
   font-weight: 400;
-  line-height: 1.08;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
   text-wrap: balance;
 }
 
@@ -105,8 +106,11 @@
 .availability {
   display: inline-flex;
   align-items: center;
-  gap: .42rem;
   color: var(--vision-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
 }
 
 .availability i {
@@ -118,7 +122,7 @@
 }
 
 .card[data-availability="available"] .availability {
-  color: var(--vision-ink);
+  color: var(--vision-graphite);
 }
 
 .card[data-availability="last_unit"] .availability {
@@ -129,32 +133,8 @@
   background: var(--vision-bronze);
 }
 
-.card[data-availability="unavailable"] .availability {
-  color: var(--vision-muted);
-}
-
-.card[data-availability="unavailable"] .media img {
-  filter: saturate(0.72) contrast(0.96);
-}
-
-.action {
-  display: inline-flex;
-  width: fit-content;
-  min-height: 38px;
-  align-items: center;
-  gap: 0.38rem;
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.action svg {
-  transition: transform 180ms var(--ease-vision);
-}
-
 .card[data-presentation="preview"] .media {
   aspect-ratio: 4 / 3;
-  border-color: rgb(var(--vision-steel-rgb) / 0.36);
-  box-shadow: none;
 }
 
 .card[data-presentation="preview"] .content {

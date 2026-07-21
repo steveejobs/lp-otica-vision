@@ -33,6 +33,16 @@ interface CatalogViewProps {
   styleOptions: CurationStyle[];
 }
 
+const BRAND_LOGOS: Record<string, string> = {
+  "carrera": "/media/brands/carrera (1).png",
+  "ray-ban": "/media/brands/logo-rayban.png",
+  "max-mara": "/media/brands/Max-Mara-logo.png",
+  "persol": "/media/brands/persol-logo-png-transparent.png",
+  "swarovski": "/media/brands/Swarovski-Logo-2016.png",
+  "tom-ford": "/media/brands/Tom-Ford-logo.png",
+  "versace": "/media/brands/versace-logo.png",
+};
+
 export function CatalogView({
   catalog,
   collectionId,
@@ -89,22 +99,35 @@ export function CatalogView({
                   data-catalog-filter-link
                   href={catalogHref(query, { brand: null, page: 1 })}
                   scroll={false}
+                  className={styles.brandLinkText}
                 >
                   <strong>Todas</strong>
                   <span>{filters.brands.reduce((sum, item) => sum + item.count, 0)}</span>
                 </Link>
-                {filters.brands.map((brand) => (
-                  <Link
-                    aria-current={query.brand === brand.key ? "page" : undefined}
-                    data-catalog-filter-link
-                    href={catalogHref(query, { brand: brand.key, page: 1 })}
-                    key={brand.key}
-                    scroll={false}
-                  >
-                    <strong>{brand.name}</strong>
-                    <span>{brand.count} {brand.count === 1 ? "modelo" : "modelos"}</span>
-                  </Link>
-                ))}
+                {filters.brands.map((brand) => {
+                  const logoPath = BRAND_LOGOS[brand.key];
+                  return (
+                    <Link
+                      aria-current={query.brand === brand.key ? "page" : undefined}
+                      data-catalog-filter-link
+                      href={catalogHref(query, { brand: brand.key, page: 1 })}
+                      key={brand.key}
+                      scroll={false}
+                      className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
+                    >
+                      {logoPath ? (
+                         <div className={styles.brandLogoWrapper}>
+                           <img src={logoPath} alt={brand.name} className={styles.brandLogo} />
+                         </div>
+                      ) : (
+                        <>
+                          <strong>{brand.name}</strong>
+                          <span>{brand.count} {brand.count === 1 ? "modelo" : "modelos"}</span>
+                        </>
+                      )}
+                    </Link>
+                  );
+                })}
               </nav>
             </div>
 

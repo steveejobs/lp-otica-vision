@@ -112,9 +112,40 @@
   display: grid;
   flex: 0 0 auto;
   align-content: center;
-  gap: .3rem;
   padding: .4rem .08rem .65rem;
   scroll-snap-align: start;
+}
+
+.brandLinkText {
+  gap: .3rem;
+}
+
+.brandLinkImage {
+  padding: .2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandLogoWrapper {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandLogo {
+  max-width: 100px;
+  max-height: 100%;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  mix-blend-mode: multiply; /* since images might have white backgrounds instead of transparent */
+}
+
+.brandRail a[aria-current="page"] .brandLogo,
+.brandRail a:hover .brandLogo {
+  opacity: 1;
 }
 
 .brandRail a::after,
@@ -138,7 +169,7 @@
   transform: scaleX(1);
 }
 
-.brandRail strong {
+.brandLinkText strong {
   font-family: var(--font-display);
   font-size: 1.2rem;
   font-weight: 400;

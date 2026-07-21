@@ -103,6 +103,7 @@ function ClusterMarkers({
 
         const html = `
           <div class="${styles.mapMarker}" data-cluster="${cluster.cities.length > 1}" data-selected="${selected}" style="width: ${markerSize}px; height: ${markerSize}px;">
+            <div class="${styles.mapRadar}"></div>
             <b>${cluster.cities.length > 1 ? cluster.cities.length : activeUsers}</b>
           </div>
         `;
@@ -175,7 +176,7 @@ export default function ActivityMapLeaflet({ cities }: { cities: CityActivity[] 
             bounds={mapped.length > 0 ? mapped.map((c) => [c.coordinates!.latitude, c.coordinates!.longitude]) : [[-33, -73], [4, -34]]}
             className={styles.mapFrame}
             maxBounds={[[-90, -180], [90, 180]]}
-            maxZoom={18}
+            maxZoom={11}
             minZoom={2}
             scrollWheelZoom={true}
           >
@@ -200,12 +201,7 @@ export default function ActivityMapLeaflet({ cities }: { cities: CityActivity[] 
               <div><dt>Eventos</dt><dd>{selectedCity.eventCount}</dd></div>
             </dl>
             <small>{selectedCity.coordinates ? "Ponto no centro da cidade segundo GeoNames; não representa GPS." : "Sem coordenada confiável; a cidade não foi colocada no mapa."}</small>
-          </> : <>
-            <span>Leitura do mapa</span>
-            <strong>Selecione uma cidade</strong>
-            <p>Use um marcador ou a lista para manter os detalhes visíveis.</p>
-            <small>Base OpenStreetMap. Coordenadas de centro de cidade via GeoNames, vinculadas pelo cityId do Google.</small>
-          </>}
+          </> : null}
         </aside>
       </div>
 
