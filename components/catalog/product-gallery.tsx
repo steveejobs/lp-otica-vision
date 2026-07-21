@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState, ViewTransition } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogImage } from "@/lib/catalog/types";
@@ -119,6 +119,7 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
               className={styles.slide}
               data-catalog-product-hero={isInitial ? productId : undefined}
               data-catalog-transition-media={isInitial ? "" : undefined}
+              style={isInitial && ENABLE_PRODUCT_TRANSITIONS ? { viewTransitionName: `product-media-${productId}` } as React.CSSProperties : undefined}
             >
               {imageElement}
             </figure>
@@ -126,13 +127,7 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
 
           return (
             <React.Fragment key={image.id}>
-              {isInitial && ENABLE_PRODUCT_TRANSITIONS ? (
-                <ViewTransition name={`product-media-${productId}`} share="product-morph">
-                  {figureContent}
-                </ViewTransition>
-              ) : (
-                figureContent
-              )}
+              {figureContent}
             </React.Fragment>
           );
         })}

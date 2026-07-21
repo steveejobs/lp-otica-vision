@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { ViewTransition } from "react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
@@ -62,14 +61,11 @@ const ENABLE_PRODUCT_TRANSITIONS = true;
     />
   );
 
-  const mediaContent = ENABLE_PRODUCT_TRANSITIONS ? (
-    <ViewTransition name={`product-media-${product.id}`} share="product-morph">
-      <div className={styles.media}>
-        {imageElement}
-      </div>
-    </ViewTransition>
-  ) : (
-    <div className={styles.media}>
+  const mediaContent = (
+    <div 
+      className={styles.media}
+      style={ENABLE_PRODUCT_TRANSITIONS ? { viewTransitionName: `product-media-${product.id}` } as React.CSSProperties : undefined}
+    >
       {imageElement}
     </div>
   );
