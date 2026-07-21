@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  MessageCircle,
-  SlidersHorizontal,
-} from "lucide-react";
+import { MessageCircle } from "lucide-react";
 
 import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
@@ -12,12 +7,7 @@ import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motio
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import type { CatalogFilterOptions, CatalogPageResult, CatalogProductCard as CatalogProductCardType } from "@/lib/catalog/types";
-import {
-  catalogHref,
-  catalogProductHref,
-  hasActiveCatalogFilters,
-  type CatalogQuery,
-} from "@/lib/catalog/query";
+import { catalogHref, catalogProductHref, hasActiveCatalogFilters, type CatalogQuery } from "@/lib/catalog/query";
 import type { CurationStyle } from "@/lib/curation/types";
 import { LINKS } from "@/lib/links";
 
@@ -57,12 +47,8 @@ export function CatalogView({
   const activeStyle = styleOptions.find((style) => style.slug === query.style);
   const singlePublishedBrand = filters.brands.length === 1 ? filters.brands[0] : null;
   const hasFilters = hasActiveCatalogFilters(query);
-  const refinementCount = [
-    query.search,
-    query.category,
-    query.availability,
-    query.collection,
-  ].filter(Boolean).length;
+  const title = singlePublishedBrand?.name || activeBrand?.name || "Catálogo";
+  
   const motionKey = [
     query.search,
     query.brand,
@@ -72,192 +58,87 @@ export function CatalogView({
     query.style,
     query.page,
   ].join(":");
-  const showroomItems = catalog.products.map((product) => ({
-    href: catalogProductHref(product.slug, query),
-    product,
-  }));
 
   return (
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        <section className={styles.filters} aria-label="Explorar o catálogo">
-          <div className={styles.filterInner} data-catalog-enter="filters">
-            <div className={styles.brandBlock}>
-              <div className={styles.filterHeading}>
-                <span className={styles.filterLabel}>Marcas na Vision</span>
-                <small>Explore a seleção atual</small>
-              </div>
-              <nav className={styles.brandRail} aria-label="Selecionar marca">
-                <Link
-                  aria-current={!query.brand ? "page" : undefined}
-                  data-catalog-filter-link
-                  href={catalogHref(query, { brand: null, page: 1 })}
-                  scroll={false}
-                  className={styles.brandLinkText}
-                >
-                  <strong>Todas</strong>
-                  <span>{filters.brands.reduce((sum, item) => sum + item.count, 0)}</span>
-                </Link>
-                {filters.brands.map((brand) => {
-                  const logoPath = BRAND_LOGOS[brand.key];
-                  return (
-                    <Link
-                      aria-current={query.brand === brand.key ? "page" : undefined}
-                      data-catalog-filter-link
-                      href={catalogHref(query, { brand: brand.key, page: 1 })}
-                      key={brand.key}
-                      scroll={false}
-                      className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
-                    >
-                      {logoPath ? (
-                         <div className={styles.brandLogoWrapper}>
-                           <img src={logoPath} alt={brand.name} className={styles.brandLogo} />
-                         </div>
-                      ) : (
-                        <>
-                          <strong>{brand.name}</strong>
-                          <span>{brand.count} {brand.count === 1 ? "modelo" : "modelos"}</span>
-                        </>
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
+        
+        <section className={styles.premiumHeader} aria-label="Detalhes da vitrine">
+          <div className={styles.premiumHeaderInner}>
+            <div className={styles.premiumHeaderContent}>
+              <h1 id="catalog-results-title">{title}</h1>
+              <p aria-live="polite" className={styles.premiumModelCount}>
+                {catalog.total} {catalog.total === 1 ? "modelo disponível" : "modelos disponíveis"}
+              </p>
+              <p className={styles.premiumDescription}>
+                Escolha um modelo e fale com a ótica pelo WhatsApp para consultar detalhes e disponibilidade.
+              </p>
             </div>
 
-            {styleOptions.length ? (
-              <div className={styles.styleBlock}>
-                <span className={styles.filterLabel}>Estilo</span>
-                <nav className={styles.styleRail} aria-label="Selecionar estilo">
-                  <Link
-                    aria-current={!query.style ? "page" : undefined}
-                    data-catalog-filter-link
-                    href={catalogHref(query, { page: 1, style: null })}
-                    scroll={false}
-                  >
-                    Todos
-                  </Link>
-                  {styleOptions.map((style) => style.productCount > 0 ? (
-                    <Link
-                      aria-current={query.style === style.slug ? "page" : undefined}
-                      data-catalog-filter-link
-                      href={catalogHref(query, { page: 1, style: style.slug })}
-                      key={style.id}
-                      scroll={false}
-                    >
-                      {style.label}
-                      <span>{style.productCount}</span>
-                    </Link>
-                  ) : (
-                    <span
-                      aria-disabled="true"
-                      className={styles.disabledFilter}
-                      key={style.id}
-                      title="Nenhum modelo publicado neste estilo"
-                    >
-                      {style.label}
-                      <small>0</small>
-                    </span>
-                  ))}
-                </nav>
-              </div>
-            ) : null}
-
-            <details className={styles.refinePanel} open={refinementCount > 0}>
-              <summary>
-                <span>
-                  <SlidersHorizontal aria-hidden="true" size={17} strokeWidth={1.6} />
-                  Filtrar
-                </span>
-                {refinementCount ? <strong>{refinementCount}</strong> : null}
-              </summary>
-              <form
-                className={styles.filterForm}
-                data-catalog-filter-form
-                method="get"
-                role="search"
+            <nav className={styles.brandRail} aria-label="Selecionar marca">
+              <Link
+                aria-current={!query.brand ? "page" : undefined}
+                data-catalog-filter-link
+                href={catalogHref(query, { brand: null, page: 1 })}
+                scroll={false}
+                className={styles.brandLinkText}
               >
-                {query.brand ? <input name="marca" type="hidden" value={query.brand} /> : null}
-                {query.style ? <input name="estilo" type="hidden" value={query.style} /> : null}
-                <label className={styles.field}>
-                  <span>Buscar no catálogo</span>
-                  <input
-                    defaultValue={query.search}
-                    maxLength={80}
-                    name="busca"
-                    placeholder="Nome, modelo, cor ou marca"
-                    type="search"
-                  />
-                </label>
-                {filters.categories.length ? (
-                  <label className={styles.field}>
-                    <span>Categoria</span>
-                    <select defaultValue={query.category ?? ""} name="categoria">
-                      <option value="">Todas as categorias</option>
-                      {filters.categories.map((category) => (
-                         <option key={category.key} value={category.key}>
-                          {category.name} ({category.count})
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ) : null}
-                {filters.availability.length ? (
-                  <label className={styles.field}>
-                    <span>Disponibilidade</span>
-                    <select defaultValue={query.availability ?? ""} name="disponibilidade">
-                      <option value="">Todas</option>
-                      {filters.availability.map((availability) => (
-                        <option key={availability.key} value={availability.key}>
-                          {availability.name} ({availability.count})
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ) : null}
-                {filters.collections.length ? (
-                  <label className={styles.field}>
-                    <span>Coleção</span>
-                    <select defaultValue={query.collection ?? ""} name="colecao">
-                      <option value="">Todas as coleções</option>
-                      {filters.collections.map((collection) => (
-                        <option key={collection.key} value={collection.key}>
-                          {collection.name} ({collection.count})
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ) : null}
-                <div className={styles.formActions}>
-                  <button className={styles.submit} type="submit">Ver seleção</button>
-                  {hasFilters ? (
-                    <Link className={styles.clear} data-catalog-filter-link href="/catalogo" scroll={false}>
-                      Limpar filtros
-                    </Link>
-                  ) : null}
-                </div>
-              </form>
-            </details>
+                <strong>Todas as Marcas</strong>
+              </Link>
+              {filters.brands.map((brand) => {
+                const logoPath = BRAND_LOGOS[brand.key];
+                return (
+                  <Link
+                    aria-current={query.brand === brand.key ? "page" : undefined}
+                    data-catalog-filter-link
+                    href={catalogHref(query, { brand: brand.key, page: 1 })}
+                    key={brand.key}
+                    scroll={false}
+                    className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
+                  >
+                    {logoPath ? (
+                       <div className={styles.brandLogoWrapper}>
+                         <img src={logoPath} alt={brand.name} className={styles.brandLogo} />
+                       </div>
+                    ) : (
+                      <strong>{brand.name}</strong>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {styleOptions.some(style => style.productCount > 0) ? (
+              <nav className={styles.styleTabs} aria-label="Selecionar estilo">
+                <Link
+                  aria-current={!query.style ? "page" : undefined}
+                  data-catalog-filter-link
+                  href={catalogHref(query, { page: 1, style: null })}
+                  scroll={false}
+                  className={styles.styleTab}
+                >
+                  Todos
+                </Link>
+                {styleOptions.map((style) => style.productCount > 0 ? (
+                  <Link
+                    aria-current={query.style === style.slug ? "page" : undefined}
+                    data-catalog-filter-link
+                    href={catalogHref(query, { page: 1, style: style.slug })}
+                    key={style.id}
+                    scroll={false}
+                    className={styles.styleTab}
+                  >
+                    {style.label}
+                  </Link>
+                ) : null)}
+              </nav>
+            ) : null}
           </div>
         </section>
 
         <section className={styles.results} aria-labelledby="catalog-results-title">
           <div className={styles.resultsInner}>
-            <div className={styles.compactHeader} data-catalog-enter="summary">
-              <div className={styles.compactHeaderTitle}>
-                {singlePublishedBrand || activeBrand ? (
-                  <h1 id="catalog-results-title">{singlePublishedBrand?.name || activeBrand?.name}</h1>
-                ) : (
-                  <h1 id="catalog-results-title">Catálogo</h1>
-                )}
-                <p>Explore os modelos e consulte os detalhes pelo WhatsApp.</p>
-              </div>
-              <p aria-live="polite" className={styles.compactModelCount}>
-                {catalog.total} {catalog.total === 1 ? "modelo" : "modelos"}
-              </p>
-            </div>
-
             {catalog.products.length === 0 ? (
               <div className={styles.empty} data-motion-reveal data-motion-variant="section">
                 <h2>{hasFilters ? "Nenhum modelo nesta seleção." : "A vitrine está sendo atualizada."}</h2>
@@ -267,7 +148,7 @@ export function CatalogView({
                     : "Enquanto novos modelos são publicados, fale diretamente com a equipe Vision."}
                 </p>
                 <div className={styles.emptyActions}>
-                  {hasFilters ? <Link data-catalog-filter-link href="/catalogo" scroll={false}>Limpar filtros</Link> : null}
+                  {hasFilters ? <Link data-catalog-filter-link href="/catalogo" scroll={false}>Ver catálogo completo</Link> : null}
                   <a href={LINKS.whatsapp} rel="noopener noreferrer" target="_blank">
                     <MessageCircle aria-hidden="true" size={17} />
                     Falar no WhatsApp
@@ -275,21 +156,18 @@ export function CatalogView({
                 </div>
               </div>
             ) : (
-              <>
-                <CatalogResultsMotion motionKey={motionKey}>
-                  <div className={styles.grid} data-catalog-results-grid data-count={Math.min(catalog.products.length, 9)}>
-                    {catalog.products.map((product, index) => (
-                      <CatalogProductCard
-                        href={catalogProductHref(product.slug, query)}
-                        key={product.id}
-                        priority={index === 0}
-                        product={product}
-                      />
-                    ))}
-                  </div>
-                </CatalogResultsMotion>
-                <p className={styles.catalogNote}>Catálogo para consulta. Fale com a Vision para confirmar os detalhes.</p>
-              </>
+              <CatalogResultsMotion motionKey={motionKey}>
+                <div className={styles.grid} data-catalog-results-grid data-count={Math.min(catalog.products.length, 9)}>
+                  {catalog.products.map((product, index) => (
+                    <CatalogProductCard
+                      href={catalogProductHref(product.slug, query)}
+                      key={product.id}
+                      priority={index === 0}
+                      product={product}
+                    />
+                  ))}
+                </div>
+              </CatalogResultsMotion>
             )}
 
             {catalog.page < catalog.totalPages ? (
@@ -301,7 +179,7 @@ export function CatalogView({
                   replace
                   scroll={false}
                 >
-                  Ver mais modelos
+                  Carregar mais modelos
                 </Link>
                 <span>Mostrando {catalog.products.length} de {catalog.total}</span>
               </div>
@@ -314,5 +192,3 @@ export function CatalogView({
     </div>
   );
 }
-
-

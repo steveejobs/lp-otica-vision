@@ -60,14 +60,9 @@ const getOfficialPhone = cache(async function getOfficialPhone() {
 
 export function buildProductWhatsappUrlWithPhone(phone: string, input: ProductWhatsappInput) {
   const productName = cleanLine(input.productName, "Nome do produto", 160);
-  const model = input.model?.trim()
-    ? cleanLine(input.model, "Modelo", 120)
-    : null;
   const productUrl = validateProductUrl(input.productUrl);
-  const interest = model
-    ? `Olá! Tenho interesse no ${productName}, modelo ${model}. Gostaria de confirmar a disponibilidade.`
-    : `Olá! Tenho interesse no ${productName}. Gostaria de confirmar a disponibilidade.`;
-  const message = `${interest}\n\n${productUrl}`;
+  
+  const message = `Olá! Vim pelo catálogo da Ótica Vision e quero consultar o modelo ${productName}.\n\n${productUrl}`;
 
   return `https://api.whatsapp.com/send/?phone=${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
 }

@@ -1,3 +1,19 @@
+@keyframes productEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.985) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes productEntranceReduced {
+  0% { opacity: 0; transform: none; }
+  100% { opacity: 1; transform: none; }
+}
+
 .page {
   background: var(--vision-paper);
 }
@@ -7,6 +23,14 @@
   max-width: 1320px;
   margin-inline: auto;
   padding: 1.25rem 0 clamp(5rem, 9vw, 8rem);
+  opacity: 0;
+  animation: productEntrance 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main {
+    animation: productEntranceReduced 200ms ease forwards;
+  }
 }
 
 .back {
