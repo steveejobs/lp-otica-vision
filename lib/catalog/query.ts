@@ -1,4 +1,5 @@
-export type { CatalogAvailability, CatalogQuery } from "./types";
+import type { CatalogAvailability, CatalogQuery } from "./types";
+export type { CatalogAvailability, CatalogQuery };
 
 const availabilityValues = new Set<CatalogAvailability>([
   "available",

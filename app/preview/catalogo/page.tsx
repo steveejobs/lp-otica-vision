@@ -36,6 +36,7 @@ export default async function CatalogPreviewPage({
     <CatalogView
       catalog={catalog}
       collectionId={null}
+      featuredProducts={[]}
       filters={filters}
       query={query}
       styleOptions={[]}

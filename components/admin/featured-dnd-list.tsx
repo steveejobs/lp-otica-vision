@@ -115,7 +115,7 @@ export function FeaturedDndList({
             <div style={{ flex: "0 0 64px", height: "64px", position: "relative", backgroundColor: "var(--vision-warm-white)" }}>
               {product.cover ? (
                 <Image
-                  src={catalogImageUrl({ ...product.cover, id: "dummy", isCover: true, width: 200, height: 200, updatedAt: "0" }, "catalog_card")}
+                  src={catalogImageUrl({ id: product.cover.storage_path, updatedAt: product.cover.asset_version }, "catalog_card")}
                   alt={product.cover.alt_text}
                   fill
                   style={{ objectFit: "cover", objectPosition: product.cover.object_position }}

@@ -19,7 +19,7 @@ import {
   hasActiveCatalogFilters,
   type CatalogQuery,
 } from "@/lib/catalog/query";
-import type { CurationStyleOption } from "@/lib/curation/types";
+import type { CurationStyle } from "@/lib/curation/types";
 import { LINKS } from "@/lib/links";
 
 import styles from "../../app/catalogo/catalog.module.css";
@@ -30,7 +30,7 @@ interface CatalogViewProps {
   featuredProducts: CatalogProductCardType[];
   filters: CatalogFilterOptions;
   query: CatalogQuery;
-  styleOptions: CurationStyleOption[];
+  styleOptions: CurationStyle[];
 }
 
 export function CatalogView({
