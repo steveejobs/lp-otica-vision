@@ -11,7 +11,7 @@ import type { CatalogProductCard as CatalogProductCardData, CatalogProduct } fro
 
 import { ProductMediaShell } from "./product-media-shell";
 import { ProductWhatsappButton } from "./product-whatsapp-button";
-import { useCatalogFocus } from "./catalog-focus-manager";
+import { useCatalogFocus, getCachedProductData } from "./catalog-focus-manager";
 import styles from "./catalog-product-card.module.css";
 
 export function CatalogProductCard({
@@ -40,15 +40,21 @@ export function CatalogProductCard({
 
   const flipFrameRef = useRef<HTMLDivElement>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const productHref = `/catalogo/${product.slug}`;
   const styleText = product.category?.name || "Óculos de Sol";
 
   // Preload handler
-  const handlePreload = () => {
+  const handlePointerEnter = () => {
+    setIsHovered(true);
     if (focusContext && !external) {
       focusContext.preloadProduct(product.slug);
     }
+  };
+
+  const handlePointerLeave = () => {
+    setIsHovered(false);
   };
 
   const handleFocusTrigger = () => {
@@ -63,6 +69,12 @@ export function CatalogProductCard({
       flipFrame: flipFrameRef.current,
     });
   };
+
+  // Inspect cached product data for secondary hover images
+  const cachedData = getCachedProductData(product.slug);
+  const secondaryImage = cachedData?.images && cachedData.images.length > 1
+    ? (cachedData.images.find((img) => !img.isCover) ?? cachedData.images[1])
+    : null;
 
   // --- External cards (WhatsApp preview cards) ---
   if (external) {
@@ -108,7 +120,7 @@ export function CatalogProductCard({
     );
   }
 
-  // --- FOCUSED MODE: Single unified container, zero image duplication ---
+  // --- FOCUSED MODE: Single unified container, sticky 50% stage on desktop ---
   if (isFocused) {
     const displayProduct: CatalogProduct = (focusContext?.focusedProductData as CatalogProduct) ?? {
       ...product,
@@ -139,7 +151,7 @@ export function CatalogProductCard({
             onClick={() => focusContext?.closeFocus()}
             aria-label="Fechar detalhes do produto"
           >
-            <X size={20} strokeWidth={1.5} />
+            <X size={18} strokeWidth={1.5} />
           </button>
 
           <div className={styles.focusedGrid}>
@@ -220,7 +232,7 @@ export function CatalogProductCard({
     );
   }
 
-  // --- GRID MODE: Clean cutout cutout image on paper background + button trigger + canonical link ---
+  // --- GRID MODE: Clean 100% cutout image + hover photo swap animation ---
   return (
     <article
       aria-hidden={clone || undefined}
@@ -237,10 +249,12 @@ export function CatalogProductCard({
         className={styles.focusTrigger}
         data-focus-trigger=""
         onClick={handleFocusTrigger}
-        onPointerEnter={handlePreload}
-        onFocus={handlePreload}
+        onPointerEnter={handlePointerEnter}
+        onPointerLeave={handlePointerLeave}
+        onFocus={handlePointerEnter}
+        onBlur={handlePointerLeave}
         onPointerDown={(e) => {
-          if (e.button === 0) handlePreload();
+          if (e.button === 0) handlePointerEnter();
         }}
         tabIndex={clone ? -1 : undefined}
         aria-label={`Visualizar ${product.name}`}
@@ -248,17 +262,43 @@ export function CatalogProductCard({
       >
         <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
           <ProductMediaShell presentation="catalog" className={styles.gridMedia}>
+            {/* Primary Cover Image */}
             <Image
               alt={product.cover.altText}
               fill
               priority={priority}
               sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
               src={catalogImageUrl(product.cover, imageVariant)}
-              style={{ objectPosition: product.cover.objectPosition }}
+              className={styles.coverImage}
+              style={{
+                objectPosition: product.cover.objectPosition,
+                opacity: isHovered && secondaryImage ? 0 : 1,
+                transform: isHovered && !secondaryImage ? "scale(1.05)" : "scale(1)",
+                transition: "opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              }}
               unoptimized
             />
+
+            {/* Secondary Image on Hover (if available) */}
+            {secondaryImage && (
+              <Image
+                alt={secondaryImage.altText}
+                fill
+                sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
+                src={catalogImageUrl(secondaryImage, imageVariant)}
+                className={styles.secondaryHoverImage}
+                style={{
+                  objectPosition: secondaryImage.objectPosition,
+                  opacity: isHovered ? 1 : 0,
+                  transform: isHovered ? "scale(1.03)" : "scale(0.98)",
+                  transition: "opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                }}
+                unoptimized
+              />
+            )}
           </ProductMediaShell>
         </div>
+
         <div className={styles.summary}>
           <h3>{product.name}</h3>
           <p className={styles.styleName}>{styleText}</p>

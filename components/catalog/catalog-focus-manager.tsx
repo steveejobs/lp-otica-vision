@@ -43,6 +43,10 @@ type FlipGeometry = {
 const detailCache = new Map<string, CatalogProduct>();
 const fetchPromises = new Map<string, Promise<CatalogProduct>>();
 
+export function getCachedProductData(slug: string): CatalogProduct | null {
+  return detailCache.get(slug) ?? null;
+}
+
 export function preloadProductData(slug: string) {
   if (detailCache.has(slug) || fetchPromises.has(slug)) return;
   
