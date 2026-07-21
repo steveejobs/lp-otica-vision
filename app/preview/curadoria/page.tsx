@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { VisionCuration } from "@/components/curation/vision-curation";
-import { fixtureCurationScenario } from "@/lib/curation/fixtures";
+import { OpticalBenchPrototype } from "@/components/curation/optical-bench-prototype";
+
+import { opticalBenchProducts } from "./prototype-data";
 
 export const metadata: Metadata = {
   robots: { follow: false, index: false },
@@ -16,15 +17,12 @@ export default async function CurationPreviewPage({
 }) {
   if (process.env.VERCEL_ENV === "production") notFound();
   const { cenario } = await searchParams;
+  const requestedSize = Number(cenario ?? 4);
+  const size = Number.isFinite(requestedSize) ? Math.min(Math.max(requestedSize, 0), 4) : 4;
 
   return (
     <main id="main-content">
-      <VisionCuration
-        analytics={false}
-        demoBasePath="/preview/curadoria"
-        initialSelection={fixtureCurationScenario(cenario)}
-        previewLabel="Preview isolado · dados visuais de QA"
-      />
+      <OpticalBenchPrototype products={opticalBenchProducts.slice(0, size)} />
     </main>
   );
 }
