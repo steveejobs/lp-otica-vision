@@ -1,0 +1,14 @@
+::view-transition-group(product-morph) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(product-morph),
+::view-transition-new(product-morph) {
+  /* Prevent default crossfade blur on the image to keep it crisp */
+  mix-blend-mode: normal;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* On navigation, don't crossfade the image if it is still loading, just keep the old one until new is ready, but Next.js usually handles the swap when the DOM commits */

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { ViewTransition } from "react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
@@ -47,21 +48,35 @@ export function CatalogProductCard({
   // I will just use category name or style if available.
   const styleText = product.category?.name || "Óculos de Sol";
 
+const ENABLE_PRODUCT_TRANSITIONS = true;
+
+  const imageElement = (
+    <Image
+      alt={product.cover.altText}
+      fill
+      priority={priority}
+      sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
+      src={catalogImageUrl(product.cover, imageVariant)}
+      style={{ objectPosition: product.cover.objectPosition }}
+      unoptimized
+    />
+  );
+
+  const mediaContent = ENABLE_PRODUCT_TRANSITIONS ? (
+    <ViewTransition name={`product-media-${product.id}`} share="product-morph">
+      <div className={styles.media}>
+        {imageElement}
+      </div>
+    </ViewTransition>
+  ) : (
+    <div className={styles.media}>
+      {imageElement}
+    </div>
+  );
+
   const content = (
     <>
-      <div className={styles.media}>
-        <Image
-          alt={product.cover.altText}
-          blurDataURL={product.cover.blurDataUrl ?? blurDataUrl}
-          fill
-          placeholder="blur"
-          priority={priority}
-          sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
-          src={catalogImageUrl(product.cover, imageVariant)}
-          style={{ objectPosition: product.cover.objectPosition }}
-          unoptimized
-        />
-      </div>
+      {mediaContent}
 
       <div className={styles.content}>
         <h3>{product.name}</h3>
@@ -72,6 +87,12 @@ export function CatalogProductCard({
       </div>
     </>
   );
+
+  const preloadHighRes = () => {
+    if (!ENABLE_PRODUCT_TRANSITIONS || typeof window === 'undefined') return;
+    const img = new window.Image();
+    img.src = catalogImageUrl(product.cover, "product_detail");
+  };
 
   return (
     <article
@@ -100,6 +121,9 @@ export function CatalogProductCard({
           className={styles.link}
           href={productHref}
           tabIndex={clone ? -1 : undefined}
+          onPointerEnter={preloadHighRes}
+          onFocus={preloadHighRes}
+          onPointerDown={preloadHighRes}
         >
           {content}
         </Link>
