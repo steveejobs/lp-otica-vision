@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { CatalogView } from "@/components/catalog/catalog-view";
+import { CatalogViewV2 } from "@/components/catalog/v2/catalog-view-v2";
 import { generateMockFilterOptions, generateMockProducts } from "@/lib/catalog/fixtures";
 import { parseCatalogQuery, type CatalogSearchParams } from "@/lib/catalog/query";
 
@@ -33,7 +33,7 @@ export default async function CatalogPreviewPage({
   };
 
   return (
-    <CatalogView
+    <CatalogViewV2
       catalog={catalog}
       collectionId={null}
       featuredProducts={[]}
