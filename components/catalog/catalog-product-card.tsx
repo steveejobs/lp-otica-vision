@@ -1,11 +1,12 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { ProductImageVariantKind } from "@/lib/catalog/image-variants";
 import type { CatalogProductCard as CatalogProductCardData } from "@/lib/catalog/types";
 
+import { ProductMediaShell } from "./product-media-shell";
+import { ProductTransitionLink } from "./product-transition-link";
 import styles from "./catalog-product-card.module.css";
 
 const blurDataUrl =
@@ -41,27 +42,29 @@ export function CatalogProductCard({
     ? `Consultar ${product.name} pelo WhatsApp`
     : `Explorar ${product.name}`;
     
-  // Estilo is not directly on product card data? Wait, it usually has categories.
-  // Actually, wait, does it? The user said "nome ou código do modelo; estilo; CTA discreto".
-  // Let me check what properties are available on product.
-  // I will just use category name or style if available.
   const styleText = product.category?.name || "Óculos de Sol";
+
+  const imageElement = (
+    <Image
+      alt={product.cover.altText}
+      fill
+      priority={priority}
+      sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
+      src={catalogImageUrl(product.cover, imageVariant)}
+      style={{ objectPosition: product.cover.objectPosition }}
+      unoptimized
+    />
+  );
+
+  const mediaContent = (
+    <ProductMediaShell presentation="catalog" className={styles.media}>
+      {imageElement}
+    </ProductMediaShell>
+  );
 
   const content = (
     <>
-      <div className={styles.media}>
-        <Image
-          alt={product.cover.altText}
-          blurDataURL={product.cover.blurDataUrl ?? blurDataUrl}
-          fill
-          placeholder="blur"
-          priority={priority}
-          sizes="(max-width: 720px) 84vw, (max-width: 960px) 30vw, 22vw"
-          src={catalogImageUrl(product.cover, imageVariant)}
-          style={{ objectPosition: product.cover.objectPosition }}
-          unoptimized
-        />
-      </div>
+      {mediaContent}
 
       <div className={styles.content}>
         <h3>{product.name}</h3>
@@ -83,27 +86,15 @@ export function CatalogProductCard({
       data-catalog-product-brand={clone ? undefined : product.brand?.slug}
       data-presentation={presentation}
     >
-      {external ? (
-        <a
-          aria-label={linkLabel}
-          className={styles.link}
-          href={productHref}
-          rel="noopener noreferrer"
-          tabIndex={clone ? -1 : undefined}
-          target="_blank"
-        >
-          {content}
-        </a>
-      ) : (
-        <Link
-          aria-label={linkLabel}
-          className={styles.link}
-          href={productHref}
-          tabIndex={clone ? -1 : undefined}
-        >
-          {content}
-        </Link>
-      )}
+      <ProductTransitionLink
+        clone={clone}
+        external={external}
+        href={productHref}
+        linkLabel={linkLabel}
+        product={product}
+      >
+        {content}
+      </ProductTransitionLink>
     </article>
   );
 }

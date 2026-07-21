@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogImage } from "@/lib/catalog/types";
 
+import { useCatalogMediaTransition } from "./catalog-transition-provider";
+import { ProductMediaShell } from "./product-media-shell";
 import styles from "./product-gallery.module.css";
 
 const blurDataUrl =
@@ -15,9 +17,12 @@ const blurDataUrl =
 export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
   const railRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
+  const targetRef = useRef<HTMLDivElement>(null);
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [loadedIndexes, setLoadedIndexes] = useState(() => new Set([initialIndex]));
+
+  const { state, enabled, registerTarget } = useCatalogMediaTransition();
 
   const ensureLoaded = useCallback((index: number) => {
     setLoadedIndexes((current) => {
@@ -57,6 +62,19 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
     });
   }
 
+  // Register target when mounted
+  useLayoutEffect(() => {
+    if (!enabled || !targetRef.current || !state.transitionId || state.productId !== productId) return;
+    const targetEl = targetRef.current;
+    const rect = targetEl.getBoundingClientRect();
+    registerTarget(productId, state.transitionId, rect);
+  }, [enabled, state.transitionId, state.productId, productId, registerTarget]);
+
+  const isTransitioningCurrentProduct = 
+    enabled && 
+    state.productId === productId && 
+    (state.status === "animating" || state.status === "settling");
+
   return (
     <div className={styles.gallery}>
       <div
@@ -85,42 +103,56 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
         role="region"
         tabIndex={0}
       >
-        {images.map((image, index) => (
-          <figure
-            className={styles.slide}
-            data-catalog-product-hero={index === initialIndex ? productId : undefined}
-            data-catalog-transition-media={index === initialIndex ? "" : undefined}
-            key={image.id}
-          >
-            {loadedIndexes.has(index) ? (
-              <Image
-                alt={image.altText}
-                blurDataURL={image.blurDataUrl ?? blurDataUrl}
-                fetchPriority={index === initialIndex ? "high" : "auto"}
-                fill
-                loading={index === initialIndex ? "eager" : "lazy"}
-                placeholder="blur"
-                sizes="(max-width: 900px) 92vw, 58vw"
-                src={catalogImageUrl(image, "product_detail")}
-                style={{ objectPosition: image.objectPosition }}
-                unoptimized
-              />
-            ) : (
-              <span
-                aria-hidden="true"
-                className={styles.lazyPlaceholder}
-                style={{
-                  backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
-                  backgroundPosition: image.objectPosition,
-                }}
-              />
-            )}
-          </figure>
-        ))}
+        {images.map((image, index) => {
+          const isCover = index === initialIndex;
+          // While transition is active, the real image is hidden to let the overlay show.
+          // Wait, actually opacity: 0 allows the overlay to sit on top perfectly.
+          // The overlay uses mixBlendMode multiply so the real image shouldn't show underneath, 
+          // or if it does, it might double the multiply. It's safer to opacity: 0 the real image.
+          const imgOpacity = isCover && isTransitioningCurrentProduct ? 0 : 1;
+          
+          return (
+            <figure
+              className={styles.slide}
+              data-catalog-product-hero={isCover ? productId : undefined}
+              key={image.id}
+            >
+              <ProductMediaShell 
+                presentation="gallery" 
+                ref={isCover ? targetRef : undefined}
+              >
+                {loadedIndexes.has(index) ? (
+                  <Image
+                    alt={image.altText}
+                    blurDataURL={image.blurDataUrl ?? blurDataUrl}
+                    fetchPriority={isCover ? "high" : "auto"}
+                    fill
+                    loading={isCover ? "eager" : "lazy"}
+                    placeholder="blur"
+                    sizes="(max-width: 900px) 92vw, 58vw"
+                    src={catalogImageUrl(image, "product_detail")}
+                    style={{ objectPosition: image.objectPosition, opacity: imgOpacity, transition: "opacity 0.15s ease-in-out" }}
+                    unoptimized
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className={styles.lazyPlaceholder}
+                    style={{
+                      backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
+                      backgroundPosition: image.objectPosition,
+                      opacity: imgOpacity,
+                    }}
+                  />
+                )}
+              </ProductMediaShell>
+            </figure>
+          );
+        })}
       </div>
 
       {images.length > 1 ? (
-        <div className={styles.controls}>
+        <div className={styles.controls} style={{ opacity: isTransitioningCurrentProduct ? 0 : 1, transition: "opacity 0.2s ease" }}>
           <button
             aria-label="Imagem anterior"
             disabled={activeIndex === 0}

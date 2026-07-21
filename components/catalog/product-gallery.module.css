@@ -24,7 +24,6 @@
   position: relative;
   width: 100%;
   min-width: 100%;
-  aspect-ratio: 4 / 5;
   flex: 0 0 100%;
   overflow: hidden;
   background: var(--vision-bg-soft);

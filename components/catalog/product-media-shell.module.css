@@ -1,0 +1,49 @@
+.shell {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: transparent;
+  mix-blend-mode: multiply;
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.shell :global(img) {
+  object-fit: contain !important;
+  transition: opacity 0.3s ease;
+}
+
+/* Catalog Card specific */
+.catalog {
+  aspect-ratio: 4 / 3;
+}
+
+/* Product Gallery specific */
+.gallery {
+  aspect-ratio: 4 / 3; /* Unifying aspect ratio to match catalog perfectly */
+}
+
+@media (max-width: 720px) {
+  .gallery {
+    aspect-ratio: 4 / 3; /* Keep it uniform on mobile for smooth transition */
+    border-radius: 0;
+  }
+}
+
+/* Loading Shell specific */
+.loading {
+  aspect-ratio: 4 / 3;
+  background-color: var(--vision-bg-soft);
+}
+
+/* Transition Overlay specific */
+.transition {
+  background: transparent;
+  mix-blend-mode: multiply;
+}
