@@ -28,7 +28,25 @@ const TransitionContext = createContext<TransitionContextValue | null>(null);
 
 export function useCatalogMediaTransition() {
   const ctx = useContext(TransitionContext);
-  if (!ctx) throw new Error("Missing CatalogMediaTransitionProvider");
+  if (!ctx) {
+    return {
+      state: {
+        status: "idle",
+        productId: null,
+        transitionId: null,
+        mediaUrl: null,
+        originRect: null,
+        targetRect: null,
+        objectPosition: "50% 50%"
+      } as TransitionState,
+      enabled: false,
+      registerOrigin: () => {},
+      registerTarget: () => {},
+      markNavigating: () => {},
+      markTargetReady: () => {},
+      reset: () => {},
+    };
+  }
   return ctx;
 }
 
