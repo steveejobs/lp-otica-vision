@@ -70,21 +70,56 @@ export function CatalogResultsMotion({ children, motionKey }: CatalogResultsMoti
 
     const cards = [...root.querySelectorAll<HTMLElement>("[data-catalog-product-id]")];
     
-    // Luxurious entrance
-    const animations = cards.map((card, index) => card.animate(
-      [
-        { clipPath: "inset(12% 0 0 0)", opacity: 0, transform: "translate3d(0, 16px, 0) scale(0.98)", filter: "blur(3px)" },
-        { clipPath: "inset(0)", opacity: 1, transform: "translate3d(0, 0, 0) scale(1)", filter: "blur(0px)" },
-      ],
-      {
-        delay: index * 60,
-        duration: 480,
-        easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
-        fill: "both",
-      },
-    ));
+    const isMobile = window.innerWidth <= 720;
+    const duration = isMobile ? 550 : 650;
+    const stagger = isMobile ? 60 : 80;
 
-    return () => animations.forEach((animation) => animation.cancel());
+    let indexInView = 0;
+
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const card = entry.target as HTMLElement;
+          obs.unobserve(card);
+
+          // Only stagger the first 6 items that enter the viewport.
+          const delay = indexInView < 6 ? indexInView * stagger : 0;
+          indexInView++;
+
+          const animation = card.animate(
+            [
+              { clipPath: "inset(12% 0 0 0)", opacity: 0, transform: "translate3d(0, 16px, 0)" },
+              { clipPath: "inset(0 0 0 0)", opacity: 1, transform: "translate3d(0, 0, 0)" },
+            ],
+            {
+              delay,
+              duration,
+              easing: "cubic-bezier(0.22, 1, 0.36, 1)", // Clean smooth easing
+              fill: "forwards",
+            }
+          );
+          
+          animation.finished.then(() => {
+            // Remove will-change and transform after animation completes for performance
+            card.style.transform = "";
+            card.style.clipPath = "";
+            card.style.opacity = "1";
+          }).catch(() => {
+            // Cancelled
+          });
+        }
+      });
+    }, { rootMargin: "50px" });
+
+    // Initialize state
+    cards.forEach(card => {
+      card.style.opacity = "0"; // initial hidden state before animation takes over
+      observer.observe(card);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, [displayedContent.motionKey]);
 
   return <div className="catalog-results-motion" ref={rootRef}>{displayedContent.children}</div>;

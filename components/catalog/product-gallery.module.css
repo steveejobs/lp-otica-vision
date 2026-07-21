@@ -1,133 +1,91 @@
 .gallery {
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
 }
 
-.rail {
+.gallery[data-count="2"] {
+  /* On desktop, 2 images can be side by side if desired, but 
+     the user said "escolher lateral ou inferior conforme proporção real, mobile swipe".
+     Since we don't know proportion statically, let's keep it clean: main + thumbnail rail below, 
+     or main + lateral thumbnails for desktop. Let's do a flex layout. */
   display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 960px) {
+  .gallery[data-count="2"],
+  .gallery[data-count="many"] {
+    display: grid;
+    grid-template-columns: 1fr 100px; /* main area + vertical thumbnails */
+    gap: 1.5rem;
+    align-items: start;
+  }
+}
+
+.mainView {
+  position: relative;
   width: 100%;
+}
+
+.mainShell {
+  width: 100%;
+}
+
+.fadeOutImage {
+  transition: opacity 180ms ease-out !important;
+  opacity: 0 !important;
+}
+
+/* Thumbnail Rail */
+.thumbnailRail {
+  display: flex;
+  gap: 0.5rem;
   overflow-x: auto;
-  border: 1px solid rgb(var(--vision-graphite-rgb) / 0.11);
-  border-radius: var(--radius-md);
-  background: var(--vision-bg-soft);
-  box-shadow: 0 22px 50px rgb(var(--vision-graphite-rgb) / 0.1);
-  overscroll-behavior-x: contain;
+  padding-bottom: 4px; /* for scrollbar or focus ring */
   scrollbar-width: none;
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
-
-.rail::-webkit-scrollbar {
+.thumbnailRail::-webkit-scrollbar {
   display: none;
 }
 
-.slide {
-  position: relative;
-  width: 100%;
-  min-width: 100%;
-  flex: 0 0 100%;
-  overflow: hidden;
-  background: var(--vision-bg-soft);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+@media (min-width: 960px) {
+  .thumbnailRail {
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px); /* rough limit to avoid endless scrolling */
+  }
 }
 
-.slide img {
-  object-fit: cover;
-}
-
-.lazyPlaceholder {
-  position: absolute;
-  inset: 0;
-  display: block;
-  background-color: var(--vision-bg-soft);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.controls {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto 44px;
-  align-items: center;
-  gap: 0.55rem;
-  margin-top: 0.8rem;
-}
-
-.controls > button {
-  display: inline-flex;
-  width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid var(--vision-line);
-  border-radius: 50%;
+.thumbnailBtn {
+  flex: 0 0 80px;
+  width: 80px;
   background: transparent;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px;
   cursor: pointer;
+  transition: border-color 0.2s ease;
 }
 
-.controls > button:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.indicators {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 0.42rem;
-}
-
-.indicators button {
-  width: 44px;
-  min-width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.indicators button::after {
-  content: "";
-  display: block;
-  width: 50%;
-  height: 2px;
-  margin-inline: auto;
-  background: var(--vision-steel-dark);
-  opacity: 0.42;
-}
-
-.indicators button[aria-pressed="true"]::after {
-  background: var(--vision-champagne);
-  opacity: 1;
-}
-
-.counter {
-  color: var(--vision-muted);
-  font-size: 0.72rem;
-  white-space: nowrap;
-}
-
-@media (max-width: 720px) {
-  .rail {
-    margin-inline: -4vw;
-    width: 100vw;
-    border-right: 0;
-    border-left: 0;
-    border-radius: 0;
-  }
-
-  .controls {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .controls > button {
-    display: none;
+@media (min-width: 960px) {
+  .thumbnailBtn {
+    flex: 0 0 auto;
+    width: 100%;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .rail {
-    scroll-behavior: auto;
-  }
+.thumbnailBtn[aria-pressed="true"] {
+  border-color: var(--vision-graphite);
 }
+
+.thumbnailShell {
+  /* A thumbnail doesn't need to match the catalog exactly, but it uses the shell 
+     to maintain the optical center. */
+  aspect-ratio: 1 / 1 !important; /* Force square for thumbnails */
+  border-radius: calc(var(--radius-sm) - 2px); /* Slightly smaller inner radius */
+}
+
+/* Single image has no rail */

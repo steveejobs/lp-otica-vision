@@ -15,52 +15,23 @@ const blurDataUrl =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAoUlEQVR4nO2SMQkAURTD6l9ox5si4Iu4ITwoVEASGr6eXnQCJlC9IrtQ7y46AROoXpFdqHcXnYAJVK7IL9e6iEzCB6hXZBfq3UUnYALVK7IL9e6iEzCB6hXZhXp30QmYQPWK7EK9u+gETKB6RXah3l10AiZQvSK7UO8uOgETqF6RXah3F52ACVSvyC7Uu4tOwASqV2QX6t1FJ2AC1Sv+udAD+2GCleGPpz0AAAAASUVORK5CYII=";
 
 export function ProductGallery({ images, productId, productName }: { images: CatalogImage[]; productId: string; productName: string }) {
-  const railRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<number | null>(null);
   const targetRef = useRef<HTMLDivElement>(null);
   const initialIndex = Math.max(0, images.findIndex((image) => image.isCover));
   const [activeIndex, setActiveIndex] = useState(initialIndex);
-  const [loadedIndexes, setLoadedIndexes] = useState(() => new Set([initialIndex]));
+  
+  // To handle smooth crossfade between main images:
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
+  const [isFading, setIsFading] = useState(false);
 
-  const { state, enabled, registerTarget } = useCatalogMediaTransition();
+  const { state, enabled, registerTarget, markTargetReady } = useCatalogMediaTransition();
 
-  const ensureLoaded = useCallback((index: number) => {
-    setLoadedIndexes((current) => {
-      if (current.has(index)) return current;
-      const next = new Set(current);
-      next.add(index);
-      return next;
-    });
-  }, []);
-
-  const goTo = useCallback((index: number, behavior: ScrollBehavior = "smooth") => {
-    const rail = railRef.current;
-    if (!rail) return;
+  const goTo = useCallback((index: number) => {
+    if (index === activeIndex) return;
     const safeIndex = Math.max(0, Math.min(index, images.length - 1));
-    const item = rail.children.item(safeIndex) as HTMLElement | null;
-    ensureLoaded(safeIndex);
-    item?.scrollIntoView({ behavior, block: "nearest", inline: "start" });
+    setPrevIndex(activeIndex);
+    setIsFading(true);
     setActiveIndex(safeIndex);
-  }, [ensureLoaded, images.length]);
-
-  useEffect(() => {
-    goTo(initialIndex, "auto");
-  }, [goTo, initialIndex]);
-
-  useEffect(() => () => {
-    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-  }, []);
-
-  function updateFromScroll() {
-    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-    frameRef.current = requestAnimationFrame(() => {
-      const rail = railRef.current;
-      if (!rail || !rail.clientWidth) return;
-      const nextIndex = Math.max(0, Math.min(Math.round(rail.scrollLeft / rail.clientWidth), images.length - 1));
-      ensureLoaded(nextIndex);
-      setActiveIndex(nextIndex);
-    });
-  }
+  }, [activeIndex, images.length]);
 
   // Register target when mounted
   useLayoutEffect(() => {
@@ -75,116 +46,106 @@ export function ProductGallery({ images, productId, productName }: { images: Cat
     state.productId === productId && 
     (state.status === "animating" || state.status === "settling");
 
+  const activeImage = images[activeIndex];
+  const isCoverActive = activeIndex === initialIndex;
+  const imgOpacity = isCoverActive && isTransitioningCurrentProduct ? 0 : 1;
+
+  // Single Image Layout
+  if (images.length === 1) {
+    return (
+      <div className={styles.gallery} data-count="1">
+        <ProductMediaShell presentation="gallery" ref={targetRef} className={styles.mainShell}>
+          <Image
+            alt={activeImage.altText}
+            blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
+            fetchPriority="high"
+            fill
+            loading="eager"
+            placeholder="blur"
+            sizes="(max-width: 900px) 92vw, 58vw"
+            src={catalogImageUrl(activeImage, "product_detail")}
+            style={{ objectPosition: activeImage.objectPosition, opacity: imgOpacity, transition: "opacity 0.15s ease-in-out" }}
+            unoptimized
+            onLoad={() => {
+              if (isTransitioningCurrentProduct && state.transitionId) {
+                markTargetReady(state.transitionId);
+              }
+            }}
+          />
+        </ProductMediaShell>
+      </div>
+    );
+  }
+
+  // Multi Image Layout (2 or 3+)
   return (
-    <div className={styles.gallery}>
-      <div
-        aria-label={`Galeria de ${productName}`}
-        className={styles.rail}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowLeft") {
-            event.preventDefault();
-            goTo(activeIndex - 1);
-          }
-          if (event.key === "ArrowRight") {
-            event.preventDefault();
-            goTo(activeIndex + 1);
-          }
-          if (event.key === "Home") {
-            event.preventDefault();
-            goTo(0);
-          }
-          if (event.key === "End") {
-            event.preventDefault();
-            goTo(images.length - 1);
-          }
-        }}
-        onScroll={updateFromScroll}
-        ref={railRef}
-        role="region"
-        tabIndex={0}
-      >
-        {images.map((image, index) => {
-          const isCover = index === initialIndex;
-          // While transition is active, the real image is hidden to let the overlay show.
-          // Wait, actually opacity: 0 allows the overlay to sit on top perfectly.
-          // The overlay uses mixBlendMode multiply so the real image shouldn't show underneath, 
-          // or if it does, it might double the multiply. It's safer to opacity: 0 the real image.
-          const imgOpacity = isCover && isTransitioningCurrentProduct ? 0 : 1;
-          
-          return (
-            <figure
-              className={styles.slide}
-              data-catalog-product-hero={isCover ? productId : undefined}
-              key={image.id}
-            >
-              <ProductMediaShell 
-                presentation="gallery" 
-                ref={isCover ? targetRef : undefined}
-              >
-                {loadedIndexes.has(index) ? (
-                  <Image
-                    alt={image.altText}
-                    blurDataURL={image.blurDataUrl ?? blurDataUrl}
-                    fetchPriority={isCover ? "high" : "auto"}
-                    fill
-                    loading={isCover ? "eager" : "lazy"}
-                    placeholder="blur"
-                    sizes="(max-width: 900px) 92vw, 58vw"
-                    src={catalogImageUrl(image, "product_detail")}
-                    style={{ objectPosition: image.objectPosition, opacity: imgOpacity, transition: "opacity 0.15s ease-in-out" }}
-                    unoptimized
-                  />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className={styles.lazyPlaceholder}
-                    style={{
-                      backgroundImage: `url(${image.blurDataUrl ?? blurDataUrl})`,
-                      backgroundPosition: image.objectPosition,
-                      opacity: imgOpacity,
-                    }}
-                  />
-                )}
-              </ProductMediaShell>
-            </figure>
-          );
-        })}
+    <div className={styles.gallery} data-count={images.length >= 3 ? "many" : "2"}>
+      <div className={styles.mainView}>
+        <ProductMediaShell presentation="gallery" ref={isCoverActive ? targetRef : undefined} className={styles.mainShell}>
+          {prevIndex !== null && isFading && (
+            <Image
+              alt={images[prevIndex].altText}
+              blurDataURL={images[prevIndex].blurDataUrl ?? blurDataUrl}
+              fill
+              src={catalogImageUrl(images[prevIndex], "product_detail")}
+              style={{ objectPosition: images[prevIndex].objectPosition, opacity: 1, zIndex: 1 }}
+              unoptimized
+              className={styles.fadeOutImage}
+            />
+          )}
+          <Image
+            key={activeImage.id}
+            alt={activeImage.altText}
+            blurDataURL={activeImage.blurDataUrl ?? blurDataUrl}
+            fetchPriority={isCoverActive ? "high" : "auto"}
+            fill
+            loading={isCoverActive ? "eager" : "lazy"}
+            placeholder="blur"
+            sizes="(max-width: 900px) 92vw, 58vw"
+            src={catalogImageUrl(activeImage, "product_detail")}
+            style={{ 
+              objectPosition: activeImage.objectPosition, 
+              opacity: isFading ? 0 : imgOpacity, 
+              transition: isFading ? "none" : "opacity 0.15s ease-in-out",
+              zIndex: 2
+            }}
+            unoptimized
+            onLoad={() => {
+              if (isFading) {
+                // When new image loads, fade it in over 180ms
+                requestAnimationFrame(() => setIsFading(false));
+              }
+              if (isCoverActive && isTransitioningCurrentProduct && state.transitionId) {
+                markTargetReady(state.transitionId);
+              }
+            }}
+          />
+        </ProductMediaShell>
       </div>
 
-      {images.length > 1 ? (
-        <div className={styles.controls} style={{ opacity: isTransitioningCurrentProduct ? 0 : 1, transition: "opacity 0.2s ease" }}>
-          <button
-            aria-label="Imagem anterior"
-            disabled={activeIndex === 0}
-            onClick={() => goTo(activeIndex - 1)}
-            type="button"
+      <div className={styles.thumbnailRail} style={{ opacity: isTransitioningCurrentProduct ? 0 : 1, transition: "opacity 0.2s ease" }}>
+        {images.map((img, idx) => (
+          <button 
+            key={img.id} 
+            type="button" 
+            className={styles.thumbnailBtn} 
+            aria-pressed={activeIndex === idx}
+            onClick={() => goTo(idx)}
+            aria-label={`Ver imagem ${idx + 1} de ${images.length}`}
           >
-            <ChevronLeft aria-hidden="true" size={19} />
-          </button>
-          <div className={styles.indicators} aria-label="Selecionar imagem">
-            {images.map((image, index) => (
-              <button
-                aria-label={`Ver imagem ${index + 1} de ${images.length}`}
-                aria-pressed={activeIndex === index}
-                key={image.id}
-                onClick={() => goTo(index)}
-                type="button"
+            <ProductMediaShell presentation="gallery" className={styles.thumbnailShell}>
+              <Image
+                alt={img.altText}
+                fill
+                sizes="120px"
+                src={catalogImageUrl(img, "product_detail")} // Or a smaller variant if we want
+                style={{ objectPosition: img.objectPosition }}
+                unoptimized
               />
-            ))}
-          </div>
-          <span aria-live="polite" className={styles.counter}>
-            {activeIndex + 1} / {images.length}
-          </span>
-          <button
-            aria-label="Próxima imagem"
-            disabled={activeIndex === images.length - 1}
-            onClick={() => goTo(activeIndex + 1)}
-            type="button"
-          >
-            <ChevronRight aria-hidden="true" size={19} />
+            </ProductMediaShell>
           </button>
-        </div>
-      ) : null}
+        ))}
+      </div>
     </div>
   );
 }

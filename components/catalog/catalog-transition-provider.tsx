@@ -20,6 +20,7 @@ type TransitionContextValue = {
   registerOrigin: (productId: string, url: string, rect: Rect, objectPosition: string) => void;
   registerTarget: (productId: string, transitionId: string, rect: Rect) => void;
   markNavigating: () => void;
+  markTargetReady: (transitionId: string) => void;
   reset: () => void;
 };
 
@@ -58,6 +59,15 @@ export function CatalogMediaTransitionProvider({ children, enabled }: { children
 
   const markNavigating = () => {
     setState(s => s.status === "armed" ? { ...s, status: "navigating" } : s);
+  };
+
+  const markTargetReady = (transitionId: string) => {
+    setState(s => {
+      if (s.transitionId === transitionId && (s.status === "animating" || s.status === "settling")) {
+        return { ...s, status: "cleanup" };
+      }
+      return s;
+    });
   };
 
   const registerTarget = (productId: string, transitionId: string, targetRect: Rect) => {
@@ -122,20 +132,25 @@ export function CatalogMediaTransitionProvider({ children, enabled }: { children
         { transform: 'translate(0, 0) scale(1)', borderRadius: 'var(--radius-sm)' },
         { transform: `translate(${deltaX}px, ${deltaY}px) scale(${scaleX}, ${scaleY})`, borderRadius: '0px' }
       ], {
-        duration: 400,
+        duration: 480,
         easing: "cubic-bezier(0.22, 1, 0.36, 1)",
         fill: "forwards"
       });
 
       animation.finished.then(() => {
         setState(s => ({ ...s, status: "settling" }));
-        setTimeout(() => {
-          setState(s => ({ ...s, status: "cleanup" }));
-        }, 150);
+      }).catch(() => {
+        // Animation cancelled or error
       });
+
+      // Safety watchdog: se a imagem não disparar load em 2.5s após iniciar animação, forçamos cleanup
+      const watchdog = setTimeout(() => {
+        setState(s => s.status === "settling" || s.status === "animating" ? { ...s, status: "cleanup" } : s);
+      }, 2500);
 
       return () => {
         animation.cancel();
+        clearTimeout(watchdog);
       };
     }
 
@@ -147,7 +162,7 @@ export function CatalogMediaTransitionProvider({ children, enabled }: { children
   const showOverlay = enabled && (state.status === "animating" || state.status === "settling");
 
   return (
-    <TransitionContext.Provider value={{ state, enabled, registerOrigin, registerTarget, markNavigating, reset }}>
+    <TransitionContext.Provider value={{ state, enabled, registerOrigin, registerTarget, markNavigating, markTargetReady, reset }}>
       {children}
       {showOverlay && state.mediaUrl && (
         <div

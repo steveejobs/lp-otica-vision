@@ -17,7 +17,7 @@ type ProductTransitionLinkProps = {
 };
 
 export function ProductTransitionLink({ children, product, href, external, linkLabel, clone }: ProductTransitionLinkProps) {
-  const { enabled, registerOrigin, markNavigating } = useCatalogMediaTransition();
+  const { state, enabled, registerOrigin, markNavigating } = useCatalogMediaTransition();
   const linkRef = useRef<HTMLAnchorElement>(null);
   
   const preloadHighRes = useCallback(() => {
@@ -71,6 +71,10 @@ export function ProductTransitionLink({ children, product, href, external, linkL
     markNavigating();
   };
 
+  const isActiveTransition = state.status === "navigating" || state.status === "animating" || state.status === "settling" || state.status === "awaiting-target";
+  const isThisProductNavigating = state.productId === product.id;
+  const opacity = isActiveTransition && !isThisProductNavigating ? 0.72 : 1;
+
   if (external) {
     return (
       <a
@@ -98,6 +102,7 @@ export function ProductTransitionLink({ children, product, href, external, linkL
       onPointerDown={handlePointerDown}
       onKeyDown={handleKeyDown}
       onClick={handleClick}
+      style={{ opacity, transition: "opacity 200ms ease" }}
     >
       {children}
     </Link>

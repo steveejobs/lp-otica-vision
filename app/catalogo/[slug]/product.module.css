@@ -1,15 +1,15 @@
-@keyframes productEntrance {
+@keyframes productDetailsEntrance {
   0% {
     opacity: 0;
-    transform: scale(0.985) translateY(8px);
+    transform: translateY(12px);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
 }
 
-@keyframes productEntranceReduced {
+@keyframes productDetailsEntranceReduced {
   0% { opacity: 0; transform: none; }
   100% { opacity: 1; transform: none; }
 }
@@ -23,14 +23,6 @@
   max-width: 1320px;
   margin-inline: auto;
   padding: 1.25rem 0 clamp(5rem, 9vw, 8rem);
-  opacity: 0;
-  animation: productEntrance 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .main {
-    animation: productEntranceReduced 200ms ease forwards;
-  }
 }
 
 .back {
@@ -55,6 +47,14 @@
   display: grid;
   gap: 1.35rem;
   padding-top: clamp(0.5rem, 2vw, 2rem);
+  opacity: 0;
+  animation: productDetailsEntrance 200ms cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .details {
+    animation: productDetailsEntranceReduced 200ms ease forwards;
+  }
 }
 
 .detailsHeader {
