@@ -13,6 +13,12 @@
   border: none;
   box-shadow: none;
   background: var(--vision-paper);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.card[data-mode="grid"]:hover {
+  border-bottom-color: var(--vision-champagne, #c7ad8e);
 }
 
 /* === Button reset for primary focus trigger === */
@@ -49,22 +55,32 @@
   will-change: transform;
 }
 
-/* --- GRID MODE MEDIA: 100% Clean cutout on paper background, no shadows, no borders --- */
+/* --- GRID MODE MEDIA: 100% Clean cutout on warm beige background --- */
 .gridMedia {
   position: relative;
   aspect-ratio: 4 / 3;
   width: 100%;
-  border-radius: 0;
+  border-radius: 6px;
   border: none;
   overflow: hidden;
-  background-color: var(--vision-paper, #fbf8f3);
+  background-color: var(--vision-bg-soft, #f4eee6);
   margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.card[data-mode="grid"]:hover .gridMedia {
+  background-color: #ede7de;
 }
 
 .gridMedia img {
   object-fit: contain !important;
   mix-blend-mode: multiply !important;
   filter: none !important;
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card[data-mode="grid"]:hover .gridMedia img {
+  transform: scale(1.05);
 }
 
 .coverImage,
@@ -78,36 +94,51 @@
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.25rem;
   flex: 1;
   justify-content: flex-end;
+  padding-bottom: 0.25rem;
 }
 
 .summary h3 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--vision-ink);
   line-height: 1.2;
+  letter-spacing: 0;
 }
 
 .styleName {
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--vision-muted);
+  display: none; /* Removido: poluição visual conforme feedback */
 }
 
+/* CTA — sempre visível, underline bronze editorial */
 .cta {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   margin-top: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--vision-ink);
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vision-bronze, #7a6049);
+  opacity: 1;
+  transform: none;
+  border-bottom: 1px solid var(--vision-champagne, #c7ad8e);
+  padding-bottom: 0.1rem;
+  transition: color 0.25s ease, border-color 0.25s ease, gap 0.25s ease;
+}
+
+/* Desktop hover: sutil expansão de gap */
+@media (hover: hover) and (pointer: fine) {
+  .card[data-mode="grid"]:hover .cta {
+    color: var(--vision-ink);
+    border-color: var(--vision-ink);
+    gap: 0.5rem;
+  }
 }
 
 .canonicalLink {
@@ -124,14 +155,6 @@
   color: var(--vision-ink);
 }
 
-/* Hover effects for grid cards */
-@media (hover: hover) and (pointer: fine) {
-  .card[data-mode="grid"]:hover .cta {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: 720px) {
   .focusTrigger, .externalLink {
     padding: 0.75rem;
@@ -139,12 +162,6 @@
 
   .gridMedia {
     margin-bottom: 0.75rem;
-  }
-
-  .cta {
-    opacity: 1;
-    transform: translateY(0);
-    color: var(--vision-muted);
   }
 }
 

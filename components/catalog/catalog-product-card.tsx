@@ -313,7 +313,6 @@ export function CatalogProductCard({
 
         <div className={styles.summary}>
           <h3>{product.name}</h3>
-          <p className={styles.styleName}>{styleText}</p>
           <span className={styles.cta}>Visualizar modelo</span>
         </div>
       </button>
