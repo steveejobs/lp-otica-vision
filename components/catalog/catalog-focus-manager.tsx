@@ -125,6 +125,11 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     };
   }, [focusedSlug]);
 
+  // Reset focused product whenever filter query changes (e.g. clicking "Todas as Marcas", "Todos os Estilos", or brand filters)
+  useEffect(() => {
+    setFocusedSlug(query.product ?? null);
+  }, [query.brand, query.style, query.search, query.page, query.product]);
+
   // Fetch logic when focusedSlug changes with instant 0ms data seeding
   useEffect(() => {
     if (!focusedSlug) {
@@ -289,11 +294,19 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
         frame.style.transform = "";
         
         frame.animate([
-          { transform: invertTransform },
-          { transform: "translate(0, 0) scale(1)" }
+          { 
+            transform: invertTransform,
+            opacity: 0.9,
+            filter: "blur(1.5px)"
+          },
+          { 
+            transform: "translate(0, 0) scale(1)",
+            opacity: 1,
+            filter: "blur(0px)"
+          }
         ], {
-          duration: 520,
-          easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+          duration: 460,
+          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
           fill: "both"
         });
       }

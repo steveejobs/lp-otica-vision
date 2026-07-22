@@ -79,7 +79,7 @@ export function CatalogHeaderSpotlight({ products }: { products: CatalogProductC
           {product.brand && <span className={styles.brand}>{product.brand.name}</span>}
           <h3 className={styles.title}>{product.name}</h3>
           <p className={styles.styleName}>{styleText}</p>
-          <span className={styles.cta}>Visualizar no showroom ↗</span>
+          <span className={styles.cta}>Visualizar modelo</span>
         </div>
       </button>
     </div>
