@@ -13,6 +13,8 @@ import { catalogHref, catalogProductHref, hasActiveCatalogFilters, type CatalogQ
 import type { CurationStyle } from "@/lib/curation/types";
 import { LINKS } from "@/lib/links";
 
+import { CatalogHeaderSpotlight } from "@/components/catalog/catalog-header-spotlight";
+
 import styles from "./catalog.module.css";
 
 interface CatalogViewProps {
@@ -62,6 +64,10 @@ export function CatalogView({
     query.page,
   ].join(":");
 
+  const spotlightProducts = featuredProducts && featuredProducts.length > 0
+    ? featuredProducts
+    : catalog.products.slice(0, 5);
+
   return (
     <div className={styles.page}>
       <SiteHeader />
@@ -69,74 +75,80 @@ export function CatalogView({
         
         <section className={styles.premiumHeader} aria-label="Detalhes da vitrine">
           <div className={styles.premiumHeaderInner}>
-            <div className={styles.premiumHeaderContent}>
-              <h1 id="catalog-results-title">{title}</h1>
-              <p aria-live="polite" className={styles.premiumModelCount}>
-                {catalog.total} {catalog.total === 1 ? "modelo disponível" : "modelos disponíveis"}
-              </p>
-              <p className={styles.premiumDescription}>
-                Escolha um modelo e fale com a ótica pelo WhatsApp para consultar detalhes e disponibilidade.
-              </p>
-            </div>
+            <div className={styles.headerLeftCol}>
+              <div className={styles.premiumHeaderContent}>
+                <h1 id="catalog-results-title">{title}</h1>
+                <p aria-live="polite" className={styles.premiumModelCount}>
+                  {catalog.total} {catalog.total === 1 ? "modelo disponível" : "modelos disponíveis"}
+                </p>
+                <p className={styles.premiumDescription}>
+                  Escolha um modelo e fale com a ótica pelo WhatsApp para consultar detalhes e disponibilidade.
+                </p>
+              </div>
 
-            <nav className={styles.brandRail} aria-label="Selecionar marca">
-              <Link
-                aria-current={!query.brand ? "page" : undefined}
-                data-catalog-filter-link
-                href={catalogHref(query, { brand: null, page: 1, product: null })}
-                scroll={false}
-                className={styles.brandLinkText}
-              >
-                <strong>Todas as Marcas</strong>
-              </Link>
-              {filters.brands.map((brand) => {
-                const logoPath = BRAND_LOGOS[brand.key];
-                return (
-                  <Link
-                    aria-current={query.brand === brand.key ? "page" : undefined}
-                    data-catalog-filter-link
-                    href={catalogHref(query, { brand: brand.key, page: 1, product: null })}
-                    key={brand.key}
-                    scroll={false}
-                    className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
-                  >
-                    {logoPath ? (
-                       <div className={styles.brandLogoWrapper}>
-                         <img src={logoPath} alt={brand.name} className={styles.brandLogo} />
-                       </div>
-                    ) : (
-                      <strong>{brand.name}</strong>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {styleOptions.some(style => style.productCount > 0) ? (
-              <nav className={styles.styleTabs} aria-label="Selecionar estilo">
+              <nav className={styles.brandRail} aria-label="Selecionar marca">
                 <Link
-                  aria-current={!query.style ? "page" : undefined}
+                  aria-current={!query.brand ? "page" : undefined}
                   data-catalog-filter-link
-                  href={catalogHref(query, { page: 1, style: null, product: null })}
+                  href={catalogHref(query, { brand: null, page: 1, product: null })}
                   scroll={false}
-                  className={styles.styleTab}
+                  className={styles.brandLinkText}
                 >
-                  Todos
+                  <strong>Todas as Marcas</strong>
                 </Link>
-                {styleOptions.map((style) => style.productCount > 0 ? (
+                {filters.brands.map((brand) => {
+                  const logoPath = BRAND_LOGOS[brand.key];
+                  return (
+                    <Link
+                      aria-current={query.brand === brand.key ? "page" : undefined}
+                      data-catalog-filter-link
+                      href={catalogHref(query, { brand: brand.key, page: 1, product: null })}
+                      key={brand.key}
+                      scroll={false}
+                      className={logoPath ? styles.brandLinkImage : styles.brandLinkText}
+                    >
+                      {logoPath ? (
+                         <div className={styles.brandLogoWrapper}>
+                           <img src={logoPath} alt={brand.name} className={styles.brandLogo} />
+                         </div>
+                      ) : (
+                        <strong>{brand.name}</strong>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {styleOptions.some(style => style.productCount > 0) ? (
+                <nav className={styles.styleTabs} aria-label="Selecionar estilo">
                   <Link
-                    aria-current={query.style === style.slug ? "page" : undefined}
+                    aria-current={!query.style ? "page" : undefined}
                     data-catalog-filter-link
-                    href={catalogHref(query, { page: 1, style: style.slug, product: null })}
-                    key={style.id}
+                    href={catalogHref(query, { page: 1, style: null, product: null })}
                     scroll={false}
                     className={styles.styleTab}
                   >
-                    {style.label}
+                    Todos
                   </Link>
-                ) : null)}
-              </nav>
-            ) : null}
+                  {styleOptions.map((style) => style.productCount > 0 ? (
+                    <Link
+                      aria-current={query.style === style.slug ? "page" : undefined}
+                      data-catalog-filter-link
+                      href={catalogHref(query, { page: 1, style: style.slug, product: null })}
+                      key={style.id}
+                      scroll={false}
+                      className={styles.styleTab}
+                    >
+                      {style.label}
+                    </Link>
+                  ) : null)}
+                </nav>
+              ) : null}
+            </div>
+
+            <div className={styles.headerRightCol}>
+              <CatalogHeaderSpotlight products={spotlightProducts} />
+            </div>
           </div>
         </section>
 
