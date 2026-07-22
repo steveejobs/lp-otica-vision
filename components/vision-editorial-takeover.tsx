@@ -17,12 +17,6 @@ export function VisionEditorialTakeover({ media, heroProducts = [] }: Props) {
       <HeroCopy />
 
       <HeroGallery media={media} />
-
-      {heroProducts.length > 0 && (
-        <div style={{ position: "absolute", top: "2rem", left: "2rem", zIndex: 10, maxWidth: "320px", width: "100%" }}>
-          <CatalogHeaderSpotlight products={heroProducts} />
-        </div>
-      )}
     </section>
   );
 }
