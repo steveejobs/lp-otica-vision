@@ -167,7 +167,18 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
   }, [focusedSlug, catalogProducts, initialProduct]);
 
   const focusProduct = ({ slug, flipFrame }: FocusProductInput) => {
-    if (slug === focusedSlug) return;
+    if (slug === focusedSlug) {
+      // Re-trigger camera scroll centering if user clicks the product card while it is already focused
+      requestAnimationFrame(() => {
+        const focusedCard = document.querySelector<HTMLElement>('[data-mode="focused"]');
+        if (focusedCard) {
+          const cardTop = focusedCard.getBoundingClientRect().top + window.scrollY;
+          const targetY = Math.max(0, cardTop - 16);
+          window.scrollTo({ top: targetY, behavior: "smooth" });
+        }
+      });
+      return;
+    }
 
     // 1. FIRST — capture geometry before setState
     flipOrigins.current.clear();

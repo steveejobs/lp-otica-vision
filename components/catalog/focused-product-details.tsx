@@ -52,7 +52,7 @@ export function FocusedProductDetails({ product }: { product: CatalogProduct }) 
             className={styles.pageLink}
             data-vision-motion-ignore=""
           >
-            Ver página completa →
+            Ver mais detalhes →
           </Link>
         </div>
       </div>
