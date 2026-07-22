@@ -125,10 +125,26 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     };
   }, [focusedSlug]);
 
-  // Reset focused product whenever filter query changes (e.g. clicking "Todas as Marcas", "Todos os Estilos", or brand filters)
+  // Reset focused product whenever filter query changes
   useEffect(() => {
     setFocusedSlug(query.product ?? null);
   }, [query.brand, query.style, query.search, query.page, query.product]);
+
+  // Auto-scroll & center camera on focused product stage on mount or slug change
+  useEffect(() => {
+    if (!focusedSlug) return;
+
+    const timer = setTimeout(() => {
+      const focusedCard = document.querySelector<HTMLElement>('[data-mode="focused"]');
+      if (focusedCard) {
+        const cardTop = focusedCard.getBoundingClientRect().top + window.scrollY;
+        const targetY = Math.max(0, cardTop - 24);
+        window.scrollTo({ top: targetY, behavior: "smooth" });
+      }
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [focusedSlug]);
 
   // Fetch logic when focusedSlug changes with instant 0ms data seeding
   useEffect(() => {
