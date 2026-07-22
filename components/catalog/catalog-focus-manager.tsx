@@ -161,12 +161,8 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     // 1. FIRST — capture geometry before setState
     flipOrigins.current.clear();
     
-    // Use the passed flipFrame directly for the focused product
     if (flipFrame) {
-      const productSlug = flipFrame.closest("[data-catalog-product-slug]")?.getAttribute("data-catalog-product-slug");
-      if (productSlug) {
-        flipOrigins.current.set(productSlug, { rect: flipFrame.getBoundingClientRect() });
-      }
+      flipOrigins.current.set(slug, { rect: flipFrame.getBoundingClientRect() });
     }
     
     // Also capture other visible flip frames for rail animation
@@ -274,22 +270,22 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
           { transform: invertTransform },
           { transform: "translate(0, 0) scale(1)" }
         ], {
-          duration: 480,
-          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          duration: 520,
+          easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
           fill: "both"
         });
       }
     });
 
     if (focusedSlug) {
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const focusedCard = document.querySelector<HTMLElement>('[data-mode="focused"]');
         if (focusedCard) {
           const cardTop = focusedCard.getBoundingClientRect().top + window.scrollY;
-          const targetY = Math.max(0, cardTop - 30);
+          const targetY = Math.max(0, cardTop - 16);
           window.scrollTo({ top: targetY, behavior: "smooth" });
         }
-      }, 50);
+      });
     }
   }, [focusedSlug]);
 

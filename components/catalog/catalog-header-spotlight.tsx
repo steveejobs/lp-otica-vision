@@ -54,6 +54,7 @@ export function CatalogHeaderSpotlight({ products }: { products: CatalogProductC
       <button
         type="button"
         className={styles.spotlightCard}
+        data-catalog-product-slug={product.slug}
         onClick={handleSpotlightClick}
         aria-label={`Visualizar armação ${product.name}`}
       >
