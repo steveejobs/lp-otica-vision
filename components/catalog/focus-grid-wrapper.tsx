@@ -11,11 +11,12 @@ export function FocusGridWrapper({ catalog, query }: { catalog: CatalogPageResul
   const hasFocus = !!focusManager?.focusedSlug;
   
   return (
-    <div 
-      className={styles.grid} 
-      data-catalog-results-grid 
+    <div
+      className={styles.grid}
+      data-catalog-results-grid
       data-count={Math.min(catalog.products.length, 9)}
       data-catalog-focus-active={hasFocus}
+      data-motion-stagger
     >
       {catalog.products.map((product, index) => (
         <CatalogProductCard

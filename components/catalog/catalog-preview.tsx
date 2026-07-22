@@ -39,7 +39,7 @@ export function CatalogPreview({ products }: { products: CatalogProductCard[] })
           </div>
         </header>
 
-        <div className={styles.grid}>
+        <div className={styles.grid} data-motion-stagger>
           {displayProducts.map((product) => {
             const descriptor = [product.brand?.name, product.model].filter(Boolean).join(" · ");
             const whatsappText = `Olá! Gostaria de consultar disponibilidade e detalhes do modelo ${product.name} (Ótica Vision Araguaína).`;

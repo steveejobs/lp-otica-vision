@@ -242,6 +242,8 @@ export function CatalogProductCard({
       aria-hidden={clone || undefined}
       className={styles.card}
       data-mode="grid"
+      data-motion-reveal
+      data-motion-variant="catalog-card"
       data-catalog-product-id={clone ? undefined : product.id}
       data-catalog-product-name={clone ? undefined : product.name}
       data-catalog-product-slug={clone ? undefined : product.slug}
