@@ -72,7 +72,7 @@ export function CatalogView({
     <div className={styles.page}>
       <SiteHeader />
       <main id="main-content">
-        <CatalogFocusManager initialSlug={query.product} initialProduct={initialFocusedProduct} query={query}>
+        <CatalogFocusManager initialSlug={query.product} initialProduct={initialFocusedProduct} query={query} catalogProducts={catalog.products}>
           <section className={styles.premiumHeader} aria-label="Detalhes da vitrine">
             <div className={styles.premiumHeaderInner}>
               <div className={styles.headerLeftCol}>

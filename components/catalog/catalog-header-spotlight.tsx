@@ -58,11 +58,10 @@ export function CatalogHeaderSpotlight({ products }: { products: CatalogProductC
         onClick={handleSpotlightClick}
         aria-label={`Visualizar armação ${product.name}`}
       >
-        {/* Large Product Image Container */}
+        {/* Large Product Image Container with key for smooth transition */}
         <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
-          <div className={styles.largeMediaShell}>
+          <div key={product.id} className={styles.largeMediaShell}>
             <Image
-              key={product.id}
               alt={product.cover.altText}
               fill
               priority
@@ -75,8 +74,8 @@ export function CatalogHeaderSpotlight({ products }: { products: CatalogProductC
           </div>
         </div>
 
-        {/* Information BELOW the image */}
-        <div className={styles.infoBelow}>
+        {/* Information BELOW the image with key for smooth text transition */}
+        <div key={product.id} className={styles.infoBelow}>
           {product.brand && <span className={styles.brand}>{product.brand.name}</span>}
           <h3 className={styles.title}>{product.name}</h3>
           <p className={styles.styleName}>{styleText}</p>

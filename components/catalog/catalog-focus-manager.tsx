@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import type { CatalogProduct, CatalogQuery } from "@/lib/catalog/types";
+import type { CatalogProduct, CatalogProductCard, CatalogQuery } from "@/lib/catalog/types";
 import { catalogHref } from "@/lib/catalog/query";
 
 type FocusMode = "grid" | "focused" | "rail";
@@ -33,6 +33,7 @@ interface CatalogFocusManagerProps {
   initialSlug: string | null;
   initialProduct: CatalogProduct | null;
   query: CatalogQuery;
+  catalogProducts?: CatalogProductCard[];
 }
 
 type FlipGeometry = {
@@ -65,7 +66,7 @@ export function preloadProductData(slug: string) {
   fetchPromises.set(slug, promise);
 }
 
-export function CatalogFocusManager({ children, initialSlug, initialProduct, query }: CatalogFocusManagerProps) {
+export function CatalogFocusManager({ children, initialSlug, initialProduct, query, catalogProducts = [] }: CatalogFocusManagerProps) {
   const [focusedSlug, setFocusedSlug] = useState<string | null>(initialSlug);
   const [focusedProductData, setFocusedProductData] = useState<CatalogProduct | null>(initialProduct);
   const flipOrigins = useRef<Map<string, FlipGeometry>>(new Map());
@@ -124,7 +125,7 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     };
   }, [focusedSlug]);
 
-  // Fetch logic when focusedSlug changes
+  // Fetch logic when focusedSlug changes with instant 0ms data seeding
   useEffect(() => {
     if (!focusedSlug) {
       setFocusedProductData(null);
@@ -135,7 +136,17 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     
     if (detailCache.has(focusedSlug)) {
       setFocusedProductData(detailCache.get(focusedSlug)!);
-      return;
+    } else {
+      // Find basic product data in initialProduct or catalog list for 0ms instant rendering
+      const catalogItem = catalogProducts.find(p => p.slug === focusedSlug) || (initialProduct?.slug === focusedSlug ? initialProduct : null);
+      if (catalogItem) {
+        const instantData: CatalogProduct = {
+          ...catalogItem,
+          images: [catalogItem.cover],
+        };
+        detailCache.set(focusedSlug, instantData);
+        setFocusedProductData(instantData);
+      }
     }
     
     const promise = fetchPromises.get(focusedSlug) || (
@@ -153,7 +164,7 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
     return () => {
       isMounted = false;
     };
-  }, [focusedSlug]);
+  }, [focusedSlug, catalogProducts, initialProduct]);
 
   const focusProduct = ({ slug, flipFrame }: FocusProductInput) => {
     if (slug === focusedSlug) return;
