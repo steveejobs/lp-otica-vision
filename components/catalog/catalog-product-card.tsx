@@ -222,7 +222,7 @@ export function CatalogProductCard({
                   className={styles.focusedCanonicalLink}
                   data-vision-motion-ignore=""
                 >
-                  Ver página completa →
+                  Ver mais detalhes →
                 </Link>
               </div>
             </div>
