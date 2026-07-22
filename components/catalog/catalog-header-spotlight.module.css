@@ -1,129 +1,76 @@
 ﻿.spotlightWrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
   width: 100%;
-}
-
-.spotlightHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.spotlightBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--vision-ink);
-  background: var(--vision-warm-white, #f4eee6);
-  padding: 0.35rem 0.75rem;
-  border-radius: 2rem;
-  border: 1px solid var(--vision-line);
-}
-
-.sparkleIcon {
-  color: var(--vision-bronze, #7a6049);
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.controlBtn {
-  all: unset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid var(--vision-line);
-  background: var(--vision-paper);
-  color: var(--vision-ink);
-  transition: all 0.2s ease;
-}
-
-.controlBtn:hover {
-  background: var(--vision-ink);
-  color: var(--vision-paper);
-}
-
-.counter {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--vision-muted);
 }
 
 .spotlightCard {
   all: unset;
   cursor: pointer;
-  display: grid;
-  grid-template-columns: 140px 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.25rem;
-  align-items: center;
   background: #ffffff;
   border: 1px solid var(--vision-line);
-  border-radius: 16px;
-  padding: 1.25rem;
-  box-shadow: 0 12px 32px -8px rgba(25, 22, 20, 0.08);
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 16px 40px -12px rgba(25, 22, 20, 0.09);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease;
   position: relative;
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .spotlightCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 40px -10px rgba(25, 22, 20, 0.14);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px -10px rgba(25, 22, 20, 0.16);
 }
 
 .flipFrame {
   width: 100%;
 }
 
-.mediaShell {
+/* Large High-Impact Image Shell */
+.largeMediaShell {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 10;
   width: 100%;
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--vision-paper, #fbf8f3);
 }
 
-.image {
+.largeImage {
   object-fit: contain !important;
   mix-blend-mode: multiply !important;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.info {
+.spotlightCard:hover .largeImage {
+  transform: scale(1.03);
+}
+
+/* Information BELOW the Image */
+.infoBelow {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .brand {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--vision-muted);
 }
 
-.info h3 {
+.title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
   font-weight: 400;
   color: var(--vision-ink);
   line-height: 1.15;
@@ -131,48 +78,22 @@
 
 .styleName {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--vision-muted);
 }
 
 .cta {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--vision-ink);
-  margin-top: 0.25rem;
-  transition: color 0.2s ease;
+  margin-top: 0.4rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .spotlightCard:hover .cta {
   color: var(--vision-bronze, #7a6049);
-}
-
-.dots {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding-top: 0.25rem;
-}
-
-.dot {
-  all: unset;
-  cursor: pointer;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vision-line);
-  transition: all 0.25s ease;
-}
-
-.dot[aria-pressed="true"] {
-  background: var(--vision-ink);
-  width: 20px;
-  border-radius: 4px;
-}
-
-@media (max-width: 960px) {
-  .spotlightWrapper {
-    margin-top: 0.5rem;
-  }
+  transform: translateX(2px);
 }

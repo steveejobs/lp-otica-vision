@@ -280,6 +280,17 @@ export function CatalogFocusManager({ children, initialSlug, initialProduct, que
         });
       }
     });
+
+    if (focusedSlug) {
+      setTimeout(() => {
+        const focusedCard = document.querySelector<HTMLElement>('[data-mode="focused"]');
+        if (focusedCard) {
+          const cardTop = focusedCard.getBoundingClientRect().top + window.scrollY;
+          const targetY = Math.max(0, cardTop - 30);
+          window.scrollTo({ top: targetY, behavior: "smooth" });
+        }
+      }, 50);
+    }
   }, [focusedSlug]);
 
   const getMode = (slug: string): FocusMode => {

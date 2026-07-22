@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { catalogImageUrl } from "@/lib/catalog/image-url";
 import type { CatalogProductCard } from "@/lib/catalog/types";
@@ -46,101 +45,43 @@ export function CatalogHeaderSpotlight({ products }: { products: CatalogProductC
     }
   };
 
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % displayProducts.length);
-  };
-
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev - 1 + displayProducts.length) % displayProducts.length);
-  };
-
   return (
     <div
       className={styles.spotlightWrapper}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className={styles.spotlightHeader}>
-        <span className={styles.spotlightBadge}>
-          <Sparkles size={13} className={styles.sparkleIcon} />
-          Destaque da Vitrine
-        </span>
-        {displayProducts.length > 1 && (
-          <div className={styles.controls}>
-            <button
-              type="button"
-              className={styles.controlBtn}
-              onClick={handlePrev}
-              aria-label="Destaque anterior"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className={styles.counter}>
-              {currentIndex + 1} / {displayProducts.length}
-            </span>
-            <button
-              type="button"
-              className={styles.controlBtn}
-              onClick={handleNext}
-              aria-label="Próximo destaque"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
-      </div>
-
       <button
         type="button"
         className={styles.spotlightCard}
         onClick={handleSpotlightClick}
-        aria-label={`Visualizar destaque ${product.name}`}
+        aria-label={`Visualizar armação ${product.name}`}
       >
+        {/* Large Product Image Container */}
         <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
-          <div className={styles.mediaShell}>
+          <div className={styles.largeMediaShell}>
             <Image
               key={product.id}
               alt={product.cover.altText}
               fill
               priority
-              sizes="(max-width: 960px) 90vw, 420px"
+              sizes="(max-width: 960px) 90vw, 520px"
               src={catalogImageUrl(product.cover, "home_preview")}
               style={{ objectPosition: product.cover.objectPosition }}
-              className={styles.image}
+              className={styles.largeImage}
               unoptimized
             />
           </div>
         </div>
 
-        <div className={styles.info}>
-          <div className={styles.titleRow}>
-            {product.brand && <span className={styles.brand}>{product.brand.name}</span>}
-            <h3>{product.name}</h3>
-            <p className={styles.styleName}>{styleText}</p>
-          </div>
+        {/* Information BELOW the image */}
+        <div className={styles.infoBelow}>
+          {product.brand && <span className={styles.brand}>{product.brand.name}</span>}
+          <h3 className={styles.title}>{product.name}</h3>
+          <p className={styles.styleName}>{styleText}</p>
           <span className={styles.cta}>Visualizar no showroom ↗</span>
         </div>
       </button>
-
-      {displayProducts.length > 1 && (
-        <div className={styles.dots}>
-          {displayProducts.map((p, idx) => (
-            <button
-              key={p.id}
-              type="button"
-              className={styles.dot}
-              aria-pressed={idx === currentIndex}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentIndex(idx);
-              }}
-              aria-label={`Ver destaque ${idx + 1}`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

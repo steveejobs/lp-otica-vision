@@ -27,7 +27,7 @@
 @media (min-width: 961px) {
   .premiumHeaderInner {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
     gap: clamp(2.5rem, 5vw, 5rem);
     align-items: center;
   }
@@ -46,22 +46,48 @@
   width: 100%;
 }
 
-/* Staggered Entrance Animations for Header Elements */
-@keyframes headerFadeUp {
-  from {
+/* === CREATIVE ENTRANCE ANIMATIONS === */
+@keyframes creativeSlideFromLeft {
+  0% {
     opacity: 0;
-    transform: translateY(18px);
+    filter: blur(8px);
+    transform: translateX(-32px) scale(0.96);
   }
-  to {
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes creativeFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes creativeHeroEntrance {
+  0% {
+    opacity: 0;
+    filter: blur(6px);
+    transform: perspective(800px) rotateY(-8deg) translateX(36px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+    transform: perspective(800px) rotateY(0deg) translateX(0) scale(1);
   }
 }
 
 .premiumHeaderContent {
   display: grid;
   gap: 0.5rem;
-  animation: headerFadeUp 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: creativeSlideFromLeft 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .premiumHeaderContent h1 {
@@ -96,7 +122,7 @@
   scroll-snap-type: x proximity;
   gap: clamp(1rem, 3vw, 2.5rem);
   padding-bottom: 0.5rem;
-  animation: headerFadeUp 500ms cubic-bezier(0.22, 1, 0.36, 1) 90ms both;
+  animation: creativeFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both;
 }
 
 .brandRail::-webkit-scrollbar {
@@ -164,11 +190,11 @@
   gap: 0.6rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--vision-line);
-  animation: headerFadeUp 500ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both;
+  animation: creativeFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both;
 }
 
 .headerRightCol {
-  animation: headerFadeUp 600ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  animation: creativeHeroEntrance 700ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
 }
 
 .styleTab {
@@ -355,7 +381,6 @@
     scrollbar-width: none;
   }
 
-  /* When a product is focused on mobile: Grid becomes a 2-column scrollable grid below the compact top sticky bar! */
   .grid[data-catalog-focus-active="true"] {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
