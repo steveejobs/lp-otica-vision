@@ -9,86 +9,83 @@ import { CatalogPreviewRail } from "./catalog-preview-rail";
 import styles from "./catalog-preview.module.css";
 
 export function CatalogPreview({ products }: { products: CatalogProductCard[] }) {
-  const [featuredProduct, ...supportingProducts] = products;
-  const descriptor = featuredProduct
-    ? [
-        featuredProduct.brand?.name ?? "Seleção Vision",
-        featuredProduct.model,
-        featuredProduct.color,
-      ].filter(Boolean).join(" · ")
-    : "";
+  const displayProducts = products.slice(0, 4);
 
   return (
     <section
       id="preview-catalogo"
       className={styles.section}
       aria-labelledby="catalog-preview-title"
-      data-product-count={products.length}
       data-motion-reveal
       data-motion-variant="section"
     >
       <div className={styles.inner}>
         <header className={styles.header}>
-          <div>
+          <div className={styles.headerTitleGroup}>
             <p className="eyebrow">Vitrine Vision</p>
-            <h2 id="catalog-preview-title">A vitrine passa diante dos olhos.</h2>
+            <h2 id="catalog-preview-title">Modelos em Destaque</h2>
           </div>
           <div className={styles.headerAside}>
-            <p>Modelos publicados no catálogo, com caminho direto para consultar pelo WhatsApp.</p>
+            <p>Selecione uma armação para abrir no WhatsApp com atendimento exclusivo em Araguaína - TO.</p>
             <Link
               className={styles.cta}
               data-catalog-collection-link
               data-catalog-transition-link
               href="/catalogo"
             >
-              Ver catálogo geral
-              <ArrowRight aria-hidden="true" size={17} />
+              Ver catálogo completo
+              <ArrowRight aria-hidden="true" size={16} />
             </Link>
           </div>
         </header>
 
-        {featuredProduct ? (
-          <div className={styles.showcase} data-layout={products.length === 1 ? "protagonist" : products.length === 2 ? "diptych" : products.length === 3 ? "editorial" : "rail"}>
-            <Link
-              aria-label={`Ver ${featuredProduct.name}`}
-              className={styles.feature}
-              data-catalog-product-id={featuredProduct.id}
-              data-catalog-transition-link
-              href={`/catalogo/${featuredProduct.slug}`}
-            >
-              <span className={styles.featureMedia} data-catalog-feature-media data-catalog-transition-media>
-                <Image
-                  alt={featuredProduct.cover.altText}
-                  blurDataURL={featuredProduct.cover.blurDataUrl ?? undefined}
-                  fill
-                  placeholder={featuredProduct.cover.blurDataUrl ? "blur" : "empty"}
-                  sizes="(max-width: 720px) 92vw, (max-width: 1100px) 44vw, 520px"
-                  src={catalogImageUrl(featuredProduct.cover, "home_preview")}
-                  style={{ objectPosition: featuredProduct.cover.objectPosition }}
-                  unoptimized
-                />
-              </span>
-              <span className={styles.featureContent}>
-                <span className={styles.featureMeta}>Destaque da vitrine</span>
-                <span className={styles.featureTitle}>{featuredProduct.name}</span>
-                {descriptor ? <span className={styles.featureDescriptor}>{descriptor}</span> : null}
-                <span className={styles.featureAction}>
-                  Abrir modelo
-                  <ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.7} />
-                </span>
-              </span>
-            </Link>
+        <div className={styles.grid}>
+          {displayProducts.map((product) => {
+            const descriptor = [product.brand?.name, product.model].filter(Boolean).join(" · ");
+            const whatsappText = `Olá! Gostaria de consultar disponibilidade e detalhes do modelo ${product.name} (Ótica Vision Araguaína).`;
+            const whatsappUrl = `https://api.whatsapp.com/send/?phone=5563992231522&text=${encodeURIComponent(whatsappText)}&type=phone_number&app_absent=0&utm_source=ig`;
 
-            {supportingProducts.length ? (
-              <div className={styles.railColumn}>
-                <div className={styles.railHeader}>
-                  <p>Em movimento</p>
+            return (
+              <div key={product.id} className={styles.productCard}>
+                <Link
+                  href={`/catalogo?produto=${product.slug}`}
+                  className={styles.imageLink}
+                  aria-label={`Ver ${product.name} no catálogo`}
+                >
+                  <div className={styles.imageShell}>
+                    <Image
+                      alt={product.cover.altText}
+                      fill
+                      sizes="(max-width: 720px) 90vw, (max-width: 1024px) 45vw, 280px"
+                      src={catalogImageUrl(product.cover, "catalog_card")}
+                      style={{ objectPosition: product.cover.objectPosition }}
+                      className={styles.productImage}
+                      unoptimized
+                    />
+                  </div>
+                </Link>
+
+                <div className={styles.cardInfo}>
+                  <span className={styles.cardMeta}>{descriptor || "Ótica Vision"}</span>
+                  <h3 className={styles.cardTitle}>{product.name}</h3>
+                  
+                  <div className={styles.cardActions}>
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.whatsappBtn}
+                      aria-label={`Consultar ${product.name} no WhatsApp`}
+                    >
+                      Consultar no WhatsApp
+                      <ArrowUpRight size={15} />
+                    </a>
+                  </div>
                 </div>
-                <CatalogPreviewRail products={supportingProducts} />
               </div>
-            ) : null}
-          </div>
-        ) : null}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

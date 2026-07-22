@@ -155,7 +155,7 @@ export function CatalogProductCard({
           </button>
 
           <div className={styles.focusedGrid}>
-            {/* Left/Stage Column: single FLIP frame with rounded white card + thumbnails below */}
+            {/* Left/Stage Column: single FLIP frame with rounded white card + direct CTA + thumbnails below */}
             <div className={styles.focusedStageCol}>
               <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
                 <ProductMediaShell presentation="gallery" className={styles.focusedMediaShell}>
@@ -169,6 +169,15 @@ export function CatalogProductCard({
                     unoptimized
                   />
                 </ProductMediaShell>
+              </div>
+
+              {/* Direct WhatsApp CTA Button immediately attached under the photo container */}
+              <div className={styles.stageActions}>
+                <ProductWhatsappButton
+                  href={whatsappUrl}
+                  label={`Falar sobre ${displayProduct.name} no WhatsApp`}
+                  productId={displayProduct.id}
+                />
               </div>
 
               {images.length > 1 && (
@@ -198,7 +207,7 @@ export function CatalogProductCard({
               )}
             </div>
 
-            {/* Right/Info Column: Brand, Title, Description, WhatsApp CTA, Canonical Link */}
+            {/* Right/Info Column: Brand, Title, Description, Canonical Link */}
             <div className={styles.focusedInfoCol}>
               {displayProduct.brand && (
                 <span className={styles.brand}>{displayProduct.brand.name}</span>
@@ -207,16 +216,11 @@ export function CatalogProductCard({
 
               <div className={styles.description}>
                 <p>
-                  Estrutura Premium selecionada. Entre em contato para consultar numerações, cores disponíveis e valores exatos desta armação com as suas lentes de grau feitas em nosso Laboratório Digital.
+                  Confecção própria em Araguaína - TO no Laboratório Digital da Ótica Vision. Entre em contato para consultar valores com suas lentes de grau.
                 </p>
               </div>
 
               <div className={styles.actions}>
-                <ProductWhatsappButton
-                  href={whatsappUrl}
-                  label={`Consultar ${displayProduct.name}`}
-                  productId={displayProduct.id}
-                />
                 <Link
                   href={productHref}
                   className={styles.focusedCanonicalLink}

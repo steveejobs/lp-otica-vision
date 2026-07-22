@@ -262,6 +262,11 @@
   width: 100%;
 }
 
+.stageActions {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
 /* Focused Media Shell: Clean solid white rounded card revealing the zoomed product */
 .focusedMediaShell {
   position: relative;

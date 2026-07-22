@@ -120,32 +120,6 @@ export function CatalogView({
                     );
                   })}
                 </nav>
-
-                {styleOptions.some(style => style.productCount > 0) ? (
-                  <nav className={styles.styleTabs} aria-label="Selecionar estilo">
-                    <Link
-                      aria-current={!query.style ? "page" : undefined}
-                      data-catalog-filter-link
-                      href={catalogHref(query, { page: 1, style: null, product: null })}
-                      scroll={false}
-                      className={styles.styleTab}
-                    >
-                      Todos
-                    </Link>
-                    {styleOptions.map((style) => style.productCount > 0 ? (
-                      <Link
-                        aria-current={query.style === style.slug ? "page" : undefined}
-                        data-catalog-filter-link
-                        href={catalogHref(query, { page: 1, style: style.slug, product: null })}
-                        key={style.id}
-                        scroll={false}
-                        className={styles.styleTab}
-                      >
-                        {style.label}
-                      </Link>
-                    ) : null)}
-                  </nav>
-                ) : null}
               </div>
 
               <div className={styles.headerRightCol}>
