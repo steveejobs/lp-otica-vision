@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/types/supabase";
 
+import { parseCatalogQuery } from "./query";
 import { CATALOG_CACHE_TAG } from "./cache";
 import { availabilityLabels } from "./format";
 import type {
@@ -51,6 +52,9 @@ function coverFromSearch(row: CatalogSearchRow): CatalogImage {
 }
 
 function cardFromSearch(row: CatalogSearchRow): CatalogProductCard {
+  const rawBadge = "editorial_badge" in row ? (row as { editorial_badge?: string }).editorial_badge : null;
+  const editorialBadge = (rawBadge === "featured" || rawBadge === "new") ? rawBadge : null;
+
   return {
     availability: showcaseAvailability(row.availability_status),
     brand: taxonomy(row.brand_id, row.brand_name, row.brand_slug),
@@ -59,6 +63,7 @@ function cardFromSearch(row: CatalogSearchRow): CatalogProductCard {
     cover: coverFromSearch(row),
     displayOrder: row.display_order,
     featured: row.featured,
+    editorialBadge,
     id: row.product_id,
     model: row.model ?? null,
     name: row.product_name,
@@ -419,5 +424,24 @@ export async function getPublishedCollectionId(slug: string) {
     .select("id")
     .eq("slug", slug)
     .maybeSingle();
-  return error ? null : data?.id ?? null;
+
+  if (error || !data) return null;
+  return data.id;
+}
+
+/**
+ * Returns products exclusively from the active Hero Editorial Collection.
+ * Published, with valid cover, ordered by position. Maximum 1 shown at a time.
+ */
+export async function getHeroEditorialProducts({ limit = 3 }: { limit?: number } = {}): Promise<CatalogProductCard[]> {
+  const supabase = createOptionalSupabasePublicClient();
+  if (!supabase) return [];
+
+  try {
+    const query = parseCatalogQuery({ colecao: "featured_collection", pagina: "1" });
+    const pageResult = await getCatalogPage(query);
+    return pageResult.products.slice(0, limit);
+  } catch {
+    return [];
+  }
 }

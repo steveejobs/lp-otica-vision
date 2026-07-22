@@ -1,0 +1,72 @@
+.container {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--vision-line, rgba(0, 0, 0, 0.08));
+  border-radius: 9999px;
+  padding: 0.6rem 1.1rem;
+  box-shadow: 0 4px 16px -4px rgba(25, 22, 20, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.searchWrapper:focus-within {
+  border-color: var(--vision-ink, #191614);
+  box-shadow: 0 6px 20px -4px rgba(25, 22, 20, 0.08);
+}
+
+.searchIcon {
+  color: var(--vision-muted, #767069);
+  flex-shrink: 0;
+  margin-right: 0.6rem;
+}
+
+.input {
+  all: unset;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--vision-ink, #191614);
+}
+
+.input::placeholder {
+  color: var(--vision-muted, #948d85);
+}
+
+.clearButton {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vision-muted, #767069);
+  padding: 0.2rem;
+  border-radius: 50%;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.clearButton:hover {
+  color: var(--vision-ink, #191614);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--vision-bronze, #7a6049);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

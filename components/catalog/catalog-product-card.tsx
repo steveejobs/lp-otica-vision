@@ -262,6 +262,14 @@ export function CatalogProductCard({
       >
         <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
           <ProductMediaShell presentation="catalog" className={styles.gridMedia}>
+            {product.editorialBadge && (
+              <span 
+                className={`${styles.editorialBadge} ${styles[product.editorialBadge]}`}
+                aria-label={`Selo: ${product.editorialBadge === "featured" ? "Destaque" : "Lançamento"}`}
+              >
+                {product.editorialBadge === "featured" ? "DESTAQUE" : "LANÇAMENTO"}
+              </span>
+            )}
             {/* Primary Cover Image */}
             <Image
               alt={product.cover.altText}

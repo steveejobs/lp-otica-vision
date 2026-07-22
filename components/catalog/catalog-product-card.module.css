@@ -1,4 +1,4 @@
-﻿.card {
+.card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -217,6 +217,35 @@
 .closeButton:hover {
   background: var(--vision-ink);
   color: var(--vision-paper);
+}
+
+/* === EDITORIAL BADGES (Minimalist Steel & Bronze) === */
+.editorialBadge {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 5;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.editorialBadge.featured {
+  background: var(--vision-paper, #fbf8f3);
+  color: var(--vision-ink, #191614);
+  border: 1px solid rgba(25, 22, 20, 0.12);
+}
+
+.editorialBadge.new {
+  background: var(--vision-ink, #191614);
+  color: var(--vision-paper, #fbf8f3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .focusedGrid {

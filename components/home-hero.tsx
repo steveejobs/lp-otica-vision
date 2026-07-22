@@ -39,12 +39,17 @@ function publishedHeroMedia(
   }));
 }
 
+import { getHeroEditorialProducts } from "@/lib/catalog/data";
+
 /** The published collection controls content; the hero controls its fixed-frame presentation. */
 export async function HomeHero() {
-  const published = await getHomeHeroMedia();
+  const [published, heroProducts] = await Promise.all([
+    getHomeHeroMedia(),
+    getHeroEditorialProducts({ limit: 3 }),
+  ]);
   const media = published.length
     ? publishedHeroMedia(published)
     : localHeroMedia();
 
-  return <VisionEditorialTakeover media={media} />;
+  return <VisionEditorialTakeover media={media} heroProducts={heroProducts} />;
 }

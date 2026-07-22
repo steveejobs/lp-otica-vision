@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 
@@ -5,6 +6,7 @@ import { CatalogAnalytics } from "@/components/catalog/catalog-analytics";
 import { CatalogProductCard } from "@/components/catalog/catalog-product-card";
 import { CatalogResultsMotion } from "@/components/catalog/catalog-results-motion";
 import { CatalogFocusManager } from "@/components/catalog/catalog-focus-manager";
+import { CatalogSearchBar } from "@/components/catalog/catalog-search-bar";
 import { FocusGridWrapper } from "@/components/catalog/focus-grid-wrapper";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -154,6 +156,10 @@ export function CatalogView({
 
           <section className={styles.results} aria-labelledby="catalog-results-title">
             <div className={styles.resultsInner}>
+              <Suspense fallback={null}>
+                <CatalogSearchBar />
+              </Suspense>
+
               {catalog.products.length === 0 ? (
                 <div className={styles.empty} data-motion-reveal data-motion-variant="section">
                   <h2>{hasFilters ? "Nenhum modelo nesta seleção." : "A vitrine está sendo atualizada."}</h2>

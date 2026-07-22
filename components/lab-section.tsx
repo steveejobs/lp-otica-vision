@@ -38,15 +38,15 @@ export function LabSection({ media }: LabSectionProps) {
       aria-labelledby="lab-section-title"
     >
       <div className={styles.copy}>
-        <p className={`eyebrow ${styles.eyebrow}`}>LAB. DIGITAL</p>
+        <p className={`eyebrow ${styles.eyebrow}`}>LABORATÓRIO DIGITAL</p>
         <h2 id="lab-section-title">Lentes que nascem na própria Vision.</h2>
         <p className={styles.description}>
-          Confecção própria em Araguaína - TO, com cuidado no acabamento.
+          Confecção própria em Araguaína - TO no Laboratório Digital da Ótica Vision.
         </p>
         <VisionButton
           analyticsEvent="lab_cta_clicked"
           analyticsLocation="lab_section"
-          href={LINKS.whatsapp}
+          href="https://api.whatsapp.com/send/?phone=5563992231522&text=Ol%C3%A1%2C+gostaria+de+informa%C3%A7%C3%B5es+sobre+lentes+no+Laborat%C3%B3rio+Digital+da+%C3%93tica+Vision.&type=phone_number&app_absent=0&utm_source=ig"
           icon={MessageCircle}
           external
           ariaLabel="Falar sobre lentes pelo WhatsApp"

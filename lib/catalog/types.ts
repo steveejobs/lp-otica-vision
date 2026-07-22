@@ -20,6 +20,8 @@ export type CatalogImage = {
   width: number;
 };
 
+export type EditorialBadgeType = "featured" | "new" | null;
+
 export type CatalogProductCard = {
   availability: CatalogAvailability;
   brand: CatalogTaxonomy | null;
@@ -28,6 +30,7 @@ export type CatalogProductCard = {
   cover: CatalogImage;
   displayOrder: number;
   featured: boolean;
+  editorialBadge?: EditorialBadgeType;
   id: string;
   model: string | null;
   name: string;
