@@ -235,12 +235,12 @@
   transition: grid-template-columns 0.3s ease;
 }
 
-/* === CLEAN COMPACT SHOWROOM FOCUS LAYOUT === */
+/* === STICKY 50% SPLIT SCREEN SHOWROOM FOCUS LAYOUT (Desktop >= 961px) === */
 @media (min-width: 961px) {
   .grid[data-catalog-focus-active="true"] {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(1rem, 2vw, 2rem);
+    grid-template-columns: 50% repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
     align-items: start;
   }
 }

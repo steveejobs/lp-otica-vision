@@ -178,11 +178,15 @@
 
 @media (min-width: 961px) {
   .card[data-mode="focused"] {
-    grid-column: span 2;
-    position: relative;
+    grid-column: 1 / 2;
+    grid-row: 1 / span 999;
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
     width: 100%;
     margin-bottom: 0;
-    align-self: start;
   }
 }
 
