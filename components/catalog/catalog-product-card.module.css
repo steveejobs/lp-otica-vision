@@ -27,6 +27,7 @@
   text-align: left;
   width: 100%;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .externalLink {
@@ -63,7 +64,7 @@
 .gridMedia img {
   object-fit: contain !important;
   mix-blend-mode: multiply !important;
-  filter: none !important; /* Zero artificial margin shadow: 100% clean paper cutout */
+  filter: none !important;
 }
 
 .coverImage,
@@ -147,7 +148,7 @@
   }
 }
 
-/* === STICKY SHOWROOM FOCUS MODE: Left 50% Sticky Column up to top level === */
+/* === STICKY SHOWROOM FOCUS MODE === */
 .card[data-mode="focused"] {
   background: var(--vision-paper);
   border: 1px solid var(--vision-line);
@@ -180,7 +181,7 @@
     grid-column: 1 / 2;
     grid-row: 1 / span 999;
     position: sticky;
-    top: 1rem; /* Sticky up to top level under header */
+    top: 1rem;
     align-self: start;
     max-height: calc(100vh - 2rem);
     overflow-y: auto;
@@ -210,6 +211,7 @@
   border: 1px solid var(--vision-line);
   cursor: pointer;
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
 .closeButton:hover {
@@ -277,6 +279,7 @@
   background: #ffffff;
   opacity: 0.65;
   transition: opacity 0.2s ease, border-color 0.2s ease;
+  touch-action: manipulation;
 }
 
 .thumbnailBtn[aria-pressed="true"] {
@@ -356,14 +359,61 @@
   }
 }
 
+/* === MOBILE ERGONOMIC SHOWROOM FOCUS (< 960px) === */
+/* Compact sticky top stage (~180px height max) so 75% of mobile viewport is open for scrolling and tapping other products! */
 @media (max-width: 960px) {
   .card[data-mode="focused"] {
     position: sticky;
-    top: 3.5rem;
+    top: 0.5rem;
     z-index: 100;
     width: 100%;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 12px 32px -8px rgba(25, 22, 20, 0.15);
+    padding: 0.85rem;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px -8px rgba(25, 22, 20, 0.18);
+    max-height: 220px;
+    overflow: hidden;
+  }
+
+  .focusedGrid {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 0.85rem;
+    align-items: center;
+  }
+
+  .focusedMediaShell {
+    aspect-ratio: 1 / 1;
+    padding: 0.4rem;
+    border-radius: 10px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .brand {
+    font-size: 0.7rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .description {
+    display: none; /* Hidden in compact mobile sticky view to save viewport space */
+  }
+
+  .thumbnailRail {
+    display: none; /* Kept compact on mobile top bar */
+  }
+
+  .focusedCanonicalLink {
+    display: none;
+  }
+
+  .closeButton {
+    top: -0.1rem;
+    right: -0.1rem;
+    width: 32px;
+    height: 32px;
   }
 }
 

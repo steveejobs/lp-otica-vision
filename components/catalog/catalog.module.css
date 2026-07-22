@@ -313,6 +313,7 @@
   }
 }
 
+/* === MOBILE ERGONOMIC GRID SHOWROOM FOCUS (< 720px) === */
 @media (max-width: 720px) {
   .premiumHeader {
     padding-top: 1.5rem;
@@ -354,9 +355,11 @@
     scrollbar-width: none;
   }
 
+  /* When a product is focused on mobile: Grid becomes a 2-column scrollable grid below the compact top sticky bar! */
   .grid[data-catalog-focus-active="true"] {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
     width: 100%;
     margin-left: 0;
     padding: 0;
@@ -376,5 +379,9 @@
   .grid[data-catalog-focus-active="true"] > [data-catalog-product-id] {
     width: 100%;
     min-width: 100%;
+  }
+
+  .grid[data-catalog-focus-active="true"] > [data-mode="focused"] {
+    grid-column: 1 / -1;
   }
 }
