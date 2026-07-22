@@ -155,7 +155,7 @@ export function CatalogProductCard({
           </button>
 
           <div className={styles.focusedGrid}>
-            {/* Left/Stage Column: single FLIP frame with rounded white card + direct CTA + thumbnails below */}
+            {/* Left/Stage Column: single FLIP frame with rounded white card + thumbnails below */}
             <div className={styles.focusedStageCol}>
               <div data-flip-frame className={styles.flipFrame} ref={flipFrameRef}>
                 <ProductMediaShell presentation="gallery" className={styles.focusedMediaShell}>
@@ -169,15 +169,6 @@ export function CatalogProductCard({
                     unoptimized
                   />
                 </ProductMediaShell>
-              </div>
-
-              {/* Direct WhatsApp CTA Button immediately attached under the photo container */}
-              <div className={styles.stageActions}>
-                <ProductWhatsappButton
-                  href={whatsappUrl}
-                  label={`Falar sobre ${displayProduct.name} no WhatsApp`}
-                  productId={displayProduct.id}
-                />
               </div>
 
               {images.length > 1 && (
@@ -207,7 +198,7 @@ export function CatalogProductCard({
               )}
             </div>
 
-            {/* Right/Info Column: Brand, Title, Description, Canonical Link */}
+            {/* Right/Info Column: Brand, Title, Description, WhatsApp CTA, Canonical Link */}
             <div className={styles.focusedInfoCol}>
               {displayProduct.brand && (
                 <span className={styles.brand}>{displayProduct.brand.name}</span>
@@ -216,11 +207,16 @@ export function CatalogProductCard({
 
               <div className={styles.description}>
                 <p>
-                  Confecção própria em Araguaína - TO no Laboratório Digital da Ótica Vision. Entre em contato para consultar valores com suas lentes de grau.
+                  Estrutura Premium selecionada. Entre em contato para consultar numerações, cores disponíveis e valores exatos desta armação com as suas lentes de grau feitas em nosso Laboratório Digital.
                 </p>
               </div>
 
               <div className={styles.actions}>
+                <ProductWhatsappButton
+                  href={whatsappUrl}
+                  label={`Consultar ${displayProduct.name}`}
+                  productId={displayProduct.id}
+                />
                 <Link
                   href={productHref}
                   className={styles.focusedCanonicalLink}
@@ -242,8 +238,6 @@ export function CatalogProductCard({
       aria-hidden={clone || undefined}
       className={styles.card}
       data-mode="grid"
-      data-motion-reveal
-      data-motion-variant="catalog-card"
       data-catalog-product-id={clone ? undefined : product.id}
       data-catalog-product-name={clone ? undefined : product.name}
       data-catalog-product-slug={clone ? undefined : product.slug}
@@ -315,6 +309,7 @@ export function CatalogProductCard({
 
         <div className={styles.summary}>
           <h3>{product.name}</h3>
+          <p className={styles.styleName}>{styleText}</p>
           <span className={styles.cta}>Visualizar modelo</span>
         </div>
       </button>

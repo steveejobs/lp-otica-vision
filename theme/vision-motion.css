@@ -46,9 +46,9 @@
 
 [data-motion-variant="media"],
 [data-motion-variant="section"] {
-  --motion-distance: 42px;
-  --motion-duration: 1.1s;
-  --motion-child-distance: 30px;
+  --motion-distance: 38px;
+  --motion-duration: 1.08s;
+  --motion-child-distance: 28px;
 }
 
 [data-motion-variant="section"] {
@@ -56,11 +56,11 @@
 }
 
 [data-motion-variant="catalog-card"] {
-  --motion-distance: 36px;
-  --motion-duration: 700ms;
-  --motion-entry-scale: 0.978;
-  --motion-media-scale: 1.048;
-  transform-origin: 50% 20%;
+  --motion-distance: 34px;
+  --motion-duration: 480ms;
+  --motion-entry-scale: 0.982;
+  --motion-media-scale: 1.045;
+  transform-origin: 50% 18%;
 }
 
 [data-motion-reveal] :where(.eyebrow, h1, h2, h3),

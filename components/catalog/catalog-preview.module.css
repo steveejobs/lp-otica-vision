@@ -1,8 +1,6 @@
-﻿/* =========================================================
-   CATALOG PREVIEW — Home Section
-   Identidade editorial: beige quente, precisão metálica
-   Tokens: --vision-paper, --vision-champagne, --vision-ink,
-           --vision-steel-dark, --vision-bronze, --vision-muted
+/* =========================================================
+   CATALOG PREVIEW — Home Page Section
+   Design System V2: Editorial Quente com Precisão Metálica
    ========================================================= */
 
 .section {
@@ -13,22 +11,10 @@
   overflow: hidden;
 }
 
-/* Linha vertical decorativa discreta (editorial) */
-.section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  background: rgba(199, 173, 142, 0.18);
-  pointer-events: none;
-}
-
 .inner {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2.25rem;
   width: min(88vw, 1320px);
   margin-inline: auto;
 }
@@ -38,7 +24,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
   border-bottom: 1px solid var(--vision-line);
 }
 
@@ -54,13 +40,13 @@
 .headerTitleGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .headerTitleGroup h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0;
@@ -70,7 +56,7 @@
 .headerAside {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: flex-start;
 }
 
@@ -84,18 +70,17 @@
 
 .headerAside p {
   margin: 0;
-  max-width: 22rem;
+  max-width: 24rem;
   color: var(--vision-muted);
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   line-height: 1.5;
 }
 
-/* Botão "Ver catálogo completo" — discreto, sem preenchimento sólido preto */
-.cta {
+.ctaHeader {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.6rem 1rem;
+  padding: 0.55rem 0.95rem;
   border: 1px solid var(--vision-champagne, #c7ad8e);
   border-radius: 6px;
   background: transparent;
@@ -104,165 +89,271 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   text-decoration: none;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cta:hover {
+.ctaHeader:hover {
   background: var(--vision-champagne, #c7ad8e);
   color: var(--vision-ink);
+}
+
+/* ---- GRID: 2 COLUNAS NO MOBILE, 4 COLUNAS NO DESKTOP ---- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* ---- CARD COMPACTO EDITORIAL ---- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--vision-bg-soft, #f4eee6);
+  border: 1px solid rgba(199, 173, 142, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease;
+
+  /* Staggered entrance animation */
+  opacity: 0;
+  animation: cardStaggerIn 650ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--card-index, 0) * 90ms + 100ms);
+}
+
+@keyframes cardStaggerIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px -6px rgba(25, 22, 20, 0.1);
   border-color: var(--vision-champagne, #c7ad8e);
 }
 
-/* ---- GRID 4 COLUNAS ---- */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.25rem;
-}
-
-@media (min-width: 560px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 960px) {
-  .grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-/* ---- CARD EDITORIAL — sem card branco genérico ---- */
-.productCard {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  overflow: hidden;
-
-  /* Animação de entrada escalonada (stagger via --delay) */
-  opacity: 0;
-  transform: translateY(18px);
-  animation: cardReveal 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  animation-delay: var(--card-delay, 0ms);
-}
-
-.productCard:nth-child(1) { --card-delay: 0ms; }
-.productCard:nth-child(2) { --card-delay: 80ms; }
-.productCard:nth-child(3) { --card-delay: 160ms; }
-.productCard:nth-child(4) { --card-delay: 240ms; }
-
-@keyframes cardReveal {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Respeitar prefers-reduced-motion */
-@media (prefers-reduced-motion: reduce) {
-  .productCard {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-
-/* Linha horizontal editorial na base do card */
-.productCard::after {
-  content: "";
-  display: block;
-  height: 1px;
-  background: var(--vision-line);
-  margin-top: 1rem;
-  transition: background 0.3s ease;
-}
-
-.productCard:hover::after {
-  background: var(--vision-champagne, #c7ad8e);
-}
-
-.imageLink {
-  all: unset;
-  cursor: pointer;
-  display: block;
-  width: 100%;
-}
-
-.imageShell {
+/* CONTAINER DA IMAGEM */
+.mediaContainer {
   position: relative;
   aspect-ratio: 4 / 3;
   width: 100%;
-  background: var(--vision-bg-soft, #f4eee6);
+  background: #ffffff;
   overflow: hidden;
 }
 
-/* Zoom editorial na foto ao hover */
+.imageLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .productImage {
   object-fit: contain !important;
   mix-blend-mode: multiply !important;
-  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0.5rem;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.productCard:hover .productImage {
+.card:hover .productImage {
   transform: scale(1.06);
 }
 
-/* ---- INFORMAÇÕES DO CARD ---- */
-.cardInfo {
+/* OVERLAY DE AÇÕES RÁPIDAS SOBRE A FOTO (DESKTOP HOVER) */
+.mediaActions {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 0.85rem 0 0.6rem;
+  gap: 0.4rem;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
-.cardMeta {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--vision-steel-dark, #8f969d);
-  margin-bottom: 0.3rem;
+.card:hover .mediaActions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-.cardTitle {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 400;
-  color: var(--vision-ink);
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-
-.cardActions {
-  margin-top: 0.75rem;
-}
-
-/* Botão WhatsApp — bronze/champagne, não preto sólido */
-.whatsappBtn {
+.quickViewBtn,
+.quickWhatsappBtn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.3rem;
-  padding: 0.55rem 0;
-  border: none;
-  border-bottom: 1px solid var(--vision-champagne, #c7ad8e);
-  border-radius: 0;
-  background: transparent;
-  color: var(--vision-bronze, #7a6049);
-  font-size: 0.75rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 5px;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-decoration: none;
-  text-transform: uppercase;
-  transition: color 0.2s ease, border-color 0.2s ease, gap 0.2s ease;
-  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
 }
 
-.whatsappBtn:hover {
+.quickViewBtn {
+  background: rgba(25, 22, 20, 0.85);
+  color: #ffffff;
+}
+
+.quickViewBtn:hover {
+  background: var(--vision-ink, #191614);
+}
+
+.quickWhatsappBtn {
+  background: rgba(37, 211, 102, 0.9);
+  color: #ffffff;
+}
+
+.quickWhatsappBtn:hover {
+  background: #20bd5a;
+}
+
+/* CORPO DO CARD */
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.metaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.brandTag {
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--vision-steel-dark, #8f969d);
+}
+
+.productTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.productTitle a {
+  color: var(--vision-ink);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.productTitle a:hover {
+  color: var(--vision-bronze, #7a6049);
+}
+
+/* BOTÃO WHATSAPP DIRETO NO FOOTER DO CARD */
+.cardWhatsappCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--vision-champagne, #c7ad8e);
+  color: var(--vision-bronze, #7a6049);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+.waIcon {
   color: #25d366;
+  transition: transform 0.25s ease;
+}
+
+.cardWhatsappCta:hover {
+  background: #25d366;
   border-color: #25d366;
-  gap: 0.5rem;
+  color: #ffffff;
+}
+
+.cardWhatsappCta:hover .waIcon {
+  color: #ffffff;
+  transform: scale(1.15);
+}
+
+/* ---- MOBILE SPECIFIC REFINEMENTS (< 600px) ---- */
+@media (max-width: 599px) {
+  .inner {
+    gap: 1.5rem;
+    width: 92vw;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .cardBody {
+    padding: 0.65rem;
+    gap: 0.5rem;
+  }
+
+  .productTitle {
+    font-size: 0.92rem;
+  }
+
+  .mediaActions {
+    display: none; /* No mobile os botões principais abaixo da foto já resolvem com toque direto */
+  }
+
+  .cardWhatsappCta span {
+    font-size: 0.68rem;
+  }
+
+  .cardWhatsappCta {
+    padding: 0.5rem 0.3rem;
+  }
 }
